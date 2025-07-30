@@ -106,7 +106,26 @@ function processConfig(configLines) {
     // Salvar o arquivo atualizado
     fs.writeFileSync(path.join(__dirname, 'src', 'firebase', 'config.js'), updatedContent);
     
+    // Criar arquivo .env
+    const envContent = `# Firebase Configuration
+REACT_APP_FIREBASE_API_KEY="${configObj.apiKey}"
+REACT_APP_FIREBASE_AUTH_DOMAIN="${configObj.authDomain}"
+REACT_APP_FIREBASE_PROJECT_ID="${configObj.projectId}"
+REACT_APP_FIREBASE_STORAGE_BUCKET="${configObj.storageBucket}"
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID="${configObj.messagingSenderId}"
+REACT_APP_FIREBASE_APP_ID="${configObj.appId}"
+REACT_APP_FIREBASE_MEASUREMENT_ID="${configObj.measurementId || ''}"
+
+# App Configuration
+REACT_APP_NAME=SGL - Sistema de Gestão de Logística
+REACT_APP_VERSION=1.0.0
+REACT_APP_ENVIRONMENT=production
+`;
+    
+    fs.writeFileSync(path.join(__dirname, '.env'), envContent);
+    
     console.log('\n✅ Configuração do Firebase atualizada com sucesso!');
+    console.log('✅ Arquivo .env criado com as variáveis de ambiente!');
     console.log('\n🎉 Próximos passos:');
     console.log('1. Execute: npm start');
     console.log('2. Acesse: http://localhost:3000');
@@ -114,6 +133,7 @@ function processConfig(configLines) {
     console.log('4. Para criar um admin, vá em Firebase Console → Authentication → Users');
     console.log('   - Clique em "Add user"');
     console.log('   - Depois vá em Firestore → users → [user-id] → role: "admin"');
+    console.log('\n🔒 Segurança: O arquivo .env foi criado e está no .gitignore');
     
   } catch (error) {
     console.error('\n❌ Erro ao atualizar configuração:', error.message);

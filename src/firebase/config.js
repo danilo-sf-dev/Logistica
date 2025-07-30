@@ -4,15 +4,15 @@ import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-// Configuração do Firebase - Substitua com suas credenciais
+// Configuração do Firebase - Usando variáveis de ambiente
 const firebaseConfig = {
-  apiKey: "AIzaSyCPDN1WXv_M7N1AX0kphleDCxug7eJ3TcQ",
-  authDomain: "logistica-c7afc.firebaseapp.com",
-  projectId: "logistica-c7afc",
-  storageBucket: "logistica-c7afc.firebasestorage.app",
-  messagingSenderId: "744598379245",
-  appId: "1:744598379245:web:7432cd7d659f8ee7774ae4",
-  measurementId: "G-98ZBQM67V5",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 // Inicializar Firebase
