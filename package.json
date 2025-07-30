@@ -28,6 +28,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "setup": "node setup.js",
+    "setup-firebase": "node setup-firebase.js",
     "deploy": "npm run build && firebase deploy"
   },
   "eslintConfig": {

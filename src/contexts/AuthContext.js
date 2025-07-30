@@ -4,7 +4,9 @@ import {
   signOut, 
   onAuthStateChanged,
   createUserWithEmailAndPassword,
-  updateProfile
+  updateProfile,
+  signInWithPopup,
+  GoogleAuthProvider
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
@@ -24,10 +26,44 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Login
+  // Login com email/senha
   const login = async (email, password) => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Login com Google
+  const loginWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      
+      // Verificar se o usuário já existe no Firestore
+      const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+      
+      if (!userDoc.exists()) {
+        // Criar novo usuário no Firestore
+        await setDoc(doc(db, 'users', result.user.uid), {
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName,
+          photoURL: result.user.photoURL,
+          role: 'user', // Role padrão
+          createdAt: new Date(),
+          lastLogin: new Date(),
+          provider: 'google'
+        });
+      } else {
+        // Atualizar último login
+        await setDoc(doc(db, 'users', result.user.uid), {
+          lastLogin: new Date()
+        }, { merge: true });
+      }
+      
       return result;
     } catch (error) {
       throw error;
@@ -58,7 +94,8 @@ export const AuthProvider = ({ children }) => {
         displayName,
         role,
         createdAt: new Date(),
-        lastLogin: new Date()
+        lastLogin: new Date(),
+        provider: 'email'
       });
 
       return result;
@@ -113,6 +150,7 @@ export const AuthProvider = ({ children }) => {
     currentUser,
     userProfile,
     login,
+    loginWithGoogle,
     logout,
     signup,
     updateUserProfile,

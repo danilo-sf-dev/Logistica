@@ -1,17 +1,18 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 // Configuração do Firebase - Substitua com suas credenciais
 const firebaseConfig = {
-  apiKey: "sua-api-key",
-  authDomain: "seu-projeto.firebaseapp.com",
-  projectId: "seu-projeto",
-  storageBucket: "seu-projeto.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "seu-app-id"
+  apiKey: "AIzaSyCPDN1WXv_M7N1AX0kphleDCxug7eJ3TcQ",
+  authDomain: "logistica-c7afc.firebaseapp.com",
+  projectId: "logistica-c7afc",
+  storageBucket: "logistica-c7afc.firebasestorage.app",
+  messagingSenderId: "744598379245",
+  appId: "1:744598379245:web:7432cd7d659f8ee7774ae4",
+  measurementId: "G-98ZBQM67V5",
 };
 
 // Inicializar Firebase
@@ -29,14 +30,14 @@ export const messaging = getMessaging(app);
 export const requestNotificationPermission = async () => {
   try {
     const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
+    if (permission === "granted") {
       const token = await getToken(messaging, {
-        vapidKey: 'seu-vapid-key'
+        vapidKey: "seu-vapid-key",
       });
       return token;
     }
   } catch (error) {
-    console.error('Erro ao solicitar permissão de notificação:', error);
+    console.error("Erro ao solicitar permissão de notificação:", error);
   }
 };
 
@@ -48,4 +49,4 @@ export const onMessageListener = () =>
     });
   });
 
-export default app; 
+export default app;
