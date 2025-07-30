@@ -1,148 +1,166 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, Truck, Calendar, Wrench } from 'lucide-react';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import { useNotification } from '../../contexts/NotificationContext';
+import React, { useState, useEffect, useCallback } from "react";
+import { Plus, Edit, Trash2, Search, Truck } from "lucide-react";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { useNotification } from "../../contexts/NotificationContext";
 
 const Veiculos = () => {
   const [veiculos, setVeiculos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingVeiculo, setEditingVeiculo] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
-    placa: '',
-    modelo: '',
-    marca: '',
-    ano: '',
-    capacidade: '',
-    status: 'disponivel',
-    unidadeNegocio: 'frigorifico',
-    ultimaManutencao: '',
-    proximaManutencao: '',
-    motorista: ''
+    placa: "",
+    modelo: "",
+    marca: "",
+    ano: "",
+    capacidade: "",
+    status: "disponivel",
+    unidadeNegocio: "frigorifico",
+    ultimaManutencao: "",
+    proximaManutencao: "",
+    motorista: "",
   });
 
-  useEffect(() => {
-    fetchVeiculos();
-  }, []);
-
-  const fetchVeiculos = async () => {
+  const fetchVeiculos = useCallback(async () => {
     try {
-      const snapshot = await getDocs(collection(db, 'veiculos'));
-      const veiculosData = snapshot.docs.map(doc => ({
+      const snapshot = await getDocs(collection(db, "veiculos"));
+      const veiculosData = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setVeiculos(veiculosData);
       setLoading(false);
     } catch (error) {
-      console.error('Erro ao buscar veículos:', error);
-      showNotification('Erro ao carregar veículos', 'error');
+      console.error("Erro ao buscar veículos:", error);
+      showNotification("Erro ao carregar veículos", "error");
       setLoading(false);
     }
-  };
+  }, [showNotification]);
+
+  useEffect(() => {
+    fetchVeiculos();
+  }, [fetchVeiculos]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingVeiculo) {
-        await updateDoc(doc(db, 'veiculos', editingVeiculo.id), {
+        await updateDoc(doc(db, "veiculos", editingVeiculo.id), {
           ...formData,
-          dataAtualizacao: new Date()
+          dataAtualizacao: new Date(),
         });
-        showNotification('Veículo atualizado com sucesso!', 'success');
+        showNotification("Veículo atualizado com sucesso!", "success");
       } else {
-        await addDoc(collection(db, 'veiculos'), {
+        await addDoc(collection(db, "veiculos"), {
           ...formData,
           dataCriacao: new Date(),
-          dataAtualizacao: new Date()
+          dataAtualizacao: new Date(),
         });
-        showNotification('Veículo cadastrado com sucesso!', 'success');
+        showNotification("Veículo cadastrado com sucesso!", "success");
       }
-      
+
       setShowModal(false);
       setEditingVeiculo(null);
       resetForm();
       fetchVeiculos();
     } catch (error) {
-      console.error('Erro ao salvar veículo:', error);
-      showNotification('Erro ao salvar veículo', 'error');
+      console.error("Erro ao salvar veículo:", error);
+      showNotification("Erro ao salvar veículo", "error");
     }
   };
 
   const handleEdit = (veiculo) => {
     setEditingVeiculo(veiculo);
     setFormData({
-      placa: veiculo.placa || '',
-      modelo: veiculo.modelo || '',
-      marca: veiculo.marca || '',
-      ano: veiculo.ano || '',
-      capacidade: veiculo.capacidade || '',
-      status: veiculo.status || 'disponivel',
-      unidadeNegocio: veiculo.unidadeNegocio || 'frigorifico',
-      ultimaManutencao: veiculo.ultimaManutencao || '',
-      proximaManutencao: veiculo.proximaManutencao || '',
-      motorista: veiculo.motorista || ''
+      placa: veiculo.placa || "",
+      modelo: veiculo.modelo || "",
+      marca: veiculo.marca || "",
+      ano: veiculo.ano || "",
+      capacidade: veiculo.capacidade || "",
+      status: veiculo.status || "disponivel",
+      unidadeNegocio: veiculo.unidadeNegocio || "frigorifico",
+      ultimaManutencao: veiculo.ultimaManutencao || "",
+      proximaManutencao: veiculo.proximaManutencao || "",
+      motorista: veiculo.motorista || "",
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este veículo?')) {
+    if (window.confirm("Tem certeza que deseja excluir este veículo?")) {
       try {
-        await deleteDoc(doc(db, 'veiculos', id));
-        showNotification('Veículo excluído com sucesso!', 'success');
+        await deleteDoc(doc(db, "veiculos", id));
+        showNotification("Veículo excluído com sucesso!", "success");
         fetchVeiculos();
       } catch (error) {
-        console.error('Erro ao excluir veículo:', error);
-        showNotification('Erro ao excluir veículo', 'error');
+        console.error("Erro ao excluir veículo:", error);
+        showNotification("Erro ao excluir veículo", "error");
       }
     }
   };
 
   const resetForm = () => {
     setFormData({
-      placa: '',
-      modelo: '',
-      marca: '',
-      ano: '',
-      capacidade: '',
-      status: 'disponivel',
-      unidadeNegocio: 'frigorifico',
-      ultimaManutencao: '',
-      proximaManutencao: '',
-      motorista: ''
+      placa: "",
+      modelo: "",
+      marca: "",
+      ano: "",
+      capacidade: "",
+      status: "disponivel",
+      unidadeNegocio: "frigorifico",
+      ultimaManutencao: "",
+      proximaManutencao: "",
+      motorista: "",
     });
   };
 
-  const filteredVeiculos = veiculos.filter(veiculo =>
-    veiculo.placa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    veiculo.modelo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    veiculo.marca?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredVeiculos = veiculos.filter(
+    (veiculo) =>
+      veiculo.placa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      veiculo.modelo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      veiculo.marca?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'disponivel': return 'bg-green-100 text-green-800';
-      case 'em_uso': return 'bg-blue-100 text-blue-800';
-      case 'manutencao': return 'bg-yellow-100 text-yellow-800';
-      case 'inativo': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "disponivel":
+        return "bg-green-100 text-green-800";
+      case "em_uso":
+        return "bg-blue-100 text-blue-800";
+      case "manutencao":
+        return "bg-yellow-100 text-yellow-800";
+      case "inativo":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'disponivel': return 'Disponível';
-      case 'em_uso': return 'Em Uso';
-      case 'manutencao': return 'Manutenção';
-      case 'inativo': return 'Inativo';
-      default: return 'Desconhecido';
+      case "disponivel":
+        return "Disponível";
+      case "em_uso":
+        return "Em Uso";
+      case "manutencao":
+        return "Manutenção";
+      case "inativo":
+        return "Inativo";
+      default:
+        return "Desconhecido";
     }
   };
 
@@ -232,7 +250,9 @@ const Veiculos = () => {
                     </div>
                   </td>
                   <td className="table-cell">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(veiculo.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(veiculo.status)}`}
+                    >
                       {getStatusText(veiculo.status)}
                     </span>
                   </td>
@@ -270,27 +290,35 @@ const Veiculos = () => {
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingVeiculo ? 'Editar Veículo' : 'Novo Veículo'}
+                {editingVeiculo ? "Editar Veículo" : "Novo Veículo"}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Placa</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Placa
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.placa}
-                      onChange={(e) => setFormData({...formData, placa: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, placa: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Ano</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Ano
+                    </label>
                     <input
                       type="number"
                       required
                       value={formData.ano}
-                      onChange={(e) => setFormData({...formData, ano: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, ano: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
@@ -298,22 +326,30 @@ const Veiculos = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Marca</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Marca
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.marca}
-                      onChange={(e) => setFormData({...formData, marca: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, marca: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Modelo</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Modelo
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.modelo}
-                      onChange={(e) => setFormData({...formData, modelo: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, modelo: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
@@ -321,20 +357,28 @@ const Veiculos = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Capacidade (kg)</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Capacidade (kg)
+                    </label>
                     <input
                       type="number"
                       required
                       value={formData.capacidade}
-                      onChange={(e) => setFormData({...formData, capacidade: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, capacidade: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Status</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Status
+                    </label>
                     <select
                       value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, status: e.target.value })
+                      }
                       className="input-field"
                     >
                       <option value="disponivel">Disponível</option>
@@ -346,10 +390,17 @@ const Veiculos = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Unidade de Negócio</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Unidade de Negócio
+                  </label>
                   <select
                     value={formData.unidadeNegocio}
-                    onChange={(e) => setFormData({...formData, unidadeNegocio: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        unidadeNegocio: e.target.value,
+                      })
+                    }
                     className="input-field"
                   >
                     <option value="frigorifico">Frigorífico</option>
@@ -359,20 +410,34 @@ const Veiculos = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Última Manutenção</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Última Manutenção
+                    </label>
                     <input
                       type="date"
                       value={formData.ultimaManutencao}
-                      onChange={(e) => setFormData({...formData, ultimaManutencao: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          ultimaManutencao: e.target.value,
+                        })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Próxima Manutenção</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Próxima Manutenção
+                    </label>
                     <input
                       type="date"
                       value={formData.proximaManutencao}
-                      onChange={(e) => setFormData({...formData, proximaManutencao: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          proximaManutencao: e.target.value,
+                        })
+                      }
                       className="input-field"
                     />
                   </div>
@@ -390,11 +455,8 @@ const Veiculos = () => {
                   >
                     Cancelar
                   </button>
-                  <button
-                    type="submit"
-                    className="btn-primary"
-                  >
-                    {editingVeiculo ? 'Atualizar' : 'Cadastrar'}
+                  <button type="submit" className="btn-primary">
+                    {editingVeiculo ? "Atualizar" : "Cadastrar"}
                   </button>
                 </div>
               </form>
@@ -406,4 +468,4 @@ const Veiculos = () => {
   );
 };
 
-export default Veiculos; 
+export default Veiculos;

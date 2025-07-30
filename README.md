@@ -7,7 +7,7 @@ Sistema web completo para gestão de logística, desenvolvido com React e Fireba
 **🌐 URL do Sistema:** https://logistica-c7afc.web.app  
 **🔐 Login:** Funcionando com Google Authentication  
 **📊 Dashboard:** Totalmente operacional  
-**🚛 Módulos:** Todos funcionando  
+**🚛 Módulos:** Todos funcionando
 
 ## 🚀 Funcionalidades
 
@@ -50,11 +50,13 @@ npm install
 **IMPORTANTE:** Por segurança, as credenciais do Firebase devem estar em variáveis de ambiente.
 
 1. **Copie o arquivo de exemplo:**
+
 ```bash
 cp env.example .env
 ```
 
 2. **Edite o arquivo `.env`** com suas credenciais do Firebase:
+
 ```env
 # Firebase Configuration
 REACT_APP_FIREBASE_API_KEY=sua-api-key
@@ -77,6 +79,7 @@ npm run setup-firebase
 ```
 
 Siga as instruções do script para:
+
 1. Habilitar autenticação Google no Firebase Console
 2. Adicionar aplicação web
 3. Configurar Firestore Database
@@ -98,6 +101,24 @@ npm start
 ```
 
 Acesse: http://localhost:3000
+
+### 5. Comandos de Formatação e Linting
+
+```bash
+# Verificar e corrigir problemas do ESLint
+npm run lint
+
+# Formatar código com Prettier
+npm run format
+
+# Verificar formatação sem alterar
+npm run format:check
+
+# Corrigir todos os warnings do ESLint
+npm run lint:fix
+```
+
+**Nota:** O projeto está configurado com ESLint e Prettier para manter a qualidade do código.
 
 ## 🚀 Deploy
 
@@ -271,6 +292,7 @@ Este projeto é desenvolvido para uso interno da empresa.
 ## 🚀 Configuração Final Realizada
 
 ### Firebase Console
+
 - ✅ Projeto "logistica-c7afc" criado
 - ✅ Google Authentication habilitado
 - ✅ Firestore Database criado em modo teste
@@ -278,6 +300,7 @@ Este projeto é desenvolvido para uso interno da empresa.
 - ✅ Aplicação web registrada
 
 ### Credenciais Configuradas
+
 ```javascript
 const firebaseConfig = {
   apiKey: "AIzaSyCPDNlWXv_M7NlAX0kphleDCxug7eJ3TcQ",
@@ -286,11 +309,12 @@ const firebaseConfig = {
   storageBucket: "logistica-c7afc.firebasestorage.app",
   messagingSenderId: "744598379245",
   appId: "1:744598379245:web:7432cd7d659f8ee7774ae4",
-  measurementId: "G-98ZBQM67V5"
+  measurementId: "G-98ZBQM67V5",
 };
 ```
 
 ### Deploy
+
 - ✅ Build otimizado realizado
 - ✅ Firebase Hosting configurado
 - ✅ Sistema online em https://logistica-c7afc.web.app

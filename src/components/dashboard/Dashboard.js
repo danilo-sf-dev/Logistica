@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Users,
   Truck,
@@ -6,8 +6,6 @@ import {
   Calendar,
   TrendingUp,
   TrendingDown,
-  Clock,
-  MapPin,
 } from "lucide-react";
 import {
   BarChart,
@@ -21,7 +19,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/config";
 
 const Dashboard = () => {
@@ -35,11 +33,7 @@ const Dashboard = () => {
   const [rotasData, setRotasData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       // Buscar dados básicos
       const motoristasSnapshot = await getDocs(collection(db, "motoristas"));
@@ -110,7 +104,11 @@ const Dashboard = () => {
       console.error("Erro ao buscar dados do dashboard:", error);
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const StatCard = ({ title, value, icon: Icon, trend, trendValue, color }) => (
     <div className="card">

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Plus,
   Edit,
   Trash2,
   Search,
   Map,
-  MapPin,
-  Calendar,
-  Truck,
+  
+  
+  
 } from "lucide-react";
 import {
   collection,
@@ -41,11 +41,7 @@ const Rotas = () => {
     observacoes: "",
   });
 
-  useEffect(() => {
-    fetchRotas();
-  }, []);
-
-  const fetchRotas = async () => {
+  const fetchRotas = useCallback(async () => {
     try {
       const snapshot = await getDocs(collection(db, "rotas"));
       const rotasData = snapshot.docs.map((doc) => ({
@@ -59,7 +55,11 @@ const Rotas = () => {
       showNotification("Erro ao carregar rotas", "error");
       setLoading(false);
     }
-  };
+  }, [showNotification]);
+
+  useEffect(() => {
+    fetchRotas();
+  }, [fetchRotas]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { BarChart3, Download, Calendar, Users, Truck, Map } from "lucide-react";
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import React, { useState, useEffect, useCallback } from "react";
+import { Download, Users, Map, Truck, Calendar } from "lucide-react";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import {
   BarChart,
@@ -13,8 +13,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
 } from "recharts";
 
 const Relatorios = () => {
@@ -25,11 +23,7 @@ const Relatorios = () => {
   const [dadosRotas, setDadosRotas] = useState([]);
   const [dadosFolgas, setDadosFolgas] = useState([]);
 
-  useEffect(() => {
-    fetchRelatorios();
-  }, [periodo]);
-
-  const fetchRelatorios = async () => {
+  const fetchRelatorios = useCallback(async () => {
     setLoading(true);
     try {
       // Buscar dados dos motoristas
@@ -71,7 +65,11 @@ const Relatorios = () => {
       console.error("Erro ao buscar dados para relatórios:", error);
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchRelatorios();
+  }, [fetchRelatorios]);
 
   const processarDadosMotoristas = (motoristas) => {
     const statusCount = motoristas.reduce((acc, motorista) => {

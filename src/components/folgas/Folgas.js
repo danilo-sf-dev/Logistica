@@ -1,14 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Search,
-  Calendar,
-  User,
-  Check,
-  X,
-} from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Plus, Trash2, Search, User, Check, X } from "lucide-react";
 import {
   collection,
   getDocs,
@@ -38,11 +29,7 @@ const Folgas = () => {
     observacoes: "",
   });
 
-  useEffect(() => {
-    fetchFolgas();
-  }, []);
-
-  const fetchFolgas = async () => {
+  const fetchFolgas = useCallback(async () => {
     try {
       const snapshot = await getDocs(collection(db, "folgas"));
       const folgasData = snapshot.docs.map((doc) => ({
@@ -56,7 +43,11 @@ const Folgas = () => {
       showNotification("Erro ao carregar folgas", "error");
       setLoading(false);
     }
-  };
+  }, [showNotification]);
+
+  useEffect(() => {
+    fetchFolgas();
+  }, [fetchFolgas]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

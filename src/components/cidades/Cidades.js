@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Plus, Edit, Trash2, Search, MapPin } from "lucide-react";
 import {
   collection,
@@ -27,11 +27,7 @@ const Cidades = () => {
     distancia: "",
   });
 
-  useEffect(() => {
-    fetchCidades();
-  }, []);
-
-  const fetchCidades = async () => {
+  const fetchCidades = useCallback(async () => {
     try {
       const snapshot = await getDocs(collection(db, "cidades"));
       const cidadesData = snapshot.docs.map((doc) => ({
@@ -45,7 +41,11 @@ const Cidades = () => {
       showNotification("Erro ao carregar cidades", "error");
       setLoading(false);
     }
-  };
+  }, [showNotification]);
+
+  useEffect(() => {
+    fetchCidades();
+  }, [fetchCidades]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
