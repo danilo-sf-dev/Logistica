@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNotification } from '../../contexts/NotificationContext';
-import { 
-  Truck, 
-  Users, 
-  MapPin, 
-  Route, 
-  Calendar, 
-  BarChart3, 
-  Settings, 
+import React, { useState } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNotification } from "../../contexts/NotificationContext";
+import {
+  Truck,
+  Users,
+  MapPin,
+  Map,
+  Calendar,
+  BarChart3,
+  Settings,
   LogOut,
   Menu,
   X,
   Home,
-  Building2
-} from 'lucide-react';
+  Building2,
+} from "lucide-react";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -25,24 +25,24 @@ const Layout = () => {
   const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Motoristas', href: '/motoristas', icon: Users },
-    { name: 'Veículos', href: '/veiculos', icon: Truck },
-    { name: 'Rotas', href: '/rotas', icon: Route },
-    { name: 'Folgas', href: '/folgas', icon: Calendar },
-    { name: 'Cidades', href: '/cidades', icon: MapPin },
-    { name: 'Vendedores', href: '/vendedores', icon: Building2 },
-    { name: 'Relatórios', href: '/relatorios', icon: BarChart3 },
-    { name: 'Configurações', href: '/configuracoes', icon: Settings },
+    { name: "Dashboard", href: "/dashboard", icon: Home },
+    { name: "Motoristas", href: "/motoristas", icon: Users },
+    { name: "Veículos", href: "/veiculos", icon: Truck },
+    { name: "Rotas", href: "/rotas", icon: Map },
+    { name: "Folgas", href: "/folgas", icon: Calendar },
+    { name: "Cidades", href: "/cidades", icon: MapPin },
+    { name: "Vendedores", href: "/vendedores", icon: Building2 },
+    { name: "Relatórios", href: "/relatorios", icon: BarChart3 },
+    { name: "Configurações", href: "/configuracoes", icon: Settings },
   ];
 
   const handleLogout = async () => {
     try {
       await logout();
-      showNotification('Logout realizado com sucesso!', 'success');
-      navigate('/login');
+      showNotification("Logout realizado com sucesso!", "success");
+      navigate("/login");
     } catch (error) {
-      showNotification('Erro ao fazer logout', 'error');
+      showNotification("Erro ao fazer logout", "error");
     }
   };
 
@@ -53,8 +53,15 @@ const Layout = () => {
   return (
     <div className="h-screen flex overflow-hidden bg-gray-100">
       {/* Sidebar para mobile */}
-      <div className={`fixed inset-0 flex z-40 md:hidden ${sidebarOpen ? '' : 'hidden'}`}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)}></div>
+      <div
+        className={`fixed inset-0 flex z-40 md:hidden ${
+          sidebarOpen ? "" : "hidden"
+        }`}
+      >
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
         <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
           <div className="absolute top-0 right-0 -mr-12 pt-2">
             <button
@@ -68,7 +75,9 @@ const Layout = () => {
           <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
             <div className="flex-shrink-0 flex items-center px-4">
               <Truck className="h-8 w-8 text-primary-600" />
-              <span className="ml-2 text-xl font-semibold text-gray-900">SGL</span>
+              <span className="ml-2 text-xl font-semibold text-gray-900">
+                SGL
+              </span>
             </div>
             <nav className="mt-5 px-2 space-y-1">
               {navigation.map((item) => {
@@ -79,8 +88,8 @@ const Layout = () => {
                     href={item.href}
                     className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${
                       isActive(item.href)
-                        ? 'bg-primary-100 text-primary-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? "bg-primary-100 text-primary-900"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                   >
                     <Icon className="mr-4 h-6 w-6" />
@@ -100,7 +109,9 @@ const Layout = () => {
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
               <div className="flex items-center flex-shrink-0 px-4">
                 <Truck className="h-8 w-8 text-primary-600" />
-                <span className="ml-2 text-xl font-semibold text-gray-900">SGL</span>
+                <span className="ml-2 text-xl font-semibold text-gray-900">
+                  SGL
+                </span>
               </div>
               <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                 {navigation.map((item) => {
@@ -111,8 +122,8 @@ const Layout = () => {
                       href={item.href}
                       className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
                         isActive(item.href)
-                          ? 'bg-primary-100 text-primary-900'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                          ? "bg-primary-100 text-primary-900"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                       }`}
                     >
                       <Icon className="mr-3 h-5 w-5" />
@@ -126,10 +137,12 @@ const Layout = () => {
               <div className="flex items-center">
                 <div>
                   <div className="text-sm font-medium text-gray-700">
-                    {userProfile?.displayName || 'Usuário'}
+                    {userProfile?.displayName || "Usuário"}
                   </div>
                   <div className="text-xs text-gray-500">
-                    {userProfile?.role === 'admin' ? 'Administrador' : 'Usuário'}
+                    {userProfile?.role === "admin"
+                      ? "Administrador"
+                      : "Usuário"}
                   </div>
                 </div>
               </div>
@@ -167,4 +180,4 @@ const Layout = () => {
   );
 };
 
-export default Layout; 
+export default Layout;

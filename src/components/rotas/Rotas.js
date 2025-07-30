@@ -1,145 +1,172 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, Route, MapPin, Calendar, Truck } from 'lucide-react';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import { useNotification } from '../../contexts/NotificationContext';
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  Map,
+  
+  
+  
+} from "lucide-react";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { useNotification } from "../../contexts/NotificationContext";
 
 const Rotas = () => {
   const [rotas, setRotas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingRota, setEditingRota] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
-    origem: '',
-    destino: '',
-    motorista: '',
-    veiculo: '',
-    dataPartida: '',
-    dataChegada: '',
-    status: 'agendada',
-    unidadeNegocio: 'frigorifico',
-    observacoes: ''
+    origem: "",
+    destino: "",
+    motorista: "",
+    veiculo: "",
+    dataPartida: "",
+    dataChegada: "",
+    status: "agendada",
+    unidadeNegocio: "frigorifico",
+    observacoes: "",
   });
 
-  useEffect(() => {
-    fetchRotas();
-  }, []);
-
-  const fetchRotas = async () => {
+  const fetchRotas = useCallback(async () => {
     try {
-      const snapshot = await getDocs(collection(db, 'rotas'));
-      const rotasData = snapshot.docs.map(doc => ({
+      const snapshot = await getDocs(collection(db, "rotas"));
+      const rotasData = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setRotas(rotasData);
       setLoading(false);
     } catch (error) {
-      console.error('Erro ao buscar rotas:', error);
-      showNotification('Erro ao carregar rotas', 'error');
+      console.error("Erro ao buscar rotas:", error);
+      showNotification("Erro ao carregar rotas", "error");
       setLoading(false);
     }
-  };
+  }, [showNotification]);
+
+  useEffect(() => {
+    fetchRotas();
+  }, [fetchRotas]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingRota) {
-        await updateDoc(doc(db, 'rotas', editingRota.id), {
+        await updateDoc(doc(db, "rotas", editingRota.id), {
           ...formData,
-          dataAtualizacao: new Date()
+          dataAtualizacao: new Date(),
         });
-        showNotification('Rota atualizada com sucesso!', 'success');
+        showNotification("Rota atualizada com sucesso!", "success");
       } else {
-        await addDoc(collection(db, 'rotas'), {
+        await addDoc(collection(db, "rotas"), {
           ...formData,
           dataCriacao: new Date(),
-          dataAtualizacao: new Date()
+          dataAtualizacao: new Date(),
         });
-        showNotification('Rota criada com sucesso!', 'success');
+        showNotification("Rota criada com sucesso!", "success");
       }
-      
+
       setShowModal(false);
       setEditingRota(null);
       resetForm();
       fetchRotas();
     } catch (error) {
-      console.error('Erro ao salvar rota:', error);
-      showNotification('Erro ao salvar rota', 'error');
+      console.error("Erro ao salvar rota:", error);
+      showNotification("Erro ao salvar rota", "error");
     }
   };
 
   const handleEdit = (rota) => {
     setEditingRota(rota);
     setFormData({
-      origem: rota.origem || '',
-      destino: rota.destino || '',
-      motorista: rota.motorista || '',
-      veiculo: rota.veiculo || '',
-      dataPartida: rota.dataPartida || '',
-      dataChegada: rota.dataChegada || '',
-      status: rota.status || 'agendada',
-      unidadeNegocio: rota.unidadeNegocio || 'frigorifico',
-      observacoes: rota.observacoes || ''
+      origem: rota.origem || "",
+      destino: rota.destino || "",
+      motorista: rota.motorista || "",
+      veiculo: rota.veiculo || "",
+      dataPartida: rota.dataPartida || "",
+      dataChegada: rota.dataChegada || "",
+      status: rota.status || "agendada",
+      unidadeNegocio: rota.unidadeNegocio || "frigorifico",
+      observacoes: rota.observacoes || "",
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir esta rota?')) {
+    if (window.confirm("Tem certeza que deseja excluir esta rota?")) {
       try {
-        await deleteDoc(doc(db, 'rotas', id));
-        showNotification('Rota excluída com sucesso!', 'success');
+        await deleteDoc(doc(db, "rotas", id));
+        showNotification("Rota excluída com sucesso!", "success");
         fetchRotas();
       } catch (error) {
-        console.error('Erro ao excluir rota:', error);
-        showNotification('Erro ao excluir rota', 'error');
+        console.error("Erro ao excluir rota:", error);
+        showNotification("Erro ao excluir rota", "error");
       }
     }
   };
 
   const resetForm = () => {
     setFormData({
-      origem: '',
-      destino: '',
-      motorista: '',
-      veiculo: '',
-      dataPartida: '',
-      dataChegada: '',
-      status: 'agendada',
-      unidadeNegocio: 'frigorifico',
-      observacoes: ''
+      origem: "",
+      destino: "",
+      motorista: "",
+      veiculo: "",
+      dataPartida: "",
+      dataChegada: "",
+      status: "agendada",
+      unidadeNegocio: "frigorifico",
+      observacoes: "",
     });
   };
 
-  const filteredRotas = rotas.filter(rota =>
-    rota.origem?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rota.destino?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rota.motorista?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRotas = rotas.filter(
+    (rota) =>
+      rota.origem?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rota.destino?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rota.motorista?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'agendada': return 'bg-blue-100 text-blue-800';
-      case 'em_andamento': return 'bg-yellow-100 text-yellow-800';
-      case 'concluida': return 'bg-green-100 text-green-800';
-      case 'cancelada': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "agendada":
+        return "bg-blue-100 text-blue-800";
+      case "em_andamento":
+        return "bg-yellow-100 text-yellow-800";
+      case "concluida":
+        return "bg-green-100 text-green-800";
+      case "cancelada":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'agendada': return 'Agendada';
-      case 'em_andamento': return 'Em Andamento';
-      case 'concluida': return 'Concluída';
-      case 'cancelada': return 'Cancelada';
-      default: return 'Desconhecido';
+      case "agendada":
+        return "Agendada";
+      case "em_andamento":
+        return "Em Andamento";
+      case "concluida":
+        return "Concluída";
+      case "cancelada":
+        return "Cancelada";
+      default:
+        return "Desconhecido";
     }
   };
 
@@ -205,7 +232,7 @@ const Rotas = () => {
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                          <Route className="h-5 w-5 text-purple-600" />
+                          <Map className="h-5 w-5 text-purple-600" />
                         </div>
                       </div>
                       <div className="ml-4">
@@ -219,7 +246,9 @@ const Rotas = () => {
                     </div>
                   </td>
                   <td className="table-cell">
-                    <div className="text-sm text-gray-900">{rota.motorista}</div>
+                    <div className="text-sm text-gray-900">
+                      {rota.motorista}
+                    </div>
                   </td>
                   <td className="table-cell">
                     <div className="text-sm text-gray-900">{rota.veiculo}</div>
@@ -231,7 +260,11 @@ const Rotas = () => {
                     </div>
                   </td>
                   <td className="table-cell">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(rota.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                        rota.status
+                      )}`}
+                    >
                       {getStatusText(rota.status)}
                     </span>
                   </td>
@@ -264,49 +297,65 @@ const Rotas = () => {
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingRota ? 'Editar Rota' : 'Nova Rota'}
+                {editingRota ? "Editar Rota" : "Nova Rota"}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Origem</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Origem
+                  </label>
                   <input
                     type="text"
                     required
                     value={formData.origem}
-                    onChange={(e) => setFormData({...formData, origem: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, origem: e.target.value })
+                    }
                     className="input-field"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Destino</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Destino
+                  </label>
                   <input
                     type="text"
                     required
                     value={formData.destino}
-                    onChange={(e) => setFormData({...formData, destino: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, destino: e.target.value })
+                    }
                     className="input-field"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Motorista</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Motorista
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.motorista}
-                      onChange={(e) => setFormData({...formData, motorista: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, motorista: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Veículo</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Veículo
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.veiculo}
-                      onChange={(e) => setFormData({...formData, veiculo: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, veiculo: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
@@ -314,22 +363,36 @@ const Rotas = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Data de Partida</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Data de Partida
+                    </label>
                     <input
                       type="datetime-local"
                       required
                       value={formData.dataPartida}
-                      onChange={(e) => setFormData({...formData, dataPartida: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          dataPartida: e.target.value,
+                        })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Data de Chegada</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Data de Chegada
+                    </label>
                     <input
                       type="datetime-local"
                       required
                       value={formData.dataChegada}
-                      onChange={(e) => setFormData({...formData, dataChegada: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          dataChegada: e.target.value,
+                        })
+                      }
                       className="input-field"
                     />
                   </div>
@@ -337,10 +400,14 @@ const Rotas = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Status</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Status
+                    </label>
                     <select
                       value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, status: e.target.value })
+                      }
                       className="input-field"
                     >
                       <option value="agendada">Agendada</option>
@@ -350,10 +417,17 @@ const Rotas = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Unidade de Negócio</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Unidade de Negócio
+                    </label>
                     <select
                       value={formData.unidadeNegocio}
-                      onChange={(e) => setFormData({...formData, unidadeNegocio: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          unidadeNegocio: e.target.value,
+                        })
+                      }
                       className="input-field"
                     >
                       <option value="frigorifico">Frigorífico</option>
@@ -363,10 +437,14 @@ const Rotas = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Observações</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Observações
+                  </label>
                   <textarea
                     value={formData.observacoes}
-                    onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, observacoes: e.target.value })
+                    }
                     className="input-field"
                     rows="3"
                   />
@@ -384,11 +462,8 @@ const Rotas = () => {
                   >
                     Cancelar
                   </button>
-                  <button
-                    type="submit"
-                    className="btn-primary"
-                  >
-                    {editingRota ? 'Atualizar' : 'Criar'}
+                  <button type="submit" className="btn-primary">
+                    {editingRota ? "Atualizar" : "Criar"}
                   </button>
                 </div>
               </form>
@@ -400,4 +475,4 @@ const Rotas = () => {
   );
 };
 
-export default Rotas; 
+export default Rotas;

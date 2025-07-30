@@ -1,173 +1,175 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search, 
-  Filter,
-  User,
-  Phone,
-  Mail,
-  MapPin
-} from 'lucide-react';
-import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc 
-} from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import { useNotification } from '../../contexts/NotificationContext';
+import React, { useState, useEffect, useCallback } from "react";
+import { Plus, Edit, Trash2, Search, User, Phone, Mail } from "lucide-react";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { useNotification } from "../../contexts/NotificationContext";
 
 const Motoristas = () => {
   const [motoristas, setMotoristas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingMotorista, setEditingMotorista] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('todos');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("todos");
+
   const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
-    nome: '',
-    cpf: '',
-    cnh: '',
-    telefone: '',
-    email: '',
-    endereco: '',
-    cidade: '',
-    status: 'disponivel',
-    unidadeNegocio: 'frigorifico',
-    dataAdmissao: '',
-    salario: ''
+    nome: "",
+    cpf: "",
+    cnh: "",
+    telefone: "",
+    email: "",
+    endereco: "",
+    cidade: "",
+    status: "disponivel",
+    unidadeNegocio: "frigorifico",
+    dataAdmissao: "",
+    salario: "",
   });
 
-  useEffect(() => {
-    fetchMotoristas();
-  }, []);
-
-  const fetchMotoristas = async () => {
+  const fetchMotoristas = useCallback(async () => {
     try {
-      const snapshot = await getDocs(collection(db, 'motoristas'));
-      const motoristasData = snapshot.docs.map(doc => ({
+      const snapshot = await getDocs(collection(db, "motoristas"));
+      const motoristasData = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setMotoristas(motoristasData);
       setLoading(false);
     } catch (error) {
-      console.error('Erro ao buscar motoristas:', error);
-      showNotification('Erro ao carregar motoristas', 'error');
+      console.error("Erro ao buscar motoristas:", error);
+      showNotification("Erro ao carregar motoristas", "error");
       setLoading(false);
     }
-  };
+  }, [showNotification]);
+
+  useEffect(() => {
+    fetchMotoristas();
+  }, [fetchMotoristas]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingMotorista) {
-        await updateDoc(doc(db, 'motoristas', editingMotorista.id), {
+        await updateDoc(doc(db, "motoristas", editingMotorista.id), {
           ...formData,
-          dataAtualizacao: new Date()
+          dataAtualizacao: new Date(),
         });
-        showNotification('Motorista atualizado com sucesso!', 'success');
+        showNotification("Motorista atualizado com sucesso!", "success");
       } else {
-        await addDoc(collection(db, 'motoristas'), {
+        await addDoc(collection(db, "motoristas"), {
           ...formData,
           dataCriacao: new Date(),
-          dataAtualizacao: new Date()
+          dataAtualizacao: new Date(),
         });
-        showNotification('Motorista cadastrado com sucesso!', 'success');
+        showNotification("Motorista cadastrado com sucesso!", "success");
       }
-      
+
       setShowModal(false);
       setEditingMotorista(null);
       resetForm();
       fetchMotoristas();
     } catch (error) {
-      console.error('Erro ao salvar motorista:', error);
-      showNotification('Erro ao salvar motorista', 'error');
+      console.error("Erro ao salvar motorista:", error);
+      showNotification("Erro ao salvar motorista", "error");
     }
   };
 
   const handleEdit = (motorista) => {
     setEditingMotorista(motorista);
     setFormData({
-      nome: motorista.nome || '',
-      cpf: motorista.cpf || '',
-      cnh: motorista.cnh || '',
-      telefone: motorista.telefone || '',
-      email: motorista.email || '',
-      endereco: motorista.endereco || '',
-      cidade: motorista.cidade || '',
-      status: motorista.status || 'disponivel',
-      unidadeNegocio: motorista.unidadeNegocio || 'frigorifico',
-      dataAdmissao: motorista.dataAdmissao || '',
-      salario: motorista.salario || ''
+      nome: motorista.nome || "",
+      cpf: motorista.cpf || "",
+      cnh: motorista.cnh || "",
+      telefone: motorista.telefone || "",
+      email: motorista.email || "",
+      endereco: motorista.endereco || "",
+      cidade: motorista.cidade || "",
+      status: motorista.status || "disponivel",
+      unidadeNegocio: motorista.unidadeNegocio || "frigorifico",
+      dataAdmissao: motorista.dataAdmissao || "",
+      salario: motorista.salario || "",
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este motorista?')) {
+    if (window.confirm("Tem certeza que deseja excluir este motorista?")) {
       try {
-        await deleteDoc(doc(db, 'motoristas', id));
-        showNotification('Motorista excluído com sucesso!', 'success');
+        await deleteDoc(doc(db, "motoristas", id));
+        showNotification("Motorista excluído com sucesso!", "success");
         fetchMotoristas();
       } catch (error) {
-        console.error('Erro ao excluir motorista:', error);
-        showNotification('Erro ao excluir motorista', 'error');
+        console.error("Erro ao excluir motorista:", error);
+        showNotification("Erro ao excluir motorista", "error");
       }
     }
   };
 
   const resetForm = () => {
     setFormData({
-      nome: '',
-      cpf: '',
-      cnh: '',
-      telefone: '',
-      email: '',
-      endereco: '',
-      cidade: '',
-      status: 'disponivel',
-      unidadeNegocio: 'frigorifico',
-      dataAdmissao: '',
-      salario: ''
+      nome: "",
+      cpf: "",
+      cnh: "",
+      telefone: "",
+      email: "",
+      endereco: "",
+      cidade: "",
+      status: "disponivel",
+      unidadeNegocio: "frigorifico",
+      dataAdmissao: "",
+      salario: "",
     });
   };
 
-  const filteredMotoristas = motoristas.filter(motorista => {
-    const matchesSearch = motorista.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         motorista.cpf?.includes(searchTerm) ||
-                         motorista.cnh?.includes(searchTerm);
-    
-    const matchesStatus = filterStatus === 'todos' || motorista.status === filterStatus;
-    
+  const filteredMotoristas = motoristas.filter((motorista) => {
+    const matchesSearch =
+      motorista.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      motorista.cpf?.includes(searchTerm) ||
+      motorista.cnh?.includes(searchTerm);
+
+    const matchesStatus =
+      filterStatus === "todos" || motorista.status === filterStatus;
+
     return matchesSearch && matchesStatus;
   });
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'trabalhando': return 'bg-green-100 text-green-800';
-      case 'disponivel': return 'bg-blue-100 text-blue-800';
-      case 'folga': return 'bg-yellow-100 text-yellow-800';
-      case 'ferias': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "trabalhando":
+        return "bg-green-100 text-green-800";
+      case "disponivel":
+        return "bg-blue-100 text-blue-800";
+      case "folga":
+        return "bg-yellow-100 text-yellow-800";
+      case "ferias":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'trabalhando': return 'Trabalhando';
-      case 'disponivel': return 'Disponível';
-      case 'folga': return 'Folga';
-      case 'ferias': return 'Férias';
-      default: return 'Desconhecido';
+      case "trabalhando":
+        return "Trabalhando";
+      case "disponivel":
+        return "Disponível";
+      case "folga":
+        return "Folga";
+      case "ferias":
+        return "Férias";
+      default:
+        return "Desconhecido";
     }
   };
 
@@ -280,7 +282,9 @@ const Motoristas = () => {
                     )}
                   </td>
                   <td className="table-cell">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(motorista.status)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(motorista.status)}`}
+                    >
                       {getStatusText(motorista.status)}
                     </span>
                   </td>
@@ -318,38 +322,50 @@ const Motoristas = () => {
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingMotorista ? 'Editar Motorista' : 'Novo Motorista'}
+                {editingMotorista ? "Editar Motorista" : "Novo Motorista"}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nome</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nome
+                  </label>
                   <input
                     type="text"
                     required
                     value={formData.nome}
-                    onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nome: e.target.value })
+                    }
                     className="input-field"
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">CPF</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      CPF
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.cpf}
-                      onChange={(e) => setFormData({...formData, cpf: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, cpf: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">CNH</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      CNH
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.cnh}
-                      onChange={(e) => setFormData({...formData, cnh: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, cnh: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
@@ -357,50 +373,70 @@ const Motoristas = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Telefone</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Telefone
+                    </label>
                     <input
                       type="text"
                       value={formData.telefone}
-                      onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, telefone: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
                     <input
                       type="email"
                       value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Endereço</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Endereço
+                  </label>
                   <input
                     type="text"
                     value={formData.endereco}
-                    onChange={(e) => setFormData({...formData, endereco: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, endereco: e.target.value })
+                    }
                     className="input-field"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Cidade</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Cidade
+                    </label>
                     <input
                       type="text"
                       value={formData.cidade}
-                      onChange={(e) => setFormData({...formData, cidade: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, cidade: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Status</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Status
+                    </label>
                     <select
                       value={formData.status}
-                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, status: e.target.value })
+                      }
                       className="input-field"
                     >
                       <option value="disponivel">Disponível</option>
@@ -413,10 +449,17 @@ const Motoristas = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Unidade de Negócio</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Unidade de Negócio
+                    </label>
                     <select
                       value={formData.unidadeNegocio}
-                      onChange={(e) => setFormData({...formData, unidadeNegocio: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          unidadeNegocio: e.target.value,
+                        })
+                      }
                       className="input-field"
                     >
                       <option value="frigorifico">Frigorífico</option>
@@ -424,23 +467,34 @@ const Motoristas = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Data de Admissão</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Data de Admissão
+                    </label>
                     <input
                       type="date"
                       value={formData.dataAdmissao}
-                      onChange={(e) => setFormData({...formData, dataAdmissao: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          dataAdmissao: e.target.value,
+                        })
+                      }
                       className="input-field"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Salário</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Salário
+                  </label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.salario}
-                    onChange={(e) => setFormData({...formData, salario: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, salario: e.target.value })
+                    }
                     className="input-field"
                   />
                 </div>
@@ -457,11 +511,8 @@ const Motoristas = () => {
                   >
                     Cancelar
                   </button>
-                  <button
-                    type="submit"
-                    className="btn-primary"
-                  >
-                    {editingMotorista ? 'Atualizar' : 'Cadastrar'}
+                  <button type="submit" className="btn-primary">
+                    {editingMotorista ? "Atualizar" : "Cadastrar"}
                   </button>
                 </div>
               </form>
@@ -473,4 +524,4 @@ const Motoristas = () => {
   );
 };
 
-export default Motoristas; 
+export default Motoristas;

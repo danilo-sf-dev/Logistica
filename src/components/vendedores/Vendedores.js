@@ -1,110 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, User, Phone, Mail } from 'lucide-react';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
-import { useNotification } from '../../contexts/NotificationContext';
+import React, { useState, useEffect, useCallback } from "react";
+import { Plus, Edit, Trash2, Search, User, Phone, Mail } from "lucide-react";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { useNotification } from "../../contexts/NotificationContext";
 
 const Vendedores = () => {
   const [vendedores, setVendedores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingVendedor, setEditingVendedor] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    telefone: '',
-    regiao: '',
-    unidadeNegocio: 'frigorifico',
-    status: 'ativo'
+    nome: "",
+    email: "",
+    telefone: "",
+    regiao: "",
+    unidadeNegocio: "frigorifico",
+    status: "ativo",
   });
 
-  useEffect(() => {
-    fetchVendedores();
-  }, []);
-
-  const fetchVendedores = async () => {
+  const fetchVendedores = useCallback(async () => {
     try {
-      const snapshot = await getDocs(collection(db, 'vendedores'));
-      const vendedoresData = snapshot.docs.map(doc => ({
+      const snapshot = await getDocs(collection(db, "vendedores"));
+      const vendedoresData = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
       setVendedores(vendedoresData);
       setLoading(false);
     } catch (error) {
-      console.error('Erro ao buscar vendedores:', error);
-      showNotification('Erro ao carregar vendedores', 'error');
+      console.error("Erro ao buscar vendedores:", error);
+      showNotification("Erro ao carregar vendedores", "error");
       setLoading(false);
     }
-  };
+  }, [showNotification]);
+
+  useEffect(() => {
+    fetchVendedores();
+  }, [fetchVendedores]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingVendedor) {
-        await updateDoc(doc(db, 'vendedores', editingVendedor.id), {
+        await updateDoc(doc(db, "vendedores", editingVendedor.id), {
           ...formData,
-          dataAtualizacao: new Date()
+          dataAtualizacao: new Date(),
         });
-        showNotification('Vendedor atualizado com sucesso!', 'success');
+        showNotification("Vendedor atualizado com sucesso!", "success");
       } else {
-        await addDoc(collection(db, 'vendedores'), {
+        await addDoc(collection(db, "vendedores"), {
           ...formData,
           dataCriacao: new Date(),
-          dataAtualizacao: new Date()
+          dataAtualizacao: new Date(),
         });
-        showNotification('Vendedor cadastrado com sucesso!', 'success');
+        showNotification("Vendedor cadastrado com sucesso!", "success");
       }
-      
+
       setShowModal(false);
       setEditingVendedor(null);
       resetForm();
       fetchVendedores();
     } catch (error) {
-      console.error('Erro ao salvar vendedor:', error);
-      showNotification('Erro ao salvar vendedor', 'error');
+      console.error("Erro ao salvar vendedor:", error);
+      showNotification("Erro ao salvar vendedor", "error");
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir este vendedor?')) {
+    if (window.confirm("Tem certeza que deseja excluir este vendedor?")) {
       try {
-        await deleteDoc(doc(db, 'vendedores', id));
-        showNotification('Vendedor excluído com sucesso!', 'success');
+        await deleteDoc(doc(db, "vendedores", id));
+        showNotification("Vendedor excluído com sucesso!", "success");
         fetchVendedores();
       } catch (error) {
-        console.error('Erro ao excluir vendedor:', error);
-        showNotification('Erro ao excluir vendedor', 'error');
+        console.error("Erro ao excluir vendedor:", error);
+        showNotification("Erro ao excluir vendedor", "error");
       }
     }
   };
 
   const resetForm = () => {
     setFormData({
-      nome: '',
-      email: '',
-      telefone: '',
-      regiao: '',
-      unidadeNegocio: 'frigorifico',
-      status: 'ativo'
+      nome: "",
+      email: "",
+      telefone: "",
+      regiao: "",
+      unidadeNegocio: "frigorifico",
+      status: "ativo",
     });
   };
 
-  const filteredVendedores = vendedores.filter(vendedor =>
-    vendedor.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vendedor.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredVendedores = vendedores.filter(
+    (vendedor) =>
+      vendedor.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vendedor.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'ativo': return 'bg-green-100 text-green-800';
-      case 'inativo': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "ativo":
+        return "bg-green-100 text-green-800";
+      case "inativo":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -193,7 +204,9 @@ const Vendedores = () => {
                     )}
                   </td>
                   <td className="table-cell">
-                    <div className="text-sm text-gray-900">{vendedor.regiao}</div>
+                    <div className="text-sm text-gray-900">
+                      {vendedor.regiao}
+                    </div>
                   </td>
                   <td className="table-cell">
                     <span className="text-sm text-gray-900 capitalize">
@@ -201,8 +214,10 @@ const Vendedores = () => {
                     </span>
                   </td>
                   <td className="table-cell">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(vendedor.status)}`}>
-                      {vendedor.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(vendedor.status)}`}
+                    >
+                      {vendedor.status === "ativo" ? "Ativo" : "Inativo"}
                     </span>
                   </td>
                   <td className="table-cell">
@@ -211,12 +226,13 @@ const Vendedores = () => {
                         onClick={() => {
                           setEditingVendedor(vendedor);
                           setFormData({
-                            nome: vendedor.nome || '',
-                            email: vendedor.email || '',
-                            telefone: vendedor.telefone || '',
-                            regiao: vendedor.regiao || '',
-                            unidadeNegocio: vendedor.unidadeNegocio || 'frigorifico',
-                            status: vendedor.status || 'ativo'
+                            nome: vendedor.nome || "",
+                            email: vendedor.email || "",
+                            telefone: vendedor.telefone || "",
+                            regiao: vendedor.regiao || "",
+                            unidadeNegocio:
+                              vendedor.unidadeNegocio || "frigorifico",
+                            status: vendedor.status || "ativo",
                           });
                           setShowModal(true);
                         }}
@@ -245,36 +261,48 @@ const Vendedores = () => {
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {editingVendedor ? 'Editar Vendedor' : 'Novo Vendedor'}
+                {editingVendedor ? "Editar Vendedor" : "Novo Vendedor"}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nome</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nome
+                  </label>
                   <input
                     type="text"
                     required
                     value={formData.nome}
-                    onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nome: e.target.value })
+                    }
                     className="input-field"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
                     <input
                       type="email"
                       value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Telefone</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Telefone
+                    </label>
                     <input
                       type="text"
                       value={formData.telefone}
-                      onChange={(e) => setFormData({...formData, telefone: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, telefone: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
@@ -282,19 +310,30 @@ const Vendedores = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Região</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Região
+                    </label>
                     <input
                       type="text"
                       value={formData.regiao}
-                      onChange={(e) => setFormData({...formData, regiao: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({ ...formData, regiao: e.target.value })
+                      }
                       className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Unidade de Negócio</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Unidade de Negócio
+                    </label>
                     <select
                       value={formData.unidadeNegocio}
-                      onChange={(e) => setFormData({...formData, unidadeNegocio: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          unidadeNegocio: e.target.value,
+                        })
+                      }
                       className="input-field"
                     >
                       <option value="frigorifico">Frigorífico</option>
@@ -304,10 +343,14 @@ const Vendedores = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Status</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Status
+                  </label>
                   <select
                     value={formData.status}
-                    onChange={(e) => setFormData({...formData, status: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
                     className="input-field"
                   >
                     <option value="ativo">Ativo</option>
@@ -327,11 +370,8 @@ const Vendedores = () => {
                   >
                     Cancelar
                   </button>
-                  <button
-                    type="submit"
-                    className="btn-primary"
-                  >
-                    {editingVendedor ? 'Atualizar' : 'Cadastrar'}
+                  <button type="submit" className="btn-primary">
+                    {editingVendedor ? "Atualizar" : "Cadastrar"}
                   </button>
                 </div>
               </form>
@@ -343,4 +383,4 @@ const Vendedores = () => {
   );
 };
 
-export default Vendedores; 
+export default Vendedores;
