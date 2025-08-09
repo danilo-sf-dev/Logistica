@@ -13,7 +13,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import Login from "./components/auth/Login";
 import Layout from "./components/layout/Layout";
 import Dashboard from "./components/dashboard/Dashboard";
-import Motoristas from "./components/motoristas/Motoristas";
+import Funcionarios from "./components/funcionarios";
 import Veiculos from "./components/veiculos/Veiculos";
 import Rotas from "./components/rotas/Rotas";
 import Folgas from "./components/folgas/Folgas";
@@ -75,7 +75,12 @@ function App() {
               >
                 <Route index element={<Navigate to="/dashboard" />} />
                 <Route path="dashboard" element={<Dashboard />} />
-                <Route path="motoristas" element={<Motoristas />} />
+                <Route path="funcionarios" element={<Funcionarios />} />
+                {/* Compatibilidade com rota antiga */}
+                <Route
+                  path="motoristas"
+                  element={<Navigate to="/funcionarios" />}
+                />
                 <Route path="veiculos" element={<Veiculos />} />
                 <Route path="rotas" element={<Rotas />} />
                 <Route path="folgas" element={<Folgas />} />

@@ -26,18 +26,24 @@ export const storage = getStorage(app);
 // Configuração do Firebase Cloud Messaging
 export const messaging = getMessaging(app);
 
+const VAPID_PUBLIC_KEY = process.env.REACT_APP_VAPID_PUBLIC_KEY;
+
 // Solicitar permissão para notificações
 export const requestNotificationPermission = async () => {
   try {
+    if (typeof window === "undefined" || !("Notification" in window))
+      return null;
+    if (!VAPID_PUBLIC_KEY) return null; // evita erro de atob quando chave inválida/placeholder
+
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
-      const token = await getToken(messaging, {
-        vapidKey: "seu-vapid-key",
-      });
+      const token = await getToken(messaging, { vapidKey: VAPID_PUBLIC_KEY });
       return token;
     }
+    return null;
   } catch (error) {
     console.error("Erro ao solicitar permissão de notificação:", error);
+    return null;
   }
 };
 

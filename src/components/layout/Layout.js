@@ -27,7 +27,7 @@ const Layout = () => {
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Motoristas", href: "/motoristas", icon: Users },
+    { name: "Funcionários", href: "/funcionarios", icon: Users },
     { name: "Veículos", href: "/veiculos", icon: Truck },
     { name: "Rotas", href: "/rotas", icon: Map },
     { name: "Folgas", href: "/folgas", icon: Calendar },
