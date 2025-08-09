@@ -1,25 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { auth } from './firebase/config';
-import { onAuthStateChanged } from 'firebase/auth';
+import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { auth } from "./firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
 
 // Componentes
-import Login from './components/auth/Login';
-import Layout from './components/layout/Layout';
-import Dashboard from './components/dashboard/Dashboard';
-import Motoristas from './components/motoristas/Motoristas';
-import Veiculos from './components/veiculos/Veiculos';
-import Rotas from './components/rotas/Rotas';
-import Folgas from './components/folgas/Folgas';
-import Cidades from './components/cidades/Cidades';
-import Vendedores from './components/vendedores/Vendedores';
-import Relatorios from './components/relatorios/Relatorios';
-import Configuracoes from './components/configuracoes/Configuracoes';
+import Login from "./components/auth/Login";
+import Layout from "./components/layout/Layout";
+import Dashboard from "./components/dashboard/Dashboard";
+import Funcionarios from "./components/funcionarios";
+import Veiculos from "./components/veiculos/Veiculos";
+import Rotas from "./components/rotas/Rotas";
+import Folgas from "./components/folgas/Folgas";
+import Cidades from "./components/cidades";
+import Vendedores from "./components/vendedores/Vendedores";
+import Relatorios from "./components/relatorios/Relatorios";
+import Configuracoes from "./components/configuracoes/Configuracoes";
 
 // Context
-import { AuthProvider } from './contexts/AuthContext';
-import { NotificationProvider } from './contexts/NotificationContext';
+import { AuthProvider } from "./contexts/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -47,30 +52,35 @@ function App() {
       <NotificationProvider>
         <Router>
           <div className="App">
-            <Toaster 
+            <Toaster
               position="top-right"
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: '#363636',
-                  color: '#fff',
+                  background: "#363636",
+                  color: "#fff",
                 },
               }}
             />
-            
+
             <Routes>
-              <Route 
-                path="/login" 
-                element={user ? <Navigate to="/dashboard" /> : <Login />} 
+              <Route
+                path="/login"
+                element={user ? <Navigate to="/dashboard" /> : <Login />}
               />
-              
-              <Route 
-                path="/" 
+
+              <Route
+                path="/"
                 element={user ? <Layout /> : <Navigate to="/login" />}
               >
                 <Route index element={<Navigate to="/dashboard" />} />
                 <Route path="dashboard" element={<Dashboard />} />
-                <Route path="motoristas" element={<Motoristas />} />
+                <Route path="funcionarios" element={<Funcionarios />} />
+                {/* Compatibilidade com rota antiga */}
+                <Route
+                  path="motoristas"
+                  element={<Navigate to="/funcionarios" />}
+                />
                 <Route path="veiculos" element={<Veiculos />} />
                 <Route path="rotas" element={<Rotas />} />
                 <Route path="folgas" element={<Folgas />} />
@@ -87,4 +97,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;

@@ -85,7 +85,7 @@ const Dashboard = () => {
 
       const rotasPorDia = rotasData.reduce((acc, rota) => {
         const data = new Date(rota.dataCriacao?.toDate()).toLocaleDateString(
-          "pt-BR"
+          "pt-BR",
         );
         acc[data] = (acc[data] || 0) + 1;
         return acc;
@@ -95,7 +95,7 @@ const Dashboard = () => {
         ([data, quantidade]) => ({
           data,
           quantidade,
-        })
+        }),
       );
 
       setRotasData(rotasChartData);

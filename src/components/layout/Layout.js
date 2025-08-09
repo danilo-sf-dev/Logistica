@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation, NavLink } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import {
@@ -26,7 +27,7 @@ const Layout = () => {
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Motoristas", href: "/motoristas", icon: Users },
+    { name: "Funcionários", href: "/funcionarios", icon: Users },
     { name: "Veículos", href: "/veiculos", icon: Truck },
     { name: "Rotas", href: "/rotas", icon: Map },
     { name: "Folgas", href: "/folgas", icon: Calendar },
@@ -83,18 +84,20 @@ const Layout = () => {
               {navigation.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <a
+                  <NavLink
                     key={item.name}
-                    href={item.href}
-                    className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${
-                      isActive(item.href)
-                        ? "bg-primary-100 text-primary-900"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    }`}
+                    to={item.href}
+                    className={({ isActive }) =>
+                      `group flex items-center px-2 py-2 text-base font-medium rounded-md ${
+                        isActive
+                          ? "bg-primary-100 text-primary-900"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      }`
+                    }
                   >
                     <Icon className="mr-4 h-6 w-6" />
                     {item.name}
-                  </a>
+                  </NavLink>
                 );
               })}
             </nav>
@@ -117,18 +120,20 @@ const Layout = () => {
                 {navigation.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <a
+                    <NavLink
                       key={item.name}
-                      href={item.href}
-                      className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                        isActive(item.href)
-                          ? "bg-primary-100 text-primary-900"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                      }`}
+                      to={item.href}
+                      className={({ isActive }) =>
+                        `group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                          isActive
+                            ? "bg-primary-100 text-primary-900"
+                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        }`
+                      }
                     >
                       <Icon className="mr-3 h-5 w-5" />
                       {item.name}
-                    </a>
+                    </NavLink>
                   );
                 })}
               </nav>

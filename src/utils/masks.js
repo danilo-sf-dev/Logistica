@@ -25,6 +25,13 @@ export const maskMoeda = (value) => {
     .replace(/^/, "R$ ");
 };
 
+export const maskCEP = (value) => {
+  return value
+    .replace(/\D/g, "")
+    .replace(/(\d{5})(\d)/, "$1-$2")
+    .slice(0, 9);
+};
+
 // Validações
 export const validateCPF = (cpf) => {
   cpf = cpf.replace(/[^\d]/g, "");

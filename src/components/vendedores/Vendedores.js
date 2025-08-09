@@ -58,7 +58,7 @@ const Vendedores = () => {
     try {
       const q = query(
         collection(db, "vendedores"),
-        orderBy("dataCriacao", "desc")
+        orderBy("dataCriacao", "desc"),
       );
       const snapshot = await getDocs(q);
       const vendedoresData = snapshot.docs.map((doc) => ({
@@ -125,7 +125,7 @@ const Vendedores = () => {
       if (editingVendedor) {
         await updateDoc(
           doc(db, "vendedores", editingVendedor.id),
-          vendedorData
+          vendedorData,
         );
         showNotification("Vendedor atualizado com sucesso!", "success");
       } else {
@@ -208,7 +208,7 @@ const Vendedores = () => {
     (vendedor) =>
       vendedor.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vendedor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vendedor.regiao?.toLowerCase().includes(searchTerm.toLowerCase())
+      vendedor.regiao?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Ordenação
@@ -235,7 +235,7 @@ const Vendedores = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedVendedores = sortedVendedores.slice(
     startIndex,
-    startIndex + itemsPerPage
+    startIndex + itemsPerPage,
   );
 
   const getStatusColor = (status) => {
@@ -442,7 +442,7 @@ const Vendedores = () => {
                   >
                     {page}
                   </button>
-                )
+                ),
               )}
               <button
                 onClick={() =>

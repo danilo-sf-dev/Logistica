@@ -463,7 +463,7 @@ const Configuracoes = () => {
                         Último login:{" "}
                         {userProfile?.lastLogin
                           ? new Date(
-                              userProfile.lastLogin.toDate()
+                              userProfile.lastLogin.toDate(),
                             ).toLocaleString("pt-BR")
                           : "N/A"}
                       </p>
