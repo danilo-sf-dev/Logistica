@@ -131,7 +131,7 @@ const Folgas = () => {
   };
 
   const filteredFolgas = folgas.filter((folga) =>
-    folga.motorista?.toLowerCase().includes(searchTerm.toLowerCase())
+    folga.motorista?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusColor = (status) => {
@@ -260,7 +260,7 @@ const Folgas = () => {
                   <td className="table-cell">
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                        folga.status
+                        folga.status,
                       )}`}
                     >
                       {getStatusText(folga.status)}

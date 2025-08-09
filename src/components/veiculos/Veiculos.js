@@ -62,7 +62,7 @@ const Veiculos = () => {
     try {
       const q = query(
         collection(db, "veiculos"),
-        orderBy("dataCriacao", "desc")
+        orderBy("dataCriacao", "desc"),
       );
       const snapshot = await getDocs(q);
       const veiculosData = snapshot.docs.map((doc) => ({
@@ -246,7 +246,7 @@ const Veiculos = () => {
     (veiculo) =>
       veiculo.placa?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       veiculo.modelo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      veiculo.marca?.toLowerCase().includes(searchTerm.toLowerCase())
+      veiculo.marca?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Ordenação
@@ -273,7 +273,7 @@ const Veiculos = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedVeiculos = sortedVeiculos.slice(
     startIndex,
-    startIndex + itemsPerPage
+    startIndex + itemsPerPage,
   );
 
   const getStatusColor = (status) => {
@@ -541,7 +541,7 @@ const Veiculos = () => {
                   >
                     {page}
                   </button>
-                )
+                ),
               )}
               <button
                 onClick={() =>

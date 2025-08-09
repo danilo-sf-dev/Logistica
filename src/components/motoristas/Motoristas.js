@@ -72,7 +72,7 @@ const Motoristas = () => {
     try {
       const q = query(
         collection(db, "motoristas"),
-        orderBy("dataCriacao", "desc")
+        orderBy("dataCriacao", "desc"),
       );
       const snapshot = await getDocs(q);
       const motoristasData = snapshot.docs.map((doc) => ({
@@ -153,7 +153,7 @@ const Motoristas = () => {
       if (editingMotorista) {
         await updateDoc(
           doc(db, "motoristas", editingMotorista.id),
-          motoristaData
+          motoristaData,
         );
         showNotification("Motorista atualizado com sucesso!", "success");
       } else {
@@ -281,7 +281,7 @@ const Motoristas = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedMotoristas = sortedMotoristas.slice(
     startIndex,
-    startIndex + itemsPerPage
+    startIndex + itemsPerPage,
   );
 
   const getStatusColor = (status) => {
@@ -523,7 +523,7 @@ const Motoristas = () => {
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTipoContratoColor(motorista.tipoContrato || "integral")}`}
                     >
                       {getTipoContratoText(
-                        motorista.tipoContrato || "integral"
+                        motorista.tipoContrato || "integral",
                       )}
                     </span>
                   </td>
@@ -585,7 +585,7 @@ const Motoristas = () => {
                   >
                     {page}
                   </button>
-                )
+                ),
               )}
               <button
                 onClick={() =>

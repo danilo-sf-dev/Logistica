@@ -1,14 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Search,
-  Map,
-  
-  
-  
-} from "lucide-react";
+import { Plus, Edit, Trash2, Search, Map } from "lucide-react";
 import {
   collection,
   getDocs,
@@ -137,7 +128,7 @@ const Rotas = () => {
     (rota) =>
       rota.origem?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       rota.destino?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rota.motorista?.toLowerCase().includes(searchTerm.toLowerCase())
+      rota.motorista?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusColor = (status) => {
@@ -262,7 +253,7 @@ const Rotas = () => {
                   <td className="table-cell">
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                        rota.status
+                        rota.status,
                       )}`}
                     >
                       {getStatusText(rota.status)}
