@@ -21,6 +21,12 @@ export function useFuncionarios() {
   const [loading, setLoading] = useState(true);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Funcionario | null>(null);
+  const [mostrarModalInativacao, setMostrarModalInativacao] = useState(false);
+  const [funcionarioParaInativar, setFuncionarioParaInativar] =
+    useState<Funcionario | null>(null);
+  const [mostrarModalAtivacao, setMostrarModalAtivacao] = useState(false);
+  const [funcionarioParaAtivar, setFuncionarioParaAtivar] =
+    useState<Funcionario | null>(null);
   const [termoBusca, setTermoBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState<
     "todos" | Funcionario["status"]
@@ -31,6 +37,7 @@ export function useFuncionarios() {
   const [filtroFuncao, setFiltroFuncao] = useState<
     "todos" | NonNullable<Funcionario["funcao"]>
   >("todos");
+  const [filtroAtivo, setFiltroAtivo] = useState<"todos" | boolean>("todos");
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [ordenarPor, setOrdenarPor] = useState<OrdenacaoCampo>("dataCriacao");
   const [direcaoOrdenacao, setDirecaoOrdenacao] =
@@ -57,6 +64,7 @@ export function useFuncionarios() {
     dataAdmissao: "",
     salario: "",
     observacao: "",
+    ativo: true,
   });
 
   const itensPorPagina = 15;
@@ -93,6 +101,12 @@ export function useFuncionarios() {
   }, []);
 
   const confirmar = useCallback(async () => {
+    // Prevent updating inactive employees
+    if (editando && !editando.ativo) {
+      showNotification("Não é possível editar funcionários inativos", "error");
+      return;
+    }
+
     if (!validar(valores)) {
       showNotification("Por favor, corrija os erros no formulário", "error");
       return;
@@ -136,6 +150,7 @@ export function useFuncionarios() {
         dataAdmissao: "",
         salario: "",
         observacao: "",
+        ativo: true,
       });
       await carregar();
     } catch (error) {
@@ -168,6 +183,7 @@ export function useFuncionarios() {
       dataAdmissao: "",
       salario: "",
       observacao: "",
+      ativo: true,
     });
     setMostrarModal(true);
   }, []);
@@ -196,25 +212,60 @@ export function useFuncionarios() {
       dataAdmissao: f.dataAdmissao || "",
       salario: f.salario ? String(f.salario) : "",
       observacao: f.observacao || "",
+      ativo: f.ativo !== undefined ? f.ativo : true,
     });
     setMostrarModal(true);
   }, []);
 
-  const excluirFuncionario = useCallback(
-    async (id: string) => {
-      if (window.confirm("Tem certeza que deseja excluir este funcionário?")) {
-        try {
-          await funcionariosService.excluir(id);
-          showNotification("Funcionário excluído com sucesso!", "success");
-          await carregar();
-        } catch (error) {
-          console.error("Erro ao excluir funcionário:", error);
-          showNotification("Erro ao excluir funcionário", "error");
-        }
-      }
-    },
-    [carregar, showNotification]
-  );
+  const inativarFuncionario = useCallback(async (funcionario: Funcionario) => {
+    setFuncionarioParaInativar(funcionario);
+    setMostrarModalInativacao(true);
+  }, []);
+
+  const confirmarInativacao = useCallback(async () => {
+    if (!funcionarioParaInativar) return;
+
+    try {
+      await funcionariosService.inativar(funcionarioParaInativar.id);
+      showNotification("Funcionário inativado com sucesso!", "success");
+      setMostrarModalInativacao(false);
+      setFuncionarioParaInativar(null);
+      await carregar();
+    } catch (error) {
+      console.error("Erro ao inativar funcionário:", error);
+      showNotification("Erro ao inativar funcionário", "error");
+    }
+  }, [funcionarioParaInativar, showNotification, carregar]);
+
+  const cancelarInativacao = useCallback(() => {
+    setMostrarModalInativacao(false);
+    setFuncionarioParaInativar(null);
+  }, []);
+
+  const ativarFuncionario = useCallback(async (funcionario: Funcionario) => {
+    setFuncionarioParaAtivar(funcionario);
+    setMostrarModalAtivacao(true);
+  }, []);
+
+  const confirmarAtivacao = useCallback(async () => {
+    if (!funcionarioParaAtivar) return;
+
+    try {
+      await funcionariosService.ativar(funcionarioParaAtivar.id);
+      showNotification("Funcionário ativado com sucesso!", "success");
+      setMostrarModalAtivacao(false);
+      setFuncionarioParaAtivar(null);
+      await carregar();
+    } catch (error) {
+      console.error("Erro ao ativar funcionário:", error);
+      showNotification("Erro ao ativar funcionário", "error");
+    }
+  }, [funcionarioParaAtivar, showNotification, carregar]);
+
+  const cancelarAtivacao = useCallback(() => {
+    setMostrarModalAtivacao(false);
+    setFuncionarioParaAtivar(null);
+  }, []);
 
   const alternarOrdenacao = useCallback(
     (campo: OrdenacaoCampo) => {
@@ -231,6 +282,9 @@ export function useFuncionarios() {
   const listaFiltrada = useMemo(() => {
     const termo = termoBusca.toLowerCase();
     return lista.filter((f) => {
+      // Mostrar todos os funcionários (ativos e inativos)
+      // A filtragem por status ativo será feita na UI
+
       const matchesSearch =
         f.nome?.toLowerCase().includes(termo) ||
         f.cpf?.includes(termo) ||
@@ -242,9 +296,23 @@ export function useFuncionarios() {
         filtroContrato === "todos" || f.tipoContrato === filtroContrato;
       const matchesFuncao =
         filtroFuncao === "todos" || (f.funcao || "motorista") === filtroFuncao;
-      return matchesSearch && matchesStatus && matchesContrato && matchesFuncao;
+      const matchesAtivo = filtroAtivo === "todos" || f.ativo === filtroAtivo;
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesContrato &&
+        matchesFuncao &&
+        matchesAtivo
+      );
     });
-  }, [filtroContrato, filtroFuncao, filtroStatus, lista, termoBusca]);
+  }, [
+    filtroContrato,
+    filtroFuncao,
+    filtroStatus,
+    filtroAtivo,
+    lista,
+    termoBusca,
+  ]);
 
   const listaOrdenada = useMemo(() => {
     const copia = [...listaFiltrada];
@@ -291,6 +359,8 @@ export function useFuncionarios() {
     setFiltroContrato,
     filtroFuncao,
     setFiltroFuncao,
+    filtroAtivo,
+    setFiltroAtivo,
     ordenarPor,
     direcaoOrdenacao,
     alternarOrdenacao,
@@ -299,9 +369,18 @@ export function useFuncionarios() {
     valores,
     setValores,
     setMostrarModal,
+    mostrarModalInativacao,
+    funcionarioParaInativar,
+    mostrarModalAtivacao,
+    funcionarioParaAtivar,
     abrirCriacao,
     editarFuncionario,
-    excluirFuncionario,
+    inativarFuncionario,
+    confirmarInativacao,
+    cancelarInativacao,
+    ativarFuncionario,
+    confirmarAtivacao,
+    cancelarAtivacao,
     confirmar,
     carregar,
   };

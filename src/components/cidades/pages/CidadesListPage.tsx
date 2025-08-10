@@ -5,6 +5,7 @@ import { CidadesTable } from "components/cidades/ui/CidadesTable";
 import { CidadesFilters } from "components/cidades/ui/CidadesFilters";
 import { useCidades } from "../state/useCidades";
 import { CidadeFormModal } from "components/cidades/ui/CidadeFormModal";
+import ModalConfirmacaoExclusao from "../ui/ModalConfirmacaoExclusao";
 
 const CidadesListPage: React.FC = () => {
   const {
@@ -16,6 +17,8 @@ const CidadesListPage: React.FC = () => {
     itensPorPagina,
     termoBusca,
     setTermoBusca,
+    filtroRegiao,
+    setFiltroRegiao,
     ordenarPor,
     direcaoOrdenacao,
     alternarOrdenacao,
@@ -29,11 +32,30 @@ const CidadesListPage: React.FC = () => {
     setValores,
     erros,
     confirmar,
+    editando,
+    mostrarModalExclusao,
+    cidadeParaExcluir,
+    confirmarExclusao,
+    cancelarExclusao,
   } = useCidades();
 
   useEffect(() => {
     carregar();
   }, [carregar]);
+
+  useEffect(() => {
+    if (editando) {
+      setValores({
+        nome: editando.nome || "",
+        estado: editando.estado || "",
+        regiao: editando.regiao ? editando.regiao.toLowerCase() : "",
+        distancia: editando.distancia ? String(editando.distancia) : "",
+        pesoMinimo: editando.pesoMinimo ? String(editando.pesoMinimo) : "",
+        rotaId: editando.rotaId || "",
+        observacao: editando.observacao || "",
+      });
+    }
+  }, [editando, setValores]);
 
   if (loading) {
     return (
@@ -58,7 +80,12 @@ const CidadesListPage: React.FC = () => {
       </div>
 
       <div className="card">
-        <CidadesFilters termo={termoBusca} onChangeTermo={setTermoBusca} />
+        <CidadesFilters
+          termo={termoBusca}
+          onChangeTermo={setTermoBusca}
+          filtroRegiao={filtroRegiao}
+          onChangeFiltroRegiao={setFiltroRegiao}
+        />
       </div>
 
       <div className="card">
@@ -87,7 +114,7 @@ const CidadesListPage: React.FC = () => {
               </button>
               {Array.from(
                 { length: totalPaginado.totalPaginas },
-                (_, i) => i + 1,
+                (_, i) => i + 1
               ).map((page) => (
                 <button
                   key={page}
@@ -104,7 +131,7 @@ const CidadesListPage: React.FC = () => {
               <button
                 onClick={() =>
                   setPaginaAtual(
-                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
+                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}
@@ -119,12 +146,19 @@ const CidadesListPage: React.FC = () => {
 
       <CidadeFormModal
         aberto={mostrarModal}
-        editando={null}
+        editando={editando}
         valores={valores}
         erros={erros}
         onChange={setValores}
         onCancelar={() => setMostrarModal(false)}
         onConfirmar={confirmar}
+      />
+
+      <ModalConfirmacaoExclusao
+        aberto={mostrarModalExclusao}
+        cidade={cidadeParaExcluir}
+        onConfirmar={confirmarExclusao}
+        onCancelar={cancelarExclusao}
       />
     </div>
   );

@@ -1,5 +1,11 @@
-import React from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect } from "react";
 import type { CidadeInput, Cidade } from "../types";
+import {
+  REGIOES_BRASIL,
+  ESTADOS_BRASIL,
+  obterRegiaoPorEstado,
+} from "utils/constants";
 
 type Props = {
   aberto: boolean;
@@ -11,36 +17,6 @@ type Props = {
   onConfirmar: () => void;
 };
 
-const ESTADOS = [
-  { sigla: "AC", nome: "Acre" },
-  { sigla: "AL", nome: "Alagoas" },
-  { sigla: "AP", nome: "Amapá" },
-  { sigla: "AM", nome: "Amazonas" },
-  { sigla: "BA", nome: "Bahia" },
-  { sigla: "CE", nome: "Ceará" },
-  { sigla: "DF", nome: "Distrito Federal" },
-  { sigla: "ES", nome: "Espírito Santo" },
-  { sigla: "GO", nome: "Goiás" },
-  { sigla: "MA", nome: "Maranhão" },
-  { sigla: "MT", nome: "Mato Grosso" },
-  { sigla: "MS", nome: "Mato Grosso do Sul" },
-  { sigla: "MG", nome: "Minas Gerais" },
-  { sigla: "PA", nome: "Pará" },
-  { sigla: "PB", nome: "Paraíba" },
-  { sigla: "PR", nome: "Paraná" },
-  { sigla: "PE", nome: "Pernambuco" },
-  { sigla: "PI", nome: "Piauí" },
-  { sigla: "RJ", nome: "Rio de Janeiro" },
-  { sigla: "RN", nome: "Rio Grande do Norte" },
-  { sigla: "RS", nome: "Rio Grande do Sul" },
-  { sigla: "RO", nome: "Rondônia" },
-  { sigla: "RR", nome: "Roraima" },
-  { sigla: "SC", nome: "Santa Catarina" },
-  { sigla: "SP", nome: "São Paulo" },
-  { sigla: "SE", nome: "Sergipe" },
-  { sigla: "TO", nome: "Tocantins" },
-];
-
 export const CidadeFormModal: React.FC<Props> = ({
   aberto,
   editando,
@@ -50,6 +26,17 @@ export const CidadeFormModal: React.FC<Props> = ({
   onCancelar,
   onConfirmar,
 }) => {
+  // Preencher automaticamente a região quando o estado for alterado
+  useEffect(() => {
+    if (valores.estado) {
+      const regiaoAutomatica = obterRegiaoPorEstado(valores.estado);
+      if (regiaoAutomatica) {
+        // Sempre atualizar a região quando o estado mudar
+        onChange({ ...valores, regiao: regiaoAutomatica });
+      }
+    }
+  }, [valores.estado, onChange]);
+
   if (!aberto) return null;
 
   return (
@@ -82,13 +69,20 @@ export const CidadeFormModal: React.FC<Props> = ({
                 </label>
                 <select
                   value={valores.estado}
-                  onChange={(e) =>
-                    onChange({ ...valores, estado: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const estadoSelecionado = e.target.value;
+                    const regiaoAutomatica =
+                      obterRegiaoPorEstado(estadoSelecionado);
+                    onChange({
+                      ...valores,
+                      estado: estadoSelecionado,
+                      regiao: regiaoAutomatica || "",
+                    });
+                  }}
                   className={`input-field ${erros.estado ? "border-red-500" : ""}`}
                 >
                   <option value="">Selecione um estado</option>
-                  {ESTADOS.map((estado) => (
+                  {ESTADOS_BRASIL.map((estado) => (
                     <option key={estado.sigla} value={estado.sigla}>
                       {estado.sigla} - {estado.nome}
                     </option>
@@ -102,15 +96,24 @@ export const CidadeFormModal: React.FC<Props> = ({
                 <label className="block text-sm font-medium text-gray-700">
                   Região
                 </label>
-                <input
-                  type="text"
-                  value={valores.regiao}
+                <select
+                  value={valores.regiao || ""}
                   onChange={(e) =>
                     onChange({ ...valores, regiao: e.target.value })
                   }
-                  className="input-field"
-                  placeholder="Ex: Nordeste, Sudeste..."
-                />
+                  className="input-field bg-gray-100 cursor-not-allowed"
+                  disabled={true}
+                >
+                  <option value="">Selecione uma região</option>
+                  {REGIOES_BRASIL.map((regiao) => (
+                    <option key={regiao.valor} value={regiao.valor}>
+                      {regiao.nome}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Região definida automaticamente pelo estado
+                </p>
               </div>
             </div>
 
@@ -130,6 +133,48 @@ export const CidadeFormModal: React.FC<Props> = ({
               {erros.distancia && (
                 <p className="text-red-500 text-xs mt-1">{erros.distancia}</p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Peso Mínimo (kg)
+              </label>
+              <input
+                type="text"
+                value={valores.pesoMinimo}
+                onChange={(e) =>
+                  onChange({ ...valores, pesoMinimo: e.target.value })
+                }
+                className={`input-field ${erros.pesoMinimo ? "border-red-500" : ""}`}
+                placeholder="Ex: 100"
+              />
+              {erros.pesoMinimo && (
+                <p className="text-red-500 text-xs mt-1">{erros.pesoMinimo}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Rota
+              </label>
+              <select
+                value={valores.rotaId || ""}
+                onChange={(e) =>
+                  onChange({ ...valores, rotaId: e.target.value })
+                }
+                className={`input-field ${erros.rotaId ? "border-red-500" : ""}`}
+              >
+                <option value="">Selecione uma rota</option>
+                <option value="placeholder">Rota 1 (Placeholder)</option>
+                <option value="placeholder2">Rota 2 (Placeholder)</option>
+              </select>
+              {erros.rotaId && (
+                <p className="text-red-500 text-xs mt-1">{erros.rotaId}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Campo temporário - será implementado quando o sistema de rotas
+                estiver disponível
+              </p>
             </div>
 
             <div>

@@ -9,7 +9,7 @@ type Props = {
   direcaoOrdenacao: DirecaoOrdenacao;
   onOrdenar: (campo: OrdenacaoCampo) => void;
   onEditar: (cidade: Cidade) => void;
-  onExcluir: (id: string) => void;
+  onExcluir: (cidade: Cidade) => void;
 };
 
 export const CidadesTable: React.FC<Props> = ({
@@ -66,6 +66,15 @@ export const CidadesTable: React.FC<Props> = ({
                 Distância {renderSeta("distancia")}
               </div>
             </th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("pesoMinimo")}
+            >
+              <div className="flex items-center">
+                Peso Mínimo {renderSeta("pesoMinimo")}
+              </div>
+            </th>
+            <th className="table-header">Rota</th>
             <th className="table-header">Ações</th>
           </tr>
         </thead>
@@ -98,6 +107,16 @@ export const CidadesTable: React.FC<Props> = ({
                 </div>
               </td>
               <td className="table-cell">
+                <div className="text-sm text-gray-900">
+                  {cidade.pesoMinimo ? `${cidade.pesoMinimo} kg` : "-"}
+                </div>
+              </td>
+              <td className="table-cell">
+                <div className="text-sm text-gray-900">
+                  {cidade.rotaId || "-"}
+                </div>
+              </td>
+              <td className="table-cell">
                 <div className="flex space-x-2">
                   <button
                     onClick={() => onEditar(cidade)}
@@ -106,7 +125,7 @@ export const CidadesTable: React.FC<Props> = ({
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => onExcluir(cidade.id)}
+                    onClick={() => onExcluir(cidade)}
                     className="text-red-600 hover:text-red-900"
                   >
                     <Trash2 className="h-4 w-4" />

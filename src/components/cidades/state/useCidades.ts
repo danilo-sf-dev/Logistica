@@ -8,6 +8,7 @@ export type OrdenacaoCampo =
   | "estado"
   | "regiao"
   | "distancia"
+  | "pesoMinimo"
   | "dataCriacao"
   | "dataAtualizacao";
 export type DirecaoOrdenacao = "asc" | "desc";
@@ -19,7 +20,10 @@ export function useCidades() {
   const [loading, setLoading] = useState(true);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Cidade | null>(null);
+  const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
+  const [cidadeParaExcluir, setCidadeParaExcluir] = useState<Cidade | null>(null);
   const [termoBusca, setTermoBusca] = useState("");
+  const [filtroRegiao, setFiltroRegiao] = useState("");
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [ordenarPor, setOrdenarPor] = useState<OrdenacaoCampo>("dataCriacao");
   const [direcaoOrdenacao, setDirecaoOrdenacao] =
@@ -29,6 +33,8 @@ export function useCidades() {
     estado: "",
     regiao: "",
     distancia: "",
+    pesoMinimo: "",
+    rotaId: "",
     observacao: "",
   });
   const [erros, setErros] = useState<
@@ -57,6 +63,9 @@ export function useCidades() {
     if (input.distancia && parseFloat(input.distancia) < 0) {
       novosErros.distancia = "Distância deve ser um número positivo";
     }
+    if (input.pesoMinimo && parseFloat(input.pesoMinimo) < 0) {
+      novosErros.pesoMinimo = "Peso mínimo deve ser um número positivo";
+    }
     setErros(novosErros);
     return Object.keys(novosErros).length === 0;
   }, []);
@@ -72,6 +81,8 @@ export function useCidades() {
         ...valores,
         nome: valores.nome.toUpperCase(),
         regiao: valores.regiao?.toUpperCase() ?? "",
+        pesoMinimo: valores.pesoMinimo,
+        rotaId: valores.rotaId,
       };
 
       if (editando) {
@@ -89,6 +100,8 @@ export function useCidades() {
         estado: "",
         regiao: "",
         distancia: "",
+        pesoMinimo: "",
+        rotaId: "",
         observacao: "",
       });
       await carregar();
@@ -105,6 +118,8 @@ export function useCidades() {
       estado: "",
       regiao: "",
       distancia: "",
+      pesoMinimo: "",
+      rotaId: "",
       observacao: "",
     });
     setMostrarModal(true);
@@ -117,26 +132,43 @@ export function useCidades() {
       estado: cidade.estado || "",
       regiao: cidade.regiao || "",
       distancia: cidade.distancia ? String(cidade.distancia) : "",
+      pesoMinimo: cidade.pesoMinimo ? String(cidade.pesoMinimo) : "",
+      rotaId: cidade.rotaId || "",
       observacao: cidade.observacao || "",
     });
     setMostrarModal(true);
   }, []);
 
   const excluirCidade = useCallback(
-    async (id: string) => {
-      if (window.confirm("Tem certeza que deseja excluir esta cidade?")) {
-        try {
-          await cidadesService.excluir(id);
-          showNotification("Cidade excluída com sucesso!", "success");
-          await carregar();
-        } catch (error) {
-          console.error("Erro ao excluir cidade:", error);
-          showNotification("Erro ao excluir cidade", "error");
-        }
+    (cidade: Cidade) => {
+      setCidadeParaExcluir(cidade);
+      setMostrarModalExclusao(true);
+    },
+    []
+  );
+
+  const confirmarExclusao = useCallback(
+    async () => {
+      if (!cidadeParaExcluir) return;
+      
+      try {
+        await cidadesService.excluir(cidadeParaExcluir.id);
+        showNotification("Cidade excluída com sucesso!", "success");
+        setMostrarModalExclusao(false);
+        setCidadeParaExcluir(null);
+        await carregar();
+      } catch (error) {
+        console.error("Erro ao excluir cidade:", error);
+        showNotification("Erro ao excluir cidade", "error");
       }
     },
-    [carregar, showNotification],
+    [cidadeParaExcluir, carregar, showNotification]
   );
+
+  const cancelarExclusao = useCallback(() => {
+    setMostrarModalExclusao(false);
+    setCidadeParaExcluir(null);
+  }, []);
 
   const alternarOrdenacao = useCallback(
     (campo: OrdenacaoCampo) => {
@@ -147,18 +179,25 @@ export function useCidades() {
         setDirecaoOrdenacao("asc");
       }
     },
-    [direcaoOrdenacao, ordenarPor],
+    [direcaoOrdenacao, ordenarPor]
   );
 
   const listaFiltrada = useMemo(() => {
     const termo = termoBusca.toLowerCase();
-    return lista.filter(
-      (c) =>
+    const regiao = filtroRegiao.toLowerCase();
+
+    return lista.filter((c) => {
+      const matchTermo =
+        !termo ||
         c.nome?.toLowerCase().includes(termo) ||
         c.estado?.toLowerCase().includes(termo) ||
-        c.regiao?.toLowerCase().includes(termo),
-    );
-  }, [lista, termoBusca]);
+        c.regiao?.toLowerCase().includes(termo);
+
+      const matchRegiao = !regiao || c.regiao?.toLowerCase() === regiao;
+
+      return matchTermo && matchRegiao;
+    });
+  }, [lista, termoBusca, filtroRegiao]);
 
   const listaOrdenada = useMemo(() => {
     const copia = [...listaFiltrada];
@@ -199,6 +238,8 @@ export function useCidades() {
     itensPorPagina,
     termoBusca,
     setTermoBusca,
+    filtroRegiao,
+    setFiltroRegiao,
     ordenarPor,
     direcaoOrdenacao,
     alternarOrdenacao,
@@ -213,5 +254,9 @@ export function useCidades() {
     excluirCidade,
     confirmar,
     carregar,
+    mostrarModalExclusao,
+    cidadeParaExcluir,
+    confirmarExclusao,
+    cancelarExclusao,
   };
 }

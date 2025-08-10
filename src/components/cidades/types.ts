@@ -4,15 +4,19 @@ export type Cidade = {
   estado: string;
   regiao?: string;
   distancia?: number | null;
+  pesoMinimo?: number | null;
+  rotaId?: string | null;
   observacao?: string;
-  dataCriacao?: any; // Timestamp do Firestore
-  dataAtualizacao?: any; // Timestamp do Firestore
+  dataCriacao?: any;
+  dataAtualizacao?: any;
 };
 
 export type CidadeInput = {
   nome: string;
   estado: string;
   regiao?: string;
-  distancia?: string; // mantemos como string no formulário e convertemos no service
+  distancia?: string;
+  pesoMinimo?: string;
+  rotaId?: string;
   observacao?: string;
 };

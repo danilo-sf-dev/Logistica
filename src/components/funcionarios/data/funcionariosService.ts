@@ -43,6 +43,7 @@ async function criar(input: FuncionarioInput): Promise<string> {
     celular: limpar(input.celular),
     cep: input.cep ? limpar(input.cep) : undefined,
     salario: normalizeMoneyString(input.salario),
+    ativo: input.ativo !== undefined ? input.ativo : true,
     dataCriacao: serverTimestamp(),
     dataAtualizacao: serverTimestamp(),
   };
@@ -57,6 +58,7 @@ async function atualizar(id: string, input: FuncionarioInput): Promise<void> {
     celular: limpar(input.celular),
     cep: input.cep ? limpar(input.cep) : undefined,
     salario: normalizeMoneyString(input.salario),
+    ativo: input.ativo !== undefined ? input.ativo : true,
     dataAtualizacao: serverTimestamp(),
   };
   await updateDoc(doc(db, COLLECTION, id), payload);
@@ -66,4 +68,18 @@ async function excluir(id: string): Promise<void> {
   await deleteDoc(doc(db, COLLECTION, id));
 }
 
-export const funcionariosService = { listar, criar, atualizar, excluir };
+async function inativar(id: string): Promise<void> {
+  await updateDoc(doc(db, COLLECTION, id), {
+    ativo: false,
+    dataAtualizacao: serverTimestamp(),
+  });
+}
+
+async function ativar(id: string): Promise<void> {
+  await updateDoc(doc(db, COLLECTION, id), {
+    ativo: true,
+    dataAtualizacao: serverTimestamp(),
+  });
+}
+
+export const funcionariosService = { listar, criar, atualizar, excluir, inativar, ativar };
