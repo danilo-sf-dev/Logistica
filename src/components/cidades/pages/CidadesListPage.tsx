@@ -5,6 +5,7 @@ import { CidadesTable } from "components/cidades/ui/CidadesTable";
 import { CidadesFilters } from "components/cidades/ui/CidadesFilters";
 import { useCidades } from "../state/useCidades";
 import { CidadeFormModal } from "components/cidades/ui/CidadeFormModal";
+import ModalConfirmacaoExclusao from "../ui/ModalConfirmacaoExclusao";
 
 const CidadesListPage: React.FC = () => {
   const {
@@ -32,6 +33,10 @@ const CidadesListPage: React.FC = () => {
     erros,
     confirmar,
     editando,
+    mostrarModalExclusao,
+    cidadeParaExcluir,
+    confirmarExclusao,
+    cancelarExclusao,
   } = useCidades();
 
   useEffect(() => {
@@ -147,6 +152,13 @@ const CidadesListPage: React.FC = () => {
         onChange={setValores}
         onCancelar={() => setMostrarModal(false)}
         onConfirmar={confirmar}
+      />
+
+      <ModalConfirmacaoExclusao
+        aberto={mostrarModalExclusao}
+        cidade={cidadeParaExcluir}
+        onConfirmar={confirmarExclusao}
+        onCancelar={cancelarExclusao}
       />
     </div>
   );

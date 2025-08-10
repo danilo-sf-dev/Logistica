@@ -9,7 +9,7 @@ type Props = {
   direcaoOrdenacao: DirecaoOrdenacao;
   onOrdenar: (campo: OrdenacaoCampo) => void;
   onEditar: (cidade: Cidade) => void;
-  onExcluir: (id: string) => void;
+  onExcluir: (cidade: Cidade) => void;
 };
 
 export const CidadesTable: React.FC<Props> = ({
@@ -125,7 +125,7 @@ export const CidadesTable: React.FC<Props> = ({
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => onExcluir(cidade.id)}
+                    onClick={() => onExcluir(cidade)}
                     className="text-red-600 hover:text-red-900"
                   >
                     <Trash2 className="h-4 w-4" />

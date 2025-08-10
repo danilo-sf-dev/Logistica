@@ -20,6 +20,8 @@ export function useCidades() {
   const [loading, setLoading] = useState(true);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Cidade | null>(null);
+  const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
+  const [cidadeParaExcluir, setCidadeParaExcluir] = useState<Cidade | null>(null);
   const [termoBusca, setTermoBusca] = useState("");
   const [filtroRegiao, setFiltroRegiao] = useState("");
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -138,20 +140,35 @@ export function useCidades() {
   }, []);
 
   const excluirCidade = useCallback(
-    async (id: string) => {
-      if (window.confirm("Tem certeza que deseja excluir esta cidade?")) {
-        try {
-          await cidadesService.excluir(id);
-          showNotification("Cidade excluída com sucesso!", "success");
-          await carregar();
-        } catch (error) {
-          console.error("Erro ao excluir cidade:", error);
-          showNotification("Erro ao excluir cidade", "error");
-        }
+    (cidade: Cidade) => {
+      setCidadeParaExcluir(cidade);
+      setMostrarModalExclusao(true);
+    },
+    []
+  );
+
+  const confirmarExclusao = useCallback(
+    async () => {
+      if (!cidadeParaExcluir) return;
+      
+      try {
+        await cidadesService.excluir(cidadeParaExcluir.id);
+        showNotification("Cidade excluída com sucesso!", "success");
+        setMostrarModalExclusao(false);
+        setCidadeParaExcluir(null);
+        await carregar();
+      } catch (error) {
+        console.error("Erro ao excluir cidade:", error);
+        showNotification("Erro ao excluir cidade", "error");
       }
     },
-    [carregar, showNotification]
+    [cidadeParaExcluir, carregar, showNotification]
   );
+
+  const cancelarExclusao = useCallback(() => {
+    setMostrarModalExclusao(false);
+    setCidadeParaExcluir(null);
+  }, []);
 
   const alternarOrdenacao = useCallback(
     (campo: OrdenacaoCampo) => {
@@ -237,5 +254,9 @@ export function useCidades() {
     excluirCidade,
     confirmar,
     carregar,
+    mostrarModalExclusao,
+    cidadeParaExcluir,
+    confirmarExclusao,
+    cancelarExclusao,
   };
 }
