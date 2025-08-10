@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
+import ConfirmationModal from "../../common/modals/ConfirmationModal";
 import { FuncionariosTable } from "../ui/FuncionariosTable";
 import FuncionarioFormModal from "../ui/FuncionarioFormModal";
-import ModalConfirmacaoInativacao from "../ui/ModalConfirmacaoInativacao";
-import ModalConfirmacaoAtivacao from "../ui/ModalConfirmacaoAtivacao";
 import { useFuncionarios } from "../state/useFuncionarios";
+
+import { maskCPF } from "utils/masks";
 
 const FuncionariosListPage: React.FC = () => {
   const {
@@ -169,7 +170,7 @@ const FuncionariosListPage: React.FC = () => {
               </button>
               {Array.from(
                 { length: totalPaginado.totalPaginas },
-                (_, i) => i + 1,
+                (_, i) => i + 1
               ).map((page) => (
                 <button
                   key={page}
@@ -186,7 +187,7 @@ const FuncionariosListPage: React.FC = () => {
               <button
                 onClick={() =>
                   setPaginaAtual(
-                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
+                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}
@@ -209,18 +210,72 @@ const FuncionariosListPage: React.FC = () => {
         somenteLeitura={editando ? !editando.ativo : false}
       />
 
-      <ModalConfirmacaoInativacao
-        aberto={mostrarModalInativacao}
-        funcionario={funcionarioParaInativar}
-        onConfirmar={confirmarInativacao}
-        onCancelar={cancelarInativacao}
+      {/* Modal de Confirmação de Inativação */}
+      <ConfirmationModal
+        type="warning"
+        title="Confirmar Inativação"
+        message="Tem certeza que deseja inativar este funcionário?"
+        details={
+          funcionarioParaInativar
+            ? [
+                { label: "Nome", value: funcionarioParaInativar.nome },
+                {
+                  label: "Função",
+                  value: funcionarioParaInativar.funcao || "motorista",
+                },
+                {
+                  label: "CPF",
+                  value: maskCPF(funcionarioParaInativar.cpf || ""),
+                },
+              ]
+            : []
+        }
+        isOpen={mostrarModalInativacao}
+        onClose={cancelarInativacao}
+        primaryAction={{
+          label: "Confirmar Inativação",
+          onClick: confirmarInativacao,
+          variant: "warning",
+        }}
+        secondaryAction={{
+          label: "Cancelar",
+          onClick: cancelarInativacao,
+          variant: "secondary",
+        }}
       />
 
-      <ModalConfirmacaoAtivacao
-        aberto={mostrarModalAtivacao}
-        funcionario={funcionarioParaAtivar}
-        onConfirmar={confirmarAtivacao}
-        onCancelar={cancelarAtivacao}
+      {/* Modal de Confirmação de Ativação */}
+      <ConfirmationModal
+        type="success"
+        title="Ativar Funcionário"
+        message="Tem certeza que deseja ativar este funcionário?"
+        details={
+          funcionarioParaAtivar
+            ? [
+                { label: "Nome", value: funcionarioParaAtivar.nome },
+                {
+                  label: "Função",
+                  value: funcionarioParaAtivar.funcao || "motorista",
+                },
+                {
+                  label: "CPF",
+                  value: maskCPF(funcionarioParaAtivar.cpf || ""),
+                },
+              ]
+            : []
+        }
+        isOpen={mostrarModalAtivacao}
+        onClose={cancelarAtivacao}
+        primaryAction={{
+          label: "Confirmar Ativação",
+          onClick: confirmarAtivacao,
+          variant: "success",
+        }}
+        secondaryAction={{
+          label: "Cancelar",
+          onClick: cancelarAtivacao,
+          variant: "secondary",
+        }}
       />
     </div>
   );
