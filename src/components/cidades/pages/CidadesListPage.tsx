@@ -29,11 +29,24 @@ const CidadesListPage: React.FC = () => {
     setValores,
     erros,
     confirmar,
+    editando,
   } = useCidades();
 
   useEffect(() => {
     carregar();
   }, [carregar]);
+
+  useEffect(() => {
+    if (editando) {
+      setValores({
+        nome: editando.nome || "",
+        estado: editando.estado || "",
+        regiao: editando.regiao ? editando.regiao.toLowerCase() : "",
+        distancia: editando.distancia ? String(editando.distancia) : "",
+        observacao: editando.observacao || "",
+      });
+    }
+  }, [editando, setValores]);
 
   if (loading) {
     return (
@@ -87,7 +100,7 @@ const CidadesListPage: React.FC = () => {
               </button>
               {Array.from(
                 { length: totalPaginado.totalPaginas },
-                (_, i) => i + 1,
+                (_, i) => i + 1
               ).map((page) => (
                 <button
                   key={page}
@@ -104,7 +117,7 @@ const CidadesListPage: React.FC = () => {
               <button
                 onClick={() =>
                   setPaginaAtual(
-                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
+                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}
@@ -119,7 +132,7 @@ const CidadesListPage: React.FC = () => {
 
       <CidadeFormModal
         aberto={mostrarModal}
-        editando={null}
+        editando={editando}
         valores={valores}
         erros={erros}
         onChange={setValores}
