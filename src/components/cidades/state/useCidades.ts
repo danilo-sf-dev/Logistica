@@ -21,7 +21,9 @@ export function useCidades() {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Cidade | null>(null);
   const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
-  const [cidadeParaExcluir, setCidadeParaExcluir] = useState<Cidade | null>(null);
+  const [cidadeParaExcluir, setCidadeParaExcluir] = useState<Cidade | null>(
+    null,
+  );
   const [termoBusca, setTermoBusca] = useState("");
   const [filtroRegiao, setFiltroRegiao] = useState("");
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -139,31 +141,25 @@ export function useCidades() {
     setMostrarModal(true);
   }, []);
 
-  const excluirCidade = useCallback(
-    (cidade: Cidade) => {
-      setCidadeParaExcluir(cidade);
-      setMostrarModalExclusao(true);
-    },
-    []
-  );
+  const excluirCidade = useCallback((cidade: Cidade) => {
+    setCidadeParaExcluir(cidade);
+    setMostrarModalExclusao(true);
+  }, []);
 
-  const confirmarExclusao = useCallback(
-    async () => {
-      if (!cidadeParaExcluir) return;
-      
-      try {
-        await cidadesService.excluir(cidadeParaExcluir.id);
-        showNotification("Cidade excluída com sucesso!", "success");
-        setMostrarModalExclusao(false);
-        setCidadeParaExcluir(null);
-        await carregar();
-      } catch (error) {
-        console.error("Erro ao excluir cidade:", error);
-        showNotification("Erro ao excluir cidade", "error");
-      }
-    },
-    [cidadeParaExcluir, carregar, showNotification]
-  );
+  const confirmarExclusao = useCallback(async () => {
+    if (!cidadeParaExcluir) return;
+
+    try {
+      await cidadesService.excluir(cidadeParaExcluir.id);
+      showNotification("Cidade excluída com sucesso!", "success");
+      setMostrarModalExclusao(false);
+      setCidadeParaExcluir(null);
+      await carregar();
+    } catch (error) {
+      console.error("Erro ao excluir cidade:", error);
+      showNotification("Erro ao excluir cidade", "error");
+    }
+  }, [cidadeParaExcluir, carregar, showNotification]);
 
   const cancelarExclusao = useCallback(() => {
     setMostrarModalExclusao(false);
@@ -179,7 +175,7 @@ export function useCidades() {
         setDirecaoOrdenacao("asc");
       }
     },
-    [direcaoOrdenacao, ordenarPor]
+    [direcaoOrdenacao, ordenarPor],
   );
 
   const listaFiltrada = useMemo(() => {

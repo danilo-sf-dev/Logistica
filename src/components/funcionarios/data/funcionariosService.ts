@@ -82,4 +82,11 @@ async function ativar(id: string): Promise<void> {
   });
 }
 
-export const funcionariosService = { listar, criar, atualizar, excluir, inativar, ativar };
+export const funcionariosService = {
+  listar,
+  criar,
+  atualizar,
+  excluir,
+  inativar,
+  ativar,
+};

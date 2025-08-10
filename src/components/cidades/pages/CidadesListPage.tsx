@@ -5,7 +5,7 @@ import { CidadesTable } from "components/cidades/ui/CidadesTable";
 import { CidadesFilters } from "components/cidades/ui/CidadesFilters";
 import { useCidades } from "../state/useCidades";
 import { CidadeFormModal } from "components/cidades/ui/CidadeFormModal";
-import ModalConfirmacaoExclusao from "../ui/ModalConfirmacaoExclusao";
+import { ConfirmationModal } from "components/common/modals";
 
 const CidadesListPage: React.FC = () => {
   const {
@@ -114,7 +114,7 @@ const CidadesListPage: React.FC = () => {
               </button>
               {Array.from(
                 { length: totalPaginado.totalPaginas },
-                (_, i) => i + 1
+                (_, i) => i + 1,
               ).map((page) => (
                 <button
                   key={page}
@@ -131,7 +131,7 @@ const CidadesListPage: React.FC = () => {
               <button
                 onClick={() =>
                   setPaginaAtual(
-                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
+                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}
@@ -154,11 +154,31 @@ const CidadesListPage: React.FC = () => {
         onConfirmar={confirmar}
       />
 
-      <ModalConfirmacaoExclusao
-        aberto={mostrarModalExclusao}
-        cidade={cidadeParaExcluir}
-        onConfirmar={confirmarExclusao}
-        onCancelar={cancelarExclusao}
+      <ConfirmationModal
+        type="danger"
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir esta cidade?"
+        details={
+          cidadeParaExcluir
+            ? [
+                { label: "Cidade", value: cidadeParaExcluir.nome },
+                { label: "Estado", value: cidadeParaExcluir.estado },
+                { label: "Região", value: cidadeParaExcluir.regiao },
+              ]
+            : []
+        }
+        warning="Esta ação não pode ser revertida. Todos os vínculos serão perdidos e será necessário criar uma cidade novamente para ter vínculos novamente."
+        primaryAction={{
+          label: "Confirmar Exclusão",
+          onClick: confirmarExclusao,
+          variant: "danger",
+        }}
+        secondaryAction={{
+          label: "Cancelar",
+          onClick: cancelarExclusao,
+        }}
+        isOpen={mostrarModalExclusao}
+        onClose={cancelarExclusao}
       />
     </div>
   );

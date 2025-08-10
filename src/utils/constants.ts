@@ -80,7 +80,7 @@ export const ESTADO_PARA_REGIAO: Record<string, string> = {
 
 // Função helper para obter a região de um estado
 export const obterRegiaoPorEstado = (
-  siglaEstado: string
+  siglaEstado: string,
 ): string | undefined => {
   return ESTADO_PARA_REGIAO[siglaEstado];
 };

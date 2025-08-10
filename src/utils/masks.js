@@ -142,7 +142,7 @@ export const formatPlaca = (placa) => {
     if (/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(placaLimpa)) {
       return placaLimpa.replace(
         /([A-Z]{3})([0-9])([A-Z])([0-9]{2})/,
-        "$1-$2$3-$4"
+        "$1-$2$3-$4",
       );
     }
     // Padrão Brasil: LWB9390 -> LWB-9390

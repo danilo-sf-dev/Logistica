@@ -9,11 +9,11 @@ type Props = {
   onChangeFiltroRegiao: (value: string) => void;
 };
 
-export const CidadesFilters: React.FC<Props> = ({ 
-  termo, 
-  onChangeTermo, 
-  filtroRegiao, 
-  onChangeFiltroRegiao 
+export const CidadesFilters: React.FC<Props> = ({
+  termo,
+  onChangeTermo,
+  filtroRegiao,
+  onChangeFiltroRegiao,
 }) => {
   return (
     <div className="flex gap-4">
@@ -27,7 +27,7 @@ export const CidadesFilters: React.FC<Props> = ({
           className="input-field pl-10"
         />
       </div>
-      
+
       <div className="w-48">
         <select
           value={filtroRegiao}
