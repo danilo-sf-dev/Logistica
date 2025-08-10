@@ -16,6 +16,8 @@ const CidadesListPage: React.FC = () => {
     itensPorPagina,
     termoBusca,
     setTermoBusca,
+    filtroRegiao,
+    setFiltroRegiao,
     ordenarPor,
     direcaoOrdenacao,
     alternarOrdenacao,
@@ -43,6 +45,8 @@ const CidadesListPage: React.FC = () => {
         estado: editando.estado || "",
         regiao: editando.regiao ? editando.regiao.toLowerCase() : "",
         distancia: editando.distancia ? String(editando.distancia) : "",
+        pesoMinimo: editando.pesoMinimo ? String(editando.pesoMinimo) : "",
+        rotaId: editando.rotaId || "",
         observacao: editando.observacao || "",
       });
     }
@@ -71,7 +75,12 @@ const CidadesListPage: React.FC = () => {
       </div>
 
       <div className="card">
-        <CidadesFilters termo={termoBusca} onChangeTermo={setTermoBusca} />
+        <CidadesFilters
+          termo={termoBusca}
+          onChangeTermo={setTermoBusca}
+          filtroRegiao={filtroRegiao}
+          onChangeFiltroRegiao={setFiltroRegiao}
+        />
       </div>
 
       <div className="card">

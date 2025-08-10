@@ -26,20 +26,10 @@ export const CidadeFormModal: React.FC<Props> = ({
   onCancelar,
   onConfirmar,
 }) => {
-  // Debug temporário
-  console.log("Modal valores:", valores);
-  console.log("Modal editando:", editando);
-
   // Preencher automaticamente a região quando o estado for alterado
   useEffect(() => {
     if (valores.estado) {
       const regiaoAutomatica = obterRegiaoPorEstado(valores.estado);
-      console.log(
-        "Estado:",
-        valores.estado,
-        "Região automática:",
-        regiaoAutomatica
-      );
       if (regiaoAutomatica) {
         // Sempre atualizar a região quando o estado mudar
         onChange({ ...valores, regiao: regiaoAutomatica });
@@ -143,6 +133,48 @@ export const CidadeFormModal: React.FC<Props> = ({
               {erros.distancia && (
                 <p className="text-red-500 text-xs mt-1">{erros.distancia}</p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Peso Mínimo (kg)
+              </label>
+              <input
+                type="text"
+                value={valores.pesoMinimo}
+                onChange={(e) =>
+                  onChange({ ...valores, pesoMinimo: e.target.value })
+                }
+                className={`input-field ${erros.pesoMinimo ? "border-red-500" : ""}`}
+                placeholder="Ex: 100"
+              />
+              {erros.pesoMinimo && (
+                <p className="text-red-500 text-xs mt-1">{erros.pesoMinimo}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Rota
+              </label>
+              <select
+                value={valores.rotaId || ""}
+                onChange={(e) =>
+                  onChange({ ...valores, rotaId: e.target.value })
+                }
+                className={`input-field ${erros.rotaId ? "border-red-500" : ""}`}
+              >
+                <option value="">Selecione uma rota</option>
+                <option value="placeholder">Rota 1 (Placeholder)</option>
+                <option value="placeholder2">Rota 2 (Placeholder)</option>
+              </select>
+              {erros.rotaId && (
+                <p className="text-red-500 text-xs mt-1">{erros.rotaId}</p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Campo temporário - será implementado quando o sistema de rotas
+                estiver disponível
+              </p>
             </div>
 
             <div>

@@ -66,6 +66,15 @@ export const CidadesTable: React.FC<Props> = ({
                 Distância {renderSeta("distancia")}
               </div>
             </th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("pesoMinimo")}
+            >
+              <div className="flex items-center">
+                Peso Mínimo {renderSeta("pesoMinimo")}
+              </div>
+            </th>
+            <th className="table-header">Rota</th>
             <th className="table-header">Ações</th>
           </tr>
         </thead>
@@ -95,6 +104,16 @@ export const CidadesTable: React.FC<Props> = ({
               <td className="table-cell">
                 <div className="text-sm text-gray-900">
                   {cidade.distancia ? `${cidade.distancia} km` : "-"}
+                </div>
+              </td>
+              <td className="table-cell">
+                <div className="text-sm text-gray-900">
+                  {cidade.pesoMinimo ? `${cidade.pesoMinimo} kg` : "-"}
+                </div>
+              </td>
+              <td className="table-cell">
+                <div className="text-sm text-gray-900">
+                  {cidade.rotaId || "-"}
                 </div>
               </td>
               <td className="table-cell">

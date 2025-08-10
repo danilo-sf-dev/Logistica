@@ -27,6 +27,8 @@ async function criar(input: CidadeInput): Promise<string> {
   const payload = {
     ...input,
     distancia: input.distancia ? Number(input.distancia) : null,
+    pesoMinimo: input.pesoMinimo ? Number(input.pesoMinimo) : null,
+    rotaId: input.rotaId || null,
     dataCriacao: serverTimestamp(),
     dataAtualizacao: serverTimestamp(),
   };
@@ -38,6 +40,8 @@ async function atualizar(id: string, input: CidadeInput): Promise<void> {
   const payload = {
     ...input,
     distancia: input.distancia ? Number(input.distancia) : null,
+    pesoMinimo: input.pesoMinimo ? Number(input.pesoMinimo) : null,
+    rotaId: input.rotaId || null,
     dataAtualizacao: serverTimestamp(),
   };
   await updateDoc(doc(db, COLLECTION, id), payload);
