@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { X, Eye } from "lucide-react";
 import { Rota, RotaFormData } from "../types";
+import { cidadesService } from "../../cidades/data/cidadesService";
+import type { Cidade } from "../../cidades/types";
 
 interface RotaFormModalProps {
   isOpen: boolean;
@@ -34,6 +36,8 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cidadesVinculadas, setCidadesVinculadas] = useState<Cidade[]>([]);
+  const [loadingCidades, setLoadingCidades] = useState(false);
 
   useEffect(() => {
     if (editingRota) {
@@ -46,10 +50,36 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
           : [], // Garantir que seja array
         cidades: [...editingRota.cidades],
       });
+
+      // Buscar dados das cidades vinculadas
+      if (editingRota.cidades && editingRota.cidades.length > 0) {
+        buscarCidadesVinculadas(editingRota.cidades);
+      } else {
+        setCidadesVinculadas([]);
+      }
     } else {
       resetForm();
+      setCidadesVinculadas([]);
     }
   }, [editingRota]);
+
+  const buscarCidadesVinculadas = async (cidadeIds: string[]) => {
+    setLoadingCidades(true);
+    try {
+      const cidades = await Promise.all(
+        cidadeIds.map((id) => cidadesService.getById(id)),
+      );
+      const cidadesValidas = cidades.filter(
+        (cidade): cidade is Cidade => cidade !== null,
+      );
+      setCidadesVinculadas(cidadesValidas);
+    } catch (error) {
+      console.error("Erro ao buscar cidades vinculadas:", error);
+      setCidadesVinculadas([]);
+    } finally {
+      setLoadingCidades(false);
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -199,16 +229,24 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                     <Eye className="h-4 w-4 mr-2" />
                     Cidades vinculadas: {formData.cidades.length}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.cidades.map((cidade, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                      >
-                        {cidade}
-                      </span>
-                    ))}
-                  </div>
+                  {loadingCidades ? (
+                    <div className="text-center py-2">
+                      <p className="text-sm text-gray-500">
+                        Carregando cidades...
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {cidadesVinculadas.map((cidade) => (
+                        <span
+                          key={cidade.id}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        >
+                          {cidade.nome}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <p className="text-xs text-gray-500 mt-2">
                     Para vincular cidades a esta rota, vá para a seção de
                     Cidades e selecione esta rota no dropdown.

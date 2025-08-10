@@ -6,6 +6,7 @@ import {
   ESTADOS_BRASIL,
   obterRegiaoPorEstado,
 } from "utils/constants";
+import { useRotasForCidades } from "../state/useRotasForCidades";
 
 type Props = {
   aberto: boolean;
@@ -26,6 +27,8 @@ export const CidadeFormModal: React.FC<Props> = ({
   onCancelar,
   onConfirmar,
 }) => {
+  const { rotas, loading: loadingRotas } = useRotasForCidades();
+
   // Preencher automaticamente a região quando o estado for alterado
   useEffect(() => {
     if (valores.estado) {
@@ -163,17 +166,23 @@ export const CidadeFormModal: React.FC<Props> = ({
                   onChange({ ...valores, rotaId: e.target.value })
                 }
                 className={`input-field ${erros.rotaId ? "border-red-500" : ""}`}
+                disabled={loadingRotas}
               >
-                <option value="">Selecione uma rota</option>
-                <option value="placeholder">Rota 1 (Placeholder)</option>
-                <option value="placeholder2">Rota 2 (Placeholder)</option>
+                <option value="">
+                  {loadingRotas ? "Carregando rotas..." : "Selecione uma rota"}
+                </option>
+                {rotas.map((rota) => (
+                  <option key={rota.id} value={rota.id}>
+                    {rota.nome} -{" "}
+                    {new Date(rota.dataRota).toLocaleDateString("pt-BR")}
+                  </option>
+                ))}
               </select>
               {erros.rotaId && (
                 <p className="text-red-500 text-xs mt-1">{erros.rotaId}</p>
               )}
               <p className="text-xs text-gray-500 mt-1">
-                Campo temporário - será implementado quando o sistema de rotas
-                estiver disponível
+                Selecione uma rota para vincular esta cidade
               </p>
             </div>
 

@@ -53,7 +53,7 @@ export const useRotas = () => {
         return false;
       }
     },
-    [fetchRotas, showNotification]
+    [fetchRotas, showNotification],
   );
 
   const updateRota = useCallback(
@@ -69,7 +69,7 @@ export const useRotas = () => {
         return false;
       }
     },
-    [fetchRotas, showNotification]
+    [fetchRotas, showNotification],
   );
 
   const deleteRota = useCallback(
@@ -85,7 +85,7 @@ export const useRotas = () => {
         return false;
       }
     },
-    [fetchRotas, showNotification]
+    [fetchRotas, showNotification],
   );
 
   const updateFilters = useCallback((newFilters: Partial<RotaFilters>) => {
@@ -108,8 +108,8 @@ export const useRotas = () => {
           (rota.cidades &&
             Array.isArray(rota.cidades) &&
             rota.cidades.some((cidade) =>
-              cidade?.toLowerCase().includes(filters.searchTerm.toLowerCase())
-            ))
+              cidade?.toLowerCase().includes(filters.searchTerm.toLowerCase()),
+            )),
       );
     }
 
@@ -118,7 +118,7 @@ export const useRotas = () => {
         (rota) =>
           rota.diaSemana &&
           Array.isArray(rota.diaSemana) &&
-          rota.diaSemana.includes(filters.diaSemana)
+          rota.diaSemana.includes(filters.diaSemana),
       );
     }
 

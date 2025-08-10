@@ -6,5 +6,6 @@ export * from "./ui/CidadeFormModal";
 export { default as ModalConfirmacaoExclusaoGenerico } from "./ui/ModalConfirmacaoExclusaoGenerico";
 export { default as CidadesTestePage } from "./pages/CidadesTestePage";
 export * from "./state/useCidades";
+export * from "./state/useRotasForCidades";
 export * from "./data/cidadesService";
 export * from "./types";

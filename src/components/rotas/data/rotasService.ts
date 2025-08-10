@@ -21,7 +21,7 @@ export const rotasService = {
       console.log("rotasService.getAll() iniciado");
       const q = query(
         collection(db, COLLECTION_NAME),
-        orderBy("dataCriacao", "desc")
+        orderBy("dataCriacao", "desc"),
       );
       console.log("Query criada:", q);
       const snapshot = await getDocs(q);
@@ -98,13 +98,52 @@ export const rotasService = {
     }
   },
 
+  async updateCidadesVinculadas(
+    rotaId: string,
+    cidadeId: string,
+    adicionar: boolean,
+  ): Promise<void> {
+    try {
+      const docRef = doc(db, COLLECTION_NAME, rotaId);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        throw new Error("Rota não encontrada");
+      }
+
+      const rotaData = docSnap.data();
+      const cidadesAtuais = rotaData.cidades || [];
+
+      let novasCidades;
+      if (adicionar) {
+        // Adicionar cidade se não estiver já na lista
+        if (!cidadesAtuais.includes(cidadeId)) {
+          novasCidades = [...cidadesAtuais, cidadeId];
+        } else {
+          return; // Cidade já está vinculada
+        }
+      } else {
+        // Remover cidade da lista
+        novasCidades = cidadesAtuais.filter((id) => id !== cidadeId);
+      }
+
+      await updateDoc(docRef, {
+        cidades: novasCidades,
+        dataAtualizacao: new Date(),
+      });
+    } catch (error) {
+      console.error("Erro ao atualizar cidades vinculadas:", error);
+      throw new Error("Erro ao atualizar cidades vinculadas");
+    }
+  },
+
   async getByDiaSemana(diaSemana: string): Promise<Rota[]> {
     try {
       // Busca rotas que contenham o dia da semana especificado no array
       const q = query(
         collection(db, COLLECTION_NAME),
         where("diaSemana", "array-contains", diaSemana),
-        orderBy("dataCriacao", "desc")
+        orderBy("dataCriacao", "desc"),
       );
       const snapshot = await getDocs(q);
       return snapshot.docs.map((doc) => ({
