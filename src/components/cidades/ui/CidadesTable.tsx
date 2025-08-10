@@ -2,6 +2,7 @@ import React from "react";
 import { MapPin, Edit, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import type { Cidade } from "components/cidades/types";
 import type { OrdenacaoCampo, DirecaoOrdenacao } from "../state/useCidades";
+import { useRotasForCidades } from "../state/useRotasForCidades";
 
 type Props = {
   cidades: Cidade[];
@@ -20,6 +21,8 @@ export const CidadesTable: React.FC<Props> = ({
   onEditar,
   onExcluir,
 }) => {
+  const { rotas } = useRotasForCidades();
+
   const renderSeta = (campo: OrdenacaoCampo) => {
     if (ordenarPor !== campo) return null;
     return direcaoOrdenacao === "asc" ? (
@@ -113,7 +116,12 @@ export const CidadesTable: React.FC<Props> = ({
               </td>
               <td className="table-cell">
                 <div className="text-sm text-gray-900">
-                  {cidade.rotaId || "-"}
+                  {cidade.rotaId
+                    ? (() => {
+                        const rota = rotas.find((r) => r.id === cidade.rotaId);
+                        return rota ? rota.nome : "Rota não encontrada";
+                      })()
+                    : "-"}
                 </div>
               </td>
               <td className="table-cell">
