@@ -10,6 +10,7 @@ type Props = {
   onChange: (v: FuncionarioInput) => void;
   onCancelar: () => void;
   onConfirmar: () => void;
+  somenteLeitura?: boolean;
 };
 
 const FuncionarioFormModal: React.FC<Props> = ({
@@ -20,6 +21,7 @@ const FuncionarioFormModal: React.FC<Props> = ({
   onChange,
   onCancelar,
   onConfirmar,
+  somenteLeitura = false,
 }) => {
   // ViaCEP auto-fill
   useEffect(() => {
@@ -44,41 +46,53 @@ const FuncionarioFormModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+      <div className="relative top-10 mx-auto p-6 border w-full max-w-4xl shadow-lg rounded-md bg-white">
         <div className="mt-3">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="text-xl font-medium text-gray-900 mb-6">
             {editando ? "Editar Funcionário" : "Novo Funcionário"}
+            {somenteLeitura && editando && (
+              <span className="ml-3 text-sm text-gray-500 font-normal">
+                (Somente leitura - funcionário inativo)
+              </span>
+            )}
           </h3>
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nome *
               </label>
               <input
                 type="text"
                 value={valores.nome}
                 onChange={(e) => onChange({ ...valores, nome: e.target.value })}
-                className={`input-field ${erros.nome ? "border-red-500" : ""}`}
+                className={`input-field h-11 ${erros.nome ? "border-red-500" : ""} ${
+                  somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                }`}
+                disabled={somenteLeitura}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   CPF *
                 </label>
                 <input
                   type="text"
-                  value={maskCPF(valores.cpf)}
-                  onChange={(e) =>
-                    onChange({ ...valores, cpf: maskCPF(e.target.value) })
-                  }
-                  className={`input-field ${erros.cpf ? "border-red-500" : ""}`}
+                  value={maskCPF(valores.cpf || "")}
+                  onChange={(e) => {
+                    const valorLimpo = e.target.value.replace(/\D/g, "");
+                    onChange({ ...valores, cpf: valorLimpo });
+                  }}
+                  className={`input-field h-11 ${erros.cpf ? "border-red-500" : ""} ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   placeholder="000.000.000-00"
+                  disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   CNH *
                 </label>
                 <input
@@ -87,14 +101,17 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, cnh: e.target.value })
                   }
-                  className={`input-field ${erros.cnh ? "border-red-500" : ""}`}
+                  className={`input-field h-11 ${erros.cnh ? "border-red-500" : ""} ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Venc. CNH
                 </label>
                 <input
@@ -103,11 +120,14 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, cnhVencimento: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Categoria CNH
                 </label>
                 <select
@@ -115,7 +135,10 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, cnhCategoria: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 >
                   <option value="">Selecione</option>
                   <option value="A">A</option>
@@ -127,26 +150,27 @@ const FuncionarioFormModal: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Celular *
                 </label>
                 <input
                   type="text"
-                  value={maskCelular(valores.celular)}
-                  onChange={(e) =>
-                    onChange({
-                      ...valores,
-                      celular: maskCelular(e.target.value),
-                    })
-                  }
-                  className={`input-field ${erros.celular ? "border-red-500" : ""}`}
+                  value={maskCelular(valores.celular || "")}
+                  onChange={(e) => {
+                    const valorLimpo = e.target.value.replace(/\D/g, "");
+                    onChange({ ...valores, celular: valorLimpo });
+                  }}
+                  className={`input-field h-11 ${erros.celular ? "border-red-500" : ""} ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   placeholder="(73) 99999-9999"
+                  disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
                 </label>
                 <input
@@ -155,28 +179,35 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, email: e.target.value })
                   }
-                  className={`input-field ${erros.email ? "border-red-500" : ""}`}
+                  className={`input-field h-11 ${erros.email ? "border-red-500" : ""} ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   CEP
                 </label>
                 <input
                   type="text"
                   value={maskCEP(valores.cep || "")}
-                  onChange={(e) =>
-                    onChange({ ...valores, cep: maskCEP(e.target.value) })
-                  }
-                  className={`input-field ${erros.cep ? "border-red-500" : ""}`}
+                  onChange={(e) => {
+                    const valorLimpo = e.target.value.replace(/\D/g, "");
+                    onChange({ ...valores, cep: valorLimpo });
+                  }}
+                  className={`input-field h-11 ${erros.cep ? "border-red-500" : ""} ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   placeholder="00000-000"
+                  disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Número
                 </label>
                 <input
@@ -185,11 +216,14 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, numero: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Complemento
                 </label>
                 <input
@@ -198,13 +232,16 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, complemento: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Endereço *
               </label>
               <input
@@ -213,13 +250,16 @@ const FuncionarioFormModal: React.FC<Props> = ({
                 onChange={(e) =>
                   onChange({ ...valores, endereco: e.target.value })
                 }
-                className={`input-field ${erros.endereco ? "border-red-500" : ""}`}
+                className={`input-field h-11 ${erros.endereco ? "border-red-500" : ""} ${
+                  somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                }`}
+                disabled={somenteLeitura}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Cidade *
                 </label>
                 <input
@@ -228,11 +268,14 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, cidade: e.target.value })
                   }
-                  className={`input-field ${erros.cidade ? "border-red-500" : ""}`}
+                  className={`input-field h-11 ${erros.cidade ? "border-red-500" : ""} ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Função
                 </label>
                 <select
@@ -240,7 +283,10 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, funcao: e.target.value as any })
                   }
-                  className="input-field"
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 >
                   <option value="motorista">Motorista</option>
                   <option value="ajudante">Ajudante</option>
@@ -249,9 +295,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Data de Admissão
                 </label>
                 <input
@@ -260,28 +306,35 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, dataAdmissao: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Salário
                 </label>
                 <input
                   type="text"
                   value={maskMoeda(valores.salario || "")}
-                  onChange={(e) =>
-                    onChange({ ...valores, salario: maskMoeda(e.target.value) })
-                  }
-                  className="input-field"
+                  onChange={(e) => {
+                    const valorLimpo = e.target.value.replace(/\D/g, "");
+                    onChange({ ...valores, salario: valorLimpo });
+                  }}
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
                   placeholder="R$ 0,00"
+                  disabled={somenteLeitura}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Último Exame Toxicológico
                 </label>
                 <input
@@ -290,11 +343,14 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, toxicoUltimoExame: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Venc. Exame Toxicológico
                 </label>
                 <input
@@ -303,26 +359,31 @@ const FuncionarioFormModal: React.FC<Props> = ({
                   onChange={(e) =>
                     onChange({ ...valores, toxicoVencimento: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field h-11 ${
+                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                  disabled={somenteLeitura}
                 />
               </div>
             </div>
 
-            <div className="flex justify-end space-x-3 pt-4">
+            <div className="flex justify-end space-x-4 pt-6">
               <button
                 type="button"
                 onClick={onCancelar}
-                className="btn-secondary"
+                className="btn-secondary px-6 py-3"
               >
-                Cancelar
+                {somenteLeitura ? "Fechar" : "Cancelar"}
               </button>
-              <button
-                type="button"
-                onClick={onConfirmar}
-                className="btn-primary"
-              >
-                {editando ? "Atualizar" : "Cadastrar"}
-              </button>
+              {!somenteLeitura && (
+                <button
+                  type="button"
+                  onClick={onConfirmar}
+                  className="btn-primary px-6 py-3"
+                >
+                  {editando ? "Atualizar" : "Cadastrar"}
+                </button>
+              )}
             </div>
           </div>
         </div>

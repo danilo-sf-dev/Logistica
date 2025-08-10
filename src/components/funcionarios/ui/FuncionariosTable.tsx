@@ -4,7 +4,8 @@ import {
   Phone,
   Mail,
   Edit,
-  Trash2,
+  X,
+  CheckCircle,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
@@ -21,7 +22,8 @@ type Props = {
   direcaoOrdenacao: DirecaoOrdenacao;
   onOrdenar: (campo: OrdenacaoCampo) => void;
   onEditar: (f: Funcionario) => void;
-  onExcluir: (id: string) => void;
+  onInativar: (f: Funcionario) => void;
+  onAtivar: (f: Funcionario) => void;
 };
 
 export const FuncionariosTable: React.FC<Props> = ({
@@ -30,7 +32,8 @@ export const FuncionariosTable: React.FC<Props> = ({
   direcaoOrdenacao,
   onOrdenar,
   onEditar,
-  onExcluir,
+  onInativar,
+  onAtivar,
 }) => {
   const seta = (campo: OrdenacaoCampo) => {
     if (ordenarPor !== campo) return null;
@@ -79,12 +82,18 @@ export const FuncionariosTable: React.FC<Props> = ({
             >
               <div className="flex items-center">Status {seta("status")}</div>
             </th>
+            <th className="table-header">Ativo</th>
             <th className="table-header">Ações</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {funcionarios.map((f) => (
-            <tr key={f.id} className="hover:bg-gray-50">
+            <tr
+              key={f.id}
+              className={`hover:bg-gray-50 ${
+                !f.ativo ? "bg-gray-100 text-gray-500" : ""
+              }`}
+            >
               <td className="table-cell">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 h-10 w-10">
@@ -131,6 +140,17 @@ export const FuncionariosTable: React.FC<Props> = ({
                 </span>
               </td>
               <td className="table-cell">
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    f.ativo
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {f.ativo ? "Ativo" : "Inativo"}
+                </span>
+              </td>
+              <td className="table-cell">
                 <div className="flex space-x-2">
                   <button
                     onClick={() => onEditar(f)}
@@ -138,12 +158,23 @@ export const FuncionariosTable: React.FC<Props> = ({
                   >
                     <Edit className="h-4 w-4" />
                   </button>
-                  <button
-                    onClick={() => onExcluir(f.id)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  {f.ativo ? (
+                    <button
+                      onClick={() => onInativar(f)}
+                      className="text-red-600 hover:text-red-900"
+                      title="Inativar funcionário"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onAtivar(f)}
+                      className="text-green-600 hover:text-green-900"
+                      title="Ativar funcionário"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>

@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { FuncionariosTable } from "../ui/FuncionariosTable";
 import FuncionarioFormModal from "../ui/FuncionarioFormModal";
+import ModalConfirmacaoInativacao from "../ui/ModalConfirmacaoInativacao";
+import ModalConfirmacaoAtivacao from "../ui/ModalConfirmacaoAtivacao";
 import { useFuncionarios } from "../state/useFuncionarios";
 
 const FuncionariosListPage: React.FC = () => {
@@ -18,18 +20,30 @@ const FuncionariosListPage: React.FC = () => {
     setFiltroContrato,
     filtroFuncao,
     setFiltroFuncao,
+    filtroAtivo,
+    setFiltroAtivo,
     ordenarPor,
     direcaoOrdenacao,
     alternarOrdenacao,
     abrirCriacao,
     editarFuncionario,
-    excluirFuncionario,
+    inativarFuncionario,
+    confirmarInativacao,
+    cancelarInativacao,
+    ativarFuncionario,
+    confirmarAtivacao,
+    cancelarAtivacao,
     carregar,
     mostrarModal,
     setMostrarModal,
+    mostrarModalInativacao,
+    funcionarioParaInativar,
+    mostrarModalAtivacao,
+    funcionarioParaAtivar,
     valores,
     setValores,
     confirmar,
+    editando,
   } = useFuncionarios();
 
   useEffect(() => {
@@ -105,6 +119,26 @@ const FuncionariosListPage: React.FC = () => {
               <option value="inativo">Inativo</option>
             </select>
           </div>
+          <div className="sm:w-48">
+            <select
+              value={
+                filtroAtivo === "todos"
+                  ? "todos"
+                  : filtroAtivo
+                    ? "true"
+                    : "false"
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                setFiltroAtivo(value === "todos" ? "todos" : value === "true");
+              }}
+              className="input-field"
+            >
+              <option value="todos">Todos os status</option>
+              <option value="true">Apenas ativos</option>
+              <option value="false">Apenas inativos</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -115,7 +149,8 @@ const FuncionariosListPage: React.FC = () => {
           direcaoOrdenacao={direcaoOrdenacao}
           onOrdenar={alternarOrdenacao}
           onEditar={editarFuncionario}
-          onExcluir={excluirFuncionario}
+          onInativar={inativarFuncionario}
+          onAtivar={ativarFuncionario}
         />
 
         {totalPaginado.totalPaginas > 1 && (
@@ -166,11 +201,26 @@ const FuncionariosListPage: React.FC = () => {
 
       <FuncionarioFormModal
         aberto={mostrarModal}
-        editando={null}
+        editando={editando}
         valores={valores}
         onChange={setValores}
         onCancelar={() => setMostrarModal(false)}
         onConfirmar={confirmar}
+        somenteLeitura={editando ? !editando.ativo : false}
+      />
+
+      <ModalConfirmacaoInativacao
+        aberto={mostrarModalInativacao}
+        funcionario={funcionarioParaInativar}
+        onConfirmar={confirmarInativacao}
+        onCancelar={cancelarInativacao}
+      />
+
+      <ModalConfirmacaoAtivacao
+        aberto={mostrarModalAtivacao}
+        funcionario={funcionarioParaAtivar}
+        onConfirmar={confirmarAtivacao}
+        onCancelar={cancelarAtivacao}
       />
     </div>
   );

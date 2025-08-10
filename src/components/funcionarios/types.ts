@@ -21,6 +21,7 @@ export type Funcionario = {
   dataAdmissao?: string;
   salario?: string | null;
   observacao?: string;
+  ativo: boolean;
   dataCriacao?: any;
   dataAtualizacao?: any;
 };
@@ -47,5 +48,6 @@ export type FuncionarioInput = {
   dataAdmissao?: string;
   salario?: string;
   observacao?: string;
+  ativo: boolean;
 };
 export * from "../funcionarios/types";
