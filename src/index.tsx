@@ -1,3 +1,6 @@
+// Importar a correção do ResizeObserver ANTES de qualquer outra coisa
+import "./utils/resizeObserverFix";
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";

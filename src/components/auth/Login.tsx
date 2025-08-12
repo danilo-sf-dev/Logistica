@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import { useErrorHandler } from "../../hooks/useErrorHandler";
-import { Truck, Eye, EyeOff } from "lucide-react";
+import { Truck, Eye, EyeOff, UserPlus } from "lucide-react";
+import SignupModal from "./SignupModal";
+import { useResizeObserver } from "../../hooks/useResizeObserver";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -11,6 +13,10 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [googleLoading, setGoogleLoading] = useState<boolean>(false);
+  const [showSignupModal, setShowSignupModal] = useState<boolean>(false);
+
+  // Aplicar o hook de ResizeObserver para suprimir erros
+  useResizeObserver();
 
   const { login, loginWithGoogle } = useAuth();
   const { showNotification } = useNotification();
@@ -180,13 +186,34 @@ const Login: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-3">
             <p className="text-xs text-gray-500">
               Sistema de Gestão de Logística v1.0
             </p>
+
+            <div className="pt-4 border-t border-gray-200">
+              <p className="text-sm text-gray-600 mb-3">Não tem uma conta?</p>
+              <button
+                type="button"
+                onClick={() => setShowSignupModal(true)}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Criar Nova Conta
+              </button>
+            </div>
           </div>
         </form>
       </div>
+
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        onSuccess={() => {
+          setEmail("");
+          setPassword("");
+        }}
+      />
     </div>
   );
 };

@@ -66,25 +66,38 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     message: string,
     type: NotificationType = "success",
   ): void => {
+    const toastOptions = {
+      duration: 4000,
+      position: "bottom-right" as const,
+      style: {
+        background: "#363636",
+        color: "#fff",
+        borderRadius: "8px",
+        fontSize: "14px",
+      },
+    };
+
     switch (type) {
       case "success":
-        toast.success(message);
+        toast.success(message, toastOptions);
         break;
       case "error":
-        toast.error(message);
+        toast.error(message, toastOptions);
         break;
       case "warning":
         toast(message, {
+          ...toastOptions,
           icon: "⚠️",
         });
         break;
       case "info":
         toast(message, {
+          ...toastOptions,
           icon: "ℹ️",
         });
         break;
       default:
-        toast(message);
+        toast(message, toastOptions);
     }
   };
 
