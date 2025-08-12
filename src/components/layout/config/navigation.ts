@@ -25,7 +25,7 @@ export const defaultNavigation: NavigationItem[] = [
 
 export const getNavigationByRole = (role?: string): NavigationItem[] => {
   const baseNavigation = defaultNavigation.filter(
-    (item) => !item.roles || item.roles.includes(role || "user")
+    (item) => !item.roles || item.roles.includes(role || "user"),
   );
 
   return baseNavigation;

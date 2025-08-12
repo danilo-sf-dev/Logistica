@@ -77,7 +77,7 @@ export const useConfiguracoes = () => {
         setLoading(false);
       }
     },
-    [validatePerfilForm, showNotification, updateUserProfile, userProfile?.uid]
+    [validatePerfilForm, showNotification, updateUserProfile, userProfile?.uid],
   );
 
   const handlePerfilChange = useCallback(
@@ -87,7 +87,7 @@ export const useConfiguracoes = () => {
         [field]: value,
       }));
     },
-    []
+    [],
   );
 
   const handleNotificacoesChange = useCallback(
@@ -97,7 +97,7 @@ export const useConfiguracoes = () => {
         [key]: !prev[key],
       }));
     },
-    []
+    [],
   );
 
   const handleSistemaChange = useCallback(
@@ -107,7 +107,7 @@ export const useConfiguracoes = () => {
         [key]: value,
       }));
     },
-    []
+    [],
   );
 
   return {

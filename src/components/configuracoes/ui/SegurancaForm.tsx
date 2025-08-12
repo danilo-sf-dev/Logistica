@@ -43,7 +43,7 @@ export const SegurancaForm: React.FC<SegurancaProps> = ({
                   Último login:{" "}
                   {userProfile?.lastLogin
                     ? new Date(userProfile.lastLogin.toDate()).toLocaleString(
-                        "pt-BR"
+                        "pt-BR",
                       )
                     : "N/A"}
                 </p>
