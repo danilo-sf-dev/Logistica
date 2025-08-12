@@ -10,7 +10,7 @@ export const exportService = {
     tipo: string,
     dados: any[],
     dadosProcessados: RelatorioData[],
-    periodo: string
+    periodo: string,
   ): Promise<void> {
     try {
       console.log("Iniciando exportação PDF em orientação paisagem...", {
@@ -63,7 +63,7 @@ export const exportService = {
 
         const colunas = Object.keys(dados[0]).filter(
           (key) =>
-            key !== "id" && key !== "dataCriacao" && key !== "dataAtualizacao"
+            key !== "id" && key !== "dataCriacao" && key !== "dataAtualizacao",
         );
 
         const dadosTabela = dados.slice(0, 50).map((item) =>
@@ -77,7 +77,7 @@ export const exportService = {
               return valor.toLocaleDateString("pt-BR");
             }
             return valor?.toString() || "";
-          })
+          }),
         );
 
         autoTable(doc, {
@@ -91,7 +91,7 @@ export const exportService = {
           columnStyles: {
             // Ajustar larguras das colunas para orientação paisagem
             ...Object.fromEntries(
-              colunas.map((_, index) => [index, { cellWidth: 30 }])
+              colunas.map((_, index) => [index, { cellWidth: 30 }]),
             ),
           },
         });
@@ -113,7 +113,7 @@ export const exportService = {
     tipo: string,
     dados: any[],
     dadosProcessados: RelatorioData[],
-    periodo: string
+    periodo: string,
   ): Promise<void> {
     try {
       console.log("Iniciando exportação Excel otimizada para paisagem...", {
@@ -155,7 +155,7 @@ export const exportService = {
       if (dados.length > 0) {
         const colunas = Object.keys(dados[0]).filter(
           (key) =>
-            key !== "id" && key !== "dataCriacao" && key !== "dataAtualizacao"
+            key !== "id" && key !== "dataCriacao" && key !== "dataAtualizacao",
         );
 
         const dadosDetalhados = [
@@ -171,7 +171,7 @@ export const exportService = {
                 return valor.toLocaleDateString("pt-BR");
               }
               return valor?.toString() || "";
-            })
+            }),
           ),
         ];
 
@@ -210,7 +210,7 @@ export const exportService = {
     formato: "pdf" | "csv",
     dados: any[],
     dadosProcessados: RelatorioData[],
-    periodo: string
+    periodo: string,
   ): Promise<void> {
     try {
       console.log(`Exportando relatório: ${tipo} em formato ${formato}`);

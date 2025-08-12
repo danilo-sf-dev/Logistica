@@ -158,7 +158,7 @@ export const relatoriosService = {
       {} as Record<string, number>,
     );
 
-    return [
+    const statusData = [
       {
         name: "Trabalhando",
         value: statusCount.trabalhando || 0,
@@ -180,6 +180,9 @@ export const relatoriosService = {
         color: "#EF4444",
       },
     ];
+
+    // Filtrar apenas valores maiores que 0
+    return statusData.filter((status) => status.value > 0);
   },
 
   // Processar dados dos veículos para relatório
@@ -193,7 +196,7 @@ export const relatoriosService = {
       {} as Record<string, number>,
     );
 
-    return [
+    const statusData = [
       {
         name: "Disponível",
         value: statusCount.disponivel || 0,
@@ -215,6 +218,9 @@ export const relatoriosService = {
         color: "#EF4444",
       },
     ];
+
+    // Filtrar apenas valores maiores que 0
+    return statusData.filter((status) => status.value > 0);
   },
 
   // Processar dados das rotas para relatório
@@ -228,7 +234,7 @@ export const relatoriosService = {
       {} as Record<string, number>,
     );
 
-    return [
+    const statusData = [
       {
         name: "Agendada",
         value: statusCount.agendada || 0,
@@ -250,6 +256,9 @@ export const relatoriosService = {
         color: "#EF4444",
       },
     ];
+
+    // Filtrar apenas valores maiores que 0
+    return statusData.filter((status) => status.value > 0);
   },
 
   // Processar dados das folgas para relatório
@@ -263,7 +272,7 @@ export const relatoriosService = {
       {} as Record<string, number>,
     );
 
-    return [
+    const statusData = [
       {
         name: "Pendente",
         value: statusCount.pendente || 0,
@@ -280,6 +289,9 @@ export const relatoriosService = {
         color: "#EF4444",
       },
     ];
+
+    // Filtrar apenas valores maiores que 0
+    return statusData.filter((status) => status.value > 0);
   },
 };
 

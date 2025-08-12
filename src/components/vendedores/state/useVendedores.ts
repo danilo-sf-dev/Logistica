@@ -31,7 +31,7 @@ export function useVendedores() {
     useState<Vendedor | null>(null);
   const [mostrarModalAtivacao, setMostrarModalAtivacao] = useState(false);
   const [vendedorParaAtivar, setVendedorParaAtivar] = useState<Vendedor | null>(
-    null
+    null,
   );
   const [termoBusca, setTermoBusca] = useState("");
 
@@ -242,7 +242,7 @@ export function useVendedores() {
         setDirecaoOrdenacao("asc");
       }
     },
-    [direcaoOrdenacao, ordenarPor]
+    [direcaoOrdenacao, ordenarPor],
   );
 
   const listaFiltrada = useMemo(() => {

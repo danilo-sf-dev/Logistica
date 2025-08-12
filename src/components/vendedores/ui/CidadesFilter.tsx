@@ -59,7 +59,7 @@ const CidadesFilter: React.FC<CidadesFilterProps> = ({
   const cidadesFiltradas = cidades.filter(
     (cidade) =>
       cidade.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cidade.estado.toLowerCase().includes(searchTerm.toLowerCase())
+      cidade.estado.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const cidadeSelecionada = cidades.find((cidade) => cidade.id === value);
