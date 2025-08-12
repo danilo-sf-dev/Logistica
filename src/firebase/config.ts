@@ -2,7 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  Messaging,
+} from "firebase/messaging";
 
 // Configuração do Firebase - Usando variáveis de ambiente
 const firebaseConfig = {
@@ -24,12 +29,14 @@ export const auth = getAuth(app);
 export const storage = getStorage(app);
 
 // Configuração do Firebase Cloud Messaging
-export const messaging = getMessaging(app);
+export const messaging: Messaging = getMessaging(app);
 
 const VAPID_PUBLIC_KEY = process.env.REACT_APP_VAPID_PUBLIC_KEY;
 
 // Solicitar permissão para notificações
-export const requestNotificationPermission = async () => {
+export const requestNotificationPermission = async (): Promise<
+  string | null
+> => {
   try {
     if (typeof window === "undefined" || !("Notification" in window))
       return null;
@@ -48,7 +55,7 @@ export const requestNotificationPermission = async () => {
 };
 
 // Listener para mensagens em primeiro plano
-export const onMessageListener = () =>
+export const onMessageListener = (): Promise<any> =>
   new Promise((resolve) => {
     onMessage(messaging, (payload) => {
       resolve(payload);

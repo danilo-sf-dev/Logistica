@@ -1,7 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import type { Vendedor, VendedorInput } from "../types";
-import { maskCelular, maskCPF } from "../../../utils/masks.js";
+import { maskCelular, maskCPF } from "../../../utils/masks";
 import { REGIOES_BRASIL } from "../../../utils/constants";
 import CidadesSelect from "./CidadesSelect";
 

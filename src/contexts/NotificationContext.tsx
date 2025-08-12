@@ -1,13 +1,21 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, ReactNode } from "react";
 import {
   onMessageListener,
   requestNotificationPermission,
 } from "../firebase/config";
 import toast from "react-hot-toast";
 
-const NotificationContext = createContext();
+type NotificationType = "success" | "error" | "warning" | "info";
 
-export const useNotification = () => {
+interface NotificationContextType {
+  showNotification: (message: string, type?: NotificationType) => void;
+}
+
+const NotificationContext = createContext<NotificationContextType | undefined>(
+  undefined,
+);
+
+export const useNotification = (): NotificationContextType => {
   const context = useContext(NotificationContext);
   if (!context) {
     throw new Error(
@@ -17,7 +25,13 @@ export const useNotification = () => {
   return context;
 };
 
-export const NotificationProvider = ({ children }) => {
+interface NotificationProviderProps {
+  children: ReactNode;
+}
+
+export const NotificationProvider: React.FC<NotificationProviderProps> = ({
+  children,
+}) => {
   useEffect(() => {
     // Solicitar permissão para notificações
     requestNotificationPermission();
@@ -48,7 +62,10 @@ export const NotificationProvider = ({ children }) => {
       });
   }, []);
 
-  const showNotification = (message, type = "success") => {
+  const showNotification = (
+    message: string,
+    type: NotificationType = "success",
+  ): void => {
     switch (type) {
       case "success":
         toast.success(message);
@@ -71,7 +88,7 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
-  const value = {
+  const value: NotificationContextType = {
     showNotification,
   };
 

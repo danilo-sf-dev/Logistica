@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import type { Vendedor } from "../types";
 import type { OrdenacaoCampo, DirecaoOrdenacao } from "../state/useVendedores";
-import { formatCelular, formatCPF } from "../../../utils/masks.js";
+import { formatCelular, formatCPF } from "../../../utils/masks";
 import { REGIOES_BRASIL } from "../../../utils/constants";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type { Cidade } from "../../cidades/types";

@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { auth } from "./firebase/config";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 // Componentes
 import Login from "./components/auth/Login";
@@ -27,9 +27,9 @@ import Configuracoes from "./components/configuracoes/Configuracoes";
 import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const App: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -97,6 +97,6 @@ function App() {
       </NotificationProvider>
     </AuthProvider>
   );
-}
+};
 
 export default App;
