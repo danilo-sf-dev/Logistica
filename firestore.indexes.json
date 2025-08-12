@@ -49,6 +49,16 @@
           "order": "ASCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "vendedores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "cpf",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

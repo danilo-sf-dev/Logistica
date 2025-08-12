@@ -19,7 +19,7 @@ import Rotas from "./components/rotas/Rotas";
 import Folgas from "./components/folgas/Folgas";
 import Cidades from "./components/cidades";
 import CidadesTestePage from "./components/cidades/pages/CidadesTestePage";
-import Vendedores from "./components/vendedores/Vendedores";
+import Vendedores from "./components/vendedores";
 import Relatorios from "./components/relatorios/Relatorios";
 import Configuracoes from "./components/configuracoes/Configuracoes";
 
