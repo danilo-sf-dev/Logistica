@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -7,13 +13,47 @@ import {
   updateProfile,
   signInWithPopup,
   GoogleAuthProvider,
+  User,
+  UserCredential,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, DocumentData } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 
-const AuthContext = createContext();
+interface UserProfile {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  role: string;
+  createdAt: Date;
+  lastLogin: Date;
+  provider: string;
+  telefone?: string;
+  cargo?: string;
+}
 
-export const useAuth = () => {
+interface AuthContextType {
+  currentUser: User | null;
+  userProfile: UserProfile | null;
+  login: (email: string, password: string) => Promise<UserCredential>;
+  loginWithGoogle: () => Promise<UserCredential>;
+  logout: () => Promise<void>;
+  signup: (
+    email: string,
+    password: string,
+    displayName: string,
+    role?: string,
+  ) => Promise<UserCredential>;
+  updateUserProfile: (
+    uid: string,
+    updates: Partial<UserProfile>,
+  ) => Promise<void>;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth deve ser usado dentro de um AuthProvider");
@@ -21,13 +61,20 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Login com email/senha
-  const login = async (email, password) => {
+  const login = async (
+    email: string,
+    password: string,
+  ): Promise<UserCredential> => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       return result;
@@ -37,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Login com Google
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = async (): Promise<UserCredential> => {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -75,7 +122,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Logout
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       await signOut(auth);
     } catch (error) {
@@ -84,7 +131,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Criar usuário
-  const signup = async (email, password, displayName, role = "user") => {
+  const signup = async (
+    email: string,
+    password: string,
+    displayName: string,
+    role: string = "user",
+  ): Promise<UserCredential> => {
     try {
       const result = await createUserWithEmailAndPassword(
         auth,
@@ -113,11 +165,23 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Buscar perfil do usuário
-  const fetchUserProfile = async (uid) => {
+  const fetchUserProfile = async (uid: string): Promise<UserProfile | null> => {
     try {
       const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
-        return userDoc.data();
+        const data = userDoc.data() as DocumentData;
+        return {
+          uid: data.uid,
+          email: data.email,
+          displayName: data.displayName,
+          photoURL: data.photoURL,
+          role: data.role,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          lastLogin: data.lastLogin?.toDate() || new Date(),
+          provider: data.provider,
+          telefone: data.telefone,
+          cargo: data.cargo,
+        };
       }
       return null;
     } catch (error) {
@@ -127,7 +191,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Atualizar perfil do usuário
-  const updateUserProfile = async (uid, updates) => {
+  const updateUserProfile = async (
+    uid: string,
+    updates: Partial<UserProfile>,
+  ): Promise<void> => {
     try {
       await setDoc(doc(db, "users", uid), updates, { merge: true });
       const updatedProfile = await fetchUserProfile(uid);
@@ -154,7 +221,7 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  const value = {
+  const value: AuthContextType = {
     currentUser,
     userProfile,
     login,

@@ -7,7 +7,7 @@ import {
   validateCelular,
   formatCelular,
   validateCPF,
-} from "../../../utils/masks.js";
+} from "../../../utils/masks";
 
 export type OrdenacaoCampo =
   | "nome"

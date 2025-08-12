@@ -4,7 +4,7 @@ import { VendedoresTable } from "../ui/VendedoresTable";
 import VendedorFormModal from "../ui/VendedorFormModal";
 import CidadesFilter from "../ui/CidadesFilter";
 import { useVendedores } from "../state/useVendedores";
-import { maskCelular, formatCPF } from "../../../utils/masks.js";
+import { maskCelular, formatCPF } from "../../../utils/masks";
 
 const VendedoresListPage: React.FC = () => {
   const {

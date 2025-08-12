@@ -4,18 +4,20 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import { Truck, Eye, EyeOff } from "lucide-react";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+const Login: React.FC = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [googleLoading, setGoogleLoading] = useState<boolean>(false);
 
   const { login, loginWithGoogle } = useAuth();
   const { showNotification } = useNotification();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
     setLoading(true);
 
@@ -23,7 +25,7 @@ const Login = () => {
       await login(email, password);
       showNotification("Login realizado com sucesso!", "success");
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       let errorMessage = "Erro ao fazer login";
 
       switch (error.code) {
@@ -49,13 +51,13 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = async (): Promise<void> => {
     setGoogleLoading(true);
     try {
       await loginWithGoogle();
       showNotification("Login com Google realizado com sucesso!", "success");
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       let errorMessage = "Erro ao fazer login com Google";
 
       switch (error.code) {
