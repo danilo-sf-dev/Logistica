@@ -25,7 +25,7 @@ export const useRelatorios = () => {
     MotoristaData[]
   >([]);
   const [dadosBrutosVeiculos, setDadosBrutosVeiculos] = useState<VeiculoData[]>(
-    []
+    [],
   );
   const [dadosBrutosRotas, setDadosBrutosRotas] = useState<RotaData[]>([]);
   const [dadosBrutosFolgas, setDadosBrutosFolgas] = useState<FolgaData[]>([]);
@@ -57,7 +57,7 @@ export const useRelatorios = () => {
 
       // Processar dados para relatórios
       setDadosMotoristas(
-        relatoriosService.processarDadosMotoristas(motoristas)
+        relatoriosService.processarDadosMotoristas(motoristas),
       );
       setDadosVeiculos(relatoriosService.processarDadosVeiculos(veiculos));
       setDadosRotas(relatoriosService.processarDadosRotas(rotas));
@@ -70,7 +70,7 @@ export const useRelatorios = () => {
         motoristas.length + veiculos.length + rotas.length + folgas.length;
       showNotification(
         `Dados carregados: ${totalItens} itens encontrados`,
-        "success"
+        "success",
       );
     } catch (error) {
       console.error("Erro ao buscar dados para relatórios:", error);
@@ -153,13 +153,13 @@ export const useRelatorios = () => {
           formato,
           dados,
           dadosProcessados,
-          periodo
+          periodo,
         );
 
         const tipoRelatorio = isDetalhado ? "Relatório Detalhado" : "Relatório";
         showNotification(
           `${tipoRelatorio} de ${nomeTipo} exportado com sucesso!`,
-          "success"
+          "success",
         );
       } catch (error) {
         console.error("Erro ao exportar relatório:", error);
@@ -177,7 +177,7 @@ export const useRelatorios = () => {
       dadosFolgas,
       periodo,
       showNotification,
-    ]
+    ],
   );
 
   const handlePeriodoChange = useCallback(
@@ -191,7 +191,7 @@ export const useRelatorios = () => {
       // Recarregar dados com o novo período
       fetchRelatorios();
     },
-    [fetchRelatorios, showNotification]
+    [fetchRelatorios, showNotification],
   );
 
   return {

@@ -21,7 +21,7 @@ export const RelatorioHeader: React.FC<RelatorioHeaderProps> = ({
           <select
             value={periodo}
             onChange={(e) => onPeriodoChange(e.target.value)}
-            className="input-field w-32 pr-8"
+            className="input-field w-40 pr-10"
             disabled={loading}
           >
             <option value="semana">Semana</option>
@@ -30,7 +30,7 @@ export const RelatorioHeader: React.FC<RelatorioHeaderProps> = ({
             <option value="ano">Ano</option>
           </select>
           {loading && (
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
               <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
             </div>
           )}

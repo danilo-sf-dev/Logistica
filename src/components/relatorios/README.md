@@ -75,6 +75,13 @@ import { ResumoCards } from "./components/relatorios";
 
 Componente reutilizável para exibir gráficos.
 
+**Características:**
+
+- Suporte a gráficos de pizza e barras
+- Filtra automaticamente valores 0% para melhor visualização
+- Botão de download integrado
+- Altura configurável
+
 ```tsx
 import { GraficoCard } from "./components/relatorios";
 

@@ -42,7 +42,7 @@ const CidadesAtendidas: React.FC<{ cidadesIds: string[] }> = ({
         setLoading(true);
         const todasCidades = await cidadesService.listar();
         const cidadesFiltradas = todasCidades.filter((cidade) =>
-          cidadesIds.includes(cidade.id)
+          cidadesIds.includes(cidade.id),
         );
         setCidades(cidadesFiltradas);
       } catch (error) {

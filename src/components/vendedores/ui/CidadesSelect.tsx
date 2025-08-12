@@ -61,11 +61,11 @@ const CidadesSelect: React.FC<CidadesSelectProps> = ({
   const cidadesFiltradas = cidades.filter(
     (cidade) =>
       cidade.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cidade.estado.toLowerCase().includes(searchTerm.toLowerCase())
+      cidade.estado.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const cidadesSelecionadas = cidades.filter((cidade) =>
-    value.includes(cidade.id)
+    value.includes(cidade.id),
   );
 
   const toggleCidade = (cidadeId: string) => {
