@@ -8,6 +8,7 @@ import {
 import { Toaster } from "react-hot-toast";
 import { auth } from "./firebase/config";
 import { onAuthStateChanged, User } from "firebase/auth";
+import { useResizeObserver } from "./hooks/useResizeObserver";
 
 // Componentes
 import Login from "./components/auth/Login";
@@ -26,6 +27,7 @@ import Configuracoes from "./components/configuracoes/Configuracoes";
 // Páginas de erro
 import { NotFoundPage, ServerErrorPage } from "./components/common/ErrorPages";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
+import { ResizeObserverErrorBoundary } from "./components/common/ErrorBoundary/ResizeObserverErrorBoundary";
 import ErrorTestPage from "./components/common/ErrorPages/ErrorTestPage";
 
 // Context
@@ -35,6 +37,9 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Aplicar o hook de ResizeObserver globalmente para suprimir erros
+  useResizeObserver();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -55,61 +60,66 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <NotificationProvider>
-          <Router>
-            <div className="App">
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: "#363636",
-                    color: "#fff",
-                  },
-                }}
-              />
-
-              <Routes>
-                <Route
-                  path="/login"
-                  element={user ? <Navigate to="/dashboard" /> : <Login />}
+      <ResizeObserverErrorBoundary>
+        <AuthProvider>
+          <NotificationProvider>
+            <Router>
+              <div className="App">
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      background: "#363636",
+                      color: "#fff",
+                    },
+                  }}
                 />
 
-                {/* Rotas de erro */}
-                <Route path="/error/500" element={<ServerErrorPage />} />
-                <Route path="/error/404" element={<NotFoundPage />} />
-                <Route path="/error-test" element={<ErrorTestPage />} />
-
-                <Route
-                  path="/"
-                  element={user ? <Layout /> : <Navigate to="/login" />}
-                >
-                  <Route index element={<Navigate to="/dashboard" />} />
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="funcionarios" element={<Funcionarios />} />
-                  {/* Compatibilidade com rota antiga */}
+                <Routes>
                   <Route
-                    path="motoristas"
-                    element={<Navigate to="/funcionarios" />}
+                    path="/login"
+                    element={user ? <Navigate to="/dashboard" /> : <Login />}
                   />
-                  <Route path="veiculos" element={<Veiculos />} />
-                  <Route path="rotas" element={<Rotas />} />
-                  <Route path="folgas" element={<Folgas />} />
-                  <Route path="cidades" element={<Cidades />} />
-                  <Route path="cidades-teste" element={<CidadesTestePage />} />
-                  <Route path="vendedores" element={<Vendedores />} />
-                  <Route path="relatorios" element={<Relatorios />} />
-                  <Route path="configuracoes" element={<Configuracoes />} />
-                </Route>
 
-                {/* Rota catch-all para 404 */}
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </div>
-          </Router>
-        </NotificationProvider>
-      </AuthProvider>
+                  {/* Rotas de erro */}
+                  <Route path="/error/500" element={<ServerErrorPage />} />
+                  <Route path="/error/404" element={<NotFoundPage />} />
+                  <Route path="/error-test" element={<ErrorTestPage />} />
+
+                  <Route
+                    path="/"
+                    element={user ? <Layout /> : <Navigate to="/login" />}
+                  >
+                    <Route index element={<Navigate to="/dashboard" />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="funcionarios" element={<Funcionarios />} />
+                    {/* Compatibilidade com rota antiga */}
+                    <Route
+                      path="motoristas"
+                      element={<Navigate to="/funcionarios" />}
+                    />
+                    <Route path="veiculos" element={<Veiculos />} />
+                    <Route path="rotas" element={<Rotas />} />
+                    <Route path="folgas" element={<Folgas />} />
+                    <Route path="cidades" element={<Cidades />} />
+                    <Route
+                      path="cidades-teste"
+                      element={<CidadesTestePage />}
+                    />
+                    <Route path="vendedores" element={<Vendedores />} />
+                    <Route path="relatorios" element={<Relatorios />} />
+                    <Route path="configuracoes" element={<Configuracoes />} />
+                  </Route>
+
+                  {/* Rota catch-all para 404 */}
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </div>
+            </Router>
+          </NotificationProvider>
+        </AuthProvider>
+      </ResizeObserverErrorBoundary>
     </ErrorBoundary>
   );
 };

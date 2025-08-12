@@ -32,27 +32,44 @@ export const useErrorHandler = () => {
       if (error?.code) {
         switch (error.code) {
           case "auth/user-not-found":
+            errorMessage =
+              "Usuário não encontrado. Verifique se o email está correto ou use o login com Google.";
+            break;
           case "auth/wrong-password":
+            errorMessage =
+              "Senha incorreta. Verifique sua senha e tente novamente.";
+            break;
           case "auth/invalid-email":
-            errorMessage = "Credenciais inválidas";
+            errorMessage = "Email inválido. Verifique o formato do email.";
+            break;
+          case "auth/invalid-credential":
+            errorMessage =
+              "Credenciais inválidas. Verifique seu email e senha, ou use o login com Google.";
+            break;
+          case "auth/operation-not-allowed":
+            errorMessage =
+              "Método de login não habilitado. Entre em contato com o administrador.";
             break;
           case "auth/too-many-requests":
-            errorMessage = "Muitas tentativas. Tente novamente mais tarde";
+            errorMessage =
+              "Muitas tentativas. Tente novamente em alguns minutos.";
             break;
           case "auth/network-request-failed":
-            errorMessage = "Erro de conexão. Verifique sua internet";
+            errorMessage =
+              "Erro de conexão. Verifique sua internet e tente novamente.";
             errorType = "500";
             break;
           case "permission-denied":
-            errorMessage = "Você não tem permissão para esta ação";
+            errorMessage = "Você não tem permissão para esta ação.";
             errorType = "403";
             break;
           case "not-found":
-            errorMessage = "Recurso não encontrado";
+            errorMessage = "Recurso não encontrado.";
             errorType = "404";
             break;
           default:
-            errorMessage = error.message || fallbackMessage;
+            errorMessage =
+              "Ocorreu um erro inesperado. Tente novamente ou use o login com Google.";
         }
       } else if (error?.message) {
         errorMessage = error.message;
