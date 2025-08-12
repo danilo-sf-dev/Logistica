@@ -124,7 +124,7 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedVeiculos = veiculos.slice(
     startIndex,
-    startIndex + itemsPerPage
+    startIndex + itemsPerPage,
   );
 
   return (

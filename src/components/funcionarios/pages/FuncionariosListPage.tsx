@@ -170,7 +170,7 @@ const FuncionariosListPage: React.FC = () => {
               </button>
               {Array.from(
                 { length: totalPaginado.totalPaginas },
-                (_, i) => i + 1
+                (_, i) => i + 1,
               ).map((page) => (
                 <button
                   key={page}
@@ -187,7 +187,7 @@ const FuncionariosListPage: React.FC = () => {
               <button
                 onClick={() =>
                   setPaginaAtual(
-                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
+                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}

@@ -1,5 +1,12 @@
-export type Funcionario = {
-  id: string;
+import type {
+  BaseEntity,
+  TipoFuncao,
+  StatusFuncionario,
+  TipoContrato,
+  UnidadeNegocio,
+} from "../../types";
+
+export type Funcionario = BaseEntity & {
   nome: string;
   cpf: string;
   cnh: string;
@@ -12,41 +19,19 @@ export type Funcionario = {
   numero?: string;
   complemento?: string;
   cidade: string;
-  funcao?: "motorista" | "ajudante" | "outro";
+  funcao?: TipoFuncao;
   toxicoUltimoExame?: string;
   toxicoVencimento?: string;
-  status: "trabalhando" | "disponivel" | "folga" | "ferias";
-  tipoContrato: "integral" | "temporario" | "folguista" | "inativo";
-  unidadeNegocio: "frigorifico" | "ovos" | "ambos";
+  status: StatusFuncionario;
+  tipoContrato: TipoContrato;
+  unidadeNegocio: UnidadeNegocio;
   dataAdmissao?: string;
   salario?: string | null;
   observacao?: string;
   ativo: boolean;
-  dataCriacao?: any;
-  dataAtualizacao?: any;
 };
 
-export type FuncionarioInput = {
-  nome: string;
-  cpf: string;
-  cnh: string;
-  cnhVencimento?: string;
-  cnhCategoria?: string;
-  celular: string;
-  email?: string;
-  endereco: string;
-  cep?: string;
-  numero?: string;
-  complemento?: string;
-  cidade: string;
-  funcao?: "motorista" | "ajudante" | "outro";
-  toxicoUltimoExame?: string;
-  toxicoVencimento?: string;
-  status: "trabalhando" | "disponivel" | "folga" | "ferias";
-  tipoContrato: "integral" | "temporario" | "folguista" | "inativo";
-  unidadeNegocio: "frigorifico" | "ovos" | "ambos";
-  dataAdmissao?: string;
-  salario?: string;
-  observacao?: string;
-  ativo: boolean;
-};
+export type FuncionarioInput = Omit<
+  Funcionario,
+  "id" | "dataCriacao" | "dataAtualizacao"
+>;

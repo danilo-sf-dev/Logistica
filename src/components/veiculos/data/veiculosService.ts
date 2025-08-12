@@ -19,7 +19,7 @@ export class VeiculosService {
     try {
       const q = query(
         collection(db, this.collectionName),
-        orderBy("dataCriacao", "desc")
+        orderBy("dataCriacao", "desc"),
       );
       const snapshot = await getDocs(q);
       return snapshot.docs.map((doc) => ({
@@ -85,7 +85,7 @@ export class VeiculosService {
 
   static async updateVeiculo(
     id: string,
-    veiculoData: Partial<VeiculoFormData>
+    veiculoData: Partial<VeiculoFormData>,
   ): Promise<void> {
     try {
       const updateData = {
@@ -121,7 +121,7 @@ export class VeiculosService {
 
   static async toggleVeiculoStatus(
     id: string,
-    novoStatus: string
+    novoStatus: string,
   ): Promise<void> {
     try {
       await updateDoc(doc(db, this.collectionName, id), {
@@ -136,12 +136,12 @@ export class VeiculosService {
 
   static async checkPlacaExists(
     placa: string,
-    excludeId?: string
+    excludeId?: string,
   ): Promise<boolean> {
     try {
       const q = query(
         collection(db, this.collectionName),
-        where("placa", "==", placa.toUpperCase())
+        where("placa", "==", placa.toUpperCase()),
       );
       const snapshot = await getDocs(q);
 

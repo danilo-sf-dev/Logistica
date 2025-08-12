@@ -1,5 +1,6 @@
-export type Cidade = {
-  id: string;
+import type { BaseEntity } from "../../types";
+
+export type Cidade = BaseEntity & {
   nome: string;
   estado: string;
   regiao?: string;
@@ -7,16 +8,20 @@ export type Cidade = {
   pesoMinimo?: number | null;
   rotaId?: string | null;
   observacao?: string;
-  dataCriacao?: any;
-  dataAtualizacao?: any;
 };
 
-export type CidadeInput = {
+export type CidadeInput = Omit<
+  Cidade,
+  "id" | "dataCriacao" | "dataAtualizacao"
+>;
+
+// Tipo para formulário que aceita strings nos campos numéricos
+export type CidadeFormData = {
   nome: string;
   estado: string;
-  regiao?: string;
-  distancia?: string;
-  pesoMinimo?: string;
-  rotaId?: string;
-  observacao?: string;
+  regiao: string;
+  distancia: string;
+  pesoMinimo: string;
+  rotaId: string;
+  observacao: string;
 };

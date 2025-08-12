@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { cidadesService } from "../data/cidadesService";
-import type { Cidade, CidadeInput } from "../types.ts";
+import type { Cidade, CidadeInput, CidadeFormData } from "../types";
 
 export type OrdenacaoCampo =
   | "nome"
@@ -30,7 +30,7 @@ export function useCidades() {
   const [ordenarPor, setOrdenarPor] = useState<OrdenacaoCampo>("dataCriacao");
   const [direcaoOrdenacao, setDirecaoOrdenacao] =
     useState<DirecaoOrdenacao>("desc");
-  const [valores, setValores] = useState<CidadeInput>({
+  const [valores, setValores] = useState<CidadeFormData>({
     nome: "",
     estado: "",
     regiao: "",
@@ -40,7 +40,7 @@ export function useCidades() {
     observacao: "",
   });
   const [erros, setErros] = useState<
-    Partial<Record<keyof CidadeInput, string>>
+    Partial<Record<keyof CidadeFormData, string>>
   >({});
 
   const itensPorPagina = 15;
@@ -58,8 +58,8 @@ export function useCidades() {
     }
   }, [showNotification]);
 
-  const validar = useCallback((input: CidadeInput) => {
-    const novosErros: Partial<Record<keyof CidadeInput, string>> = {};
+  const validar = useCallback((input: CidadeFormData) => {
+    const novosErros: Partial<Record<keyof CidadeFormData, string>> = {};
     if (!input.nome.trim()) novosErros.nome = "Nome da cidade é obrigatório";
     if (!input.estado) novosErros.estado = "Estado é obrigatório";
     if (input.distancia && parseFloat(input.distancia) < 0) {
@@ -83,8 +83,9 @@ export function useCidades() {
         ...valores,
         nome: valores.nome.toUpperCase(),
         regiao: valores.regiao?.toUpperCase() ?? "",
-        pesoMinimo: valores.pesoMinimo,
-        rotaId: valores.rotaId,
+        distancia: valores.distancia ? parseFloat(valores.distancia) : null,
+        pesoMinimo: valores.pesoMinimo ? parseFloat(valores.pesoMinimo) : null,
+        rotaId: valores.rotaId || null,
       };
 
       if (editando) {

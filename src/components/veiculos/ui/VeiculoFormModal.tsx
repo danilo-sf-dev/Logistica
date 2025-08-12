@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Veiculo, VeiculoFormData } from "../types";
+import type {
+  StatusVeiculo,
+  UnidadeNegocio,
+  TipoCarroceria,
+} from "../../../types";
 import {
   maskPlaca,
   validatePlaca,
@@ -119,7 +124,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
     if (formData.placa && !newErrors.placa) {
       const placaExists = await checkPlacaExists(
         formData.placa,
-        editingVeiculo?.id
+        editingVeiculo?.id,
       );
       if (placaExists) {
         newErrors.placa = "Placa já cadastrada para outro veículo";
@@ -293,7 +298,10 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
               <select
                 value={formData.status}
                 onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.value })
+                  setFormData({
+                    ...formData,
+                    status: e.target.value as StatusVeiculo,
+                  })
                 }
                 className={`input-field ${
                   somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
@@ -318,7 +326,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    tipoCarroceria: e.target.value,
+                    tipoCarroceria: e.target.value as TipoCarroceria,
                   })
                 }
                 className={`input-field ${errors.tipoCarroceria ? "border-red-500" : ""} ${
@@ -405,7 +413,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  unidadeNegocio: e.target.value,
+                  unidadeNegocio: e.target.value as UnidadeNegocio,
                 })
               }
               className={`input-field ${
