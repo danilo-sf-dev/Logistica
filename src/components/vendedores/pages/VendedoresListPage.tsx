@@ -1,51 +1,46 @@
 import React, { useEffect } from "react";
 import ConfirmationModal from "../../common/modals/ConfirmationModal";
-import { FuncionariosTable } from "../ui/FuncionariosTable";
-import FuncionarioFormModal from "../ui/FuncionarioFormModal";
-import { useFuncionarios } from "../state/useFuncionarios";
+import { VendedoresTable } from "../ui/VendedoresTable";
+import VendedorFormModal from "../ui/VendedorFormModal";
+import { useVendedores } from "../state/useVendedores";
+import { maskCelular, formatCPF } from "../../../utils/masks.js";
 
-import { maskCPF } from "utils/masks";
-
-const FuncionariosListPage: React.FC = () => {
+const VendedoresListPage: React.FC = () => {
   const {
     loading,
-    funcionariosPaginados,
+    vendedoresPaginados,
     totalPaginado,
     paginaAtual,
     setPaginaAtual,
     termoBusca,
     setTermoBusca,
-    filtroStatus,
-    setFiltroStatus,
-    filtroContrato,
-    setFiltroContrato,
-    filtroFuncao,
-    setFiltroFuncao,
+    filtroUnidadeNegocio,
+    setFiltroUnidadeNegocio,
     filtroAtivo,
     setFiltroAtivo,
     ordenarPor,
     direcaoOrdenacao,
     alternarOrdenacao,
     abrirCriacao,
-    editarFuncionario,
-    inativarFuncionario,
+    editarVendedor,
+    inativarVendedor,
     confirmarInativacao,
     cancelarInativacao,
-    ativarFuncionario,
+    ativarVendedor,
     confirmarAtivacao,
     cancelarAtivacao,
     carregar,
     mostrarModal,
     setMostrarModal,
     mostrarModalInativacao,
-    funcionarioParaInativar,
+    vendedorParaInativar,
     mostrarModalAtivacao,
-    funcionarioParaAtivar,
+    vendedorParaAtivar,
     valores,
     setValores,
     confirmar,
     editando,
-  } = useFuncionarios();
+  } = useVendedores();
 
   useEffect(() => {
     carregar();
@@ -63,11 +58,13 @@ const FuncionariosListPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Funcionários</h1>
-          <p className="mt-1 text-sm text-gray-500">Gerencie a equipe</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Vendedores</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Gerencie os vendedores da empresa
+          </p>
         </div>
         <button onClick={abrirCriacao} className="btn-primary">
-          Novo Funcionário
+          Novo Vendedor
         </button>
       </div>
 
@@ -76,7 +73,7 @@ const FuncionariosListPage: React.FC = () => {
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Buscar por nome, CPF, CNH ou cidade..."
+              placeholder="Buscar por nome, CPF, email ou região..."
               value={termoBusca}
               onChange={(e) => setTermoBusca(e.target.value)}
               className="input-field"
@@ -84,42 +81,17 @@ const FuncionariosListPage: React.FC = () => {
           </div>
           <div className="sm:w-48">
             <select
-              value={filtroFuncao}
-              onChange={(e) => setFiltroFuncao(e.target.value as any)}
+              value={filtroUnidadeNegocio}
+              onChange={(e) => setFiltroUnidadeNegocio(e.target.value as any)}
               className="input-field"
             >
-              <option value="todos">Todas as funções</option>
-              <option value="motorista">Motorista</option>
-              <option value="ajudante">Ajudante</option>
-              <option value="outro">Outro</option>
+              <option value="todos">Todas as unidades</option>
+              <option value="frigorifico">Frigorífico</option>
+              <option value="ovos">Ovos</option>
+              <option value="ambos">Ambos</option>
             </select>
           </div>
-          <div className="sm:w-48">
-            <select
-              value={filtroStatus}
-              onChange={(e) => setFiltroStatus(e.target.value as any)}
-              className="input-field"
-            >
-              <option value="todos">Todos os status</option>
-              <option value="trabalhando">Trabalhando</option>
-              <option value="disponivel">Disponível</option>
-              <option value="folga">Folga</option>
-              <option value="ferias">Férias</option>
-            </select>
-          </div>
-          <div className="sm:w-48">
-            <select
-              value={filtroContrato}
-              onChange={(e) => setFiltroContrato(e.target.value as any)}
-              className="input-field"
-            >
-              <option value="todos">Todos os contratos</option>
-              <option value="integral">Integral</option>
-              <option value="temporario">Temporário</option>
-              <option value="folguista">Folguista</option>
-              <option value="inativo">Inativo</option>
-            </select>
-          </div>
+
           <div className="sm:w-48">
             <select
               value={
@@ -144,14 +116,14 @@ const FuncionariosListPage: React.FC = () => {
       </div>
 
       <div className="card">
-        <FuncionariosTable
-          funcionarios={funcionariosPaginados}
+        <VendedoresTable
+          vendedores={vendedoresPaginados}
           ordenarPor={ordenarPor}
           direcaoOrdenacao={direcaoOrdenacao}
           onOrdenar={alternarOrdenacao}
-          onEditar={editarFuncionario}
-          onInativar={inativarFuncionario}
-          onAtivar={ativarFuncionario}
+          onEditar={editarVendedor}
+          onInativar={inativarVendedor}
+          onAtivar={ativarVendedor}
         />
 
         {totalPaginado.totalPaginas > 1 && (
@@ -200,7 +172,7 @@ const FuncionariosListPage: React.FC = () => {
         )}
       </div>
 
-      <FuncionarioFormModal
+      <VendedorFormModal
         aberto={mostrarModal}
         editando={editando}
         valores={valores}
@@ -214,18 +186,26 @@ const FuncionariosListPage: React.FC = () => {
       <ConfirmationModal
         type="warning"
         title="Confirmar Inativação"
-        message="Tem certeza que deseja inativar este funcionário?"
+        message="Tem certeza que deseja inativar este vendedor?"
         details={
-          funcionarioParaInativar
+          vendedorParaInativar
             ? [
-                { label: "Nome", value: funcionarioParaInativar.nome },
-                {
-                  label: "Função",
-                  value: funcionarioParaInativar.funcao || "motorista",
-                },
+                { label: "Nome", value: vendedorParaInativar.nome },
                 {
                   label: "CPF",
-                  value: maskCPF(funcionarioParaInativar.cpf || ""),
+                  value: formatCPF(vendedorParaInativar.cpf),
+                },
+                { label: "Região", value: vendedorParaInativar.regiao },
+                {
+                  label: "Unidade",
+                  value:
+                    vendedorParaInativar.unidadeNegocio === "ambos"
+                      ? "Ambos"
+                      : vendedorParaInativar.unidadeNegocio,
+                },
+                {
+                  label: "Celular",
+                  value: maskCelular(vendedorParaInativar.celular),
                 },
               ]
             : []
@@ -247,19 +227,27 @@ const FuncionariosListPage: React.FC = () => {
       {/* Modal de Confirmação de Ativação */}
       <ConfirmationModal
         type="success"
-        title="Ativar Funcionário"
-        message="Tem certeza que deseja ativar este funcionário?"
+        title="Ativar Vendedor"
+        message="Tem certeza que deseja ativar este vendedor?"
         details={
-          funcionarioParaAtivar
+          vendedorParaAtivar
             ? [
-                { label: "Nome", value: funcionarioParaAtivar.nome },
-                {
-                  label: "Função",
-                  value: funcionarioParaAtivar.funcao || "motorista",
-                },
+                { label: "Nome", value: vendedorParaAtivar.nome },
                 {
                   label: "CPF",
-                  value: maskCPF(funcionarioParaAtivar.cpf || ""),
+                  value: formatCPF(vendedorParaAtivar.cpf),
+                },
+                { label: "Região", value: vendedorParaAtivar.regiao },
+                {
+                  label: "Unidade",
+                  value:
+                    vendedorParaAtivar.unidadeNegocio === "ambos"
+                      ? "Ambos"
+                      : vendedorParaAtivar.unidadeNegocio,
+                },
+                {
+                  label: "Celular",
+                  value: maskCelular(vendedorParaAtivar.celular),
                 },
               ]
             : []
@@ -281,4 +269,4 @@ const FuncionariosListPage: React.FC = () => {
   );
 };
 
-export default FuncionariosListPage;
+export default VendedoresListPage;

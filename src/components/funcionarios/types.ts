@@ -50,4 +50,3 @@ export type FuncionarioInput = {
   observacao?: string;
   ativo: boolean;
 };
-export * from "../funcionarios/types";
