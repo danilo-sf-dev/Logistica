@@ -45,8 +45,8 @@
 ### 📁 **Projeto Firebase**
 
 - **Nome:** Logistica
-- **ID:** logistica-c7afc
-- **URL:** https://console.firebase.google.com/project/logistica-c7afc
+- **ID:** your-project
+- **URL:** https://console.firebase.google.com/project/your-project
 
 ### 🔧 **Serviços Configurados**
 
@@ -59,13 +59,13 @@
 
 ```javascript
 const firebaseConfig = {
-  apiKey: "AIzaSyCPDNlWXv_M7NlAX0kphleDCxug7eJ3TcQ",
-  authDomain: "logistica-c7afc.firebaseapp.com",
-  projectId: "logistica-c7afc",
-  storageBucket: "logistica-c7afc.firebasestorage.app",
-  messagingSenderId: "744598379245",
-  appId: "1:744598379245:web:7432cd7d659f8ee7774ae4",
-  measurementId: "G-98ZBQM67V5",
+  apiKey: "your-api-key-here",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "your-sender-id",
+  appId: "your-app-id",
+  measurementId: "your-measurement-id",
 };
 ```
 
@@ -212,7 +212,6 @@ REACT_APP_FIREBASE_MEASUREMENT_ID=seu-measurement-id
 
 **Arquivos de configuração:**
 
-- `env.example` - Exemplo das variáveis necessárias
 - `.env` - Arquivo com as credenciais reais (não commitado)
 - `.gitignore` - Configurado para ignorar .env
 

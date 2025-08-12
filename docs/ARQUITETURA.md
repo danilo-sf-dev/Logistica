@@ -2,7 +2,7 @@
 
 ## 📋 Visão Geral
 
-O SGL é um sistema web completo desenvolvido em React com Firebase, projetado para gerenciar operações logísticas de empresas do setor de Frigorífico e Ovos. O sistema oferece uma interface moderna, responsiva e intuitiva para gestão de motoristas, veículos, rotas e folgas.
+O SGL é um sistema web completo desenvolvido em React com Firebase, projetado para gerenciar operações logísticas de empresas do setor de Frigorífico e Ovos. O sistema oferece uma interface moderna, responsiva e intuitiva para gestão de funcionários, veículos, rotas e folgas.
 
 ## 🏗️ Arquitetura
 
@@ -44,7 +44,7 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
 }
 ```
 
-#### motoristas
+#### funcionarios
 
 ```javascript
 {
@@ -77,7 +77,7 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
   unidadeNegocio: "frigorifico" | "ovos",
   ultimaManutencao: "string",
   proximaManutencao: "string",
-  motorista: "string",
+  funcionario: "string",
   dataCriacao: Timestamp,
   dataAtualizacao: Timestamp
 }
@@ -89,7 +89,7 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
 {
   origem: "string",
   destino: "string",
-  motorista: "string",
+  funcionario: "string",
   veiculo: "string",
   dataPartida: "string",
   dataChegada: "string",
@@ -105,7 +105,7 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
 
 ```javascript
 {
-  motorista: "string",
+  funcionario: "string",
   dataInicio: "string",
   dataFim: "string",
   tipo: "folga" | "ferias" | "licenca",
@@ -149,7 +149,7 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
 ### Roles (Funções)
 
 - **admin**: Acesso total ao sistema
-- **gerente**: Pode gerenciar motoristas, veículos, rotas e folgas
+- **gerente**: Pode gerenciar funcionários, veículos, rotas e folgas
 - **dispatcher**: Pode criar e gerenciar rotas
 - **user**: Acesso apenas de leitura
 
@@ -168,6 +168,25 @@ match /{document=**} {
 }
 ```
 
+## 📁 Estrutura de Arquivos
+
+### Arquivos Principais
+
+```
+src/
+├── App.tsx                   # Componente principal da aplicação
+├── index.tsx                 # Ponto de entrada da aplicação
+├── firebase/
+│   └── config.ts             # Configuração do Firebase
+├── contexts/
+│   ├── AuthContext.tsx       # Contexto de autenticação
+│   └── NotificationContext.tsx # Contexto de notificações
+├── utils/
+│   └── masks.ts              # Utilitários e máscaras
+└── types/
+    └── index.ts              # Definições de tipos globais
+```
+
 ## 🎨 Componentes React
 
 ### Estrutura de Componentes
@@ -175,27 +194,125 @@ match /{document=**} {
 ```
 src/components/
 ├── auth/
-│   └── Login.js              # Tela de login
+│   └── Login.tsx             # Tela de login
 ├── dashboard/
-│   └── Dashboard.js          # Dashboard principal
-├── motoristas/
-│   └── Motoristas.js         # Gestão de motoristas
+│   ├── Dashboard.tsx         # Dashboard principal (wrapper)
+│   ├── data/
+│   │   └── dashboardService.ts  # Serviços de dados
+│   ├── state/
+│   │   └── useDashboard.ts      # Hook de estado
+│   ├── ui/
+│   │   ├── StatsCards.tsx       # Cards de estatísticas
+│   │   ├── DashboardCharts.tsx  # Gráficos do dashboard
+│   │   └── RecentActivities.tsx # Atividades recentes
+│   ├── pages/
+│   │   └── DashboardPage.tsx    # Página principal
+│   └── types.ts              # Tipos TypeScript
+├── funcionarios/             # Antigo motoristas
+│   ├── data/
+│   │   └── funcionariosService.ts
+│   ├── state/
+│   │   └── useFuncionarios.ts
+│   ├── ui/
+│   │   ├── FuncionarioFormModal.tsx
+│   │   └── FuncionariosTable.tsx
+│   ├── pages/
+│   │   └── FuncionariosListPage.tsx
+│   └── types.ts
 ├── veiculos/
-│   └── Veiculos.js           # Gestão de veículos
+│   ├── data/
+│   │   └── veiculosService.ts
+│   ├── state/
+│   │   └── useVeiculos.ts
+│   ├── ui/
+│   │   ├── VeiculoFormModal.tsx
+│   │   ├── VeiculosTable.tsx
+│   │   └── VeiculosFilters.tsx
+│   ├── pages/
+│   │   └── VeiculosListPage.tsx
+│   └── types.ts
 ├── rotas/
-│   └── Rotas.js              # Gestão de rotas
+│   ├── data/
+│   │   └── rotasService.ts
+│   ├── state/
+│   │   └── useRotas.ts
+│   ├── ui/
+│   │   ├── RotaFormModal.tsx
+│   │   ├── RotasTable.tsx
+│   │   └── RotasFilters.tsx
+│   ├── pages/
+│   │   └── RotasListPage.tsx
+│   └── types.ts
 ├── folgas/
-│   └── Folgas.js             # Gestão de folgas
+│   ├── data/
+│   │   └── folgasService.ts
+│   ├── state/
+│   │   └── useFolgas.ts
+│   ├── ui/
+│   │   ├── FolgaFormModal.tsx
+│   │   ├── FolgasTable.tsx
+│   │   └── FolgasFilters.tsx
+│   ├── pages/
+│   │   └── FolgasListPage.tsx
+│   └── types.ts
 ├── cidades/
-│   └── Cidades.js            # Gestão de cidades
+│   ├── data/
+│   │   └── cidadesService.ts
+│   ├── state/
+│   │   └── useCidades.ts
+│   ├── ui/
+│   │   ├── CidadeFormModal.tsx
+│   │   ├── CidadesTable.tsx
+│   │   └── CidadesFilters.tsx
+│   ├── pages/
+│   │   └── CidadesListPage.tsx
+│   └── types.ts
 ├── vendedores/
-│   └── Vendedores.js         # Gestão de vendedores
+│   ├── data/
+│   │   └── vendedoresService.ts
+│   ├── state/
+│   │   └── useVendedores.ts
+│   ├── ui/
+│   │   ├── VendedorFormModal.tsx
+│   │   ├── VendedoresTable.tsx
+│   │   └── CidadesFilter.tsx
+│   ├── pages/
+│   │   └── VendedoresListPage.tsx
+│   └── types.ts
 ├── relatorios/
-│   └── Relatorios.js         # Relatórios e análises
+│   ├── data/
+│   │   ├── relatoriosService.ts
+│   │   └── exportService.ts
+│   ├── state/
+│   │   └── useRelatorios.ts
+│   ├── ui/
+│   │   ├── RelatorioHeader.tsx
+│   │   ├── GraficoCard.tsx
+│   │   ├── ResumoCards.tsx
+│   │   └── ExportModal.tsx
+│   ├── pages/
+│   │   └── RelatoriosPage.tsx
+│   └── types.ts
 ├── configuracoes/
-│   └── Configuracoes.js      # Configurações do sistema
+│   ├── state/
+│   │   └── useConfiguracoes.ts
+│   ├── ui/
+│   │   ├── PerfilForm.tsx
+│   │   ├── NotificacoesForm.tsx
+│   │   ├── SegurancaForm.tsx
+│   │   └── SistemaForm.tsx
+│   ├── pages/
+│   │   └── ConfiguracoesPage.tsx
+│   └── types.ts
 └── layout/
-    └── Layout.js             # Layout principal
+    ├── state/
+    │   └── useLayout.ts
+    ├── ui/
+    │   ├── Header.tsx
+    │   ├── Sidebar.tsx
+    │   └── MainContent.tsx
+    ├── Layout.tsx
+    └── types.ts
 ```
 
 ### Contextos
@@ -207,21 +324,21 @@ src/components/
 
 ### KPIs Principais
 
-- Total de motoristas
+- Total de funcionários
 - Total de veículos
 - Rotas ativas
 - Folgas pendentes
 
 ### Gráficos
 
-- Status dos motoristas (Pizza)
+- Status dos funcionários (Pizza)
 - Status dos veículos (Pizza)
 - Status das rotas (Barras)
 - Status das folgas (Barras)
 
 ### Relatórios Disponíveis
 
-- Motoristas detalhado
+- Funcionários detalhado
 - Veículos detalhado
 - Rotas detalhado
 - Folgas detalhado
@@ -351,7 +468,7 @@ const urlsToCache = ["/", "/static/js/bundle.js", "/static/css/main.css"];
 // Logs estruturados
 console.log("[SGL]", "Ação do usuário:", {
   userId: user.uid,
-  action: "create_motorista",
+  action: "create_funcionario",
   timestamp: new Date(),
 });
 ```
