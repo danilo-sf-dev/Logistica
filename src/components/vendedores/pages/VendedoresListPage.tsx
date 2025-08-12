@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import ConfirmationModal from "../../common/modals/ConfirmationModal";
 import { VendedoresTable } from "../ui/VendedoresTable";
 import VendedorFormModal from "../ui/VendedorFormModal";
+import CidadesFilter from "../ui/CidadesFilter";
 import { useVendedores } from "../state/useVendedores";
 import { maskCelular, formatCPF } from "../../../utils/masks.js";
 
@@ -18,6 +19,8 @@ const VendedoresListPage: React.FC = () => {
     setFiltroUnidadeNegocio,
     filtroAtivo,
     setFiltroAtivo,
+    filtroCidade,
+    setFiltroCidade,
     ordenarPor,
     direcaoOrdenacao,
     alternarOrdenacao,
@@ -112,6 +115,14 @@ const VendedoresListPage: React.FC = () => {
               <option value="false">Apenas inativos</option>
             </select>
           </div>
+
+          <div className="sm:w-48">
+            <CidadesFilter
+              value={filtroCidade}
+              onChange={setFiltroCidade}
+              placeholder="Filtrar por cidade"
+            />
+          </div>
         </div>
       </div>
 
@@ -142,7 +153,7 @@ const VendedoresListPage: React.FC = () => {
               </button>
               {Array.from(
                 { length: totalPaginado.totalPaginas },
-                (_, i) => i + 1,
+                (_, i) => i + 1
               ).map((page) => (
                 <button
                   key={page}
@@ -159,7 +170,7 @@ const VendedoresListPage: React.FC = () => {
               <button
                 onClick={() =>
                   setPaginaAtual(
-                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
+                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}

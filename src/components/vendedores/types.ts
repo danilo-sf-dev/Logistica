@@ -14,6 +14,7 @@ export type Vendedor = BaseEntity & {
   unidadeNegocio: UnidadeNegocio;
   tipoContrato: TipoContratoVendedor;
   ativo: boolean;
+  cidadesAtendidas?: string[]; // Array de IDs das cidades que o vendedor atende
 };
 
 export type VendedorInput = Omit<

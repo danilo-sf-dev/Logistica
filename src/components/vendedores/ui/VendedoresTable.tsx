@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Edit,
   User,
@@ -8,11 +8,14 @@ import {
   ChevronDown,
   X,
   CheckCircle,
+  MapPin,
 } from "lucide-react";
 import type { Vendedor } from "../types";
 import type { OrdenacaoCampo, DirecaoOrdenacao } from "../state/useVendedores";
 import { formatCelular, formatCPF } from "../../../utils/masks.js";
 import { REGIOES_BRASIL } from "../../../utils/constants";
+import { cidadesService } from "../../cidades/data/cidadesService";
+import type { Cidade } from "../../cidades/types";
 
 interface VendedoresTableProps {
   vendedores: Vendedor[];
@@ -23,6 +26,66 @@ interface VendedoresTableProps {
   onInativar: (vendedor: Vendedor) => void;
   onAtivar: (vendedor: Vendedor) => void;
 }
+
+// Componente para exibir as cidades atendidas
+const CidadesAtendidas: React.FC<{ cidadesIds: string[] }> = ({
+  cidadesIds,
+}) => {
+  const [cidades, setCidades] = useState<Cidade[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const carregarCidades = async () => {
+      if (cidadesIds.length === 0) return;
+
+      try {
+        setLoading(true);
+        const todasCidades = await cidadesService.listar();
+        const cidadesFiltradas = todasCidades.filter((cidade) =>
+          cidadesIds.includes(cidade.id)
+        );
+        setCidades(cidadesFiltradas);
+      } catch (error) {
+        console.error("Erro ao carregar cidades:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarCidades();
+  }, [cidadesIds]);
+
+  if (loading) {
+    return <div className="text-sm text-gray-500">Carregando...</div>;
+  }
+
+  if (cidadesIds.length === 0) {
+    return <div className="text-sm text-gray-400">Nenhuma cidade</div>;
+  }
+
+  if (cidades.length === 0) {
+    return <div className="text-sm text-gray-400">Cidades não encontradas</div>;
+  }
+
+  return (
+    <div className="space-y-1">
+      {cidades.slice(0, 2).map((cidade) => (
+        <div
+          key={cidade.id}
+          className="flex items-center text-sm text-gray-600"
+        >
+          <MapPin className="h-3 w-3 mr-1" />
+          {cidade.nome} - {cidade.estado}
+        </div>
+      ))}
+      {cidades.length > 2 && (
+        <div className="text-xs text-gray-500">
+          +{cidades.length - 2} mais cidade{cidades.length - 2 !== 1 ? "s" : ""}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const VendedoresTable: React.FC<VendedoresTableProps> = ({
   vendedores,
@@ -77,6 +140,7 @@ export const VendedoresTable: React.FC<VendedoresTableProps> = ({
               </div>
             </th>
             <th className="table-header">Tipo Contrato</th>
+            <th className="table-header">Cidades Atendidas</th>
             <th className="table-header">Ativo</th>
             <th className="table-header">Ações</th>
           </tr>
@@ -143,6 +207,11 @@ export const VendedoresTable: React.FC<VendedoresTableProps> = ({
                         ? "Autônomo"
                         : vendedor.tipoContrato}
                 </span>
+              </td>
+              <td className="table-cell">
+                <CidadesAtendidas
+                  cidadesIds={vendedor.cidadesAtendidas || []}
+                />
               </td>
               <td className="table-cell">
                 <span

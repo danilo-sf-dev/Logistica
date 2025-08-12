@@ -27,7 +27,7 @@ const limpar = (s: string) => s.replace(/\D/g, "");
 
 async function verificarCPFExistente(
   cpf: string,
-  idExcluir?: string,
+  idExcluir?: string
 ): Promise<boolean> {
   const cpfLimpo = limpar(cpf);
   const q = query(collection(db, COLLECTION), where("cpf", "==", cpfLimpo));
@@ -55,6 +55,7 @@ async function criar(input: VendedorInput): Promise<string> {
     regiao: input.regiao,
     celular: limpar(input.celular),
     ativo: input.ativo !== undefined ? input.ativo : true,
+    cidadesAtendidas: input.cidadesAtendidas || [],
     dataCriacao: serverTimestamp(),
     dataAtualizacao: serverTimestamp(),
   };
@@ -76,6 +77,7 @@ async function atualizar(id: string, input: VendedorInput): Promise<void> {
     regiao: input.regiao,
     celular: limpar(input.celular),
     ativo: input.ativo !== undefined ? input.ativo : true,
+    cidadesAtendidas: input.cidadesAtendidas || [],
     dataAtualizacao: serverTimestamp(),
   };
   await updateDoc(doc(db, COLLECTION, id), payload);
