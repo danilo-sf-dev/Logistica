@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import type { Vendedor, VendedorInput } from "../types";
 import { maskCelular, maskCPF } from "../../../utils/masks.js";
 import { REGIOES_BRASIL } from "../../../utils/constants";
+import CidadesSelect from "./CidadesSelect";
 
 interface VendedorFormModalProps {
   aberto: boolean;
@@ -191,6 +192,17 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                   <option value="ambos">Ambos</option>
                 </select>
               </div>
+            </div>
+
+            <div>
+              <CidadesSelect
+                value={valores.cidadesAtendidas || []}
+                onChange={(cidadesIds) =>
+                  updateField("cidadesAtendidas", cidadesIds)
+                }
+                disabled={somenteLeitura}
+                placeholder="Selecione as cidades que o vendedor atende"
+              />
             </div>
 
             <div className="flex justify-end space-x-3 pt-4">

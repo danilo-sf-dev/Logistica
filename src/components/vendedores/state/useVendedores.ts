@@ -31,7 +31,7 @@ export function useVendedores() {
     useState<Vendedor | null>(null);
   const [mostrarModalAtivacao, setMostrarModalAtivacao] = useState(false);
   const [vendedorParaAtivar, setVendedorParaAtivar] = useState<Vendedor | null>(
-    null,
+    null
   );
   const [termoBusca, setTermoBusca] = useState("");
 
@@ -39,6 +39,7 @@ export function useVendedores() {
     "todos" | Vendedor["unidadeNegocio"]
   >("todos");
   const [filtroAtivo, setFiltroAtivo] = useState<"todos" | boolean>("todos");
+  const [filtroCidade, setFiltroCidade] = useState<string>("");
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [ordenarPor, setOrdenarPor] = useState<OrdenacaoCampo>("dataCriacao");
   const [direcaoOrdenacao, setDirecaoOrdenacao] =
@@ -53,6 +54,7 @@ export function useVendedores() {
     unidadeNegocio: "frigorifico",
     tipoContrato: "clt",
     ativo: true,
+    cidadesAtendidas: [],
   });
 
   const itensPorPagina = 15;
@@ -131,6 +133,7 @@ export function useVendedores() {
         unidadeNegocio: "frigorifico",
         tipoContrato: "clt",
         ativo: true,
+        cidadesAtendidas: [],
       });
       await carregar();
     } catch (error) {
@@ -158,6 +161,7 @@ export function useVendedores() {
       unidadeNegocio: "frigorifico",
       tipoContrato: "clt",
       ativo: true,
+      cidadesAtendidas: [],
     });
     setMostrarModal(true);
   }, []);
@@ -174,6 +178,7 @@ export function useVendedores() {
       unidadeNegocio: v.unidadeNegocio || "frigorifico",
       tipoContrato: v.tipoContrato || "clt",
       ativo: v.ativo !== undefined ? v.ativo : true,
+      cidadesAtendidas: v.cidadesAtendidas || [],
     });
     setMostrarModal(true);
   }, []);
@@ -237,11 +242,12 @@ export function useVendedores() {
         setDirecaoOrdenacao("asc");
       }
     },
-    [direcaoOrdenacao, ordenarPor],
+    [direcaoOrdenacao, ordenarPor]
   );
 
   const listaFiltrada = useMemo(() => {
     const termo = termoBusca.toLowerCase();
+    const cidadeTermo = filtroCidade.toLowerCase();
     return lista.filter((v) => {
       const matchesSearch =
         v.nome?.toLowerCase().includes(termo) ||
@@ -252,9 +258,17 @@ export function useVendedores() {
         filtroUnidadeNegocio === "todos" ||
         v.unidadeNegocio === filtroUnidadeNegocio;
       const matchesAtivo = filtroAtivo === "todos" || v.ativo === filtroAtivo;
-      return matchesSearch && matchesUnidadeNegocio && matchesAtivo;
+
+      // Filtro por cidade - verificar se o vendedor atende a cidade selecionada
+      const matchesCidade =
+        !cidadeTermo ||
+        (v.cidadesAtendidas && v.cidadesAtendidas.includes(cidadeTermo));
+
+      return (
+        matchesSearch && matchesUnidadeNegocio && matchesAtivo && matchesCidade
+      );
     });
-  }, [filtroUnidadeNegocio, filtroAtivo, lista, termoBusca]);
+  }, [filtroUnidadeNegocio, filtroAtivo, filtroCidade, lista, termoBusca]);
 
   const listaOrdenada = useMemo(() => {
     const copia = [...listaFiltrada];
@@ -303,6 +317,8 @@ export function useVendedores() {
     setFiltroUnidadeNegocio,
     filtroAtivo,
     setFiltroAtivo,
+    filtroCidade,
+    setFiltroCidade,
     ordenarPor,
     direcaoOrdenacao,
     alternarOrdenacao,
