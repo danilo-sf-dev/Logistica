@@ -25,7 +25,7 @@ export const useRelatorios = () => {
     MotoristaData[]
   >([]);
   const [dadosBrutosVeiculos, setDadosBrutosVeiculos] = useState<VeiculoData[]>(
-    [],
+    []
   );
   const [dadosBrutosRotas, setDadosBrutosRotas] = useState<RotaData[]>([]);
   const [dadosBrutosFolgas, setDadosBrutosFolgas] = useState<FolgaData[]>([]);
@@ -57,7 +57,7 @@ export const useRelatorios = () => {
 
       // Processar dados para relatórios
       setDadosMotoristas(
-        relatoriosService.processarDadosMotoristas(motoristas),
+        relatoriosService.processarDadosMotoristas(motoristas)
       );
       setDadosVeiculos(relatoriosService.processarDadosVeiculos(veiculos));
       setDadosRotas(relatoriosService.processarDadosRotas(rotas));
@@ -70,7 +70,7 @@ export const useRelatorios = () => {
         motoristas.length + veiculos.length + rotas.length + folgas.length;
       showNotification(
         `Dados carregados: ${totalItens} itens encontrados`,
-        "success",
+        "success"
       );
     } catch (error) {
       console.error("Erro ao buscar dados para relatórios:", error);
@@ -90,11 +90,18 @@ export const useRelatorios = () => {
         console.log("Tipo recebido:", tipo);
         console.log("Formato recebido:", formato);
 
-        showNotification("Gerando relatório...", "info");
+        // Verificar se é um relatório detalhado
+        const isDetalhado = tipo.includes("_detalhado");
+        console.log("É relatório detalhado:", isDetalhado);
 
         let dados: any[] = [];
         let dadosProcessados: RelatorioData[] = [];
         let nomeTipo = "";
+
+        const mensagemInicial = isDetalhado
+          ? `Gerando relatório detalhado...`
+          : "Gerando relatório...";
+        showNotification(mensagemInicial, "info");
 
         switch (tipo) {
           case "motoristas":
@@ -146,12 +153,13 @@ export const useRelatorios = () => {
           formato,
           dados,
           dadosProcessados,
-          periodo,
+          periodo
         );
 
+        const tipoRelatorio = isDetalhado ? "Relatório Detalhado" : "Relatório";
         showNotification(
-          `Relatório de ${nomeTipo} exportado com sucesso!`,
-          "success",
+          `${tipoRelatorio} de ${nomeTipo} exportado com sucesso!`,
+          "success"
         );
       } catch (error) {
         console.error("Erro ao exportar relatório:", error);
@@ -169,7 +177,7 @@ export const useRelatorios = () => {
       dadosFolgas,
       periodo,
       showNotification,
-    ],
+    ]
   );
 
   const handlePeriodoChange = useCallback(
@@ -183,7 +191,7 @@ export const useRelatorios = () => {
       // Recarregar dados com o novo período
       fetchRelatorios();
     },
-    [fetchRelatorios, showNotification],
+    [fetchRelatorios, showNotification]
   );
 
   return {

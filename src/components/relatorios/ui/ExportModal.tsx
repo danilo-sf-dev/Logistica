@@ -40,8 +40,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
         <div className="mb-4">
           <p className="text-sm text-gray-600 mb-4">
-            Selecione o formato para exportar o relatório de{" "}
+            Selecione o formato para exportar o relatório detalhado de{" "}
             <strong>{titulo}</strong>:
+          </p>
+          <p className="text-xs text-gray-500 mb-4">
+            Este relatório incluirá todos os dados e campos de{" "}
+            {titulo.toLowerCase()}.
           </p>
 
           <div className="space-y-3">
