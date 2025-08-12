@@ -45,7 +45,7 @@ export const useVeiculos = () => {
         setLoading(false);
       }
     },
-    [showNotification]
+    [showNotification],
   );
 
   const createVeiculo = useCallback(
@@ -60,7 +60,7 @@ export const useVeiculos = () => {
         return false;
       }
     },
-    [fetchVeiculos, showNotification]
+    [fetchVeiculos, showNotification],
   );
 
   const updateVeiculo = useCallback(
@@ -75,7 +75,7 @@ export const useVeiculos = () => {
         return false;
       }
     },
-    [fetchVeiculos, showNotification]
+    [fetchVeiculos, showNotification],
   );
 
   const deleteVeiculo = useCallback(
@@ -90,7 +90,7 @@ export const useVeiculos = () => {
         return false;
       }
     },
-    [fetchVeiculos, showNotification]
+    [fetchVeiculos, showNotification],
   );
 
   const toggleVeiculoStatus = useCallback(
@@ -106,7 +106,7 @@ export const useVeiculos = () => {
         return false;
       }
     },
-    [fetchVeiculos, showNotification]
+    [fetchVeiculos, showNotification],
   );
 
   const checkPlacaExists = useCallback(
@@ -118,14 +118,14 @@ export const useVeiculos = () => {
         return false;
       }
     },
-    []
+    [],
   );
 
   const updateFilters = useCallback(
     (newFilters: Partial<VeiculosFiltersType>) => {
       setFilters((prev) => ({ ...prev, ...newFilters }));
     },
-    []
+    [],
   );
 
   const updateSortConfig = useCallback((field: keyof Veiculo) => {
@@ -145,28 +145,28 @@ export const useVeiculos = () => {
         veiculo.modelo
           ?.toLowerCase()
           .includes(filters.searchTerm.toLowerCase()) ||
-        veiculo.marca?.toLowerCase().includes(filters.searchTerm.toLowerCase())
+        veiculo.marca?.toLowerCase().includes(filters.searchTerm.toLowerCase()),
     );
 
     // Aplicar filtros adicionais
     if (filters.status) {
       filtered = filtered.filter(
-        (veiculo) => veiculo.status === filters.status
+        (veiculo) => veiculo.status === filters.status,
       );
     }
     if (filters.tipoCarroceria) {
       filtered = filtered.filter(
-        (veiculo) => veiculo.tipoCarroceria === filters.tipoCarroceria
+        (veiculo) => veiculo.tipoCarroceria === filters.tipoCarroceria,
       );
     }
     if (filters.tipoBau) {
       filtered = filtered.filter(
-        (veiculo) => veiculo.tipoBau === filters.tipoBau
+        (veiculo) => veiculo.tipoBau === filters.tipoBau,
       );
     }
     if (filters.unidadeNegocio) {
       filtered = filtered.filter(
-        (veiculo) => veiculo.unidadeNegocio === filters.unidadeNegocio
+        (veiculo) => veiculo.unidadeNegocio === filters.unidadeNegocio,
       );
     }
 

@@ -1,39 +1,50 @@
-export interface Veiculo {
-  id: string;
+import type {
+  BaseEntity,
+  StatusVeiculo,
+  UnidadeNegocio,
+  DirecaoOrdenacao,
+  TipoCarroceria,
+} from "../../types";
+
+export interface Veiculo extends BaseEntity {
   placa: string;
   modelo?: string;
   marca: string;
   ano?: string;
   capacidade: string;
-  tipoCarroceria: string;
+  tipoCarroceria: TipoCarroceria;
   quantidadeEixos: string;
   tipoBau: string;
-  status: string;
-  unidadeNegocio: string;
+  status: StatusVeiculo;
+  unidadeNegocio: UnidadeNegocio;
   ultimaManutencao?: string;
   proximaManutencao?: string;
   motorista?: string;
   observacao?: string;
-  dataCriacao: Date;
-  dataAtualizacao: Date;
 }
 
-export interface VeiculoFormData {
+export type VeiculoInput = Omit<
+  Veiculo,
+  "id" | "dataCriacao" | "dataAtualizacao"
+>;
+
+// Tipo para formulário que aceita strings nos campos de seleção
+export type VeiculoFormData = {
   placa: string;
-  modelo?: string;
+  modelo: string;
   marca: string;
   ano: string;
   capacidade: string;
-  tipoCarroceria: string;
+  tipoCarroceria: TipoCarroceria;
   quantidadeEixos: string;
   tipoBau: string;
-  status: string;
-  unidadeNegocio: string;
+  status: StatusVeiculo;
+  unidadeNegocio: UnidadeNegocio;
   ultimaManutencao: string;
   proximaManutencao: string;
   motorista: string;
   observacao: string;
-}
+};
 
 export interface VeiculosFiltersType {
   searchTerm: string;
@@ -45,5 +56,5 @@ export interface VeiculosFiltersType {
 
 export interface VeiculosSortConfig {
   field: keyof Veiculo;
-  direction: "asc" | "desc";
+  direction: DirecaoOrdenacao;
 }

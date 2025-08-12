@@ -27,7 +27,7 @@ const limpar = (s: string) => s.replace(/\D/g, "");
 
 async function verificarCPFExistente(
   cpf: string,
-  idExcluir?: string
+  idExcluir?: string,
 ): Promise<boolean> {
   const cpfLimpo = limpar(cpf);
   const q = query(collection(db, COLLECTION), where("cpf", "==", cpfLimpo));

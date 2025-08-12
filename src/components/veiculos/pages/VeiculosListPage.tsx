@@ -131,7 +131,7 @@ export const VeiculosListPage: React.FC = () => {
               Mostrando {(currentPage - 1) * itemsPerPage + 1} a{" "}
               {Math.min(
                 currentPage * itemsPerPage,
-                filteredAndSortedVeiculos.length
+                filteredAndSortedVeiculos.length,
               )}{" "}
               de {filteredAndSortedVeiculos.length} resultados
             </span>
@@ -177,7 +177,9 @@ export const VeiculosListPage: React.FC = () => {
         onSubmit={handleSubmit}
         editingVeiculo={editingVeiculo}
         checkPlacaExists={checkPlacaExists}
-        somenteLeitura={editingVeiculo ? editingVeiculo.status === "inativo" : false}
+        somenteLeitura={
+          editingVeiculo ? editingVeiculo.status === "inativo" : false
+        }
       />
 
       {/* Modal de Confirmação de Ativação */}

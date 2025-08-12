@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
-import type { CidadeInput, Cidade } from "../types";
+import type { CidadeFormData, Cidade } from "../types";
 import {
   REGIOES_BRASIL,
   ESTADOS_BRASIL,
@@ -11,9 +11,9 @@ import { useRotasForCidades } from "../state/useRotasForCidades";
 type Props = {
   aberto: boolean;
   editando?: Cidade | null;
-  valores: CidadeInput;
-  erros: Partial<Record<keyof CidadeInput, string>>;
-  onChange: (valores: CidadeInput) => void;
+  valores: CidadeFormData;
+  erros: Partial<Record<keyof CidadeFormData, string>>;
+  onChange: (valores: CidadeFormData) => void;
   onCancelar: () => void;
   onConfirmar: () => void;
 };
