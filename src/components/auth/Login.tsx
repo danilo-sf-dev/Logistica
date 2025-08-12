@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
+import { useErrorHandler } from "../../hooks/useErrorHandler";
 import { Truck, Eye, EyeOff } from "lucide-react";
 
 const Login: React.FC = () => {
@@ -13,6 +14,7 @@ const Login: React.FC = () => {
 
   const { login, loginWithGoogle } = useAuth();
   const { showNotification } = useNotification();
+  const { handleError } = useErrorHandler();
   const navigate = useNavigate();
 
   const handleSubmit = async (
@@ -26,26 +28,12 @@ const Login: React.FC = () => {
       showNotification("Login realizado com sucesso!", "success");
       navigate("/dashboard");
     } catch (error: any) {
-      let errorMessage = "Erro ao fazer login";
-
-      switch (error.code) {
-        case "auth/user-not-found":
-          errorMessage = "Usuário não encontrado";
-          break;
-        case "auth/wrong-password":
-          errorMessage = "Senha incorreta";
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Email inválido";
-          break;
-        case "auth/too-many-requests":
-          errorMessage = "Muitas tentativas. Tente novamente mais tarde";
-          break;
-        default:
-          errorMessage = "Erro ao fazer login. Tente novamente";
-      }
-
-      showNotification(errorMessage, "error");
+      // Usando o novo hook de erro
+      handleError(error, {
+        showNotification: true,
+        redirectToErrorPage: false,
+        fallbackMessage: "Erro ao fazer login. Tente novamente",
+      });
     } finally {
       setLoading(false);
     }
@@ -58,23 +46,12 @@ const Login: React.FC = () => {
       showNotification("Login com Google realizado com sucesso!", "success");
       navigate("/dashboard");
     } catch (error: any) {
-      let errorMessage = "Erro ao fazer login com Google";
-
-      switch (error.code) {
-        case "auth/popup-closed-by-user":
-          errorMessage = "Login cancelado pelo usuário";
-          break;
-        case "auth/popup-blocked":
-          errorMessage = "Popup bloqueado pelo navegador";
-          break;
-        case "auth/cancelled-popup-request":
-          errorMessage = "Múltiplas tentativas de login detectadas";
-          break;
-        default:
-          errorMessage = "Erro ao fazer login com Google. Tente novamente";
-      }
-
-      showNotification(errorMessage, "error");
+      // Usando o novo hook de erro
+      handleError(error, {
+        showNotification: true,
+        redirectToErrorPage: false,
+        fallbackMessage: "Erro ao fazer login com Google. Tente novamente",
+      });
     } finally {
       setGoogleLoading(false);
     }

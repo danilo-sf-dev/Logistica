@@ -6,6 +6,38 @@ export const SegurancaForm: React.FC<SegurancaProps> = ({
   userProfile,
   className = "",
 }) => {
+  // Função para formatar a data do último login
+  const formatLastLogin = (lastLogin: any): string => {
+    if (!lastLogin) return "N/A";
+
+    try {
+      // Verifica se é um Timestamp do Firestore (tem método toDate)
+      if (lastLogin && typeof lastLogin.toDate === "function") {
+        return new Date(lastLogin.toDate()).toLocaleString("pt-BR");
+      }
+
+      // Verifica se é um Date JavaScript ou timestamp
+      if (lastLogin instanceof Date) {
+        return lastLogin.toLocaleString("pt-BR");
+      }
+
+      // Se for um timestamp numérico
+      if (typeof lastLogin === "number") {
+        return new Date(lastLogin).toLocaleString("pt-BR");
+      }
+
+      // Se for uma string de data
+      if (typeof lastLogin === "string") {
+        return new Date(lastLogin).toLocaleString("pt-BR");
+      }
+
+      return "N/A";
+    } catch (error) {
+      console.error("Erro ao formatar data do último login:", error);
+      return "N/A";
+    }
+  };
+
   return (
     <div className={`card ${className}`}>
       <h3 className="text-lg font-medium text-gray-900 mb-4">Segurança</h3>
@@ -39,14 +71,7 @@ export const SegurancaForm: React.FC<SegurancaProps> = ({
                 Informações de Sessão
               </h3>
               <div className="mt-2 text-sm text-blue-700">
-                <p>
-                  Último login:{" "}
-                  {userProfile?.lastLogin
-                    ? new Date(userProfile.lastLogin.toDate()).toLocaleString(
-                        "pt-BR",
-                      )
-                    : "N/A"}
-                </p>
+                <p>Último login: {formatLastLogin(userProfile?.lastLogin)}</p>
                 <p>IP: 192.168.1.100</p>
                 <p>Dispositivo: Chrome - Windows</p>
               </div>
