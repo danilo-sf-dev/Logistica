@@ -49,23 +49,27 @@ npm install
 
 **IMPORTANTE:** Por segurança, as credenciais do Firebase devem estar em variáveis de ambiente.
 
-1. **Copie o arquivo de exemplo:**
-
-```bash
-cp env.example .env
-```
+1. **Crie o arquivo `.env`** com suas credenciais do Firebase:
 
 2. **Edite o arquivo `.env`** com suas credenciais do Firebase:
 
 ```env
 # Firebase Configuration
-REACT_APP_FIREBASE_API_KEY=sua-api-key
-REACT_APP_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=seu-projeto-id
-REACT_APP_FIREBASE_STORAGE_BUCKET=seu-projeto.appspot.com
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=seu-sender-id
-REACT_APP_FIREBASE_APP_ID=seu-app-id
-REACT_APP_FIREBASE_MEASUREMENT_ID=seu-measurement-id
+REACT_APP_FIREBASE_API_KEY=your-api-key-here
+REACT_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your-project-id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+REACT_APP_FIREBASE_APP_ID=your-app-id
+REACT_APP_FIREBASE_MEASUREMENT_ID=your-measurement-id
+
+# VAPID Key for Push Notifications (optional)
+REACT_APP_VAPID_PUBLIC_KEY=your-vapid-public-key
+
+# App Configuration
+REACT_APP_NAME=SGL - Sistema de Gestão de Logística
+REACT_APP_VERSION=1.0.0
+REACT_APP_ENVIRONMENT=development
 ```
 
 **⚠️ Segurança:** Nunca commite o arquivo `.env` no Git. Ele já está no `.gitignore`.
@@ -216,6 +220,30 @@ npm run deploy         # Deploy no Firebase
 
 ## 🎯 Como Usar o Sistema
 
+## 📚 Documentação
+
+A documentação completa do projeto está organizada na pasta [`docs/`](./docs/):
+
+### 🚀 **Para Usuários Finais**
+
+- **[Guia do Usuário](./docs/GUIA_USUARIO.md)** - Manual completo de uso do sistema
+- **[Instruções Rápidas](./docs/INSTRUCOES_RAPIDAS.md)** - Guia rápido para começar
+
+### 👨‍💻 **Para Desenvolvedores**
+
+- **[Arquitetura](./docs/ARQUITETURA.md)** - Documentação técnica e arquitetura
+- **[API](./docs/API.md)** - Documentação da API e estrutura de dados
+- **[Guia de Contribuição](./docs/CONTRIBUICAO.md)** - Como contribuir com o projeto
+
+### 📊 **Para Gestores**
+
+- **[Resumo do Projeto](./docs/RESUMO_PROJETO.md)** - Resumo executivo e status atual
+- **[Roadmap](./docs/ROADMAP.md)** - Planejamento futuro e melhorias
+
+### 📋 **Índice da Documentação**
+
+- **[README da Documentação](./docs/README.md)** - Visão geral de toda a documentação
+
 ### 1. Acesse o Sistema
 
 - **URL**: https://logistica-c7afc.web.app
@@ -293,7 +321,7 @@ Este projeto é desenvolvido para uso interno da empresa.
 
 ### Firebase Console
 
-- ✅ Projeto "logistica-c7afc" criado
+- ✅ Projeto "your-project" criado
 - ✅ Google Authentication habilitado
 - ✅ Firestore Database criado em modo teste
 - ✅ Domínios autorizados configurados
@@ -303,13 +331,13 @@ Este projeto é desenvolvido para uso interno da empresa.
 
 ```javascript
 const firebaseConfig = {
-  apiKey: "AIzaSyCPDNlWXv_M7NlAX0kphleDCxug7eJ3TcQ",
-  authDomain: "logistica-c7afc.firebaseapp.com",
-  projectId: "logistica-c7afc",
-  storageBucket: "logistica-c7afc.firebasestorage.app",
-  messagingSenderId: "744598379245",
-  appId: "1:744598379245:web:7432cd7d659f8ee7774ae4",
-  measurementId: "G-98ZBQM67V5",
+  apiKey: "your-api-key-here",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "your-sender-id",
+  appId: "your-app-id",
+  measurementId: "your-measurement-id",
 };
 ```
 
@@ -317,7 +345,7 @@ const firebaseConfig = {
 
 - ✅ Build otimizado realizado
 - ✅ Firebase Hosting configurado
-- ✅ Sistema online em https://logistica-c7afc.web.app
+- ✅ Sistema online em https://your-project.web.app
 
 ---
 
