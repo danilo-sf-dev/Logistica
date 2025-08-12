@@ -68,7 +68,18 @@ export interface SistemaFormProps {
 }
 
 export interface SegurancaProps {
-  userProfile?: any;
+  userProfile?: {
+    uid?: string;
+    email?: string | null;
+    displayName?: string | null;
+    photoURL?: string | null;
+    role?: string;
+    createdAt?: Date | any; // Pode ser Date ou Timestamp do Firestore
+    lastLogin?: Date | any; // Pode ser Date ou Timestamp do Firestore
+    provider?: string;
+    telefone?: string;
+    cargo?: string;
+  } | null;
   className?: string;
 }
 

@@ -170,14 +170,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
         const data = userDoc.data() as DocumentData;
+
+        // Função auxiliar para converter Timestamp para Date
+        const convertTimestampToDate = (timestamp: any): Date => {
+          if (!timestamp) return new Date();
+
+          try {
+            // Se é um Timestamp do Firestore
+            if (timestamp && typeof timestamp.toDate === "function") {
+              return timestamp.toDate();
+            }
+
+            // Se já é um Date
+            if (timestamp instanceof Date) {
+              return timestamp;
+            }
+
+            // Se é um timestamp numérico
+            if (typeof timestamp === "number") {
+              return new Date(timestamp);
+            }
+
+            // Se é uma string de data
+            if (typeof timestamp === "string") {
+              return new Date(timestamp);
+            }
+
+            return new Date();
+          } catch (error) {
+            console.error("Erro ao converter timestamp:", error);
+            return new Date();
+          }
+        };
+
         return {
           uid: data.uid,
           email: data.email,
           displayName: data.displayName,
           photoURL: data.photoURL,
           role: data.role,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          lastLogin: data.lastLogin?.toDate() || new Date(),
+          createdAt: convertTimestampToDate(data.createdAt),
+          lastLogin: convertTimestampToDate(data.lastLogin),
           provider: data.provider,
           telefone: data.telefone,
           cargo: data.cargo,

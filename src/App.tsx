@@ -23,6 +23,11 @@ import Vendedores from "./components/vendedores";
 import Relatorios from "./components/relatorios/Relatorios";
 import Configuracoes from "./components/configuracoes/Configuracoes";
 
+// Páginas de erro
+import { NotFoundPage, ServerErrorPage } from "./components/common/ErrorPages";
+import { ErrorBoundary } from "./components/common/ErrorBoundary";
+import ErrorTestPage from "./components/common/ErrorPages/ErrorTestPage";
+
 // Context
 import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -49,53 +54,63 @@ const App: React.FC = () => {
   }
 
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <Router>
-          <div className="App">
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: "#363636",
-                  color: "#fff",
-                },
-              }}
-            />
-
-            <Routes>
-              <Route
-                path="/login"
-                element={user ? <Navigate to="/dashboard" /> : <Login />}
+    <ErrorBoundary>
+      <AuthProvider>
+        <NotificationProvider>
+          <Router>
+            <div className="App">
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: "#363636",
+                    color: "#fff",
+                  },
+                }}
               />
 
-              <Route
-                path="/"
-                element={user ? <Layout /> : <Navigate to="/login" />}
-              >
-                <Route index element={<Navigate to="/dashboard" />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="funcionarios" element={<Funcionarios />} />
-                {/* Compatibilidade com rota antiga */}
+              <Routes>
                 <Route
-                  path="motoristas"
-                  element={<Navigate to="/funcionarios" />}
+                  path="/login"
+                  element={user ? <Navigate to="/dashboard" /> : <Login />}
                 />
-                <Route path="veiculos" element={<Veiculos />} />
-                <Route path="rotas" element={<Rotas />} />
-                <Route path="folgas" element={<Folgas />} />
-                <Route path="cidades" element={<Cidades />} />
-                <Route path="cidades-teste" element={<CidadesTestePage />} />
-                <Route path="vendedores" element={<Vendedores />} />
-                <Route path="relatorios" element={<Relatorios />} />
-                <Route path="configuracoes" element={<Configuracoes />} />
-              </Route>
-            </Routes>
-          </div>
-        </Router>
-      </NotificationProvider>
-    </AuthProvider>
+
+                {/* Rotas de erro */}
+                <Route path="/error/500" element={<ServerErrorPage />} />
+                <Route path="/error/404" element={<NotFoundPage />} />
+                <Route path="/error-test" element={<ErrorTestPage />} />
+
+                <Route
+                  path="/"
+                  element={user ? <Layout /> : <Navigate to="/login" />}
+                >
+                  <Route index element={<Navigate to="/dashboard" />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="funcionarios" element={<Funcionarios />} />
+                  {/* Compatibilidade com rota antiga */}
+                  <Route
+                    path="motoristas"
+                    element={<Navigate to="/funcionarios" />}
+                  />
+                  <Route path="veiculos" element={<Veiculos />} />
+                  <Route path="rotas" element={<Rotas />} />
+                  <Route path="folgas" element={<Folgas />} />
+                  <Route path="cidades" element={<Cidades />} />
+                  <Route path="cidades-teste" element={<CidadesTestePage />} />
+                  <Route path="vendedores" element={<Vendedores />} />
+                  <Route path="relatorios" element={<Relatorios />} />
+                  <Route path="configuracoes" element={<Configuracoes />} />
+                </Route>
+
+                {/* Rota catch-all para 404 */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </div>
+          </Router>
+        </NotificationProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 };
 
