@@ -12,21 +12,21 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({
   veiculosStatus,
 }) => {
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       {/* Status dos Motoristas */}
       <SimpleChart
         data={motoristasStatus}
         title="Status dos Motoristas"
-        width={300}
-        height={200}
+        width={350}
+        height={250}
       />
 
       {/* Status dos Veículos */}
       <SimpleChart
         data={veiculosStatus}
         title="Status dos Veículos"
-        width={300}
-        height={200}
+        width={350}
+        height={250}
       />
     </div>
   );

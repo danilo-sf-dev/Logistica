@@ -57,7 +57,7 @@ export interface ResumoEstatistico {
 // Tipos para configurações de gráficos
 export interface GraficoConfig {
   titulo: string;
-  tipo: "pie" | "bar" | "line";
+  tipo: "pie" | "bar" | "line" | "horizontal-bar";
   dados: RelatorioData[];
   altura?: number;
   cor?: string;
