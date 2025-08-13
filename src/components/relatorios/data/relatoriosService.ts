@@ -12,7 +12,7 @@ export const relatoriosService = {
   // Função auxiliar para filtrar dados por período
   filtrarPorPeriodo(dados: any[], periodo: string): any[] {
     console.log(
-      `Aplicando filtro de período: ${periodo} para ${dados.length} itens`,
+      `Aplicando filtro de período: ${periodo} para ${dados.length} itens`
     );
 
     const agora = new Date();
@@ -33,7 +33,7 @@ export const relatoriosService = {
         break;
       default:
         console.log(
-          `Período não reconhecido: ${periodo}, retornando todos os dados`,
+          `Período não reconhecido: ${periodo}, retornando todos os dados`
         );
         return dados; // Se período não reconhecido, retorna todos os dados
     }
@@ -59,7 +59,7 @@ export const relatoriosService = {
     });
 
     console.log(
-      `Filtro aplicado: ${dados.length} -> ${dadosFiltrados.length} itens`,
+      `Filtro aplicado: ${dados.length} -> ${dadosFiltrados.length} itens`
     );
     return dadosFiltrados;
   },
@@ -155,7 +155,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     const statusData = [
@@ -193,18 +193,22 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     const statusData = [
       {
-        name: "Disponível",
-        value: statusCount.disponivel || 0,
+        name: "Em Operação",
+        value:
+          statusCount.operacao ||
+          statusCount.trabalhando ||
+          statusCount.em_uso ||
+          0,
         color: "#10B981",
       },
       {
-        name: "Em Uso",
-        value: statusCount.em_uso || 0,
+        name: "Disponível",
+        value: statusCount.disponivel || 0,
         color: "#3B82F6",
       },
       {
@@ -214,7 +218,7 @@ export const relatoriosService = {
       },
       {
         name: "Inativo",
-        value: statusCount.inativo || 0,
+        value: statusCount.inativo || statusCount.parado || 0,
         color: "#EF4444",
       },
     ];
@@ -223,75 +227,141 @@ export const relatoriosService = {
     return statusData.filter((status) => status.value > 0);
   },
 
+  // Processar dados das rotas para relatório (formato temporal)
+  processarDadosRotasTemporal(rotas: RotaData[]): RelatorioData[] {
+    console.log("Processando dados temporais de rotas:", rotas);
+
+    // Agrupar rotas por data de criação
+    const rotasPorData = rotas.reduce(
+      (acc, rota) => {
+        let dataCriacao: Date;
+
+        if (rota.dataInicio?.toDate) {
+          dataCriacao = rota.dataInicio.toDate();
+        } else if (rota.dataInicio instanceof Date) {
+          dataCriacao = rota.dataInicio;
+        } else {
+          dataCriacao = new Date();
+        }
+
+        const dataStr = dataCriacao.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        });
+
+        if (!acc[dataStr]) {
+          acc[dataStr] = 0;
+        }
+        acc[dataStr]++;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    console.log("Rotas por data:", rotasPorData);
+
+    // Converter para formato do gráfico
+    const dadosTemporais = Object.entries(rotasPorData)
+      .sort(
+        ([a], [b]) =>
+          new Date(a.split("/").reverse().join("-")).getTime() -
+          new Date(b.split("/").reverse().join("-")).getTime()
+      )
+      .map(([data, quantidade]) => ({
+        name: data,
+        value: quantidade,
+        color: "#3B82F6",
+      }));
+
+    console.log("Dados temporais das rotas:", dadosTemporais);
+    return dadosTemporais;
+  },
+
   // Processar dados das rotas para relatório
   processarDadosRotas(rotas: RotaData[]): RelatorioData[] {
+    console.log("Processando dados de rotas:", rotas);
+
     const statusCount = rotas.reduce(
       (acc, rota) => {
         const status = rota.status || "agendada";
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
+
+    console.log("Status count das rotas:", statusCount);
 
     const statusData = [
       {
         name: "Agendada",
         value: statusCount.agendada || 0,
-        color: "#3B82F6",
+        color: "#3B82F6", // Azul - aguardando
       },
       {
         name: "Em Andamento",
         value: statusCount.em_andamento || 0,
-        color: "#F59E0B",
+        color: "#F59E0B", // Laranja - em progresso
       },
       {
         name: "Concluída",
         value: statusCount.concluida || 0,
-        color: "#10B981",
+        color: "#10B981", // Verde - sucesso
       },
       {
         name: "Cancelada",
         value: statusCount.cancelada || 0,
-        color: "#EF4444",
+        color: "#EF4444", // Vermelho - cancelada
       },
     ];
 
+    console.log("Status data das rotas:", statusData);
+
     // Filtrar apenas valores maiores que 0
-    return statusData.filter((status) => status.value > 0);
+    const resultado = statusData.filter((status) => status.value > 0);
+    console.log("Resultado final das rotas:", resultado);
+    return resultado;
   },
 
   // Processar dados das folgas para relatório
   processarDadosFolgas(folgas: FolgaData[]): RelatorioData[] {
+    console.log("Processando dados de folgas:", folgas);
+
     const statusCount = folgas.reduce(
       (acc, folga) => {
         const status = folga.status || "pendente";
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
+
+    console.log("Status count das folgas:", statusCount);
 
     const statusData = [
       {
         name: "Pendente",
         value: statusCount.pendente || 0,
-        color: "#F59E0B",
+        color: "#F59E0B", // Laranja - aguardando aprovação
       },
       {
         name: "Aprovada",
         value: statusCount.aprovada || 0,
-        color: "#10B981",
+        color: "#10B981", // Verde - aprovada
       },
       {
         name: "Rejeitada",
         value: statusCount.rejeitada || 0,
-        color: "#EF4444",
+        color: "#EF4444", // Vermelho - rejeitada
       },
     ];
 
+    console.log("Status data das folgas:", statusData);
+
     // Filtrar apenas valores maiores que 0
-    return statusData.filter((status) => status.value > 0);
+    const resultado = statusData.filter((status) => status.value > 0);
+    console.log("Resultado final das folgas:", resultado);
+    return resultado;
   },
 };
 

@@ -48,10 +48,10 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
 
       {/* Gráficos */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Status dos Funcionários */}
+        {/* Status dos Motoristas */}
         <GraficoCard
           config={{
-            titulo: "Status dos Funcionários",
+            titulo: "Status dos Motoristas",
             tipo: "pie",
             dados: dadosMotoristas,
             altura: 256,
@@ -70,11 +70,11 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
           onDownload={handleDownload}
         />
 
-        {/* Status das Rotas */}
+        {/* Status das Rotas - Gráfico de Barras Horizontais */}
         <GraficoCard
           config={{
             titulo: "Status das Rotas",
-            tipo: "bar",
+            tipo: "horizontal-bar",
             dados: dadosRotas,
             altura: 256,
             cor: "#3B82F6",
@@ -82,11 +82,11 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
           onDownload={handleDownload}
         />
 
-        {/* Status das Folgas */}
+        {/* Status das Folgas - Gráfico de Barras Horizontais */}
         <GraficoCard
           config={{
             titulo: "Status das Folgas",
-            tipo: "bar",
+            tipo: "horizontal-bar",
             dados: dadosFolgas,
             altura: 256,
             cor: "#F59E0B",

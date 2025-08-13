@@ -25,7 +25,7 @@ export const useRelatorios = () => {
     MotoristaData[]
   >([]);
   const [dadosBrutosVeiculos, setDadosBrutosVeiculos] = useState<VeiculoData[]>(
-    [],
+    []
   );
   const [dadosBrutosRotas, setDadosBrutosRotas] = useState<RotaData[]>([]);
   const [dadosBrutosFolgas, setDadosBrutosFolgas] = useState<FolgaData[]>([]);
@@ -56,12 +56,26 @@ export const useRelatorios = () => {
       });
 
       // Processar dados para relatórios
-      setDadosMotoristas(
-        relatoriosService.processarDadosMotoristas(motoristas),
-      );
-      setDadosVeiculos(relatoriosService.processarDadosVeiculos(veiculos));
-      setDadosRotas(relatoriosService.processarDadosRotas(rotas));
-      setDadosFolgas(relatoriosService.processarDadosFolgas(folgas));
+      const dadosMotoristasProcessados =
+        relatoriosService.processarDadosMotoristas(motoristas);
+      const dadosVeiculosProcessados =
+        relatoriosService.processarDadosVeiculos(veiculos);
+      const dadosRotasProcessados =
+        relatoriosService.processarDadosRotas(rotas); // Voltar para dados de status
+      const dadosFolgasProcessados =
+        relatoriosService.processarDadosFolgas(folgas);
+
+      console.log("Dados processados para gráficos:", {
+        motoristas: dadosMotoristasProcessados,
+        veiculos: dadosVeiculosProcessados,
+        rotas: dadosRotasProcessados,
+        folgas: dadosFolgasProcessados,
+      });
+
+      setDadosMotoristas(dadosMotoristasProcessados);
+      setDadosVeiculos(dadosVeiculosProcessados);
+      setDadosRotas(dadosRotasProcessados);
+      setDadosFolgas(dadosFolgasProcessados);
 
       setLoading(false);
 
@@ -70,7 +84,7 @@ export const useRelatorios = () => {
         motoristas.length + veiculos.length + rotas.length + folgas.length;
       showNotification(
         `Dados carregados: ${totalItens} itens encontrados`,
-        "success",
+        "success"
       );
     } catch (error) {
       console.error("Erro ao buscar dados para relatórios:", error);
@@ -153,13 +167,13 @@ export const useRelatorios = () => {
           formato,
           dados,
           dadosProcessados,
-          periodo,
+          periodo
         );
 
         const tipoRelatorio = isDetalhado ? "Relatório Detalhado" : "Relatório";
         showNotification(
           `${tipoRelatorio} de ${nomeTipo} exportado com sucesso!`,
-          "success",
+          "success"
         );
       } catch (error) {
         console.error("Erro ao exportar relatório:", error);
@@ -177,7 +191,7 @@ export const useRelatorios = () => {
       dadosFolgas,
       periodo,
       showNotification,
-    ],
+    ]
   );
 
   const handlePeriodoChange = useCallback(
@@ -191,7 +205,7 @@ export const useRelatorios = () => {
       // Recarregar dados com o novo período
       fetchRelatorios();
     },
-    [fetchRelatorios, showNotification],
+    [fetchRelatorios, showNotification]
   );
 
   return {
