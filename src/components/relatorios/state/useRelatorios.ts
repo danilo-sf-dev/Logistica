@@ -124,6 +124,7 @@ export const useRelatorios = () => {
           case "funcionarios_detalhado":
           case "status_dos_funcionários":
           case "status_dos_funcionarios":
+          case "status_dos_motoristas":
             dados = dadosBrutosMotoristas;
             dadosProcessados = dadosMotoristas;
             nomeTipo = "Funcionários";
