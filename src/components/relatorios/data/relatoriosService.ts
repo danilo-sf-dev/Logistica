@@ -77,6 +77,12 @@ export const relatoriosService = {
         motoristas = this.filtrarPorPeriodo(motoristas, periodo);
       }
 
+      console.log("📊 Dados de motoristas retornados:", {
+        total: motoristas.length,
+        campos: motoristas.length > 0 ? Object.keys(motoristas[0]) : [],
+        exemplo: motoristas.length > 0 ? motoristas[0] : null,
+      });
+
       return motoristas;
     } catch (error) {
       console.error("Erro ao buscar motoristas:", error);
@@ -97,6 +103,12 @@ export const relatoriosService = {
       if (periodo) {
         veiculos = this.filtrarPorPeriodo(veiculos, periodo);
       }
+
+      console.log("📊 Dados de veículos retornados:", {
+        total: veiculos.length,
+        campos: veiculos.length > 0 ? Object.keys(veiculos[0]) : [],
+        exemplo: veiculos.length > 0 ? veiculos[0] : null,
+      });
 
       return veiculos;
     } catch (error) {
@@ -119,6 +131,12 @@ export const relatoriosService = {
         rotas = this.filtrarPorPeriodo(rotas, periodo);
       }
 
+      console.log("📊 Dados de rotas retornados:", {
+        total: rotas.length,
+        campos: rotas.length > 0 ? Object.keys(rotas[0]) : [],
+        exemplo: rotas.length > 0 ? rotas[0] : null,
+      });
+
       return rotas;
     } catch (error) {
       console.error("Erro ao buscar rotas:", error);
@@ -139,6 +157,12 @@ export const relatoriosService = {
       if (periodo) {
         folgas = this.filtrarPorPeriodo(folgas, periodo);
       }
+
+      console.log("📊 Dados de folgas retornados:", {
+        total: folgas.length,
+        campos: folgas.length > 0 ? Object.keys(folgas[0]) : [],
+        exemplo: folgas.length > 0 ? folgas[0] : null,
+      });
 
       return folgas;
     } catch (error) {

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback } from "react";
 import { relatoriosService } from "../data/relatoriosService";
-import { exportService } from "../data/exportService";
+import { ExportServiceFactory, type ExportData } from "../export";
 import { useNotification } from "../../../contexts/NotificationContext";
 import type {
   RelatorioData,
@@ -163,13 +163,22 @@ export const useRelatorios = () => {
           dadosProcessados: dadosProcessados.length,
         });
 
-        await exportService.exportRelatorio(
-          nomeTipo,
-          formato,
+        console.log("🔍 Dados para exportação:", {
+          tipo,
+          dados: dados.length,
+          dadosProcessados: dadosProcessados.length,
+          periodo,
+          camposDisponiveis: dados.length > 0 ? Object.keys(dados[0]) : [],
+        });
+
+        const exportService = ExportServiceFactory.createService(tipo);
+        const exportData: ExportData = {
           dados,
           dadosProcessados,
-          periodo
-        );
+          periodo,
+        };
+
+        await exportService.exportRelatorio(formato, exportData);
 
         const tipoRelatorio = isDetalhado ? "Relatório Detalhado" : "Relatório";
         showNotification(
