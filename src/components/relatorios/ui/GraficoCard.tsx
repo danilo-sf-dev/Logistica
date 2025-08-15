@@ -139,12 +139,12 @@ export const GraficoCard: React.FC<GraficoCardProps> = ({
           "name" in item &&
           "value" in item &&
           typeof item.value === "number" &&
-          item.value > 0
+          item.value > 0,
       );
 
       const total = dadosValidos.reduce((sum, item) => sum + item.value, 0);
       const dadosOrdenados = [...dadosValidos].sort(
-        (a, b) => b.value - a.value
+        (a, b) => b.value - a.value,
       );
 
       console.log("Dados processados:", {
