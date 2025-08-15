@@ -54,19 +54,15 @@ export class FolgasExportService extends BaseExportService {
   };
 
   protected getFilteredData(dados: any[]): any[] {
-    console.log("🔍 Dados de folgas recebidos:", dados);
-
     return dados.map((item) => {
       const filteredItem: any = {};
       this.config.campos.forEach((campo) => {
         if (item.hasOwnProperty(campo)) {
           filteredItem[campo] = this.formatValue(campo, item[campo]);
         } else {
-          console.log(`⚠️ Campo '${campo}' não encontrado em:`, item);
           filteredItem[campo] = "N/A";
         }
       });
-      console.log("📋 Item filtrado:", filteredItem);
       return filteredItem;
     });
   }

@@ -115,19 +115,15 @@ export class VeiculosExportService extends BaseExportService {
   };
 
   protected getFilteredData(dados: any[]): any[] {
-    console.log("🔍 Dados de veículos recebidos:", dados);
-
     return dados.map((item) => {
       const filteredItem: any = {};
       this.config.campos.forEach((campo) => {
         if (item.hasOwnProperty(campo)) {
           filteredItem[campo] = this.formatValue(campo, item[campo]);
         } else {
-          console.log(`⚠️ Campo '${campo}' não encontrado em:`, item);
           filteredItem[campo] = "N/A";
         }
       });
-      console.log("📋 Item filtrado:", filteredItem);
       return filteredItem;
     });
   }
@@ -181,11 +177,6 @@ export class VeiculosExportService extends BaseExportService {
   // Sobrescrever o método exportToPDF para usar as larguras específicas
   async exportToPDF(data: any, userInfo?: any): Promise<void> {
     try {
-      console.log("Iniciando exportação PDF de veículos...", {
-        tipo: this.config.titulo,
-        dados: data.dados.length,
-      });
-
       const doc = new jsPDF("landscape");
       const margin = 10;
 
@@ -205,7 +196,7 @@ export class VeiculosExportService extends BaseExportService {
 
         const total = data.dadosProcessados.reduce(
           (sum: number, d: any) => sum + d.value,
-          0
+          0,
         );
 
         // Grid dinâmico baseado no número de status
@@ -213,7 +204,7 @@ export class VeiculosExportService extends BaseExportService {
         const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
         const cardWidth = Math.min(
           40,
-          (availableWidth - (totalCards - 1) * 6) / totalCards
+          (availableWidth - (totalCards - 1) * 6) / totalCards,
         );
         const cardSpacing = 6;
         let cardX = margin;
@@ -245,7 +236,7 @@ export class VeiculosExportService extends BaseExportService {
           doc.text(
             `(${percentText})`,
             cardX + doc.getTextWidth(`${item.value} `),
-            yPosition + 8
+            yPosition + 8,
           );
           doc.setTextColor(0, 0, 0);
 
@@ -307,8 +298,6 @@ export class VeiculosExportService extends BaseExportService {
       // Salvar PDF
       const fileName = `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.pdf`;
       doc.save(fileName);
-
-      console.log(`PDF gerado com sucesso: ${fileName}`);
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
       throw error;
@@ -318,11 +307,6 @@ export class VeiculosExportService extends BaseExportService {
   // Sobrescrever o método exportToExcel para usar as larguras específicas
   async exportToExcel(data: any, userInfo?: any): Promise<void> {
     try {
-      console.log("Iniciando exportação Excel de veículos...", {
-        tipo: this.config.titulo,
-        dados: data.dados.length,
-      });
-
       const wb = XLSX.utils.book_new();
 
       // Planilha 1: Cabeçalho minimalista
@@ -368,7 +352,7 @@ export class VeiculosExportService extends BaseExportService {
       if (data.dadosProcessados.length > 0) {
         const total = data.dadosProcessados.reduce(
           (sum: number, d: any) => sum + d.value,
-          0
+          0,
         );
         const resumoData = [
           ["RESUMO ESTATÍSTICO"],
@@ -413,7 +397,7 @@ export class VeiculosExportService extends BaseExportService {
           [""],
           colunas,
           ...dadosFiltrados.map((item) =>
-            this.config.campos.map((campo) => item[campo] || "")
+            this.config.campos.map((campo) => item[campo] || ""),
           ),
         ];
 
@@ -470,8 +454,6 @@ export class VeiculosExportService extends BaseExportService {
 
       const fileName = `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`;
       saveAs(blob, fileName);
-
-      console.log(`Excel gerado com sucesso: ${fileName}`);
     } catch (error) {
       console.error("Erro ao gerar Excel:", error);
       throw error;

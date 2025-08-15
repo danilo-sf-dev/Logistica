@@ -14,9 +14,29 @@ export interface RelatorioPeriodo {
 export interface MotoristaData {
   id: string;
   nome: string;
+  cpf: string;
+  cnh: string;
+  cnhVencimento?: string;
+  cnhCategoria?: string;
+  celular: string;
+  email?: string;
+  endereco: string;
+  cep?: string;
+  numero?: string;
+  complemento?: string;
+  cidade: string;
+  funcao?: string;
+  toxicoUltimoExame?: string;
+  toxicoVencimento?: string;
   status: string;
-  cargo: string;
-  dataContratacao?: any;
+  tipoContrato: string;
+  unidadeNegocio: string;
+  dataAdmissao?: string;
+  salario?: string | null;
+  observacao?: string;
+  ativo: boolean;
+  dataCriacao?: any;
+  dataAtualizacao?: any;
 }
 
 export interface VeiculoData {

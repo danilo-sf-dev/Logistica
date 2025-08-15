@@ -12,7 +12,7 @@ export const relatoriosService = {
   // Função auxiliar para filtrar dados por período
   filtrarPorPeriodo(dados: any[], periodo: string): any[] {
     console.log(
-      `Aplicando filtro de período: ${periodo} para ${dados.length} itens`
+      `Aplicando filtro de período: ${periodo} para ${dados.length} itens`,
     );
 
     const agora = new Date();
@@ -33,7 +33,7 @@ export const relatoriosService = {
         break;
       default:
         console.log(
-          `Período não reconhecido: ${periodo}, retornando todos os dados`
+          `Período não reconhecido: ${periodo}, retornando todos os dados`,
         );
         return dados; // Se período não reconhecido, retorna todos os dados
     }
@@ -59,7 +59,7 @@ export const relatoriosService = {
     });
 
     console.log(
-      `Filtro aplicado: ${dados.length} -> ${dadosFiltrados.length} itens`
+      `Filtro aplicado: ${dados.length} -> ${dadosFiltrados.length} itens`,
     );
     return dadosFiltrados;
   },
@@ -179,7 +179,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const statusData = [
@@ -217,7 +217,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const statusData = [
@@ -279,7 +279,7 @@ export const relatoriosService = {
         acc[dataStr]++;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     console.log("Rotas por data:", rotasPorData);
@@ -289,7 +289,7 @@ export const relatoriosService = {
       .sort(
         ([a], [b]) =>
           new Date(a.split("/").reverse().join("-")).getTime() -
-          new Date(b.split("/").reverse().join("-")).getTime()
+          new Date(b.split("/").reverse().join("-")).getTime(),
       )
       .map(([data, quantidade]) => ({
         name: data,
@@ -315,7 +315,7 @@ export const relatoriosService = {
         }
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     console.log("Rotas por dia da semana:", rotasPorDia);
@@ -376,7 +376,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     console.log("Status count das folgas:", statusCount);

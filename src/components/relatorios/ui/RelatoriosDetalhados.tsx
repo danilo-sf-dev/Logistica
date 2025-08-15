@@ -18,6 +18,10 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
   const handleExport = (formato: "pdf" | "csv") => {
     onDownload(selectedTipo, formato);
   };
+
+  // Verificar se deve desabilitar PDF (apenas para funcionários)
+  const shouldDisablePDF = selectedTipo === "funcionarios_detalhado";
+
   return (
     <div className={`card ${className}`}>
       <div className="flex items-center justify-between mb-4">
@@ -76,6 +80,7 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
           .replace("_detalhado", "")
           .replace(/([A-Z])/g, " $1")
           .trim()}
+        disablePDF={shouldDisablePDF}
       />
     </div>
   );

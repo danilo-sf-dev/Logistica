@@ -84,7 +84,7 @@ export abstract class BaseExportService {
 
   protected getColumnHeaders(): string[] {
     return this.config.campos.map(
-      (campo) => campo.charAt(0).toUpperCase() + campo.slice(1)
+      (campo) => campo.charAt(0).toUpperCase() + campo.slice(1),
     );
   }
 
@@ -139,7 +139,7 @@ export abstract class BaseExportService {
     doc.text(
       `Período de Referência: ${this.formatPeriodo(this.config.titulo?.toLowerCase() || "")}`,
       margin,
-      yPosition + 4
+      yPosition + 4,
     );
 
     // Informações do usuário (direita)
@@ -199,17 +199,12 @@ export abstract class BaseExportService {
     doc.text(
       pageText,
       (pageWidth - doc.getTextWidth(pageText)) / 2,
-      pageHeight - 15
+      pageHeight - 15,
     );
   }
 
   async exportToPDF(data: ExportData, userInfo?: UserInfo): Promise<void> {
     try {
-      console.log("Iniciando exportação PDF...", {
-        tipo: this.config.titulo,
-        dados: data.dados.length,
-      });
-
       const doc = new jsPDF("landscape");
       const margin = 10;
 
@@ -229,24 +224,15 @@ export abstract class BaseExportService {
 
         const total = data.dadosProcessados.reduce(
           (sum, d) => sum + d.value,
-          0
+          0,
         );
-
-        console.log("📊 Status para resumo estatístico:", {
-          totalStatus: data.dadosProcessados.length,
-          status: data.dadosProcessados.map((s) => ({
-            name: s.name,
-            value: s.value,
-          })),
-          totalValue: total,
-        });
 
         // Grid dinâmico baseado no número de status
         const totalCards = data.dadosProcessados.length + 1; // +1 para o card TOTAL
         const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
         const cardWidth = Math.min(
           40, // Reduzido de 50 para 40 para caber mais cards
-          (availableWidth - (totalCards - 1) * 6) / totalCards // Reduzido spacing de 8 para 6
+          (availableWidth - (totalCards - 1) * 6) / totalCards, // Reduzido spacing de 8 para 6
         );
         const cardSpacing = 6; // Reduzido de 8 para 6
         let cardX = margin;
@@ -278,19 +264,11 @@ export abstract class BaseExportService {
           doc.text(
             `(${percentText})`,
             cardX + doc.getTextWidth(`${item.value} `),
-            yPosition + 8
+            yPosition + 8,
           );
           doc.setTextColor(0, 0, 0);
 
           cardX += cardWidth + cardSpacing;
-        });
-
-        console.log("📊 Cards renderizados:", {
-          totalCards,
-          cardWidth,
-          cardSpacing,
-          finalCardX: cardX,
-          pageWidth: doc.internal.pageSize.getWidth(),
         });
 
         yPosition += 10;
@@ -346,7 +324,7 @@ export abstract class BaseExportService {
                 }
                 // Largura padrão para outros campos
                 return [index, { cellWidth: 25 }];
-              })
+              }),
             ),
           },
           margin: { left: margin, right: margin },
@@ -359,8 +337,6 @@ export abstract class BaseExportService {
       // Salvar PDF
       const fileName = `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.pdf`;
       doc.save(fileName);
-
-      console.log(`PDF gerado com sucesso: ${fileName}`);
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
       throw error;
@@ -369,11 +345,6 @@ export abstract class BaseExportService {
 
   async exportToExcel(data: ExportData, userInfo?: UserInfo): Promise<void> {
     try {
-      console.log("Iniciando exportação Excel...", {
-        tipo: this.config.titulo,
-        dados: data.dados.length,
-      });
-
       const wb = XLSX.utils.book_new();
 
       // Planilha 1: Cabeçalho minimalista
@@ -419,7 +390,7 @@ export abstract class BaseExportService {
       if (data.dadosProcessados.length > 0) {
         const total = data.dadosProcessados.reduce(
           (sum, d) => sum + d.value,
-          0
+          0,
         );
         const resumoData = [
           ["RESUMO ESTATÍSTICO"],
@@ -464,7 +435,7 @@ export abstract class BaseExportService {
           [""],
           colunas,
           ...dadosFiltrados.map((item) =>
-            this.config.campos.map((campo) => item[campo] || "")
+            this.config.campos.map((campo) => item[campo] || ""),
           ),
         ];
 
@@ -511,8 +482,6 @@ export abstract class BaseExportService {
 
       const fileName = `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`;
       saveAs(blob, fileName);
-
-      console.log(`Excel gerado com sucesso: ${fileName}`);
     } catch (error) {
       console.error("Erro ao gerar Excel:", error);
       throw error;
@@ -522,20 +491,14 @@ export abstract class BaseExportService {
   async exportRelatorio(
     formato: "pdf" | "csv",
     data: ExportData,
-    userInfo?: UserInfo
+    userInfo?: UserInfo,
   ): Promise<void> {
     try {
-      console.log(
-        `Exportando relatório: ${this.config.titulo} em formato ${formato}`
-      );
-
       if (formato === "pdf") {
         await this.exportToPDF(data, userInfo);
       } else {
         await this.exportToExcel(data, userInfo);
       }
-
-      console.log("Exportação concluída com sucesso!");
     } catch (error) {
       console.error(`Erro ao exportar relatório ${this.config.titulo}:`, error);
       throw error;
