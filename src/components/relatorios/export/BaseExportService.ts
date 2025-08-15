@@ -98,8 +98,16 @@ export abstract class BaseExportService {
       mes: "Mês",
       trimestre: "Trimestre",
       ano: "Ano",
+      folgas: "Folgas",
+      funcionarios: "Funcionários",
+      veiculos: "Veículos",
+      rotas: "Rotas",
+      vendedores: "Vendedores",
+      cidades: "Cidades",
     };
-    return periodosMap[periodo] || periodo;
+    return (
+      periodosMap[periodo] || periodo.charAt(0).toUpperCase() + periodo.slice(1)
+    );
   }
 
   protected getCurrentDateTime(): string {

@@ -22,18 +22,32 @@ export interface MotoristaData {
 export interface VeiculoData {
   id: string;
   placa: string;
-  modelo: string;
+  marca: string;
+  modelo?: string;
+  ano?: string;
+  capacidade: string;
+  tipoCarroceria: string;
+  quantidadeEixos: string;
+  tipoBau: string;
   status: string;
-  ano: number;
+  unidadeNegocio: string;
+  ultimaManutencao?: string;
+  proximaManutencao?: string;
+  motorista?: string;
+  observacao?: string;
+  dataCriacao?: any;
+  dataAtualizacao?: any;
 }
 
 export interface RotaData {
   id: string;
-  origem: string;
-  destino: string;
-  status: string;
-  dataInicio?: any;
-  dataFim?: any;
+  nome: string;
+  dataRota: string;
+  pesoMinimo: number;
+  diaSemana: string[];
+  cidades: string[];
+  dataCriacao?: any;
+  dataAtualizacao?: any;
 }
 
 export interface FolgaData {
