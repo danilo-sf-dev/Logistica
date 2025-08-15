@@ -19,13 +19,6 @@ export const RotasListPage: React.FC = () => {
     updateFilters,
   } = useRotas();
 
-  console.log("RotasListPage renderizando com:", {
-    rotas,
-    loading,
-    filters,
-    filteredRotas,
-  });
-
   const [showModal, setShowModal] = useState(false);
   const [editingRota, setEditingRota] = useState<Rota | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);

@@ -34,7 +34,6 @@ export const useRelatorios = () => {
 
   const fetchRelatorios = useCallback(async () => {
     setLoading(true);
-    console.log(`=== CARREGANDO DADOS PARA PERÍODO: ${periodo} ===`);
     try {
       // Buscar dados de todas as entidades
       const [motoristas, veiculos, rotas, folgas] = await Promise.all([
@@ -50,13 +49,6 @@ export const useRelatorios = () => {
       setDadosBrutosRotas(rotas);
       setDadosBrutosFolgas(folgas);
 
-      console.log(`Dados encontrados:`, {
-        motoristas: motoristas.length,
-        veiculos: veiculos.length,
-        rotas: rotas.length,
-        folgas: folgas.length,
-      });
-
       // Processar dados para relatórios
       const dadosMotoristasProcessados =
         relatoriosService.processarDadosMotoristas(motoristas);
@@ -66,13 +58,6 @@ export const useRelatorios = () => {
         relatoriosService.processarDadosRotas(rotas); // Voltar para dados de status
       const dadosFolgasProcessados =
         relatoriosService.processarDadosFolgas(folgas);
-
-      console.log("Dados processados para gráficos:", {
-        motoristas: dadosMotoristasProcessados,
-        veiculos: dadosVeiculosProcessados,
-        rotas: dadosRotasProcessados,
-        folgas: dadosFolgasProcessados,
-      });
 
       setDadosMotoristas(dadosMotoristasProcessados);
       setDadosVeiculos(dadosVeiculosProcessados);
@@ -102,13 +87,8 @@ export const useRelatorios = () => {
   const handleDownload = useCallback(
     async (tipo: string, formato: "pdf" | "csv" = "pdf") => {
       try {
-        console.log("=== INICIANDO EXPORTAÇÃO ===");
-        console.log("Tipo recebido:", tipo);
-        console.log("Formato recebido:", formato);
-
         // Verificar se é um relatório detalhado
         const isDetalhado = tipo.includes("_detalhado");
-        console.log("É relatório detalhado:", isDetalhado);
 
         let dados: any[] = [];
         let dadosProcessados: RelatorioData[] = [];
@@ -159,20 +139,6 @@ export const useRelatorios = () => {
             return;
         }
 
-        console.log("Dados selecionados:", {
-          nomeTipo,
-          dados: dados.length,
-          dadosProcessados: dadosProcessados.length,
-        });
-
-        console.log("🔍 Dados para exportação:", {
-          tipo,
-          dados: dados.length,
-          dadosProcessados: dadosProcessados.length,
-          periodo,
-          camposDisponiveis: dados.length > 0 ? Object.keys(dados[0]) : [],
-        });
-
         const exportService = ExportServiceFactory.createService(tipo);
         const exportData: ExportData = {
           dados,
@@ -218,7 +184,6 @@ export const useRelatorios = () => {
   const handlePeriodoChange = useCallback(
     (novoPeriodo: string) => {
       setPeriodo(novoPeriodo);
-      console.log(`Período alterado para: ${novoPeriodo}`);
 
       // Mostrar notificação de carregamento
       showNotification("Atualizando dados...", "info");

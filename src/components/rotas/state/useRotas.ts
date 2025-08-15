@@ -11,20 +11,12 @@ export const useRotas = () => {
     diaSemana: "",
   });
 
-  console.log("useRotas inicializado, estado atual:", {
-    rotas,
-    loading,
-    filters,
-  });
-
   const { showNotification } = useNotification();
 
   const fetchRotas = useCallback(async () => {
     try {
       setLoading(true);
-      console.log("Buscando rotas...");
       const data = await rotasService.getAll();
-      console.log("Rotas carregadas:", data);
       if (data && Array.isArray(data)) {
         setRotas(data);
       } else {
@@ -93,9 +85,7 @@ export const useRotas = () => {
   }, []);
 
   const filteredRotas = useCallback(() => {
-    console.log("Filtrando rotas:", rotas);
     if (!rotas || !Array.isArray(rotas)) {
-      console.log("Rotas não é um array válido, retornando array vazio");
       return [];
     }
 
@@ -122,12 +112,10 @@ export const useRotas = () => {
       );
     }
 
-    console.log("Rotas filtradas:", filtered);
     return filtered;
   }, [rotas, filters]);
 
   useEffect(() => {
-    console.log("useEffect executando fetchRotas");
     fetchRotas();
   }, [fetchRotas]);
 
@@ -143,6 +131,5 @@ export const useRotas = () => {
     refreshRotas: fetchRotas,
   };
 
-  console.log("useRotas retornando:", result);
   return result;
 };

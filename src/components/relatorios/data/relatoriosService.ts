@@ -11,10 +11,6 @@ import type {
 export const relatoriosService = {
   // Função auxiliar para filtrar dados por período
   filtrarPorPeriodo(dados: any[], periodo: string): any[] {
-    console.log(
-      `Aplicando filtro de período: ${periodo} para ${dados.length} itens`,
-    );
-
     const agora = new Date();
     let dataLimite: Date;
 
@@ -32,9 +28,6 @@ export const relatoriosService = {
         dataLimite = new Date(agora.getTime() - 365 * 24 * 60 * 60 * 1000);
         break;
       default:
-        console.log(
-          `Período não reconhecido: ${periodo}, retornando todos os dados`,
-        );
         return dados; // Se período não reconhecido, retorna todos os dados
     }
 
@@ -58,9 +51,6 @@ export const relatoriosService = {
       return dataItem >= dataLimite;
     });
 
-    console.log(
-      `Filtro aplicado: ${dados.length} -> ${dadosFiltrados.length} itens`,
-    );
     return dadosFiltrados;
   },
   // Buscar dados dos motoristas
@@ -76,12 +66,6 @@ export const relatoriosService = {
       if (periodo) {
         motoristas = this.filtrarPorPeriodo(motoristas, periodo);
       }
-
-      console.log("📊 Dados de motoristas retornados:", {
-        total: motoristas.length,
-        campos: motoristas.length > 0 ? Object.keys(motoristas[0]) : [],
-        exemplo: motoristas.length > 0 ? motoristas[0] : null,
-      });
 
       return motoristas;
     } catch (error) {
@@ -104,12 +88,6 @@ export const relatoriosService = {
         veiculos = this.filtrarPorPeriodo(veiculos, periodo);
       }
 
-      console.log("📊 Dados de veículos retornados:", {
-        total: veiculos.length,
-        campos: veiculos.length > 0 ? Object.keys(veiculos[0]) : [],
-        exemplo: veiculos.length > 0 ? veiculos[0] : null,
-      });
-
       return veiculos;
     } catch (error) {
       console.error("Erro ao buscar veículos:", error);
@@ -131,12 +109,6 @@ export const relatoriosService = {
         rotas = this.filtrarPorPeriodo(rotas, periodo);
       }
 
-      console.log("📊 Dados de rotas retornados:", {
-        total: rotas.length,
-        campos: rotas.length > 0 ? Object.keys(rotas[0]) : [],
-        exemplo: rotas.length > 0 ? rotas[0] : null,
-      });
-
       return rotas;
     } catch (error) {
       console.error("Erro ao buscar rotas:", error);
@@ -157,12 +129,6 @@ export const relatoriosService = {
       if (periodo) {
         folgas = this.filtrarPorPeriodo(folgas, periodo);
       }
-
-      console.log("📊 Dados de folgas retornados:", {
-        total: folgas.length,
-        campos: folgas.length > 0 ? Object.keys(folgas[0]) : [],
-        exemplo: folgas.length > 0 ? folgas[0] : null,
-      });
 
       return folgas;
     } catch (error) {
@@ -253,8 +219,6 @@ export const relatoriosService = {
 
   // Processar dados das rotas para relatório (formato temporal)
   processarDadosRotasTemporal(rotas: RotaData[]): RelatorioData[] {
-    console.log("Processando dados temporais de rotas:", rotas);
-
     // Agrupar rotas por data de criação
     const rotasPorData = rotas.reduce(
       (acc, rota) => {
@@ -282,8 +246,6 @@ export const relatoriosService = {
       {} as Record<string, number>,
     );
 
-    console.log("Rotas por data:", rotasPorData);
-
     // Converter para formato do gráfico
     const dadosTemporais = Object.entries(rotasPorData)
       .sort(
@@ -297,14 +259,11 @@ export const relatoriosService = {
         color: "#3B82F6",
       }));
 
-    console.log("Dados temporais das rotas:", dadosTemporais);
     return dadosTemporais;
   },
 
   // Processar dados das rotas para relatório
   processarDadosRotas(rotas: RotaData[]): RelatorioData[] {
-    console.log("Processando dados de rotas:", rotas);
-
     // Agrupar rotas por dia da semana
     const rotasPorDia = rotas.reduce(
       (acc, rota) => {
@@ -317,8 +276,6 @@ export const relatoriosService = {
       },
       {} as Record<string, number>,
     );
-
-    console.log("Rotas por dia da semana:", rotasPorDia);
 
     const dadosPorDia = [
       {
@@ -358,18 +315,13 @@ export const relatoriosService = {
       },
     ];
 
-    console.log("Dados por dia da semana:", dadosPorDia);
-
     // Filtrar apenas valores maiores que 0
     const resultado = dadosPorDia.filter((dia) => dia.value > 0);
-    console.log("Resultado final das rotas:", resultado);
     return resultado;
   },
 
   // Processar dados das folgas para relatório
   processarDadosFolgas(folgas: FolgaData[]): RelatorioData[] {
-    console.log("Processando dados de folgas:", folgas);
-
     const statusCount = folgas.reduce(
       (acc, folga) => {
         const status = folga.status || "pendente";
@@ -378,8 +330,6 @@ export const relatoriosService = {
       },
       {} as Record<string, number>,
     );
-
-    console.log("Status count das folgas:", statusCount);
 
     const statusData = [
       {
@@ -404,10 +354,7 @@ export const relatoriosService = {
       },
     ];
 
-    console.log("Status data das folgas:", statusData);
-
     // Retornar todos os status, mesmo com valor 0
-    console.log("Resultado final das folgas:", statusData);
     return statusData;
   },
 };

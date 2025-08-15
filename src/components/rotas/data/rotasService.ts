@@ -18,21 +18,17 @@ const COLLECTION_NAME = "rotas";
 export const rotasService = {
   async getAll(): Promise<Rota[]> {
     try {
-      console.log("rotasService.getAll() iniciado");
       const q = query(
         collection(db, COLLECTION_NAME),
         orderBy("dataCriacao", "desc"),
       );
-      console.log("Query criada:", q);
       const snapshot = await getDocs(q);
-      console.log("Snapshot recebido:", snapshot);
       const result = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
         dataCriacao: doc.data().dataCriacao?.toDate() || new Date(),
         dataAtualizacao: doc.data().dataAtualizacao?.toDate() || new Date(),
       })) as Rota[];
-      console.log("Resultado mapeado:", result);
       return result;
     } catch (error) {
       console.error("Erro ao buscar rotas:", error);
