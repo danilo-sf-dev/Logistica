@@ -19,7 +19,7 @@ import Veiculos from "./components/veiculos/Veiculos";
 import Rotas from "./components/rotas/Rotas";
 import Folgas from "./components/folgas/Folgas";
 import Cidades from "./components/cidades";
-import CidadesTestePage from "./components/cidades/pages/CidadesTestePage";
+
 import Vendedores from "./components/vendedores";
 import Relatorios from "./components/relatorios/Relatorios";
 import Configuracoes from "./components/configuracoes/Configuracoes";
@@ -103,10 +103,7 @@ const App: React.FC = () => {
                     <Route path="rotas" element={<Rotas />} />
                     <Route path="folgas" element={<Folgas />} />
                     <Route path="cidades" element={<Cidades />} />
-                    <Route
-                      path="cidades-teste"
-                      element={<CidadesTestePage />}
-                    />
+
                     <Route path="vendedores" element={<Vendedores />} />
                     <Route path="relatorios" element={<Relatorios />} />
                     <Route path="configuracoes" element={<Configuracoes />} />

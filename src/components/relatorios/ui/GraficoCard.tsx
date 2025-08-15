@@ -31,7 +31,6 @@ export const GraficoCard: React.FC<GraficoCardProps> = ({
   const handleExport = (formato: "pdf" | "csv") => {
     // Converter o título para um formato que o switch case reconheça
     const tipo = config.titulo.toLowerCase().replace(/ /g, "_");
-    console.log("Título convertido:", config.titulo, "->", tipo);
     onDownload(tipo, formato);
   };
 
@@ -127,10 +126,6 @@ export const GraficoCard: React.FC<GraficoCardProps> = ({
     }
 
     if (config.tipo === "horizontal-bar") {
-      console.log("=== DEBUG GRÁFICO HORIZONTAL ===");
-      console.log("Config recebida:", config);
-      console.log("Dados originais:", config.dados);
-
       // Verificar se os dados têm a estrutura correta
       const dadosValidos = config.dados.filter(
         (item) =>
@@ -147,16 +142,8 @@ export const GraficoCard: React.FC<GraficoCardProps> = ({
         (a, b) => b.value - a.value,
       );
 
-      console.log("Dados processados:", {
-        dadosValidos,
-        dadosOrdenados,
-        total,
-        altura: config.altura,
-      });
-
       // Se não há dados válidos, mostrar mensagem
       if (dadosOrdenados.length === 0) {
-        console.log("Nenhum dado válido encontrado");
         return (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="text-center py-8">

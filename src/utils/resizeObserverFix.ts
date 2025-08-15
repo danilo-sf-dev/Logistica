@@ -1,8 +1,6 @@
 // Solução direta para o erro do ResizeObserver
 // Este arquivo deve ser importado no início da aplicação
 
-console.log("🔧 Inicializando supressão do erro ResizeObserver...");
-
 // Interceptar o erro do ResizeObserver antes de qualquer coisa
 const originalError = console.error;
 const originalWarn = console.warn;
@@ -26,7 +24,6 @@ const isResizeObserverError = (message: any): boolean => {
 console.error = (...args: any[]) => {
   if (isResizeObserverError(args[0])) {
     // Suprimir completamente o erro do ResizeObserver
-    console.log("🔧 Erro do ResizeObserver suprimido");
     return;
   }
   originalError.apply(console, args);
@@ -36,7 +33,6 @@ console.error = (...args: any[]) => {
 console.warn = (...args: any[]) => {
   if (isResizeObserverError(args[0])) {
     // Suprimir completamente o warning do ResizeObserver
-    console.log("🔧 Warning do ResizeObserver suprimido");
     return;
   }
   originalWarn.apply(console, args);
@@ -61,9 +57,6 @@ window.addEventListener = function (
   if (type === "error") {
     const wrappedListener = (event: ErrorEvent) => {
       if (isResizeObserverError(event.message)) {
-        console.log(
-          "🔧 Erro do ResizeObserver capturado e suprimido via addEventListener",
-        );
         event.preventDefault();
         event.stopImmediatePropagation();
         return false;
@@ -80,7 +73,6 @@ window.addEventListener(
   "unhandledrejection",
   (event: PromiseRejectionEvent) => {
     if (isResizeObserverError(event.reason)) {
-      console.log("🔧 Promise rejeitada do ResizeObserver suprimida");
       event.preventDefault();
       return false;
     }
@@ -91,7 +83,6 @@ window.addEventListener(
 const originalOnError = window.onerror;
 window.onerror = function (message, source, lineno, colno, error) {
   if (isResizeObserverError(message)) {
-    console.log("🔧 Erro do ResizeObserver suprimido via window.onerror");
     return true; // Previne o erro de ser exibido
   }
   if (originalOnError) {
@@ -103,9 +94,6 @@ window.onerror = function (message, source, lineno, colno, error) {
 // Interceptar também no nível do window.addEventListener('error')
 window.addEventListener("error", (event) => {
   if (isResizeObserverError(event.message)) {
-    console.log(
-      "🔧 Erro do ResizeObserver capturado via window.addEventListener",
-    );
     event.preventDefault();
     event.stopImmediatePropagation();
     return false;
@@ -116,12 +104,7 @@ window.addEventListener("error", (event) => {
 const originalConsoleError = console.error;
 console.error = (...args: any[]) => {
   if (isResizeObserverError(args[0])) {
-    console.log(
-      "🔧 Erro do ResizeObserver suprimido via console.error override",
-    );
     return;
   }
   originalConsoleError.apply(console, args);
 };
-
-console.log("✅ Supressão do erro ResizeObserver inicializada com sucesso!");
