@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Download, FileText, FileSpreadsheet, X } from "lucide-react";
 
 interface ExportModalProps {
@@ -6,6 +6,7 @@ interface ExportModalProps {
   onClose: () => void;
   onExport: (formato: "pdf" | "csv") => void;
   titulo: string;
+  disablePDF?: boolean; // Nova prop para desabilitar PDF
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({
@@ -13,8 +14,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   onClose,
   onExport,
   titulo,
+  disablePDF = false,
 }) => {
   const [formato, setFormato] = useState<"pdf" | "csv">("pdf");
+
+  // Se PDF estiver desabilitado, forçar Excel como padrão
+  useEffect(() => {
+    if (disablePDF) {
+      setFormato("csv");
+    } else {
+      setFormato("pdf");
+    }
+  }, [disablePDF]);
 
   if (!isOpen) return null;
 
@@ -49,13 +60,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           </p>
 
           <div className="space-y-3">
-            <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+            <label
+              className={`flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 ${
+                disablePDF ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
               <input
                 type="radio"
                 name="formato"
                 value="pdf"
                 checked={formato === "pdf"}
                 onChange={(e) => setFormato(e.target.value as "pdf" | "csv")}
+                disabled={disablePDF}
                 className="mr-3"
               />
               <FileText className="h-5 w-5 text-red-500 mr-2" />
@@ -63,6 +79,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 <div className="font-medium">PDF</div>
                 <div className="text-sm text-gray-500">
                   Documento formatado para impressão
+                  {disablePDF && (
+                    <span className="text-red-500 ml-1">
+                      (Não disponível para este relatório)
+                    </span>
+                  )}
                 </div>
               </div>
             </label>

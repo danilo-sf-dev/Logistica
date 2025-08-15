@@ -12,7 +12,7 @@ export const relatoriosService = {
   // Função auxiliar para filtrar dados por período
   filtrarPorPeriodo(dados: any[], periodo: string): any[] {
     console.log(
-      `Aplicando filtro de período: ${periodo} para ${dados.length} itens`
+      `Aplicando filtro de período: ${periodo} para ${dados.length} itens`,
     );
 
     const agora = new Date();
@@ -33,7 +33,7 @@ export const relatoriosService = {
         break;
       default:
         console.log(
-          `Período não reconhecido: ${periodo}, retornando todos os dados`
+          `Período não reconhecido: ${periodo}, retornando todos os dados`,
         );
         return dados; // Se período não reconhecido, retorna todos os dados
     }
@@ -59,7 +59,7 @@ export const relatoriosService = {
     });
 
     console.log(
-      `Filtro aplicado: ${dados.length} -> ${dadosFiltrados.length} itens`
+      `Filtro aplicado: ${dados.length} -> ${dadosFiltrados.length} itens`,
     );
     return dadosFiltrados;
   },
@@ -179,7 +179,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const statusData = [
@@ -217,7 +217,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const statusData = [
@@ -260,10 +260,10 @@ export const relatoriosService = {
       (acc, rota) => {
         let dataCriacao: Date;
 
-        if (rota.dataInicio?.toDate) {
-          dataCriacao = rota.dataInicio.toDate();
-        } else if (rota.dataInicio instanceof Date) {
-          dataCriacao = rota.dataInicio;
+        if (rota.dataCriacao?.toDate) {
+          dataCriacao = rota.dataCriacao.toDate();
+        } else if (rota.dataCriacao instanceof Date) {
+          dataCriacao = rota.dataCriacao;
         } else {
           dataCriacao = new Date();
         }
@@ -279,7 +279,7 @@ export const relatoriosService = {
         acc[dataStr]++;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     console.log("Rotas por data:", rotasPorData);
@@ -289,7 +289,7 @@ export const relatoriosService = {
       .sort(
         ([a], [b]) =>
           new Date(a.split("/").reverse().join("-")).getTime() -
-          new Date(b.split("/").reverse().join("-")).getTime()
+          new Date(b.split("/").reverse().join("-")).getTime(),
       )
       .map(([data, quantidade]) => ({
         name: data,
@@ -305,44 +305,63 @@ export const relatoriosService = {
   processarDadosRotas(rotas: RotaData[]): RelatorioData[] {
     console.log("Processando dados de rotas:", rotas);
 
-    const statusCount = rotas.reduce(
+    // Agrupar rotas por dia da semana
+    const rotasPorDia = rotas.reduce(
       (acc, rota) => {
-        const status = rota.status || "agendada";
-        acc[status] = (acc[status] || 0) + 1;
+        if (rota.diaSemana && Array.isArray(rota.diaSemana)) {
+          rota.diaSemana.forEach((dia) => {
+            acc[dia] = (acc[dia] || 0) + 1;
+          });
+        }
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
-    console.log("Status count das rotas:", statusCount);
+    console.log("Rotas por dia da semana:", rotasPorDia);
 
-    const statusData = [
+    const dadosPorDia = [
       {
-        name: "Agendada",
-        value: statusCount.agendada || 0,
-        color: "#3B82F6", // Azul - aguardando
+        name: "Segunda-feira",
+        value: rotasPorDia["Segunda-feira"] || 0,
+        color: "#3B82F6",
       },
       {
-        name: "Em Andamento",
-        value: statusCount.em_andamento || 0,
-        color: "#F59E0B", // Laranja - em progresso
+        name: "Terça-feira",
+        value: rotasPorDia["Terça-feira"] || 0,
+        color: "#10B981",
       },
       {
-        name: "Concluída",
-        value: statusCount.concluida || 0,
-        color: "#10B981", // Verde - sucesso
+        name: "Quarta-feira",
+        value: rotasPorDia["Quarta-feira"] || 0,
+        color: "#F59E0B",
       },
       {
-        name: "Cancelada",
-        value: statusCount.cancelada || 0,
-        color: "#EF4444", // Vermelho - cancelada
+        name: "Quinta-feira",
+        value: rotasPorDia["Quinta-feira"] || 0,
+        color: "#8B5CF6",
+      },
+      {
+        name: "Sexta-feira",
+        value: rotasPorDia["Sexta-feira"] || 0,
+        color: "#EF4444",
+      },
+      {
+        name: "Sábado",
+        value: rotasPorDia["Sábado"] || 0,
+        color: "#6B7280",
+      },
+      {
+        name: "Domingo",
+        value: rotasPorDia["Domingo"] || 0,
+        color: "#F97316",
       },
     ];
 
-    console.log("Status data das rotas:", statusData);
+    console.log("Dados por dia da semana:", dadosPorDia);
 
     // Filtrar apenas valores maiores que 0
-    const resultado = statusData.filter((status) => status.value > 0);
+    const resultado = dadosPorDia.filter((dia) => dia.value > 0);
     console.log("Resultado final das rotas:", resultado);
     return resultado;
   },
@@ -357,7 +376,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     console.log("Status count das folgas:", statusCount);

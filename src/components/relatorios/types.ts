@@ -14,26 +14,60 @@ export interface RelatorioPeriodo {
 export interface MotoristaData {
   id: string;
   nome: string;
+  cpf: string;
+  cnh: string;
+  cnhVencimento?: string;
+  cnhCategoria?: string;
+  celular: string;
+  email?: string;
+  endereco: string;
+  cep?: string;
+  numero?: string;
+  complemento?: string;
+  cidade: string;
+  funcao?: string;
+  toxicoUltimoExame?: string;
+  toxicoVencimento?: string;
   status: string;
-  cargo: string;
-  dataContratacao?: any;
+  tipoContrato: string;
+  unidadeNegocio: string;
+  dataAdmissao?: string;
+  salario?: string | null;
+  observacao?: string;
+  ativo: boolean;
+  dataCriacao?: any;
+  dataAtualizacao?: any;
 }
 
 export interface VeiculoData {
   id: string;
   placa: string;
-  modelo: string;
+  marca: string;
+  modelo?: string;
+  ano?: string;
+  capacidade: string;
+  tipoCarroceria: string;
+  quantidadeEixos: string;
+  tipoBau: string;
   status: string;
-  ano: number;
+  unidadeNegocio: string;
+  ultimaManutencao?: string;
+  proximaManutencao?: string;
+  motorista?: string;
+  observacao?: string;
+  dataCriacao?: any;
+  dataAtualizacao?: any;
 }
 
 export interface RotaData {
   id: string;
-  origem: string;
-  destino: string;
-  status: string;
-  dataInicio?: any;
-  dataFim?: any;
+  nome: string;
+  dataRota: string;
+  pesoMinimo: number;
+  diaSemana: string[];
+  cidades: string[];
+  dataCriacao?: any;
+  dataAtualizacao?: any;
 }
 
 export interface FolgaData {
