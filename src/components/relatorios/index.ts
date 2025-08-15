@@ -17,7 +17,6 @@ export { default as useRelatorios } from "./state/useRelatorios";
 
 // Exportações de serviços
 export { default as relatoriosService } from "./data/relatoriosService";
-export { default as exportService } from "./data/exportService";
 
 // Exportações de tipos
 export * from "./types";

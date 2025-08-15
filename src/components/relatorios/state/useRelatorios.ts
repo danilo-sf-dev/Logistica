@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback } from "react";
 import { relatoriosService } from "../data/relatoriosService";
-import { exportService } from "../data/exportService";
+import { ExportServiceFactory, type ExportData } from "../export";
 import { useNotification } from "../../../contexts/NotificationContext";
+import { useAuth } from "../../../contexts/AuthContext";
 import type {
   RelatorioData,
   MotoristaData,
@@ -13,6 +14,7 @@ import type {
 
 export const useRelatorios = () => {
   const { showNotification } = useNotification();
+  const { userProfile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [periodo, setPeriodo] = useState("mes");
   const [dadosMotoristas, setDadosMotoristas] = useState<RelatorioData[]>([]);
@@ -25,7 +27,7 @@ export const useRelatorios = () => {
     MotoristaData[]
   >([]);
   const [dadosBrutosVeiculos, setDadosBrutosVeiculos] = useState<VeiculoData[]>(
-    []
+    [],
   );
   const [dadosBrutosRotas, setDadosBrutosRotas] = useState<RotaData[]>([]);
   const [dadosBrutosFolgas, setDadosBrutosFolgas] = useState<FolgaData[]>([]);
@@ -84,7 +86,7 @@ export const useRelatorios = () => {
         motoristas.length + veiculos.length + rotas.length + folgas.length;
       showNotification(
         `Dados carregados: ${totalItens} itens encontrados`,
-        "success"
+        "success",
       );
     } catch (error) {
       console.error("Erro ao buscar dados para relatórios:", error);
@@ -124,6 +126,7 @@ export const useRelatorios = () => {
           case "funcionarios_detalhado":
           case "status_dos_funcionários":
           case "status_dos_funcionarios":
+          case "status_dos_motoristas":
             dados = dadosBrutosMotoristas;
             dadosProcessados = dadosMotoristas;
             nomeTipo = "Funcionários";
@@ -162,18 +165,36 @@ export const useRelatorios = () => {
           dadosProcessados: dadosProcessados.length,
         });
 
-        await exportService.exportRelatorio(
-          nomeTipo,
-          formato,
+        console.log("🔍 Dados para exportação:", {
+          tipo,
+          dados: dados.length,
+          dadosProcessados: dadosProcessados.length,
+          periodo,
+          camposDisponiveis: dados.length > 0 ? Object.keys(dados[0]) : [],
+        });
+
+        const exportService = ExportServiceFactory.createService(tipo);
+        const exportData: ExportData = {
           dados,
           dadosProcessados,
-          periodo
-        );
+          periodo,
+        };
+
+        // Preparar informações do usuário para o relatório
+        const userInfo = userProfile
+          ? {
+              displayName: userProfile.displayName,
+              email: userProfile.email,
+              cargo: userProfile.cargo,
+            }
+          : undefined;
+
+        await exportService.exportRelatorio(formato, exportData, userInfo);
 
         const tipoRelatorio = isDetalhado ? "Relatório Detalhado" : "Relatório";
         showNotification(
           `${tipoRelatorio} de ${nomeTipo} exportado com sucesso!`,
-          "success"
+          "success",
         );
       } catch (error) {
         console.error("Erro ao exportar relatório:", error);
@@ -191,7 +212,7 @@ export const useRelatorios = () => {
       dadosFolgas,
       periodo,
       showNotification,
-    ]
+    ],
   );
 
   const handlePeriodoChange = useCallback(
@@ -205,7 +226,7 @@ export const useRelatorios = () => {
       // Recarregar dados com o novo período
       fetchRelatorios();
     },
-    [fetchRelatorios, showNotification]
+    [fetchRelatorios, showNotification],
   );
 
   return {
