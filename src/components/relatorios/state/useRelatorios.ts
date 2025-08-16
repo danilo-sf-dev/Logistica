@@ -198,10 +198,78 @@ export const useRelatorios = () => {
 
             nomeTipo = "Cidades";
             break;
-          case "vendedores":
           case "vendedores_detalhado":
             dados = dadosBrutosVendedores;
+
+            // Estatísticas por região
+            const estatisticasRegiaoVendedores = dadosBrutosVendedores.reduce(
+              (acc, vendedor) => {
+                const regiao = vendedor.regiao || "Não definida";
+                acc[regiao] = (acc[regiao] || 0) + 1;
+                return acc;
+              },
+              {} as Record<string, number>,
+            );
+
+            // Estatísticas por unidade de negócio
+            const estatisticasUnidade = dadosBrutosVendedores.reduce(
+              (acc, vendedor) => {
+                const unidade = vendedor.unidadeNegocio || "Não definida";
+                acc[unidade] = (acc[unidade] || 0) + 1;
+                return acc;
+              },
+              {} as Record<string, number>,
+            );
+
+            // Estatísticas por tipo de contrato
+            const estatisticasContrato = dadosBrutosVendedores.reduce(
+              (acc, vendedor) => {
+                const contrato = vendedor.tipoContrato || "Não definido";
+                acc[contrato] = (acc[contrato] || 0) + 1;
+                return acc;
+              },
+              {} as Record<string, number>,
+            );
+
+            // Criar dados processados combinando todas as estatísticas
             dadosProcessados = [];
+
+            // Adicionar estatísticas por região
+            Object.entries(estatisticasRegiaoVendedores).forEach(
+              ([regiao, quantidade]) => {
+                dadosProcessados.push({
+                  name: `Região: ${regiao}`,
+                  value: quantidade,
+                  color: "#3B82F6", // Azul padrão
+                });
+              },
+            );
+
+            // Adicionar estatísticas por unidade de negócio
+            Object.entries(estatisticasUnidade).forEach(
+              ([unidade, quantidade]) => {
+                dadosProcessados.push({
+                  name: `Unidade: ${unidade}`,
+                  value: quantidade,
+                  color: "#10B981", // Verde padrão
+                });
+              },
+            );
+
+            // Adicionar estatísticas por tipo de contrato
+            Object.entries(estatisticasContrato).forEach(
+              ([contrato, quantidade]) => {
+                dadosProcessados.push({
+                  name: `Contrato: ${contrato}`,
+                  value: quantidade,
+                  color: "#F59E0B", // Laranja padrão
+                });
+              },
+            );
+
+            // Ordenar por quantidade decrescente
+            dadosProcessados.sort((a, b) => b.value - a.value);
+
             nomeTipo = "Vendedores";
             break;
           default:
