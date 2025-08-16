@@ -7,3 +7,4 @@ export type {
 } from "./ConfirmationModalTypes";
 export { MODAL_CONFIGS, BUTTON_VARIANTS } from "./ConfirmationModalConfig";
 export type { ModalConfig } from "./ConfirmationModalConfig";
+export { TableExportModal } from "./TableExportModal";

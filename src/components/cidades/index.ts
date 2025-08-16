@@ -9,3 +9,4 @@ export * from "./state/useCidades";
 export * from "./state/useRotasForCidades";
 export * from "./data/cidadesService";
 export * from "./types";
+export * from "./export";

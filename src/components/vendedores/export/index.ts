@@ -1,0 +1,1 @@
+export { VendedoresTableExportService } from "./VendedoresTableExportService";
