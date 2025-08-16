@@ -11,7 +11,8 @@ export type OrdenacaoCampo =
   | "status"
   | "tipoContrato"
   | "dataCriacao"
-  | "dataAtualizacao";
+  | "dataAtualizacao"
+  | "salario";
 export type DirecaoOrdenacao = "asc" | "desc";
 
 export function useFuncionarios() {
@@ -322,6 +323,10 @@ export function useFuncionarios() {
       if (ordenarPor === "nome") {
         aValue = aValue?.toLowerCase() || "";
         bValue = bValue?.toLowerCase() || "";
+      } else if (ordenarPor === "salario") {
+        // Converte salário para número para ordenação correta
+        aValue = aValue ? parseFloat(aValue) : 0;
+        bValue = bValue ? parseFloat(bValue) : 0;
       }
       if (aValue < bValue) return direcaoOrdenacao === "asc" ? -1 : 1;
       if (aValue > bValue) return direcaoOrdenacao === "asc" ? 1 : -1;

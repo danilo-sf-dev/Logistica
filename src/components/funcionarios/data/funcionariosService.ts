@@ -25,12 +25,19 @@ async function listar(): Promise<Funcionario[]> {
 
 function normalizeMoneyString(valor?: string | null): string | null {
   if (!valor) return null;
-  const cleaned = String(valor)
-    .replace(/[^0-9,.-]/g, "")
-    .replace(/\./g, "")
-    .replace(",", ".");
-  const num = Number(cleaned);
+
+  // Remove todos os caracteres não numéricos
+  const cleaned = String(valor).replace(/\D/g, "");
+
+  // Se não há números, retorna null
+  if (!cleaned) return null;
+
+  // Converte para número (em centavos) e depois para reais
+  const num = Number(cleaned) / 100;
+
   if (Number.isNaN(num)) return null;
+
+  // Retorna como string com 2 casas decimais
   return num.toFixed(2);
 }
 

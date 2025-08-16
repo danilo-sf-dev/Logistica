@@ -14,7 +14,7 @@ import type {
   OrdenacaoCampo,
   DirecaoOrdenacao,
 } from "../state/useFuncionarios";
-import { formatCPF, formatCelular } from "utils/masks";
+import { formatCPF, formatCelular, formatMoeda } from "utils/masks";
 
 type Props = {
   funcionarios: Funcionario[];
@@ -78,6 +78,12 @@ export const FuncionariosTable: React.FC<Props> = ({
             <th className="table-header">Cat. CNH</th>
             <th
               className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("salario")}
+            >
+              <div className="flex items-center">Salário {seta("salario")}</div>
+            </th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
               onClick={() => onOrdenar("status")}
             >
               <div className="flex items-center">Status {seta("status")}</div>
@@ -132,6 +138,11 @@ export const FuncionariosTable: React.FC<Props> = ({
               <td className="table-cell">
                 <span className="text-sm text-gray-900">
                   {f.cnhCategoria || "-"}
+                </span>
+              </td>
+              <td className="table-cell">
+                <span className="text-sm text-gray-900">
+                  {f.salario ? formatMoeda(f.salario) : "-"}
                 </span>
               </td>
               <td className="table-cell">
