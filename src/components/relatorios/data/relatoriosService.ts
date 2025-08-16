@@ -7,6 +7,8 @@ import type {
   FolgaData,
   RelatorioData,
 } from "../types";
+import type { Cidade } from "../../cidades/types";
+import type { Vendedor } from "../../vendedores/types";
 
 export const relatoriosService = {
   // Função auxiliar para filtrar dados por período
@@ -133,6 +135,48 @@ export const relatoriosService = {
       return folgas;
     } catch (error) {
       console.error("Erro ao buscar folgas:", error);
+      throw error;
+    }
+  },
+
+  // Buscar dados das cidades
+  async buscarCidades(periodo?: string): Promise<Cidade[]> {
+    try {
+      const cidadesSnapshot = await getDocs(collection(db, "cidades"));
+      let cidades = cidadesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Cidade[];
+
+      // Aplicar filtro por período se especificado
+      if (periodo) {
+        cidades = this.filtrarPorPeriodo(cidades, periodo);
+      }
+
+      return cidades;
+    } catch (error) {
+      console.error("Erro ao buscar cidades:", error);
+      throw error;
+    }
+  },
+
+  // Buscar dados dos vendedores
+  async buscarVendedores(periodo?: string): Promise<Vendedor[]> {
+    try {
+      const vendedoresSnapshot = await getDocs(collection(db, "vendedores"));
+      let vendedores = vendedoresSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Vendedor[];
+
+      // Aplicar filtro por período se especificado
+      if (periodo) {
+        vendedores = this.filtrarPorPeriodo(vendedores, periodo);
+      }
+
+      return vendedores;
+    } catch (error) {
+      console.error("Erro ao buscar vendedores:", error);
       throw error;
     }
   },
