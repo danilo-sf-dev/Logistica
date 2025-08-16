@@ -107,9 +107,9 @@ export class VendedoresExportService extends BaseExportService {
   // Método para obter configurações de largura de coluna específicas para vendedores
   protected getColumnWidths(): Record<number, { cellWidth: number }> {
     return {
-      0: { cellWidth: 35 }, // Nome
+      0: { cellWidth: 40 }, // Nome
       1: { cellWidth: 25 }, // CPF
-      2: { cellWidth: 30 }, // E-mail
+      2: { cellWidth: 40 }, // E-mail
       3: { cellWidth: 25 }, // Celular
       4: { cellWidth: 20 }, // Região
       5: { cellWidth: 15 }, // Código
@@ -175,56 +175,112 @@ export class VendedoresExportService extends BaseExportService {
 
         yPosition += 4;
 
-        const total = data.dadosProcessados.reduce(
-          (sum: number, d: any) => sum + d.value,
-          0,
+        // Separar dados por categoria
+        const dadosPorRegiao = data.dadosProcessados.filter((item: any) =>
+          item.name.startsWith("Região:"),
+        );
+        const dadosPorUnidade = data.dadosProcessados.filter((item: any) =>
+          item.name.startsWith("Unidade:"),
+        );
+        const dadosPorContrato = data.dadosProcessados.filter((item: any) =>
+          item.name.startsWith("Contrato:"),
         );
 
-        // Grid dinâmico baseado no número de categorias
-        const totalCards = data.dadosProcessados.length + 1; // +1 para o card TOTAL
-        const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
-        const cardWidth = Math.min(
-          40,
-          (availableWidth - (totalCards - 1) * 6) / totalCards,
-        );
-        const cardSpacing = 6;
-        let cardX = margin;
-
-        // Card Total
-        doc.setFontSize(6);
-        doc.setFont("helvetica", "normal");
-        doc.text("TOTAL", cardX, yPosition);
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        doc.text(total.toString(), cardX, yPosition + 8);
-        cardX += cardWidth + cardSpacing;
-
-        // Cards para cada categoria
-        data.dadosProcessados.forEach((item: any) => {
-          doc.setFontSize(6);
-          doc.setFont("helvetica", "normal");
-          doc.text(item.name.toUpperCase(), cardX, yPosition);
-          doc.setFontSize(12);
+        // Função para renderizar uma linha de cards
+        const renderizarLinhaCards = (
+          titulo: string,
+          dados: any[],
+          yPos: number,
+        ) => {
+          // Título da seção
+          doc.setFontSize(7);
           doc.setFont("helvetica", "bold");
-          const percentText =
-            total > 0 ? `${((item.value / total) * 100).toFixed(1)}%` : "0%";
-          doc.text(`${item.value} `, cardX, yPosition + 8);
+          doc.text(titulo, margin, yPos);
+          yPos += 3;
 
-          // Percentual em texto menor
-          doc.setFontSize(8);
-          doc.setFont("helvetica", "normal");
-          doc.setTextColor(107, 114, 128);
-          doc.text(
-            `(${percentText})`,
-            cardX + doc.getTextWidth(`${item.value} `),
-            yPosition + 8,
+          // Card TOTAL
+          const totalCards = dados.length + 1;
+          const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
+          const cardWidth = Math.min(
+            35,
+            (availableWidth - (totalCards - 1) * 4) / totalCards,
           );
-          doc.setTextColor(0, 0, 0);
+          const cardSpacing = 4;
+          let cardX = margin;
 
+          // Card Total para esta categoria
+          const totalCategoria = dados.reduce(
+            (sum: number, d: any) => sum + d.value,
+            0,
+          );
+          doc.setFontSize(5);
+          doc.setFont("helvetica", "normal");
+          doc.text("TOTAL", cardX, yPos);
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "bold");
+          doc.text(totalCategoria.toString(), cardX, yPos + 6);
           cardX += cardWidth + cardSpacing;
-        });
 
-        yPosition += 10;
+          // Cards para cada item da categoria
+          dados.forEach((item: any) => {
+            doc.setFontSize(5);
+            doc.setFont("helvetica", "normal");
+            const nomeLimpo = item.name.replace(
+              /^(Região|Unidade|Contrato):\s*/,
+              "",
+            );
+            doc.text(nomeLimpo.toUpperCase(), cardX, yPos);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            const percentText =
+              totalCategoria > 0
+                ? `${((item.value / totalCategoria) * 100).toFixed(1)}%`
+                : "0%";
+            doc.text(`${item.value} `, cardX, yPos + 6);
+
+            // Percentual em texto menor
+            doc.setFontSize(7);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(107, 114, 128);
+            doc.text(
+              `(${percentText})`,
+              cardX + doc.getTextWidth(`${item.value} `),
+              yPos + 6,
+            );
+            doc.setTextColor(0, 0, 0);
+
+            cardX += cardWidth + cardSpacing;
+          });
+
+          return yPos + 12; // Retorna a posição Y para a próxima linha
+        };
+
+        // Renderizar cada linha de categoria
+        if (dadosPorRegiao.length > 0) {
+          yPosition = renderizarLinhaCards(
+            "Distribuição por Região:",
+            dadosPorRegiao,
+            yPosition,
+          );
+        }
+
+        if (dadosPorUnidade.length > 0) {
+          yPosition = renderizarLinhaCards(
+            "Distribuição por Unidade de Negócio:",
+            dadosPorUnidade,
+            yPosition,
+          );
+        }
+
+        if (dadosPorContrato.length > 0) {
+          yPosition = renderizarLinhaCards(
+            "Distribuição por Tipo de Contrato:",
+            dadosPorContrato,
+            yPosition,
+          );
+        }
+
+        yPosition += 5;
       }
 
       // Dados detalhados
@@ -333,13 +389,85 @@ export class VendedoresExportService extends BaseExportService {
 
       // Planilha 2: Resumo estatístico
       if (data.dadosProcessados && data.dadosProcessados.length > 0) {
+        // Separar dados por categoria
+        const dadosPorRegiao = data.dadosProcessados.filter((item: any) =>
+          item.name.startsWith("Região:"),
+        );
+        const dadosPorUnidade = data.dadosProcessados.filter((item: any) =>
+          item.name.startsWith("Unidade:"),
+        );
+        const dadosPorContrato = data.dadosProcessados.filter((item: any) =>
+          item.name.startsWith("Contrato:"),
+        );
+
+        // Função para criar planilha de resumo por categoria
+        const criarPlanilhaResumo = (titulo: string, dados: any[]) => {
+          const totalCategoria = dados.reduce(
+            (sum: number, item: any) => sum + item.value,
+            0,
+          );
+
+          const resumoData = [
+            {
+              Categoria: "TOTAL",
+              Quantidade: totalCategoria,
+              Percentual: "100%",
+            },
+            ...dados.map((item: any) => {
+              const nomeLimpo = item.name.replace(
+                /^(Região|Unidade|Contrato):\s*/,
+                "",
+              );
+              return {
+                Categoria: nomeLimpo,
+                Quantidade: item.value,
+                Percentual:
+                  totalCategoria > 0
+                    ? `${((item.value / totalCategoria) * 100).toFixed(1)}%`
+                    : "0.0%",
+              };
+            }),
+          ];
+
+          const wsResumo = XLSX.utils.json_to_sheet(resumoData);
+          wsResumo["!cols"] = [{ width: 30 }, { width: 15 }, { width: 15 }];
+
+          return { wsResumo };
+        };
+
+        // Criar planilhas separadas para cada categoria
+        if (dadosPorRegiao.length > 0) {
+          const { wsResumo } = criarPlanilhaResumo(
+            "Distribuição por Região",
+            dadosPorRegiao,
+          );
+          XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo por Região");
+        }
+
+        if (dadosPorUnidade.length > 0) {
+          const { wsResumo } = criarPlanilhaResumo(
+            "Distribuição por Unidade",
+            dadosPorUnidade,
+          );
+          XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo por Unidade");
+        }
+
+        if (dadosPorContrato.length > 0) {
+          const { wsResumo } = criarPlanilhaResumo(
+            "Distribuição por Contrato",
+            dadosPorContrato,
+          );
+          XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo por Contrato");
+        }
+
+        // Planilha de resumo geral
         const total = data.dadosProcessados.reduce(
           (sum: number, item: any) => sum + item.value,
           0,
         );
 
-        const resumoData = [
-          { Categoria: "TOTAL", Quantidade: total, Percentual: "100%" },
+        const resumoGeralData = [
+          { Categoria: "TOTAL GERAL", Quantidade: total, Percentual: "100%" },
           ...data.dadosProcessados.map((item: any) => ({
             Categoria: item.name,
             Quantidade: item.value,
@@ -350,10 +478,10 @@ export class VendedoresExportService extends BaseExportService {
           })),
         ];
 
-        const wsResumo = XLSX.utils.json_to_sheet(resumoData);
-        wsResumo["!cols"] = [{ width: 30 }, { width: 15 }, { width: 15 }];
+        const wsResumoGeral = XLSX.utils.json_to_sheet(resumoGeralData);
+        wsResumoGeral["!cols"] = [{ width: 30 }, { width: 15 }, { width: 15 }];
 
-        XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo Estatístico");
+        XLSX.utils.book_append_sheet(wb, wsResumoGeral, "Resumo Geral");
       }
 
       // Planilha 3: Dados detalhados

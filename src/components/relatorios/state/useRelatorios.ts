@@ -231,43 +231,52 @@ export const useRelatorios = () => {
               {} as Record<string, number>,
             );
 
-            // Criar dados processados combinando todas as estatísticas
+            // Criar dados processados com todas as opções
             dadosProcessados = [];
 
-            // Adicionar estatísticas por região
-            Object.entries(estatisticasRegiaoVendedores).forEach(
-              ([regiao, quantidade]) => {
-                dadosProcessados.push({
-                  name: `Região: ${regiao}`,
-                  value: quantidade,
-                  color: "#3B82F6", // Azul padrão
-                });
-              },
-            );
+            // Definir todas as regiões do Brasil
+            const todasRegioesVendedores = [
+              "norte",
+              "nordeste",
+              "centro-oeste",
+              "sudeste",
+              "sul",
+            ];
 
-            // Adicionar estatísticas por unidade de negócio
-            Object.entries(estatisticasUnidade).forEach(
-              ([unidade, quantidade]) => {
-                dadosProcessados.push({
-                  name: `Unidade: ${unidade}`,
-                  value: quantidade,
-                  color: "#10B981", // Verde padrão
-                });
-              },
-            );
+            // Adicionar todas as regiões, mesmo as que não têm vendedores
+            todasRegioesVendedores.forEach((regiao) => {
+              dadosProcessados.push({
+                name: `Região: ${regiao}`,
+                value: estatisticasRegiaoVendedores[regiao] || 0,
+                color: "#3B82F6", // Azul padrão
+              });
+            });
 
-            // Adicionar estatísticas por tipo de contrato
-            Object.entries(estatisticasContrato).forEach(
-              ([contrato, quantidade]) => {
-                dadosProcessados.push({
-                  name: `Contrato: ${contrato}`,
-                  value: quantidade,
-                  color: "#F59E0B", // Laranja padrão
-                });
-              },
-            );
+            // Definir todas as unidades de negócio
+            const todasUnidades = ["frigorifico", "ovos", "ambos"];
 
-            // Ordenar por quantidade decrescente
+            // Adicionar todas as unidades, mesmo as que não têm vendedores
+            todasUnidades.forEach((unidade) => {
+              dadosProcessados.push({
+                name: `Unidade: ${unidade}`,
+                value: estatisticasUnidade[unidade] || 0,
+                color: "#10B981", // Verde padrão
+              });
+            });
+
+            // Definir todos os tipos de contrato
+            const todosContratos = ["clt", "pj", "autonomo", "outro"];
+
+            // Adicionar todos os contratos, mesmo os que não têm vendedores
+            todosContratos.forEach((contrato) => {
+              dadosProcessados.push({
+                name: `Contrato: ${contrato}`,
+                value: estatisticasContrato[contrato] || 0,
+                color: "#F59E0B", // Laranja padrão
+              });
+            });
+
+            // Ordenar por quantidade decrescente dentro de cada categoria
             dadosProcessados.sort((a, b) => b.value - a.value);
 
             nomeTipo = "Vendedores";

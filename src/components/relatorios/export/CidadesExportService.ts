@@ -106,11 +106,6 @@ export class CidadesExportService extends BaseExportService {
   // Sobrescrever o método exportToPDF para usar as larguras específicas
   async exportToPDF(data: any, userInfo?: any): Promise<void> {
     try {
-      console.log("=== DEBUG EXPORT CIDADES ===");
-      console.log("Data recebida:", data);
-      console.log("Dados brutos:", data.dados?.length);
-      console.log("Dados processados:", data.dadosProcessados);
-
       const doc = new jsPDF("landscape");
       const margin = 10;
 
@@ -119,7 +114,6 @@ export class CidadesExportService extends BaseExportService {
 
       // Resumo estatístico - usar dadosProcessados que já foram processados
       if (data.dadosProcessados && data.dadosProcessados.length > 0) {
-        console.log("Processando dashboard com dados:", data.dadosProcessados);
         yPosition += 5;
 
         doc.setTextColor(0, 0, 0);
@@ -133,7 +127,6 @@ export class CidadesExportService extends BaseExportService {
           (sum: number, d: any) => sum + d.value,
           0,
         );
-        console.log("Total calculado:", total);
 
         // Grid dinâmico baseado no número de regiões
         const totalCards = data.dadosProcessados.length + 1; // +1 para o card TOTAL
@@ -156,7 +149,6 @@ export class CidadesExportService extends BaseExportService {
 
         // Cards para cada região
         data.dadosProcessados.forEach((item: any) => {
-          console.log(`Renderizando card: ${item.name} = ${item.value}`);
           doc.setFontSize(6);
           doc.setFont("helvetica", "normal");
           doc.text(item.name.toUpperCase(), cardX, yPosition);
@@ -181,20 +173,7 @@ export class CidadesExportService extends BaseExportService {
         });
 
         yPosition += 10;
-      } else {
-        console.log("Nenhum dado processado encontrado para o dashboard");
-        console.log("data.dadosProcessados:", data.dadosProcessados);
-        console.log(
-          "data.dadosProcessados.length:",
-          data.dadosProcessados?.length,
-        );
-        console.log(
-          "Condição falhou:",
-          !data.dadosProcessados || data.dadosProcessados.length === 0,
-        );
       }
-
-      console.log("=== FIM DEBUG EXPORT CIDADES ===");
 
       // Dados detalhados
       if (data.dados.length > 0) {
