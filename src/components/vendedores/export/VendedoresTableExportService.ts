@@ -32,10 +32,8 @@ export class VendedoresTableExportService extends BaseTableExportService {
         if (!valor) return "N/A";
         const unidadeMap: Record<string, string> = {
           frigorifico: "Frigorífico",
-          transportadora: "Transportadora",
-          comercio: "Comércio",
-          industria: "Indústria",
-          servicos: "Serviços",
+          ovos: "Ovos",
+          ambos: "Ambos",
         };
         return unidadeMap[valor] || valor;
       },
@@ -44,8 +42,8 @@ export class VendedoresTableExportService extends BaseTableExportService {
         const contratoMap: Record<string, string> = {
           clt: "CLT",
           pj: "PJ",
-          comissionado: "Comissionado",
-          terceirizado: "Terceirizado",
+          autonomo: "Autônomo",
+          outro: "Outro",
         };
         return contratoMap[valor] || valor;
       },

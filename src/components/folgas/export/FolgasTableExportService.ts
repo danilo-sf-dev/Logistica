@@ -43,10 +43,19 @@ export class FolgasTableExportService extends BaseTableExportService {
         const tipoMap: Record<string, string> = {
           folga: "Folga",
           ferias: "Férias",
+          licenca: "Licença Médica",
+          atestado: "Atestado Médico",
           banco_horas: "Banco de Horas",
-          compensacao: "Compensação",
-          atestado: "Atestado",
-          licenca: "Licença",
+          compensacao: "Compensação de Horas",
+          suspensao: "Suspensão Disciplinar",
+          afastamento: "Afastamento por Acidente",
+          maternidade: "Licença Maternidade",
+          paternidade: "Licença Paternidade",
+          luto: "Licença por Luto",
+          casamento: "Licença para Casamento",
+          doacao_sangue: "Licença para Doação de Sangue",
+          servico_militar: "Licença para Serviço Militar",
+          capacitacao: "Licença para Capacitação",
           outros: "Outros",
         };
         return tipoMap[valor] || valor;

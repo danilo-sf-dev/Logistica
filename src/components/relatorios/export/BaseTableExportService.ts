@@ -115,14 +115,10 @@ export abstract class BaseTableExportService {
       dataAdmissao: "Data Admissão",
 
       // Veículos
-      placa: "Placa",
-      marca: "Marca",
-      modelo: "Modelo",
-      ano: "Ano",
-      cor: "Cor",
-      tipoCarroceria: "Tipo Carroceria",
-      tipoBau: "Tipo Baú",
-      capacidade: "Capacidade",
+      quantidadeEixos: "Quantidade de Eixos",
+      ultimaManutencao: "Última Manutenção",
+      proximaManutencao: "Próxima Manutenção",
+      motorista: "Motorista",
 
       // Rotas
       nome: "Nome da Rota",
@@ -168,10 +164,27 @@ export abstract class BaseTableExportService {
       filtrosAplicados.push(`Região: ${filtros.filtroRegiao}`);
     }
     if (filtros.filtroStatus && filtros.filtroStatus !== "todos") {
-      filtrosAplicados.push(`Status: ${filtros.filtroStatus}`);
+      const statusMap: Record<string, string> = {
+        disponivel: "Disponível",
+        em_uso: "Em Uso",
+        manutencao: "Manutenção",
+        inativo: "Inativo",
+        acidentado: "Acidentado",
+      };
+      const statusTraduzido =
+        statusMap[filtros.filtroStatus] || filtros.filtroStatus;
+      filtrosAplicados.push(`Status: ${statusTraduzido}`);
     }
     if (filtros.filtroContrato && filtros.filtroContrato !== "todos") {
-      filtrosAplicados.push(`Tipo de Contrato: ${filtros.filtroContrato}`);
+      const contratoMap: Record<string, string> = {
+        clt: "CLT",
+        pj: "PJ",
+        autonomo: "Autônomo",
+        outro: "Outro",
+      };
+      const contratoTraduzido =
+        contratoMap[filtros.filtroContrato] || filtros.filtroContrato;
+      filtrosAplicados.push(`Tipo de Contrato: ${contratoTraduzido}`);
     }
     if (filtros.filtroFuncao && filtros.filtroFuncao !== "todos") {
       filtrosAplicados.push(`Função: ${filtros.filtroFuncao}`);
@@ -184,15 +197,40 @@ export abstract class BaseTableExportService {
       filtros.filtroUnidadeNegocio &&
       filtros.filtroUnidadeNegocio !== "todos"
     ) {
-      filtrosAplicados.push(
-        `Unidade de Negócio: ${filtros.filtroUnidadeNegocio}`,
-      );
+      const unidadesMap: Record<string, string> = {
+        frigorifico: "Frigorífico",
+        ovos: "Ovos",
+        ambos: "Ambos",
+      };
+      const unidadeTraduzida =
+        unidadesMap[filtros.filtroUnidadeNegocio] ||
+        filtros.filtroUnidadeNegocio;
+      filtrosAplicados.push(`Unidade de Negócio: ${unidadeTraduzida}`);
     }
     if (filtros.filtroCidade) {
       filtrosAplicados.push(`Cidade: ${filtros.filtroCidade}`);
     }
     if (filtros.filtroTipo && filtros.filtroTipo !== "todos") {
-      filtrosAplicados.push(`Tipo: ${filtros.filtroTipo}`);
+      const tipoMap: Record<string, string> = {
+        folga: "Folga",
+        ferias: "Férias",
+        licenca: "Licença Médica",
+        atestado: "Atestado Médico",
+        banco_horas: "Banco de Horas",
+        compensacao: "Compensação de Horas",
+        suspensao: "Suspensão Disciplinar",
+        afastamento: "Afastamento por Acidente",
+        maternidade: "Licença Maternidade",
+        paternidade: "Licença Paternidade",
+        luto: "Licença por Luto",
+        casamento: "Licença para Casamento",
+        doacao_sangue: "Licença para Doação de Sangue",
+        servico_militar: "Licença para Serviço Militar",
+        capacitacao: "Licença para Capacitação",
+        outros: "Outros",
+      };
+      const tipoTraduzido = tipoMap[filtros.filtroTipo] || filtros.filtroTipo;
+      filtrosAplicados.push(`Tipo: ${tipoTraduzido}`);
     }
     if (filtros.filtroDiaSemana && filtros.filtroDiaSemana !== "todos") {
       const diasMap: Record<string, string> = {
@@ -207,6 +245,38 @@ export abstract class BaseTableExportService {
       const diaTraduzido =
         diasMap[filtros.filtroDiaSemana] || filtros.filtroDiaSemana;
       filtrosAplicados.push(`Dia da Semana: ${diaTraduzido}`);
+    }
+    if (
+      filtros.filtroTipoCarroceria &&
+      filtros.filtroTipoCarroceria !== "todos"
+    ) {
+      const tiposMap: Record<string, string> = {
+        truck: "Truck",
+        toco: "Toco",
+        bitruck: "Bitruck",
+        carreta: "Carreta",
+        carreta_ls: "Carreta LS",
+        carreta_3_eixos: "Carreta 3 Eixos",
+        truck_3_eixos: "Truck 3 Eixos",
+        truck_4_eixos: "Truck 4 Eixos",
+      };
+      const tipoTraduzido =
+        tiposMap[filtros.filtroTipoCarroceria] || filtros.filtroTipoCarroceria;
+      filtrosAplicados.push(`Tipo de Carroceria: ${tipoTraduzido}`);
+    }
+    if (filtros.filtroTipoBau && filtros.filtroTipoBau !== "todos") {
+      const tiposMap: Record<string, string> = {
+        frigorifico: "Frigorífico",
+        carga_seca: "Carga Seca",
+        baucher: "Baucher",
+        graneleiro: "Graneleiro",
+        tanque: "Tanque",
+        caçamba: "Caçamba",
+        plataforma: "Plataforma",
+      };
+      const tipoTraduzido =
+        tiposMap[filtros.filtroTipoBau] || filtros.filtroTipoBau;
+      filtrosAplicados.push(`Tipo de Baú: ${tipoTraduzido}`);
     }
 
     if (filtrosAplicados.length > 0) {
