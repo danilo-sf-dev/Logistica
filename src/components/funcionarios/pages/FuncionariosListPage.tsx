@@ -4,6 +4,7 @@ import { FuncionariosTable } from "../ui/FuncionariosTable";
 import FuncionarioFormModal from "../ui/FuncionarioFormModal";
 import { TableExportModal } from "../../common/modals";
 import { useFuncionarios } from "../state/useFuncionarios";
+import { FuncionariosFilters } from "../ui/FuncionariosFilters";
 
 import { maskCPF } from "utils/masks";
 
@@ -20,8 +21,6 @@ const FuncionariosListPage: React.FC = () => {
     setTermoBusca,
     filtroStatus,
     setFiltroStatus,
-    filtroContrato,
-    setFiltroContrato,
     filtroFuncao,
     setFiltroFuncao,
     filtroAtivo,
@@ -113,77 +112,26 @@ const FuncionariosListPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="card">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Buscar por nome, CPF, CNH ou cidade..."
-              value={termoBusca}
-              onChange={(e) => setTermoBusca(e.target.value)}
-              className="input-field"
-            />
-          </div>
-          <div className="sm:w-48">
-            <select
-              value={filtroFuncao}
-              onChange={(e) => setFiltroFuncao(e.target.value as any)}
-              className="input-field"
-            >
-              <option value="todos">Todas as funções</option>
-              <option value="motorista">Motorista</option>
-              <option value="ajudante">Ajudante</option>
-              <option value="outro">Outro</option>
-            </select>
-          </div>
-          <div className="sm:w-48">
-            <select
-              value={filtroStatus}
-              onChange={(e) => setFiltroStatus(e.target.value as any)}
-              className="input-field"
-            >
-              <option value="todos">Todos os status</option>
-              <option value="trabalhando">Trabalhando</option>
-              <option value="disponivel">Disponível</option>
-              <option value="folga">Folga</option>
-              <option value="ferias">Férias</option>
-            </select>
-          </div>
-          <div className="sm:w-48">
-            <select
-              value={filtroContrato}
-              onChange={(e) => setFiltroContrato(e.target.value as any)}
-              className="input-field"
-            >
-              <option value="todos">Todos os contratos</option>
-              <option value="integral">Integral</option>
-              <option value="temporario">Temporário</option>
-              <option value="folguista">Folguista</option>
-              <option value="inativo">Inativo</option>
-            </select>
-          </div>
-          <div className="sm:w-48">
-            <select
-              value={
-                filtroAtivo === "todos"
-                  ? "todos"
-                  : filtroAtivo
-                    ? "true"
-                    : "false"
-              }
-              onChange={(e) => {
-                const value = e.target.value;
-                setFiltroAtivo(value === "todos" ? "todos" : value === "true");
-              }}
-              className="input-field"
-            >
-              <option value="todos">Todos os status</option>
-              <option value="true">Apenas ativos</option>
-              <option value="false">Apenas inativos</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <FuncionariosFilters
+        termoBusca={termoBusca}
+        setTermoBusca={setTermoBusca}
+        filtroStatus={filtroStatus}
+        setFiltroStatus={setFiltroStatus}
+        filtroFuncao={filtroFuncao}
+        setFiltroFuncao={setFiltroFuncao}
+        filtroAtivo={
+          filtroAtivo === "todos" ? "todos" : filtroAtivo ? "ativo" : "inativo"
+        }
+        setFiltroAtivo={(value) => {
+          if (value === "todos") {
+            setFiltroAtivo("todos");
+          } else if (value === "ativo") {
+            setFiltroAtivo(true);
+          } else {
+            setFiltroAtivo(false);
+          }
+        }}
+      />
 
       <div className="card">
         <FuncionariosTable

@@ -3,7 +3,7 @@ import ConfirmationModal from "../../common/modals/ConfirmationModal";
 import { TableExportModal } from "../../common/modals";
 import { VendedoresTable } from "../ui/VendedoresTable";
 import VendedorFormModal from "../ui/VendedorFormModal";
-import CidadesFilter from "../ui/CidadesFilter";
+import { VendedoresFilters } from "../ui/VendedoresFilters";
 import { useVendedores } from "../state/useVendedores";
 import { maskCelular, formatCPF } from "../../../utils/masks";
 
@@ -18,8 +18,6 @@ const VendedoresListPage: React.FC = () => {
     setPaginaAtual,
     termoBusca,
     setTermoBusca,
-    filtroUnidadeNegocio,
-    setFiltroUnidadeNegocio,
     filtroAtivo,
     setFiltroAtivo,
     filtroCidade,
@@ -113,60 +111,24 @@ const VendedoresListPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="card">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Buscar por nome, CPF, email ou região..."
-              value={termoBusca}
-              onChange={(e) => setTermoBusca(e.target.value)}
-              className="input-field"
-            />
-          </div>
-          <div className="sm:w-48">
-            <select
-              value={filtroUnidadeNegocio}
-              onChange={(e) => setFiltroUnidadeNegocio(e.target.value as any)}
-              className="input-field"
-            >
-              <option value="todos">Todas as unidades</option>
-              <option value="frigorifico">Frigorífico</option>
-              <option value="ovos">Ovos</option>
-              <option value="ambos">Ambos</option>
-            </select>
-          </div>
-
-          <div className="sm:w-48">
-            <select
-              value={
-                filtroAtivo === "todos"
-                  ? "todos"
-                  : filtroAtivo
-                    ? "true"
-                    : "false"
-              }
-              onChange={(e) => {
-                const value = e.target.value;
-                setFiltroAtivo(value === "todos" ? "todos" : value === "true");
-              }}
-              className="input-field"
-            >
-              <option value="todos">Todos os status</option>
-              <option value="true">Apenas ativos</option>
-              <option value="false">Apenas inativos</option>
-            </select>
-          </div>
-
-          <div className="sm:w-48">
-            <CidadesFilter
-              value={filtroCidade}
-              onChange={setFiltroCidade}
-              placeholder="Filtrar por cidade"
-            />
-          </div>
-        </div>
-      </div>
+      <VendedoresFilters
+        termoBusca={termoBusca}
+        setTermoBusca={setTermoBusca}
+        filtroCidade={filtroCidade}
+        setFiltroCidade={setFiltroCidade}
+        filtroStatus={
+          filtroAtivo === "todos" ? "todos" : filtroAtivo ? "ativo" : "inativo"
+        }
+        setFiltroStatus={(value) => {
+          if (value === "todos") {
+            setFiltroAtivo("todos");
+          } else if (value === "ativo") {
+            setFiltroAtivo(true);
+          } else {
+            setFiltroAtivo(false);
+          }
+        }}
+      />
 
       <div className="card">
         <VendedoresTable

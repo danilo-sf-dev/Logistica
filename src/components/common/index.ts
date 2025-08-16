@@ -6,3 +6,6 @@ export * from "./ErrorPages";
 
 // Error Boundary
 export * from "./ErrorBoundary";
+
+// Filter Components
+export { FilterClearButton } from "./FilterClearButton";

@@ -122,14 +122,12 @@ const CidadesListPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="card">
-        <CidadesFilters
-          termo={termoBusca}
-          onChangeTermo={setTermoBusca}
-          filtroRegiao={filtroRegiao}
-          onChangeFiltroRegiao={setFiltroRegiao}
-        />
-      </div>
+      <CidadesFilters
+        termo={termoBusca}
+        onChangeTermo={setTermoBusca}
+        filtroRegiao={filtroRegiao}
+        onChangeFiltroRegiao={setFiltroRegiao}
+      />
 
       <div className="card">
         <CidadesTable
