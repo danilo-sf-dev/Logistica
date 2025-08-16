@@ -7,6 +7,8 @@ import type {
   FolgaData,
   RelatorioData,
 } from "../types";
+import type { Cidade } from "../../cidades/types";
+import type { Vendedor } from "../../vendedores/types";
 
 export const relatoriosService = {
   // Função auxiliar para filtrar dados por período
@@ -137,6 +139,48 @@ export const relatoriosService = {
     }
   },
 
+  // Buscar dados das cidades
+  async buscarCidades(periodo?: string): Promise<Cidade[]> {
+    try {
+      const cidadesSnapshot = await getDocs(collection(db, "cidades"));
+      let cidades = cidadesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Cidade[];
+
+      // Aplicar filtro por período se especificado
+      if (periodo) {
+        cidades = this.filtrarPorPeriodo(cidades, periodo);
+      }
+
+      return cidades;
+    } catch (error) {
+      console.error("Erro ao buscar cidades:", error);
+      throw error;
+    }
+  },
+
+  // Buscar dados dos vendedores
+  async buscarVendedores(periodo?: string): Promise<Vendedor[]> {
+    try {
+      const vendedoresSnapshot = await getDocs(collection(db, "vendedores"));
+      let vendedores = vendedoresSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Vendedor[];
+
+      // Aplicar filtro por período se especificado
+      if (periodo) {
+        vendedores = this.filtrarPorPeriodo(vendedores, periodo);
+      }
+
+      return vendedores;
+    } catch (error) {
+      console.error("Erro ao buscar vendedores:", error);
+      throw error;
+    }
+  },
+
   // Processar dados dos motoristas para relatório
   processarDadosMotoristas(motoristas: MotoristaData[]): RelatorioData[] {
     const statusCount = motoristas.reduce(
@@ -145,7 +189,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     const statusData = [
@@ -183,7 +227,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     const statusData = [
@@ -243,7 +287,7 @@ export const relatoriosService = {
         acc[dataStr]++;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     // Converter para formato do gráfico
@@ -251,7 +295,7 @@ export const relatoriosService = {
       .sort(
         ([a], [b]) =>
           new Date(a.split("/").reverse().join("-")).getTime() -
-          new Date(b.split("/").reverse().join("-")).getTime(),
+          new Date(b.split("/").reverse().join("-")).getTime()
       )
       .map(([data, quantidade]) => ({
         name: data,
@@ -274,7 +318,7 @@ export const relatoriosService = {
         }
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     const dadosPorDia = [
@@ -328,7 +372,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>,
+      {} as Record<string, number>
     );
 
     const statusData = [

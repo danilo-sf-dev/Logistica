@@ -11,6 +11,21 @@ import type {
   RotaData,
   FolgaData,
 } from "../types";
+import type { Cidade } from "../../cidades/types";
+import type { Vendedor } from "../../vendedores/types";
+
+// Função auxiliar para obter cor baseada na região
+const getCorRegiao = (regiao: string): string => {
+  const coresRegiao: Record<string, string> = {
+    Sudeste: "#3B82F6", // Azul
+    Sul: "#10B981", // Verde
+    Nordeste: "#F59E0B", // Laranja
+    "Centro-Oeste": "#8B5CF6", // Roxo
+    Norte: "#EF4444", // Vermelho
+    "Não definida": "#6B7280", // Cinza
+  };
+  return coresRegiao[regiao] || "#6B7280";
+};
 
 export const useRelatorios = () => {
   const { showNotification } = useNotification();
@@ -27,27 +42,36 @@ export const useRelatorios = () => {
     MotoristaData[]
   >([]);
   const [dadosBrutosVeiculos, setDadosBrutosVeiculos] = useState<VeiculoData[]>(
-    [],
+    []
   );
   const [dadosBrutosRotas, setDadosBrutosRotas] = useState<RotaData[]>([]);
   const [dadosBrutosFolgas, setDadosBrutosFolgas] = useState<FolgaData[]>([]);
+  const [dadosBrutosCidades, setDadosBrutosCidades] = useState<Cidade[]>([]);
+  const [dadosBrutosVendedores, setDadosBrutosVendedores] = useState<
+    Vendedor[]
+  >([]);
 
   const fetchRelatorios = useCallback(async () => {
     setLoading(true);
     try {
       // Buscar dados de todas as entidades
-      const [motoristas, veiculos, rotas, folgas] = await Promise.all([
-        relatoriosService.buscarMotoristas(periodo),
-        relatoriosService.buscarVeiculos(periodo),
-        relatoriosService.buscarRotas(periodo),
-        relatoriosService.buscarFolgas(periodo),
-      ]);
+      const [motoristas, veiculos, rotas, folgas, cidades, vendedores] =
+        await Promise.all([
+          relatoriosService.buscarMotoristas(periodo),
+          relatoriosService.buscarVeiculos(periodo),
+          relatoriosService.buscarRotas(periodo),
+          relatoriosService.buscarFolgas(periodo),
+          relatoriosService.buscarCidades(periodo),
+          relatoriosService.buscarVendedores(periodo),
+        ]);
 
       // Salvar dados brutos para exportação
       setDadosBrutosMotoristas(motoristas);
       setDadosBrutosVeiculos(veiculos);
       setDadosBrutosRotas(rotas);
       setDadosBrutosFolgas(folgas);
+      setDadosBrutosCidades(cidades);
+      setDadosBrutosVendedores(vendedores);
 
       // Processar dados para relatórios
       const dadosMotoristasProcessados =
@@ -68,10 +92,15 @@ export const useRelatorios = () => {
 
       // Mostrar notificação de sucesso
       const totalItens =
-        motoristas.length + veiculos.length + rotas.length + folgas.length;
+        motoristas.length +
+        veiculos.length +
+        rotas.length +
+        folgas.length +
+        cidades.length +
+        vendedores.length;
       showNotification(
         `Dados carregados: ${totalItens} itens encontrados`,
-        "success",
+        "success"
       );
     } catch (error) {
       console.error("Erro ao buscar dados para relatórios:", error);
@@ -133,6 +162,40 @@ export const useRelatorios = () => {
             dadosProcessados = dadosFolgas;
             nomeTipo = "Folgas";
             break;
+          case "cidades":
+          case "cidades_detalhado":
+            dados = dadosBrutosCidades;
+            console.log("Dados brutos de cidades:", dadosBrutosCidades);
+            // Processar dados estatísticos para cidades (por região)
+            dadosProcessados = dadosBrutosCidades.reduce((acc, cidade) => {
+              const regiao = cidade.regiao || "Não definida";
+              console.log(
+                `Processando cidade: ${cidade.nome}, Região: ${regiao}`
+              );
+              const existingIndex = acc.findIndex(
+                (item) => item.name === regiao
+              );
+
+              if (existingIndex >= 0 && acc[existingIndex]) {
+                acc[existingIndex].value += 1;
+              } else {
+                acc.push({
+                  name: regiao,
+                  value: 1,
+                  color: getCorRegiao(regiao),
+                });
+              }
+              return acc;
+            }, [] as RelatorioData[]);
+            console.log("Dados processados de cidades:", dadosProcessados);
+            nomeTipo = "Cidades";
+            break;
+          case "vendedores":
+          case "vendedores_detalhado":
+            dados = dadosBrutosVendedores;
+            dadosProcessados = [];
+            nomeTipo = "Vendedores";
+            break;
           default:
             console.error(`Tipo de relatório não reconhecido: ${tipo}`);
             showNotification("Tipo de relatório não reconhecido", "error");
@@ -160,7 +223,7 @@ export const useRelatorios = () => {
         const tipoRelatorio = isDetalhado ? "Relatório Detalhado" : "Relatório";
         showNotification(
           `${tipoRelatorio} de ${nomeTipo} exportado com sucesso!`,
-          "success",
+          "success"
         );
       } catch (error) {
         console.error("Erro ao exportar relatório:", error);
@@ -172,13 +235,15 @@ export const useRelatorios = () => {
       dadosBrutosVeiculos,
       dadosBrutosRotas,
       dadosBrutosFolgas,
+      dadosBrutosCidades,
+      dadosBrutosVendedores,
       dadosMotoristas,
       dadosVeiculos,
       dadosRotas,
       dadosFolgas,
       periodo,
       showNotification,
-    ],
+    ]
   );
 
   const handlePeriodoChange = useCallback(
@@ -191,7 +256,7 @@ export const useRelatorios = () => {
       // Recarregar dados com o novo período
       fetchRelatorios();
     },
-    [fetchRelatorios, showNotification],
+    [fetchRelatorios, showNotification]
   );
 
   return {
