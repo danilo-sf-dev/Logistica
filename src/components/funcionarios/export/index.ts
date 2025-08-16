@@ -1,0 +1,1 @@
+export { FuncionariosTableExportService } from "./FuncionariosTableExportService";

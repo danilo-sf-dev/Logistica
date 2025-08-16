@@ -1,8 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { funcionariosService } from "../data/funcionariosService";
+import { FuncionariosTableExportService } from "../export/FuncionariosTableExportService";
 import type { Funcionario, FuncionarioInput } from "../types";
 import { validateCPF, validateCelular, validateEmail } from "utils/masks";
+import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
 export type OrdenacaoCampo =
   | "nome"
@@ -349,6 +351,41 @@ export function useFuncionarios() {
     return { total, totalPaginas, inicio, fim };
   }, [itensPorPagina, listaOrdenada, paginaAtual]);
 
+  // Funcionalidade de exportação
+  const handleExportExcel = useCallback(async () => {
+    try {
+      const exportService = new FuncionariosTableExportService();
+      const dadosFiltrados = listaOrdenada;
+
+      const filtros: TableExportFilters = {
+        termoBusca: termoBusca,
+        filtroStatus: filtroStatus === "todos" ? undefined : filtroStatus,
+        filtroContrato: filtroContrato === "todos" ? undefined : filtroContrato,
+        filtroFuncao: filtroFuncao === "todos" ? undefined : filtroFuncao,
+        filtroAtivo:
+          filtroAtivo === "todos" ? undefined : filtroAtivo.toString(),
+        ordenarPor: ordenarPor,
+        direcaoOrdenacao: direcaoOrdenacao,
+      };
+
+      await exportService.exportToExcel(dadosFiltrados, filtros);
+      showNotification("Exportação realizada com sucesso!", "success");
+    } catch (error) {
+      console.error("Erro ao exportar Excel:", error);
+      showNotification("Erro ao exportar dados", "error");
+    }
+  }, [
+    listaOrdenada,
+    termoBusca,
+    filtroStatus,
+    filtroContrato,
+    filtroFuncao,
+    filtroAtivo,
+    ordenarPor,
+    direcaoOrdenacao,
+    showNotification,
+  ]);
+
   return {
     loading,
     funcionariosPaginados,
@@ -388,5 +425,6 @@ export function useFuncionarios() {
     cancelarAtivacao,
     confirmar,
     carregar,
+    handleExportExcel,
   };
 }

@@ -113,6 +113,8 @@ export abstract class BaseTableExportService {
       toxicoUltimoExame: "Último Exame Toxicológico",
       toxicoVencimento: "Vencimento Toxicológico",
       dataAdmissao: "Data Admissão",
+      numero: "Número",
+      complemento: "Complemento",
 
       // Veículos
       quantidadeEixos: "Quantidade de Eixos",
@@ -170,6 +172,9 @@ export abstract class BaseTableExportService {
         manutencao: "Manutenção",
         inativo: "Inativo",
         acidentado: "Acidentado",
+        trabalhando: "Trabalhando",
+        folga: "Folga",
+        ferias: "Férias",
       };
       const statusTraduzido =
         statusMap[filtros.filtroStatus] || filtros.filtroStatus;
@@ -181,13 +186,24 @@ export abstract class BaseTableExportService {
         pj: "PJ",
         autonomo: "Autônomo",
         outro: "Outro",
+        integral: "Integral",
+        temporario: "Temporário",
+        folguista: "Folguista",
+        inativo: "Inativo",
       };
       const contratoTraduzido =
         contratoMap[filtros.filtroContrato] || filtros.filtroContrato;
       filtrosAplicados.push(`Tipo de Contrato: ${contratoTraduzido}`);
     }
     if (filtros.filtroFuncao && filtros.filtroFuncao !== "todos") {
-      filtrosAplicados.push(`Função: ${filtros.filtroFuncao}`);
+      const funcaoMap: Record<string, string> = {
+        motorista: "Motorista",
+        ajudante: "Ajudante",
+        outro: "Outro",
+      };
+      const funcaoTraduzida =
+        funcaoMap[filtros.filtroFuncao] || filtros.filtroFuncao;
+      filtrosAplicados.push(`Função: ${funcaoTraduzida}`);
     }
     if (filtros.filtroAtivo && filtros.filtroAtivo !== "todos") {
       const ativoText = filtros.filtroAtivo === "true" ? "Sim" : "Não";
