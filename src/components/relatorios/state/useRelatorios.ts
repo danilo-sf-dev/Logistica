@@ -42,7 +42,7 @@ export const useRelatorios = () => {
     MotoristaData[]
   >([]);
   const [dadosBrutosVeiculos, setDadosBrutosVeiculos] = useState<VeiculoData[]>(
-    []
+    [],
   );
   const [dadosBrutosRotas, setDadosBrutosRotas] = useState<RotaData[]>([]);
   const [dadosBrutosFolgas, setDadosBrutosFolgas] = useState<FolgaData[]>([]);
@@ -100,7 +100,7 @@ export const useRelatorios = () => {
         vendedores.length;
       showNotification(
         `Dados carregados: ${totalItens} itens encontrados`,
-        "success"
+        "success",
       );
     } catch (error) {
       console.error("Erro ao buscar dados para relatórios:", error);
@@ -165,29 +165,37 @@ export const useRelatorios = () => {
           case "cidades":
           case "cidades_detalhado":
             dados = dadosBrutosCidades;
-            console.log("Dados brutos de cidades:", dadosBrutosCidades);
-            // Processar dados estatísticos para cidades (por região)
-            dadosProcessados = dadosBrutosCidades.reduce((acc, cidade) => {
-              const regiao = cidade.regiao || "Não definida";
-              console.log(
-                `Processando cidade: ${cidade.nome}, Região: ${regiao}`
-              );
-              const existingIndex = acc.findIndex(
-                (item) => item.name === regiao
-              );
+            // Estatísticas por região
+            const estatisticasRegiao = dadosBrutosCidades.reduce(
+              (acc, cidade) => {
+                const regiao = cidade.regiao || "Não definida";
+                acc[regiao] = (acc[regiao] || 0) + 1;
+                return acc;
+              },
+              {} as Record<string, number>,
+            );
 
-              if (existingIndex >= 0 && acc[existingIndex]) {
-                acc[existingIndex].value += 1;
-              } else {
-                acc.push({
-                  name: regiao,
-                  value: 1,
-                  color: getCorRegiao(regiao),
-                });
-              }
-              return acc;
-            }, [] as RelatorioData[]);
-            console.log("Dados processados de cidades:", dadosProcessados);
+            // Criar dados para todas as regiões, incluindo as que não têm cidades
+            dadosProcessados = [];
+
+            // Definir todas as regiões do Brasil (em maiúsculas como nos dados)
+            const todasRegioes = [
+              "NORDESTE",
+              "CENTRO-OESTE",
+              "SUL",
+              "NORTE",
+              "SUDESTE",
+            ];
+
+            // Adicionar todas as regiões, mesmo as que não têm cidades
+            todasRegioes.forEach((regiao) => {
+              dadosProcessados.push({
+                name: regiao,
+                value: estatisticasRegiao[regiao] || 0,
+                color: getCorRegiao(regiao),
+              });
+            });
+
             nomeTipo = "Cidades";
             break;
           case "vendedores":
@@ -223,7 +231,7 @@ export const useRelatorios = () => {
         const tipoRelatorio = isDetalhado ? "Relatório Detalhado" : "Relatório";
         showNotification(
           `${tipoRelatorio} de ${nomeTipo} exportado com sucesso!`,
-          "success"
+          "success",
         );
       } catch (error) {
         console.error("Erro ao exportar relatório:", error);
@@ -243,7 +251,7 @@ export const useRelatorios = () => {
       dadosFolgas,
       periodo,
       showNotification,
-    ]
+    ],
   );
 
   const handlePeriodoChange = useCallback(
@@ -256,7 +264,7 @@ export const useRelatorios = () => {
       // Recarregar dados com o novo período
       fetchRelatorios();
     },
-    [fetchRelatorios, showNotification]
+    [fetchRelatorios, showNotification],
   );
 
   return {

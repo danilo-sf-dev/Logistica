@@ -65,7 +65,7 @@ export class CidadesExportService extends BaseExportService {
     return {
       0: { cellWidth: 35 }, // Nome
       1: { cellWidth: 15 }, // Estado
-      2: { cellWidth: 20 }, // Região
+      2: { cellWidth: 30 }, // Região
       3: { cellWidth: 20 }, // Distância
       4: { cellWidth: 20 }, // Peso Mínimo
       5: { cellWidth: 30 }, // Rota
@@ -106,6 +106,11 @@ export class CidadesExportService extends BaseExportService {
   // Sobrescrever o método exportToPDF para usar as larguras específicas
   async exportToPDF(data: any, userInfo?: any): Promise<void> {
     try {
+      console.log("=== DEBUG EXPORT CIDADES ===");
+      console.log("Data recebida:", data);
+      console.log("Dados brutos:", data.dados?.length);
+      console.log("Dados processados:", data.dadosProcessados);
+
       const doc = new jsPDF("landscape");
       const margin = 10;
 
@@ -114,6 +119,7 @@ export class CidadesExportService extends BaseExportService {
 
       // Resumo estatístico - usar dadosProcessados que já foram processados
       if (data.dadosProcessados && data.dadosProcessados.length > 0) {
+        console.log("Processando dashboard com dados:", data.dadosProcessados);
         yPosition += 5;
 
         doc.setTextColor(0, 0, 0);
@@ -125,15 +131,16 @@ export class CidadesExportService extends BaseExportService {
 
         const total = data.dadosProcessados.reduce(
           (sum: number, d: any) => sum + d.value,
-          0
+          0,
         );
+        console.log("Total calculado:", total);
 
         // Grid dinâmico baseado no número de regiões
-        const totalCards = data.dadosProcessados.length + 1;
+        const totalCards = data.dadosProcessados.length + 1; // +1 para o card TOTAL
         const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
         const cardWidth = Math.min(
           40,
-          (availableWidth - (totalCards - 1) * 6) / totalCards
+          (availableWidth - (totalCards - 1) * 6) / totalCards,
         );
         const cardSpacing = 6;
         let cardX = margin;
@@ -149,6 +156,7 @@ export class CidadesExportService extends BaseExportService {
 
         // Cards para cada região
         data.dadosProcessados.forEach((item: any) => {
+          console.log(`Renderizando card: ${item.name} = ${item.value}`);
           doc.setFontSize(6);
           doc.setFont("helvetica", "normal");
           doc.text(item.name.toUpperCase(), cardX, yPosition);
@@ -165,7 +173,7 @@ export class CidadesExportService extends BaseExportService {
           doc.text(
             `(${percentText})`,
             cardX + doc.getTextWidth(`${item.value} `),
-            yPosition + 8
+            yPosition + 8,
           );
           doc.setTextColor(0, 0, 0);
 
@@ -173,7 +181,20 @@ export class CidadesExportService extends BaseExportService {
         });
 
         yPosition += 10;
+      } else {
+        console.log("Nenhum dado processado encontrado para o dashboard");
+        console.log("data.dadosProcessados:", data.dadosProcessados);
+        console.log(
+          "data.dadosProcessados.length:",
+          data.dadosProcessados?.length,
+        );
+        console.log(
+          "Condição falhou:",
+          !data.dadosProcessados || data.dadosProcessados.length === 0,
+        );
       }
+
+      console.log("=== FIM DEBUG EXPORT CIDADES ===");
 
       // Dados detalhados
       if (data.dados.length > 0) {
@@ -281,7 +302,7 @@ export class CidadesExportService extends BaseExportService {
       if (data.dadosProcessados && data.dadosProcessados.length > 0) {
         const total = data.dadosProcessados.reduce(
           (sum: number, d: any) => sum + d.value,
-          0
+          0,
         );
         const resumoData = [
           ["RESUMO ESTATÍSTICO"],
@@ -326,7 +347,7 @@ export class CidadesExportService extends BaseExportService {
           [""],
           colunas,
           ...dadosFiltrados.map((item) =>
-            this.config.campos.map((campo) => item[campo] || "")
+            this.config.campos.map((campo) => item[campo] || ""),
           ),
         ];
 

@@ -189,7 +189,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const statusData = [
@@ -227,7 +227,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const statusData = [
@@ -287,7 +287,7 @@ export const relatoriosService = {
         acc[dataStr]++;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     // Converter para formato do gráfico
@@ -295,7 +295,7 @@ export const relatoriosService = {
       .sort(
         ([a], [b]) =>
           new Date(a.split("/").reverse().join("-")).getTime() -
-          new Date(b.split("/").reverse().join("-")).getTime()
+          new Date(b.split("/").reverse().join("-")).getTime(),
       )
       .map(([data, quantidade]) => ({
         name: data,
@@ -318,7 +318,7 @@ export const relatoriosService = {
         }
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const dadosPorDia = [
@@ -372,7 +372,7 @@ export const relatoriosService = {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const statusData = [
