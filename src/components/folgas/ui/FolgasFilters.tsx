@@ -1,6 +1,7 @@
 import React from "react";
 import { Search } from "lucide-react";
 import type { StatusFolga, TipoFolga } from "../../../types";
+import { FilterClearButton } from "../../common/FilterClearButton";
 
 interface FolgasFiltersProps {
   termoBusca: string;
@@ -19,6 +20,9 @@ export function FolgasFilters({
   filtroTipo,
   setFiltroTipo,
 }: FolgasFiltersProps) {
+  const hasActiveFilters =
+    termoBusca || filtroStatus !== "todos" || filtroTipo !== "todos";
+
   return (
     <div className="card space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -76,6 +80,17 @@ export function FolgasFilters({
           </select>
         </div>
       </div>
+
+      {/* Botão para limpar filtros */}
+      {hasActiveFilters && (
+        <FilterClearButton
+          onClear={() => {
+            setTermoBusca("");
+            setFiltroStatus("todos");
+            setFiltroTipo("todos");
+          }}
+        />
+      )}
     </div>
   );
 }

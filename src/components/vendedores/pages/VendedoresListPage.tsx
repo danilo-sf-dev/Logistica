@@ -1,12 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ConfirmationModal from "../../common/modals/ConfirmationModal";
+import { TableExportModal } from "../../common/modals";
 import { VendedoresTable } from "../ui/VendedoresTable";
 import VendedorFormModal from "../ui/VendedorFormModal";
-import CidadesFilter from "../ui/CidadesFilter";
+import { VendedoresFilters } from "../ui/VendedoresFilters";
 import { useVendedores } from "../state/useVendedores";
 import { maskCelular, formatCPF } from "../../../utils/masks";
 
 const VendedoresListPage: React.FC = () => {
+  const [showExportModal, setShowExportModal] = useState(false);
+
   const {
     loading,
     vendedoresPaginados,
@@ -15,8 +18,6 @@ const VendedoresListPage: React.FC = () => {
     setPaginaAtual,
     termoBusca,
     setTermoBusca,
-    filtroUnidadeNegocio,
-    setFiltroUnidadeNegocio,
     filtroAtivo,
     setFiltroAtivo,
     filtroCidade,
@@ -43,11 +44,29 @@ const VendedoresListPage: React.FC = () => {
     setValores,
     confirmar,
     editando,
+    handleExportExcel,
   } = useVendedores();
 
   useEffect(() => {
     carregar();
   }, [carregar]);
+
+  // Gerar nome do arquivo para exportação
+  const generateFileName = () => {
+    const dataAtual = new Date()
+      .toLocaleDateString("pt-BR")
+      .replace(/\//g, "-");
+    const nomeArquivo = `vendedores_${dataAtual}`;
+    return `${nomeArquivo}.xlsx`;
+  };
+
+  const handleExportClick = () => {
+    setShowExportModal(true);
+  };
+
+  const handleExportConfirm = () => {
+    handleExportExcel();
+  };
 
   if (loading) {
     return (
@@ -66,65 +85,50 @@ const VendedoresListPage: React.FC = () => {
             Gerencie os vendedores da empresa
           </p>
         </div>
-        <button onClick={abrirCriacao} className="btn-primary">
-          Novo Vendedor
-        </button>
-      </div>
-
-      <div className="card">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Buscar por nome, CPF, email ou região..."
-              value={termoBusca}
-              onChange={(e) => setTermoBusca(e.target.value)}
-              className="input-field"
-            />
-          </div>
-          <div className="sm:w-48">
-            <select
-              value={filtroUnidadeNegocio}
-              onChange={(e) => setFiltroUnidadeNegocio(e.target.value as any)}
-              className="input-field"
+        <div className="flex space-x-3">
+          <button
+            onClick={handleExportClick}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+          >
+            <svg
+              className="h-4 w-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <option value="todos">Todas as unidades</option>
-              <option value="frigorifico">Frigorífico</option>
-              <option value="ovos">Ovos</option>
-              <option value="ambos">Ambos</option>
-            </select>
-          </div>
-
-          <div className="sm:w-48">
-            <select
-              value={
-                filtroAtivo === "todos"
-                  ? "todos"
-                  : filtroAtivo
-                    ? "true"
-                    : "false"
-              }
-              onChange={(e) => {
-                const value = e.target.value;
-                setFiltroAtivo(value === "todos" ? "todos" : value === "true");
-              }}
-              className="input-field"
-            >
-              <option value="todos">Todos os status</option>
-              <option value="true">Apenas ativos</option>
-              <option value="false">Apenas inativos</option>
-            </select>
-          </div>
-
-          <div className="sm:w-48">
-            <CidadesFilter
-              value={filtroCidade}
-              onChange={setFiltroCidade}
-              placeholder="Filtrar por cidade"
-            />
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            Exportar Excel
+          </button>
+          <button onClick={abrirCriacao} className="btn-primary">
+            Novo Vendedor
+          </button>
         </div>
       </div>
+
+      <VendedoresFilters
+        termoBusca={termoBusca}
+        setTermoBusca={setTermoBusca}
+        filtroCidade={filtroCidade}
+        setFiltroCidade={setFiltroCidade}
+        filtroStatus={
+          filtroAtivo === "todos" ? "todos" : filtroAtivo ? "ativo" : "inativo"
+        }
+        setFiltroStatus={(value) => {
+          if (value === "todos") {
+            setFiltroAtivo("todos");
+          } else if (value === "ativo") {
+            setFiltroAtivo(true);
+          } else {
+            setFiltroAtivo(false);
+          }
+        }}
+      />
 
       <div className="card">
         <VendedoresTable
@@ -275,6 +279,14 @@ const VendedoresListPage: React.FC = () => {
           onClick: cancelarAtivacao,
           variant: "secondary",
         }}
+      />
+
+      <TableExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={handleExportConfirm}
+        titulo="Vendedores"
+        nomeArquivo={generateFileName()}
       />
     </div>
   );

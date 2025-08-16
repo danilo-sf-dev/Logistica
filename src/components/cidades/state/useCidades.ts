@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { cidadesService } from "../data/cidadesService";
+import { CidadesTableExportService } from "../export/CidadesTableExportService";
 import type { Cidade, CidadeInput, CidadeFormData } from "../types";
+import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
 export type OrdenacaoCampo =
   | "nome"
@@ -212,6 +214,33 @@ export function useCidades() {
     return copia;
   }, [direcaoOrdenacao, listaFiltrada, ordenarPor]);
 
+  // Funcionalidade de exportação
+  const handleExportExcel = useCallback(async () => {
+    try {
+      const exportService = new CidadesTableExportService();
+
+      const filtros: TableExportFilters = {
+        termoBusca,
+        filtroRegiao,
+        ordenarPor,
+        direcaoOrdenacao,
+      };
+
+      await exportService.exportToExcel(listaOrdenada, filtros);
+      showNotification("Exportação realizada com sucesso!", "success");
+    } catch (error) {
+      console.error("Erro ao exportar Excel:", error);
+      showNotification("Erro ao exportar dados", "error");
+    }
+  }, [
+    listaOrdenada,
+    termoBusca,
+    filtroRegiao,
+    ordenarPor,
+    direcaoOrdenacao,
+    showNotification,
+  ]);
+
   const cidadesPaginadas = useMemo(() => {
     const inicio = (paginaAtual - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
@@ -255,5 +284,6 @@ export function useCidades() {
     cidadeParaExcluir,
     confirmarExclusao,
     cancelarExclusao,
+    handleExportExcel,
   };
 }

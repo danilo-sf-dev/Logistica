@@ -11,6 +11,11 @@ export {
   type ExportConfig,
   type ExportData,
 } from "./BaseExportService";
+export {
+  BaseTableExportService,
+  type TableExportConfig,
+  type TableExportFilters,
+} from "./BaseTableExportService";
 export { FuncionariosExportService } from "./FuncionariosExportService";
 export { VeiculosExportService } from "./VeiculosExportService";
 export { RotasExportService } from "./RotasExportService";

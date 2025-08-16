@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { vendedoresService } from "../data/vendedoresService";
+import { VendedoresTableExportService } from "../export/VendedoresTableExportService";
 import type { Vendedor, VendedorInput } from "../types";
+import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 import {
   validateEmail,
   validateCelular,
@@ -290,6 +292,38 @@ export function useVendedores() {
     return copia;
   }, [direcaoOrdenacao, listaFiltrada, ordenarPor]);
 
+  // Funcionalidade de exportação
+  const handleExportExcel = useCallback(async () => {
+    try {
+      const exportService = new VendedoresTableExportService();
+
+      const filtros: TableExportFilters = {
+        termoBusca,
+        filtroUnidadeNegocio,
+        filtroAtivo:
+          filtroAtivo === "todos" ? undefined : filtroAtivo.toString(),
+        filtroCidade,
+        ordenarPor,
+        direcaoOrdenacao,
+      };
+
+      await exportService.exportToExcel(listaOrdenada, filtros);
+      showNotification("Exportação realizada com sucesso!", "success");
+    } catch (error) {
+      console.error("Erro ao exportar Excel:", error);
+      showNotification("Erro ao exportar dados", "error");
+    }
+  }, [
+    listaOrdenada,
+    termoBusca,
+    filtroUnidadeNegocio,
+    filtroAtivo,
+    filtroCidade,
+    ordenarPor,
+    direcaoOrdenacao,
+    showNotification,
+  ]);
+
   const vendedoresPaginados = useMemo(() => {
     const inicio = (paginaAtual - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
@@ -341,5 +375,6 @@ export function useVendedores() {
     cancelarAtivacao,
     confirmar,
     carregar,
+    handleExportExcel,
   };
 }

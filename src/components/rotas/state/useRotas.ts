@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { rotasService } from "../data/rotasService";
+import { RotasTableExportService } from "../export/RotasTableExportService";
 import { Rota, RotaFormData, RotaFilters } from "../types";
 import { useNotification } from "../../../contexts/NotificationContext";
+import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
 export const useRotas = () => {
   const [rotas, setRotas] = useState<Rota[]>([]);
@@ -119,6 +121,42 @@ export const useRotas = () => {
     fetchRotas();
   }, [fetchRotas]);
 
+  // Funcionalidade de exportação
+  const handleExportExcel = useCallback(async () => {
+    try {
+      const exportService = new RotasTableExportService();
+      const dadosFiltrados = filteredRotas();
+
+      // Mapear dia da semana para o formato esperado
+      const mapearDiaSemana = (dia: string | undefined) => {
+        if (!dia) return undefined;
+        const mapa: Record<string, string> = {
+          "Segunda-feira": "segunda",
+          "Terça-feira": "terca",
+          "Quarta-feira": "quarta",
+          "Quinta-feira": "quinta",
+          "Sexta-feira": "sexta",
+          Sábado: "sabado",
+          Domingo: "domingo",
+        };
+        return mapa[dia] || dia;
+      };
+
+      const filtros: TableExportFilters = {
+        termoBusca: filters.searchTerm,
+        filtroDiaSemana: mapearDiaSemana(filters.diaSemana),
+        ordenarPor: "nome",
+        direcaoOrdenacao: "asc",
+      };
+
+      await exportService.exportToExcel(dadosFiltrados, filtros);
+      showNotification("Exportação realizada com sucesso!", "success");
+    } catch (error) {
+      console.error("Erro ao exportar Excel:", error);
+      showNotification("Erro ao exportar dados", "error");
+    }
+  }, [filteredRotas, filters, showNotification]);
+
   const result = {
     rotas: rotas || [],
     loading,
@@ -129,6 +167,7 @@ export const useRotas = () => {
     deleteRota,
     updateFilters,
     refreshRotas: fetchRotas,
+    handleExportExcel,
   };
 
   return result;

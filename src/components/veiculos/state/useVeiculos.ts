@@ -1,12 +1,14 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { VeiculosService } from "../data/veiculosService";
+import { VeiculosTableExportService } from "../export/VeiculosTableExportService";
 import {
   Veiculo,
   VeiculoFormData,
   VeiculosFiltersType,
   VeiculosSortConfig,
 } from "../types";
+import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
 export const useVeiculos = () => {
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
@@ -192,6 +194,30 @@ export const useVeiculos = () => {
     fetchVeiculos();
   }, [fetchVeiculos]);
 
+  // Funcionalidade de exportação
+  const handleExportExcel = useCallback(async () => {
+    try {
+      const exportService = new VeiculosTableExportService();
+      const dadosFiltrados = getFilteredAndSortedVeiculos();
+
+      const filtros: TableExportFilters = {
+        termoBusca: filters.searchTerm,
+        filtroStatus: filters.status,
+        filtroTipoCarroceria: filters.tipoCarroceria,
+        filtroTipoBau: filters.tipoBau,
+        filtroUnidadeNegocio: filters.unidadeNegocio,
+        ordenarPor: sortConfig.field,
+        direcaoOrdenacao: sortConfig.direction,
+      };
+
+      await exportService.exportToExcel(dadosFiltrados, filtros);
+      showNotification("Exportação realizada com sucesso!", "success");
+    } catch (error) {
+      console.error("Erro ao exportar Excel:", error);
+      showNotification("Erro ao exportar dados", "error");
+    }
+  }, [getFilteredAndSortedVeiculos, filters, sortConfig, showNotification]);
+
   return {
     veiculos,
     loading,
@@ -207,5 +233,6 @@ export const useVeiculos = () => {
     updateFilters,
     updateSortConfig,
     getFilteredAndSortedVeiculos,
+    handleExportExcel,
   };
 };

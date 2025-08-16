@@ -5,6 +5,7 @@ export { VeiculosFiltersComponent as VeiculosFilters } from "./ui/VeiculosFilter
 
 export { useVeiculos } from "./state/useVeiculos";
 export { VeiculosService } from "./data/veiculosService";
+export * from "./export";
 export type {
   Veiculo,
   VeiculoFormData,

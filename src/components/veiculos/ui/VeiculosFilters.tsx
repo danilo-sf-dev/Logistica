@@ -1,6 +1,7 @@
 import React from "react";
 import { Search } from "lucide-react";
 import { VeiculosFiltersType } from "../types";
+import { FilterClearButton } from "../../common/FilterClearButton";
 
 interface VeiculosFiltersProps {
   filters: VeiculosFiltersType;
@@ -106,21 +107,16 @@ export const VeiculosFiltersComponent: React.FC<VeiculosFiltersProps> = ({
         filters.tipoCarroceria ||
         filters.tipoBau ||
         filters.unidadeNegocio) && (
-        <div className="flex justify-end">
-          <button
-            onClick={() =>
-              onFiltersChange({
-                status: undefined,
-                tipoCarroceria: undefined,
-                tipoBau: undefined,
-                unidadeNegocio: undefined,
-              })
-            }
-            className="btn-secondary text-sm"
-          >
-            Limpar Filtros
-          </button>
-        </div>
+        <FilterClearButton
+          onClear={() =>
+            onFiltersChange({
+              status: undefined,
+              tipoCarroceria: undefined,
+              tipoBau: undefined,
+              unidadeNegocio: undefined,
+            })
+          }
+        />
       )}
     </div>
   );

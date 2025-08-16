@@ -1,6 +1,7 @@
 import React from "react";
 import { Search, Filter } from "lucide-react";
 import { RotaFilters } from "../types";
+import { FilterClearButton } from "../../common/FilterClearButton";
 
 interface RotasFiltersProps {
   filters: RotaFilters;
@@ -61,27 +62,11 @@ export const RotasFilters: React.FC<RotasFiltersProps> = ({
       </div>
 
       {(filters.searchTerm || filters.diaSemana) && (
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>Filtros ativos:</span>
-          {filters.searchTerm && (
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-              Busca: {filters.searchTerm}
-            </span>
-          )}
-          {filters.diaSemana && (
-            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full">
-              Dia: {filters.diaSemana}
-            </span>
-          )}
-          <button
-            onClick={() =>
-              onFiltersChange({ searchTerm: "", diaSemana: undefined })
-            }
-            className="text-red-600 hover:text-red-800 underline"
-          >
-            Limpar filtros
-          </button>
-        </div>
+        <FilterClearButton
+          onClear={() =>
+            onFiltersChange({ searchTerm: "", diaSemana: undefined })
+          }
+        />
       )}
     </div>
   );

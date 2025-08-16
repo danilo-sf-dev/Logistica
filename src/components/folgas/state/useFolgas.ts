@@ -1,8 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { folgasService } from "../data/folgasService";
+import { FolgasTableExportService } from "../export/FolgasTableExportService";
 import type { Folga, FolgaInput } from "../types";
 import type { StatusFolga, TipoFolga, DirecaoOrdenacao } from "../../../types";
+import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
 export type OrdenacaoCampo =
   | "funcionarioNome"
@@ -263,6 +265,35 @@ export function useFolgas() {
     return copia;
   }, [direcaoOrdenacao, listaFiltrada, ordenarPor]);
 
+  // Funcionalidade de exportação
+  const handleExportExcel = useCallback(async () => {
+    try {
+      const exportService = new FolgasTableExportService();
+
+      const filtros: TableExportFilters = {
+        termoBusca,
+        filtroStatus,
+        filtroTipo,
+        ordenarPor,
+        direcaoOrdenacao,
+      };
+
+      await exportService.exportToExcel(listaOrdenada, filtros);
+      showNotification("Exportação realizada com sucesso!", "success");
+    } catch (error) {
+      console.error("Erro ao exportar Excel:", error);
+      showNotification("Erro ao exportar dados", "error");
+    }
+  }, [
+    listaOrdenada,
+    termoBusca,
+    filtroStatus,
+    filtroTipo,
+    ordenarPor,
+    direcaoOrdenacao,
+    showNotification,
+  ]);
+
   const folgasPaginadas = useMemo(() => {
     const inicio = (paginaAtual - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
@@ -310,5 +341,6 @@ export function useFolgas() {
     confirmar,
     carregar,
     erros,
+    handleExportExcel,
   };
 }

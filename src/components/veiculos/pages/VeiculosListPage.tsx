@@ -5,6 +5,7 @@ import { VeiculosTable } from "../ui/VeiculosTable";
 import { VeiculosFiltersComponent as VeiculosFilters } from "../ui/VeiculosFilters";
 import { VeiculoFormModal } from "../ui/VeiculoFormModal";
 import ConfirmationModal from "../../common/modals/ConfirmationModal";
+import { TableExportModal } from "../../common/modals";
 import { Veiculo, VeiculoFormData } from "../types";
 
 export const VeiculosListPage: React.FC = () => {
@@ -14,6 +15,7 @@ export const VeiculosListPage: React.FC = () => {
   const [showInativacaoModal, setShowInativacaoModal] = useState(false);
   const [veiculoToToggle, setVeiculoToToggle] = useState<Veiculo | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const {
     loading,
@@ -26,6 +28,7 @@ export const VeiculosListPage: React.FC = () => {
     updateFilters,
     updateSortConfig,
     getFilteredAndSortedVeiculos,
+    handleExportExcel,
   } = useVeiculos();
 
   const itemsPerPage = 15;
@@ -86,6 +89,23 @@ export const VeiculosListPage: React.FC = () => {
     }
   };
 
+  // Gerar nome do arquivo para exportação
+  const generateFileName = () => {
+    const dataAtual = new Date()
+      .toLocaleDateString("pt-BR")
+      .replace(/\//g, "-");
+    const nomeArquivo = `veiculos_${dataAtual}`;
+    return `${nomeArquivo}.xlsx`;
+  };
+
+  const handleExportClick = () => {
+    setShowExportModal(true);
+  };
+
+  const handleExportConfirm = () => {
+    handleExportExcel();
+  };
+
   const filteredAndSortedVeiculos = getFilteredAndSortedVeiculos();
   const totalPages = Math.ceil(filteredAndSortedVeiculos.length / itemsPerPage);
 
@@ -99,13 +119,34 @@ export const VeiculosListPage: React.FC = () => {
             Gerencie a frota de veículos
           </p>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="btn-primary flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Veículo
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={handleExportClick}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+          >
+            <svg
+              className="h-4 w-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            Exportar Excel
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            className="btn-primary flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Veículo
+          </button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -222,6 +263,14 @@ export const VeiculosListPage: React.FC = () => {
           onClick: () => setShowInativacaoModal(false),
           variant: "secondary",
         }}
+      />
+
+      <TableExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={handleExportConfirm}
+        titulo="Veículos"
+        nomeArquivo={generateFileName()}
       />
     </div>
   );

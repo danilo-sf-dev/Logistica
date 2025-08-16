@@ -4,3 +4,4 @@ export * from "./ui/VendedoresTable";
 export * from "./ui/VendedorFormModal";
 export * from "./data/vendedoresService";
 export * from "./types";
+export * from "./export";
