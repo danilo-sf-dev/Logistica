@@ -74,11 +74,9 @@ export abstract class BaseTableExportService {
   protected getColumnHeaders(): string[] {
     const headerMap: Record<string, string> = {
       // Cidades
-      nome: "Nome",
       estado: "Estado",
       regiao: "Região",
       distancia: "Distância",
-      pesoMinimo: "Peso Mínimo",
       observacao: "Observação",
       dataCriacao: "Data Criação",
 
@@ -127,11 +125,11 @@ export abstract class BaseTableExportService {
       capacidade: "Capacidade",
 
       // Rotas
-      rotaNome: "Nome da Rota",
-      origem: "Origem",
-      destino: "Destino",
+      nome: "Nome da Rota",
+      dataRota: "Data da Rota",
+      diaSemana: "Dias da Semana",
+      cidades: "Cidades Vinculadas",
       tempoEstimado: "Tempo Estimado",
-      cidadesVinculadas: "Cidades Vinculadas",
     };
 
     return this.config.campos.map(
@@ -195,6 +193,20 @@ export abstract class BaseTableExportService {
     }
     if (filtros.filtroTipo && filtros.filtroTipo !== "todos") {
       filtrosAplicados.push(`Tipo: ${filtros.filtroTipo}`);
+    }
+    if (filtros.filtroDiaSemana && filtros.filtroDiaSemana !== "todos") {
+      const diasMap: Record<string, string> = {
+        domingo: "Domingo",
+        segunda: "Segunda-feira",
+        terca: "Terça-feira",
+        quarta: "Quarta-feira",
+        quinta: "Quinta-feira",
+        sexta: "Sexta-feira",
+        sabado: "Sábado",
+      };
+      const diaTraduzido =
+        diasMap[filtros.filtroDiaSemana] || filtros.filtroDiaSemana;
+      filtrosAplicados.push(`Dia da Semana: ${diaTraduzido}`);
     }
 
     if (filtrosAplicados.length > 0) {
