@@ -1,0 +1,1 @@
+export { FolgasTableExportService } from "./FolgasTableExportService";

@@ -72,8 +72,71 @@ export abstract class BaseTableExportService {
   }
 
   protected getColumnHeaders(): string[] {
+    const headerMap: Record<string, string> = {
+      // Cidades
+      nome: "Nome",
+      estado: "Estado",
+      regiao: "Região",
+      distancia: "Distância",
+      pesoMinimo: "Peso Mínimo",
+      observacao: "Observação",
+      dataCriacao: "Data Criação",
+
+      // Vendedores
+      cpf: "CPF",
+      email: "E-mail",
+      celular: "Celular",
+      codigoVendSistema: "Código Sistema",
+      unidadeNegocio: "Unidade Negócio",
+      tipoContrato: "Tipo Contrato",
+      cidadesAtendidas: "Cidades Atendidas",
+      ativo: "Ativo",
+
+      // Folgas
+      funcionarioNome: "Funcionário",
+      dataInicio: "Data Início",
+      dataFim: "Data Fim",
+      tipo: "Tipo",
+      status: "Status",
+      observacoes: "Observações",
+      motivo: "Motivo",
+      documento: "Documento",
+      horas: "Horas",
+
+      // Funcionários
+      cnh: "CNH",
+      cnhVencimento: "Vencimento CNH",
+      cnhCategoria: "Categoria CNH",
+      endereco: "Endereço",
+      cep: "CEP",
+      cidade: "Cidade",
+      funcao: "Função",
+      salario: "Salário",
+      toxicoUltimoExame: "Último Exame Toxicológico",
+      toxicoVencimento: "Vencimento Toxicológico",
+      dataAdmissao: "Data Admissão",
+
+      // Veículos
+      placa: "Placa",
+      marca: "Marca",
+      modelo: "Modelo",
+      ano: "Ano",
+      cor: "Cor",
+      tipoCarroceria: "Tipo Carroceria",
+      tipoBau: "Tipo Baú",
+      capacidade: "Capacidade",
+
+      // Rotas
+      rotaNome: "Nome da Rota",
+      origem: "Origem",
+      destino: "Destino",
+      tempoEstimado: "Tempo Estimado",
+      cidadesVinculadas: "Cidades Vinculadas",
+    };
+
     return this.config.campos.map(
-      (campo) => campo.charAt(0).toUpperCase() + campo.slice(1),
+      (campo) =>
+        headerMap[campo] || campo.charAt(0).toUpperCase() + campo.slice(1),
     );
   }
 
