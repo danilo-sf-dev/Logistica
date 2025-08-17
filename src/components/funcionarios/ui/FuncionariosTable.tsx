@@ -47,12 +47,24 @@ export const FuncionariosTable: React.FC<Props> = ({
   const statusText = (s: Funcionario["status"]) =>
     (
       ({
-        trabalhando: "Trabalhando",
         disponivel: "Disponível",
         folga: "Folga",
         ferias: "Férias",
       }) as const
     )[s];
+
+  const getStatusColor = (status: Funcionario["status"]) => {
+    switch (status) {
+      case "disponivel":
+        return "bg-green-100 text-green-800";
+      case "folga":
+        return "bg-orange-100 text-orange-800";
+      case "ferias":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -146,7 +158,11 @@ export const FuncionariosTable: React.FC<Props> = ({
                 </span>
               </td>
               <td className="table-cell">
-                <span className="text-sm text-gray-900">
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                    f.status,
+                  )}`}
+                >
                   {statusText(f.status)}
                 </span>
               </td>

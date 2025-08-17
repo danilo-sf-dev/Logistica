@@ -112,6 +112,12 @@ export function useFolgas() {
       if (editando) {
         await folgasService.atualizar(editando.id, payload);
         showNotification("Folga atualizada com sucesso!", "success");
+        // Atualizar status do funcionário automaticamente após edição
+        if (payload.funcionarioId) {
+          await folgasService.sincronizarStatusFuncionarioEspecifico(
+            payload.funcionarioId,
+          );
+        }
       } else {
         await folgasService.criar(payload);
         showNotification("Folga solicitada com sucesso!", "success");
@@ -226,6 +232,24 @@ export function useFolgas() {
     [carregar, showNotification],
   );
 
+  const sincronizarStatusEspecifico = useCallback(
+    async (funcionarioId: string) => {
+      try {
+        await folgasService.sincronizarStatusFuncionarioEspecifico(
+          funcionarioId,
+        );
+        showNotification(
+          "Status do funcionário sincronizado com sucesso!",
+          "success",
+        );
+      } catch (error) {
+        console.error("Erro ao sincronizar status específico:", error);
+        showNotification("Erro ao sincronizar status do funcionário", "error");
+      }
+    },
+    [showNotification],
+  );
+
   const alternarOrdenacao = useCallback(
     (campo: OrdenacaoCampo) => {
       if (ordenarPor === campo) {
@@ -338,6 +362,7 @@ export function useFolgas() {
     cancelarExclusao,
     aprovarFolga,
     rejeitarFolga,
+    sincronizarStatusEspecifico,
     confirmar,
     carregar,
     erros,

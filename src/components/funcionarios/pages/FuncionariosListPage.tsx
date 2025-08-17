@@ -4,6 +4,7 @@ import { FuncionariosTable } from "../ui/FuncionariosTable";
 import FuncionarioFormModal from "../ui/FuncionarioFormModal";
 import { TableExportModal } from "../../common/modals";
 import { useFuncionarios } from "../state/useFuncionarios";
+
 import { FuncionariosFilters } from "../ui/FuncionariosFilters";
 
 import { maskCPF } from "utils/masks";
@@ -52,6 +53,18 @@ const FuncionariosListPage: React.FC = () => {
 
   useEffect(() => {
     carregar();
+    // Sincronizar status dos funcionários automaticamente ao carregar a página
+    const sincronizarStatusAutomaticamente = async () => {
+      try {
+        const { folgasService } = await import(
+          "../../folgas/data/folgasService"
+        );
+        await folgasService.sincronizarStatusFuncionarios();
+      } catch (error) {
+        console.error("Erro na sincronização automática:", error);
+      }
+    };
+    sincronizarStatusAutomaticamente();
   }, [carregar]);
 
   // Gerar nome do arquivo para exportação
