@@ -15,6 +15,7 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
 - **Gráficos**: Recharts
 - **Ícones**: Lucide React
 - **Notificações**: React Hot Toast
+- **Exportação**: XLSX, jsPDF, file-saver
 
 ### Backend (Firebase)
 
@@ -108,8 +109,9 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
   funcionario: "string",
   dataInicio: "string",
   dataFim: "string",
-  tipo: "folga" | "ferias" | "licenca",
+  tipo: "folga" | "ferias" | "outro",
   status: "pendente" | "aprovada" | "rejeitada",
+  motivo: "string",
   observacoes: "string",
   dataCriacao: Timestamp,
   dataAtualizacao: Timestamp
@@ -124,6 +126,9 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
   estado: "string",
   regiao: "string",
   distancia: "number",
+  pesoMinimo: "number",
+  rota: "string",
+  observacao: "string",
   dataCriacao: Timestamp,
   dataAtualizacao: Timestamp
 }
@@ -134,388 +139,375 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
 ```javascript
 {
   nome: "string",
+  cpf: "string",
+  codigoVendSistema: "string",
   email: "string",
   telefone: "string",
+  estado: "string",
   regiao: "string",
+  cidadesAtendidas: "string[]",
   unidadeNegocio: "frigorifico" | "ovos",
-  status: "ativo" | "inativo",
+  tipoContrato: "string",
+  ativo: "boolean",
   dataCriacao: Timestamp,
   dataAtualizacao: Timestamp
 }
 ```
 
-## 🔐 Sistema de Permissões
+## 🆕 **Novas Funcionalidades Implementadas**
 
-### Roles (Funções)
+### 📊 **Sistema de Relatórios Avançado**
 
-- **admin**: Acesso total ao sistema
-- **gerente**: Pode gerenciar funcionários, veículos, rotas e folgas
-- **dispatcher**: Pode criar e gerenciar rotas
-- **user**: Acesso apenas de leitura
+#### Arquitetura de Exportação
 
-### Regras de Segurança
+```
+src/components/relatorios/export/
+├── BaseExportService.ts           # Classe base para exportação
+├── BaseTableExportService.ts      # Classe base para exportação de tabelas
+├── FuncionariosExportService.ts   # Serviço específico para funcionários
+├── VeiculosExportService.ts       # Serviço específico para veículos
+├── RotasExportService.ts          # Serviço específico para rotas
+├── FolgasExportService.ts         # Serviço específico para folgas
+├── CidadesExportService.ts        # Serviço específico para cidades
+├── VendedoresExportService.ts     # Serviço específico para vendedores
+└── index.ts                       # Factory e exportações
+```
 
-```javascript
-// Usuários podem ler/escrever seus próprios dados
-match /users/{userId} {
-  allow read, write: if request.auth != null && request.auth.uid == userId;
+#### Componentes de Interface
+
+```
+src/components/relatorios/ui/
+├── ExportModal.tsx                # Modal para escolher formato
+├── RelatoriosDetalhados.tsx       # Seção de relatórios detalhados
+├── GraficoCard.tsx                # Componente de gráficos com exportação
+└── ...
+```
+
+#### Serviços de Exportação
+
+**BaseExportService**: Classe abstrata que define a estrutura base para exportação
+
+```typescript
+abstract class BaseExportService {
+  protected abstract config: ExportConfig;
+
+  async exportToPDF(
+    titulo: string,
+    dados: any[],
+    dadosProcessados: RelatorioData[],
+    periodo: string
+  ): Promise<void>;
+  async exportToCSV(
+    titulo: string,
+    dados: any[],
+    dadosProcessados: RelatorioData[],
+    periodo: string
+  ): Promise<void>;
+  protected formatValue(field: string, value: any): any;
+  protected getFilteredData(dados: any[]): any[];
+  protected getColumnHeaders(): string[];
 }
+```
 
-// Administradores podem acessar todos os dados
-match /{document=**} {
-  allow read, write: if request.auth != null &&
-    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+**BaseTableExportService**: Classe base para exportação de dados tabulares
+
+```typescript
+abstract class BaseTableExportService {
+  protected abstract config: TableExportConfig;
+
+  async exportToExcel(
+    dados: any[],
+    filtros?: TableExportFilters
+  ): Promise<void>;
+  protected async formatValue(field: string, value: any): Promise<any>;
+  protected async getFilteredData(dados: any[]): Promise<any[]>;
+  protected getColumnHeaders(): string[];
+  protected generateFileName(): string;
 }
 ```
 
-## 📁 Estrutura de Arquivos
+#### Factory Pattern
 
-### Arquivos Principais
-
+```typescript
+export class ExportServiceFactory {
+  static createService(tipo: string): BaseExportService {
+    switch (tipo.toLowerCase()) {
+      case "funcionarios":
+      case "funcionarios_detalhado":
+        return new FuncionariosExportService();
+      case "veiculos":
+      case "veiculos_detalhado":
+        return new VeiculosExportService();
+      // ... outros casos
+    }
+  }
+}
 ```
-src/
-├── App.tsx                   # Componente principal da aplicação
-├── index.tsx                 # Ponto de entrada da aplicação
-├── firebase/
-│   └── config.ts             # Configuração do Firebase
-├── contexts/
-│   ├── AuthContext.tsx       # Contexto de autenticação
-│   └── NotificationContext.tsx # Contexto de notificações
-├── utils/
-│   └── masks.ts              # Utilitários e máscaras
-└── types/
-    └── index.ts              # Definições de tipos globais
-```
 
-## 🎨 Componentes React
+### 🔧 **Melhorias Técnicas**
 
-### Estrutura de Componentes
+#### Formatação Brasileira
+
+- **Datas**: Formato DD/MM/YYYY
+- **CPF**: Formato 000.000.000-00
+- **Telefone**: Formato (73) 99999-9999
+- **Números**: Separador decimal vírgula
+
+#### Layout Minimalista
+
+- **Cores**: Preto e branco
+- **Tipografia**: Fonte sans-serif
+- **Espaçamento**: Consistente
+- **Contraste**: Alto para melhor legibilidade
+
+#### Nomenclatura de Arquivos
+
+- **Padrão**: `entity_dd-MM-YYYY.xlsx`
+- **Exemplos**:
+  - `funcionarios_16-01-2025.xlsx`
+  - `veiculos_16-01-2025.xlsx`
+  - `rotas_16-01-2025.xlsx`
+
+#### Tipos Separados
+
+Cada pacote possui seu próprio arquivo de tipos:
 
 ```
 src/components/
-├── auth/
-│   └── Login.tsx             # Tela de login
-├── dashboard/
-│   ├── Dashboard.tsx         # Dashboard principal (wrapper)
-│   ├── data/
-│   │   └── dashboardService.ts  # Serviços de dados
-│   ├── state/
-│   │   └── useDashboard.ts      # Hook de estado
-│   ├── ui/
-│   │   ├── StatsCards.tsx       # Cards de estatísticas
-│   │   ├── DashboardCharts.tsx  # Gráficos do dashboard
-│   │   └── RecentActivities.tsx # Atividades recentes
-│   ├── pages/
-│   │   └── DashboardPage.tsx    # Página principal
-│   └── types.ts              # Tipos TypeScript
-├── funcionarios/             # Antigo motoristas
-│   ├── data/
-│   │   └── funcionariosService.ts
-│   ├── state/
-│   │   └── useFuncionarios.ts
-│   ├── ui/
-│   │   ├── FuncionarioFormModal.tsx
-│   │   └── FuncionariosTable.tsx
-│   ├── pages/
-│   │   └── FuncionariosListPage.tsx
-│   └── types.ts
-├── veiculos/
-│   ├── data/
-│   │   └── veiculosService.ts
-│   ├── state/
-│   │   └── useVeiculos.ts
-│   ├── ui/
-│   │   ├── VeiculoFormModal.tsx
-│   │   ├── VeiculosTable.tsx
-│   │   └── VeiculosFilters.tsx
-│   ├── pages/
-│   │   └── VeiculosListPage.tsx
-│   └── types.ts
-├── rotas/
-│   ├── data/
-│   │   └── rotasService.ts
-│   ├── state/
-│   │   └── useRotas.ts
-│   ├── ui/
-│   │   ├── RotaFormModal.tsx
-│   │   ├── RotasTable.tsx
-│   │   └── RotasFilters.tsx
-│   ├── pages/
-│   │   └── RotasListPage.tsx
-│   └── types.ts
-├── folgas/
-│   ├── data/
-│   │   └── folgasService.ts
-│   ├── state/
-│   │   └── useFolgas.ts
-│   ├── ui/
-│   │   ├── FolgaFormModal.tsx
-│   │   ├── FolgasTable.tsx
-│   │   └── FolgasFilters.tsx
-│   ├── pages/
-│   │   └── FolgasListPage.tsx
-│   └── types.ts
-├── cidades/
-│   ├── data/
-│   │   └── cidadesService.ts
-│   ├── state/
-│   │   └── useCidades.ts
-│   ├── ui/
-│   │   ├── CidadeFormModal.tsx
-│   │   ├── CidadesTable.tsx
-│   │   └── CidadesFilters.tsx
-│   ├── pages/
-│   │   └── CidadesListPage.tsx
-│   └── types.ts
-├── vendedores/
-│   ├── data/
-│   │   └── vendedoresService.ts
-│   ├── state/
-│   │   └── useVendedores.ts
-│   ├── ui/
-│   │   ├── VendedorFormModal.tsx
-│   │   ├── VendedoresTable.tsx
-│   │   └── CidadesFilter.tsx
-│   ├── pages/
-│   │   └── VendedoresListPage.tsx
-│   └── types.ts
-├── relatorios/
-│   ├── data/
-│   │   ├── relatoriosService.ts
-│   │   └── exportService.ts
-│   ├── state/
-│   │   └── useRelatorios.ts
-│   ├── ui/
-│   │   ├── RelatorioHeader.tsx
-│   │   ├── GraficoCard.tsx
-│   │   ├── ResumoCards.tsx
-│   │   └── ExportModal.tsx
-│   ├── pages/
-│   │   └── RelatoriosPage.tsx
-│   └── types.ts
-├── configuracoes/
-│   ├── state/
-│   │   └── useConfiguracoes.ts
-│   ├── ui/
-│   │   ├── PerfilForm.tsx
-│   │   ├── NotificacoesForm.tsx
-│   │   ├── SegurancaForm.tsx
-│   │   └── SistemaForm.tsx
-│   ├── pages/
-│   │   └── ConfiguracoesPage.tsx
-│   └── types.ts
-└── layout/
-    ├── state/
-    │   └── useLayout.ts
-    ├── ui/
-    │   ├── Header.tsx
-    │   ├── Sidebar.tsx
-    │   └── MainContent.tsx
-    ├── Layout.tsx
-    └── types.ts
+├── funcionarios/types.ts
+├── veiculos/types.ts
+├── rotas/types.ts
+├── folgas/types.ts
+├── cidades/types.ts
+├── vendedores/types.ts
+└── relatorios/types.ts
 ```
 
-### Contextos
+## 📁 **Estrutura de Componentes**
 
-- **AuthContext**: Gerencia autenticação e perfil do usuário
-- **NotificationContext**: Gerencia notificações do sistema
+### Módulo de Relatórios
 
-## 📊 Dashboard e Relatórios
-
-### KPIs Principais
-
-- Total de funcionários
-- Total de veículos
-- Rotas ativas
-- Folgas pendentes
-
-### Gráficos
-
-- Status dos funcionários (Pizza)
-- Status dos veículos (Pizza)
-- Status das rotas (Barras)
-- Status das folgas (Barras)
-
-### Relatórios Disponíveis
-
-- Funcionários detalhado
-- Veículos detalhado
-- Rotas detalhado
-- Folgas detalhado
-
-## 🔧 Configuração e Deploy
-
-### Variáveis de Ambiente
-
-```bash
-REACT_APP_FIREBASE_API_KEY=sua-api-key
-REACT_APP_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=seu-projeto
-REACT_APP_FIREBASE_STORAGE_BUCKET=seu-projeto.appspot.com
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=123456789
-REACT_APP_FIREBASE_APP_ID=seu-app-id
+```
+src/components/relatorios/
+├── data/
+│   └── relatoriosService.ts        # Serviços de dados
+├── export/                         # 🆕 Sistema de exportação
+│   ├── BaseExportService.ts
+│   ├── BaseTableExportService.ts
+│   ├── FuncionariosExportService.ts
+│   ├── VeiculosExportService.ts
+│   ├── RotasExportService.ts
+│   ├── FolgasExportService.ts
+│   ├── CidadesExportService.ts
+│   ├── VendedoresExportService.ts
+│   └── index.ts
+├── state/
+│   └── useRelatorios.ts            # Hook para gerenciar estado
+├── ui/
+│   ├── RelatorioHeader.tsx         # Cabeçalho dos relatórios
+│   ├── ResumoCards.tsx             # Cards de resumo estatístico
+│   ├── GraficoCard.tsx             # Componente de gráficos
+│   ├── RelatoriosDetalhados.tsx    # 🆕 Relatórios detalhados
+│   └── ExportModal.tsx             # 🆕 Modal de exportação
+├── pages/
+│   └── RelatoriosPage.tsx          # Página principal
+├── types.ts                        # Definições de tipos
+├── Relatorios.tsx                  # Componente principal
+├── index.ts                        # Exportações do pacote
+├── index.tsx                       # Ponto de entrada
+└── README.md                       # Documentação
 ```
 
-### Scripts Disponíveis
+### Módulo Common
 
-```bash
-npm run setup      # Configuração inicial do Firebase
-npm start          # Inicia o servidor de desenvolvimento
-npm run build      # Build para produção
-npm run deploy     # Deploy no Firebase Hosting
+```
+src/components/common/
+├── modals/
+│   ├── ConfirmationModal.tsx       # Modal de confirmação
+│   ├── TableExportModal.tsx        # 🆕 Modal de exportação de tabelas
+│   ├── ConfirmationModalConfig.ts
+│   ├── ConfirmationModalTypes.ts
+│   └── index.ts
+├── ErrorBoundary/
+├── ErrorPages/
+└── index.ts
 ```
 
-## 🚀 Funcionalidades Avançadas
+## 🔧 **Configurações Técnicas**
 
-### Notificações Push
+### Dependências Adicionadas
 
-- Configurado com Firebase Cloud Messaging
-- Notificações em tempo real
-- Permissões automáticas
-
-### Otimização de Rotas (Preparado)
-
-- Integração com Google Maps API
-- Cálculo de rotas otimizadas
-- Visualização de mapas
-
-### Responsividade
-
-- Design mobile-first
-- Interface adaptativa
-- Componentes responsivos
-
-## 🔍 Monitoramento e Analytics
-
-### Firebase Analytics (Preparado)
-
-```javascript
-// Configuração básica
-import { getAnalytics, logEvent } from "firebase/analytics";
-
-const analytics = getAnalytics(app);
-
-// Exemplo de evento
-logEvent(analytics, "login", {
-  method: "email",
-});
-```
-
-### Performance Monitoring
-
-- Métricas de carregamento
-- Tempo de resposta
-- Uso de recursos
-
-## 🛡️ Segurança
-
-### Autenticação
-
-- Firebase Authentication
-- Tokens JWT
-- Refresh automático
-
-### Validação de Dados
-
-- Validação no frontend
-- Sanitização de inputs
-- Regras do Firestore
-
-### CORS e CSP
-
-- Configuração de segurança
-- Headers de proteção
-- Políticas de conteúdo
-
-## 📱 PWA (Progressive Web App)
-
-### Características
-
-- Instalável
-- Offline capability (preparado)
-- Push notifications
-- App-like experience
-
-### Service Worker
-
-```javascript
-// Preparado para cache offline
-const CACHE_NAME = "sgl-v1";
-const urlsToCache = ["/", "/static/js/bundle.js", "/static/css/main.css"];
-```
-
-## 🔄 Integrações Futuras
-
-### APIs Externas
-
-- Google Maps Platform
-- WhatsApp Business API
-- Sistemas ERP
-- APIs de rastreamento
-
-### Funcionalidades Planejadas
-
-- App mobile (React Native)
-- Machine Learning para otimização
-- Integração com IoT
-- Relatórios avançados
-
-## 🐛 Debugging e Logs
-
-### Console Logs
-
-```javascript
-// Logs estruturados
-console.log("[SGL]", "Ação do usuário:", {
-  userId: user.uid,
-  action: "create_funcionario",
-  timestamp: new Date(),
-});
-```
-
-### Error Handling
-
-```javascript
-// Tratamento de erros centralizado
-try {
-  // Operação
-} catch (error) {
-  console.error("[SGL Error]", error);
-  showNotification("Erro na operação", "error");
+```json
+{
+  "dependencies": {
+    "xlsx": "^0.18.5", // Exportação Excel
+    "jspdf": "^3.0.1", // Geração de PDF
+    "jspdf-autotable": "^5.0.2", // Tabelas em PDF
+    "file-saver": "^2.0.5" // Download de arquivos
+  }
 }
 ```
 
-## 📈 Performance
+### Configurações de Exportação
 
-### Otimizações
+#### Excel (XLSX)
 
-- Lazy loading de componentes
-- Memoização com React.memo
-- Code splitting
-- Bundle optimization
+- **Formato**: XLSX (Excel 2007+)
+- **Encoding**: UTF-8
+- **Headers**: Personalizados por entidade
+- **Formatação**: Datas brasileiras, números formatados
+- **Estilo**: Layout minimalista (preto e branco)
 
-### Métricas
+#### PDF
 
-- First Contentful Paint (FCP)
-- Largest Contentful Paint (LCP)
-- Cumulative Layout Shift (CLS)
+- **Formato**: A4
+- **Orientação**: Portrait
+- **Margens**: 20mm
+- **Fonte**: Arial, 10pt
+- **Cores**: Preto e branco
+- **Headers**: Título, subtítulo, data de geração
 
-## 🔧 Manutenção
+### Configurações de Formatação
 
-### Backup
+#### Datas
 
-- Backup automático do Firestore
-- Versionamento de dados
-- Recuperação de desastres
+```typescript
+// Formatação brasileira
+const formatDate = (date: Date | string): string => {
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [year, month, day] = date.split("-");
+    return `${day}/${month}/${year}`;
+  }
+  if (date instanceof Date) {
+    return date.toLocaleDateString("pt-BR");
+  }
+  return date.toString();
+};
+```
 
-### Updates
+#### CPF
 
-- Atualizações automáticas
-- Versionamento semântico
-- Rollback capability
+```typescript
+const formatCPF = (cpf: string): string => {
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+};
+```
+
+#### Telefone
+
+```typescript
+const formatPhone = (phone: string): string => {
+  return phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+};
+```
+
+## 🚀 **Fluxo de Exportação**
+
+### 1. Usuário Solicita Exportação
+
+1. Usuário clica no botão de exportação
+2. Modal de exportação é exibido
+3. Usuário escolhe o formato (Excel ou PDF)
+4. Sistema inicia o processo de exportação
+
+### 2. Processamento dos Dados
+
+1. Sistema busca os dados do Firestore
+2. Aplica filtros se necessário
+3. Formata os dados conforme configuração
+4. Gera cabeçalhos e estrutura
+
+### 3. Geração do Arquivo
+
+#### Para Excel:
+
+1. Cria workbook com XLSX
+2. Adiciona worksheet com dados
+3. Aplica formatação
+4. Gera arquivo .xlsx
+
+#### Para PDF:
+
+1. Cria documento com jsPDF
+2. Adiciona cabeçalho com título
+3. Gera tabela com jsPDF-AutoTable
+4. Adiciona rodapé com informações
+5. Gera arquivo .pdf
+
+### 4. Download
+
+1. Sistema gera blob do arquivo
+2. Usa file-saver para download
+3. Arquivo é salvo automaticamente
+4. Notificação de sucesso é exibida
+
+## 📊 **Tipos de Relatórios**
+
+### Relatórios de Status
+
+- **Status dos Funcionários**: Distribuição por status
+- **Status dos Veículos**: Distribuição por status
+- **Status das Rotas**: Distribuição por status
+- **Status das Folgas**: Distribuição por status
+
+### Relatórios Detalhados
+
+- **Funcionários Detalhado**: Lista completa com todos os dados
+- **Veículos Detalhado**: Lista completa com dados técnicos
+- **Rotas Detalhado**: Lista completa com informações de rota
+- **Folgas Detalhado**: Lista completa com solicitações
+- **Cidades Detalhado**: Lista completa com dados geográficos
+- **Vendedores Detalhado**: Lista completa com dados comerciais
+
+## 🔒 **Segurança e Validação**
+
+### Validação de Dados
+
+- **Campos obrigatórios**: Validação antes da exportação
+- **Formato de dados**: Validação de tipos e formatos
+- **Sanitização**: Remoção de caracteres especiais
+- **Limites**: Controle de tamanho de arquivos
+
+### Permissões
+
+- **Controle de acesso**: Verificação de permissões por relatório
+- **Auditoria**: Log de exportações realizadas
+- **Rate limiting**: Controle de frequência de exportações
+
+## 🎯 **Performance**
+
+### Otimizações Implementadas
+
+- **Lazy loading**: Carregamento sob demanda
+- **Pagination**: Paginação de dados grandes
+- **Caching**: Cache de dados frequentemente acessados
+- **Compression**: Compressão de arquivos grandes
+
+### Métricas de Performance
+
+- **Tempo de geração**: < 5 segundos para arquivos pequenos
+- **Tamanho de arquivo**: Otimizado para download rápido
+- **Memória**: Uso eficiente de memória
+- **CPU**: Processamento otimizado
+
+## 🔄 **Manutenção e Evolução**
+
+### Estrutura Modular
+
+- **Serviços independentes**: Cada entidade tem seu serviço
+- **Configuração centralizada**: Configurações em arquivos separados
+- **Tipos TypeScript**: Tipagem forte para manutenibilidade
+- **Documentação**: Comentários e documentação inline
+
+### Extensibilidade
+
+- **Novos formatos**: Fácil adição de novos formatos
+- **Novas entidades**: Estrutura preparada para novas entidades
+- **Customização**: Configurações personalizáveis
+- **Plugins**: Arquitetura preparada para plugins
 
 ---
 
-**Versão**: 1.0.0  
-**Última atualização**: Janeiro 2025  
-**Desenvolvedor**: João Victor Silva Ferreira
+**Última atualização:** Janeiro 2025  
+**Versão:** 1.1.0  
+**Status:** ✅ Sistema operacional com novas funcionalidades de exportação

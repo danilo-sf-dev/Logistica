@@ -2,7 +2,7 @@
 
 ## 🌐 Acesso ao Sistema
 
-**URL:** https://your-project.web.app  
+**URL:** https://logistica-c7afc.web.app  
 **Status:** ✅ **SISTEMA OPERACIONAL**
 
 ---
@@ -22,7 +22,7 @@
 **Para usuários que precisam de acesso administrativo:**
 
 1. Faça login pela primeira vez
-2. Acesse o **Firebase Console**: https://console.firebase.google.com/project/your-project
+2. Acesse o **Firebase Console**: https://console.firebase.google.com/project/logistica-c7afc
 3. Vá em **Firestore Database**
 4. Encontre a coleção `users`
 5. Localize seu documento de usuário
@@ -99,6 +99,14 @@ O dashboard exibe os seguintes indicadores em tempo real:
 - **Filtrar por status**: Use o dropdown de status
 - **Ordenar**: Clique nos cabeçalhos das colunas
 
+### Exportar Dados
+
+1. **Acesse** a lista de funcionários
+2. **Aplique** filtros se necessário
+3. **Clique** no botão "Exportar Excel"
+4. **Escolha** o formato (Excel ou PDF)
+5. **Baixe** o arquivo automaticamente
+
 ---
 
 ## 🚛 Gestão de Veículos
@@ -107,28 +115,33 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 1. **Acesse** o módulo "Veículos"
 2. **Clique** em "Novo Veículo"
-3. **Preencha** os campos:
-   - **Placa**: Formato Mercosul (ex: ABC1234)
-   - **Modelo**: Nome do modelo
-   - **Marca**: Fabricante
+3. **Preencha** os dados:
+   - **Placa**: Placa do veículo
+   - **Modelo**: Modelo do veículo
+   - **Marca**: Marca do veículo
    - **Ano**: Ano de fabricação
-   - **Capacidade**: Em kg
+   - **Capacidade**: Capacidade em kg
    - **Status**: Disponível, Em Uso, Manutenção, Inativo
-   - **Tipo de Carroceria**: Truck, Toco, Bitruck, etc.
-   - **Tipo de Baú**: Frigorífico, Carga Seca, etc.
-   - **Unidade de Negócio**: Frigorífico, Ovos, Ambos
+   - **Última Manutenção**: Data da última manutenção
+   - **Próxima Manutenção**: Data da próxima manutenção
 4. **Clique** em "Cadastrar"
 
-### Manutenção de Veículos
+### Gerenciar Status
 
-**Para registrar manutenção:**
+**Status disponíveis:**
 
-1. **Edite** o veículo
-2. **Atualize** o status para "Manutenção"
-3. **Preencha** as datas:
-   - Última Manutenção
-   - Próxima Manutenção
-4. **Adicione** observações se necessário
+- **Disponível**: Pronto para uso
+- **Em Uso**: Em rota ativa
+- **Manutenção**: Em manutenção
+- **Inativo**: Temporariamente indisponível
+
+### Exportar Dados
+
+1. **Acesse** a lista de veículos
+2. **Aplique** filtros se necessário
+3. **Clique** no botão "Exportar Excel"
+4. **Escolha** o formato (Excel ou PDF)
+5. **Baixe** o arquivo automaticamente
 
 ---
 
@@ -139,27 +152,30 @@ O dashboard exibe os seguintes indicadores em tempo real:
 1. **Acesse** o módulo "Rotas"
 2. **Clique** em "Nova Rota"
 3. **Preencha** os dados:
-   - **Nome da Rota**: Identificação da rota
-   - **Data da Rota**: Data de execução
-   - **Peso Mínimo**: Em kg
-   - **Dias da Semana**: Selecione os dias de operação
+   - **Origem**: Cidade de origem
+   - **Destino**: Cidade de destino
+   - **Funcionário**: Motorista responsável
+   - **Veículo**: Veículo a ser utilizado
+   - **Data de Partida**: Data e hora de saída
+   - **Data de Chegada**: Data e hora de chegada
+   - **Status**: Agendada, Em Andamento, Concluída, Cancelada
+   - **Observações**: Informações adicionais
 4. **Clique** em "Criar"
 
-### Vincular Cidades
+### Acompanhar Rotas
 
-**Para vincular cidades a uma rota:**
+- **Visualize** o status em tempo real
+- **Atualize** o progresso
+- **Registre** observações
+- **Finalize** quando concluída
 
-1. **Acesse** o módulo "Cidades"
-2. **Edite** a cidade desejada
-3. **Selecione** a rota no dropdown
-4. **Salve** as alterações
+### Exportar Dados
 
-### Status das Rotas
-
-- **Agendada**: Rota programada
-- **Em Andamento**: Rota sendo executada
-- **Concluída**: Rota finalizada
-- **Cancelada**: Rota cancelada
+1. **Acesse** a lista de rotas
+2. **Aplique** filtros se necessário
+3. **Clique** no botão "Exportar Excel"
+4. **Escolha** o formato (Excel ou PDF)
+5. **Baixe** o arquivo automaticamente
 
 ---
 
@@ -168,37 +184,31 @@ O dashboard exibe os seguintes indicadores em tempo real:
 ### Solicitar Folga
 
 1. **Acesse** o módulo "Folgas"
-2. **Clique** em "Nova Solicitação"
-3. **Selecione** o funcionário
-4. **Escolha** o tipo:
-   - Folga
-   - Férias
-   - Licença Médica
-   - Atestado
-   - Banco de Horas
-   - Compensação
-   - Suspensão
-   - Afastamento
-   - Maternidade
-   - Paternidade
-   - Luto
-   - Casamento
-   - Doação de Sangue
-   - Serviço Militar
-   - Capacitação
-   - Outros
-5. **Defina** as datas de início e fim
-6. **Adicione** observações se necessário
-7. **Clique** em "Solicitar"
+2. **Clique** em "Nova Folga"
+3. **Preencha** os dados:
+   - **Funcionário**: Nome do funcionário
+   - **Data de Início**: Data de início da folga
+   - **Data de Fim**: Data de fim da folga
+   - **Tipo**: Folga, Férias, Outro
+   - **Motivo**: Justificativa da solicitação
+   - **Observações**: Informações adicionais
+4. **Clique** em "Solicitar"
 
-### Aprovar/Rejeitar Solicitações
+### Aprovar/Rejeitar Folgas
 
-**Para gestores:**
+1. **Acesse** a lista de folgas
+2. **Localize** a solicitação
+3. **Clique** em "Aprovar" ou "Rejeitar"
+4. **Adicione** comentários se necessário
+5. **Confirme** a ação
 
-1. **Visualize** as solicitações pendentes
-2. **Clique** em "Aprovar" ou "Rejeitar"
-3. **Adicione** comentários se necessário
-4. **Confirme** a ação
+### Exportar Dados
+
+1. **Acesse** a lista de folgas
+2. **Aplique** filtros se necessário
+3. **Clique** no botão "Exportar Excel"
+4. **Escolha** o formato (Excel ou PDF)
+5. **Baixe** o arquivo automaticamente
 
 ---
 
@@ -224,6 +234,14 @@ O dashboard exibe os seguintes indicadores em tempo real:
 2. **Selecione** a rota no dropdown
 3. **Salve** as alterações
 
+### Exportar Dados
+
+1. **Acesse** a lista de cidades
+2. **Aplique** filtros se necessário
+3. **Clique** no botão "Exportar Excel"
+4. **Escolha** o formato (Excel ou PDF)
+5. **Baixe** o arquivo automaticamente
+
 ---
 
 ## 👨‍💼 Gestão de Vendedores
@@ -242,6 +260,14 @@ O dashboard exibe os seguintes indicadores em tempo real:
    - **Região**: Região de atuação
    - **Cidades**: Cidades atendidas
 4. **Clique** em "Cadastrar"
+
+### Exportar Dados
+
+1. **Acesse** a lista de vendedores
+2. **Aplique** filtros se necessário
+3. **Clique** no botão "Exportar Excel"
+4. **Escolha** o formato (Excel ou PDF)
+5. **Baixe** o arquivo automaticamente
 
 ---
 
@@ -265,13 +291,70 @@ O dashboard exibe os seguintes indicadores em tempo real:
 4. **Visualize** os dados em gráficos
 5. **Exporte** se necessário
 
+### 🆕 **Novos Relatórios Detalhados**
+
+#### Funcionários Detalhado
+
+- **Dados completos**: Nome, CPF, CNH, telefone, email, endereço
+- **Informações profissionais**: Função, data de admissão, salário
+- **Status atual**: Trabalhando, Disponível, Folga, Férias
+- **Exportação**: Excel (XLSX) e PDF
+
+#### Veículos Detalhado
+
+- **Dados técnicos**: Placa, modelo, marca, ano, capacidade
+- **Status operacional**: Disponível, Em Uso, Manutenção, Inativo
+- **Manutenção**: Última e próxima manutenção
+- **Exportação**: Excel (XLSX) e PDF
+
+#### Rotas Detalhado
+
+- **Informações da rota**: Origem, destino, funcionário, veículo
+- **Datas**: Partida e chegada
+- **Status**: Agendada, Em Andamento, Concluída, Cancelada
+- **Exportação**: Excel (XLSX) e PDF
+
+#### Folgas Detalhado
+
+- **Dados da solicitação**: Funcionário, datas, tipo, motivo
+- **Status**: Pendente, Aprovada, Rejeitada
+- **Observações**: Comentários e justificativas
+- **Exportação**: Excel (XLSX) e PDF
+
+#### Cidades Detalhado
+
+- **Dados geográficos**: Nome, estado, região
+- **Informações operacionais**: Distância, peso mínimo
+- **Vínculos**: Rotas associadas
+- **Exportação**: Excel (XLSX) e PDF
+
+#### Vendedores Detalhado
+
+- **Dados pessoais**: Nome, CPF, email, telefone
+- **Informações comerciais**: Código sistema, unidade de negócio
+- **Cobertura**: Estado, região, cidades atendidas
+- **Exportação**: Excel (XLSX) e PDF
+
 ### Exportação de Dados
 
 **Formatos disponíveis:**
 
-- PDF
-- Excel (XLSX)
-- CSV
+- **Excel (XLSX)**: Planilha para análise de dados
+- **PDF**: Documento formatado para impressão
+
+**Como exportar:**
+
+1. **Acesse** o módulo "Relatórios"
+2. **Clique** em "Relatórios Detalhados"
+3. **Escolha** o tipo de relatório
+4. **Clique** no botão de download
+5. **Selecione** o formato (Excel ou PDF)
+6. **Baixe** o arquivo automaticamente
+
+**Nomenclatura dos arquivos:**
+
+- **Padrão**: `entity_dd-MM-YYYY.xlsx` (ex: `funcionarios_16-01-2025.xlsx`)
+- **Formato de data**: DD/MM/YYYY (padrão brasileiro)
 
 ---
 
@@ -360,6 +443,13 @@ O dashboard exibe os seguintes indicadores em tempo real:
 2. Verifique o formato dos dados
 3. Tente novamente
 
+**Erro na exportação:**
+
+1. Verifique se há dados para exportar
+2. Aguarde o processamento completo
+3. Verifique se o navegador permite downloads
+4. Tente novamente
+
 ### Contato
 
 **Para suporte técnico:**
@@ -398,5 +488,5 @@ O sistema é atualizado automaticamente. Para verificar atualizações:
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão do sistema:** 1.0.0  
-**Status:** ✅ Sistema operacional
+**Versão do sistema:** 1.1.0  
+**Status:** ✅ Sistema operacional com novas funcionalidades de exportação

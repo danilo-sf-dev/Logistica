@@ -7,7 +7,8 @@ Sistema web completo para gestão de logística, desenvolvido com React e Fireba
 **🌐 URL do Sistema:** https://logistica-c7afc.web.app  
 **🔐 Login:** Funcionando com Google Authentication  
 **📊 Dashboard:** Totalmente operacional  
-**🚛 Módulos:** Todos funcionando
+**🚛 Módulos:** Todos funcionando  
+**📤 Exportação:** Excel e PDF funcionando
 
 ## 🚀 Funcionalidades
 
@@ -22,6 +23,32 @@ Sistema web completo para gestão de logística, desenvolvido com React e Fireba
 - **Autenticação**: Login com Google e Email/Senha
 - **Notificações**: Sistema de notificações em tempo real
 
+## 🆕 **Novas Funcionalidades (v1.1.0)**
+
+### 📊 **Sistema de Relatórios Avançado**
+
+- **Relatórios Detalhados**: Listas completas com todos os dados de cada entidade
+- **Exportação Excel (XLSX)**: Arquivos com formatação profissional
+- **Exportação PDF**: Documentos formatados para impressão
+- **Modal de Exportação**: Interface para escolher formato (PDF/Excel)
+- **Arquitetura Modular**: Serviços especializados por entidade
+
+### 🔧 **Melhorias Técnicas**
+
+- **Formatação Brasileira**: Datas no formato DD/MM/YYYY
+- **Layout Minimalista**: Interface em preto e branco
+- **Nomenclatura Padrão**: Arquivos nomeados como `entity_dd-MM-YYYY.xlsx`
+- **Tipos Separados**: Arquivos de tipos independentes por pacote
+
+### 📈 **Funcionalidades de Exportação**
+
+- **Funcionários**: Relatório completo com dados pessoais e profissionais
+- **Veículos**: Informações técnicas e status da frota
+- **Rotas**: Detalhes de rotas e associações
+- **Folgas**: Histórico de solicitações e aprovações
+- **Cidades**: Dados geográficos e regionais
+- **Vendedores**: Informações comerciais e contatos
+
 ## 🛠️ Tecnologias
 
 - **Frontend**: React 18, Tailwind CSS, React Router
@@ -29,6 +56,7 @@ Sistema web completo para gestão de logística, desenvolvido com React e Fireba
 - **Charts**: Recharts
 - **Icons**: Lucide React
 - **Notifications**: React Hot Toast
+- **Export**: XLSX, jsPDF, file-saver
 
 ## 📋 Pré-requisitos
 
@@ -68,7 +96,7 @@ REACT_APP_VAPID_PUBLIC_KEY=your-vapid-public-key
 
 # App Configuration
 REACT_APP_NAME=SGL - Sistema de Gestão de Logística
-REACT_APP_VERSION=1.0.0
+REACT_APP_VERSION=1.1.0
 REACT_APP_ENVIRONMENT=development
 ```
 
@@ -172,13 +200,13 @@ src/
 │   ├── auth/           # Autenticação
 │   ├── dashboard/      # Dashboard principal
 │   ├── layout/         # Layout e navegação
-│   ├── motoristas/     # Gestão de motoristas
+│   ├── funcionarios/   # Gestão de funcionários
 │   ├── veiculos/       # Gestão de veículos
 │   ├── rotas/          # Gestão de rotas
 │   ├── folgas/         # Controle de folgas
 │   ├── cidades/        # Cadastro de cidades
 │   ├── vendedores/     # Gestão de vendedores
-│   ├── relatorios/     # Relatórios
+│   ├── relatorios/     # 🆕 Sistema de relatórios
 │   └── configuracao/   # Configurações
 ├── contexts/           # Contextos React
 ├── firebase/           # Configuração Firebase
@@ -186,6 +214,42 @@ src/
 ├── utils/              # Utilitários
 └── App.js              # Componente principal
 ```
+
+## 🆕 **Sistema de Relatórios**
+
+### 📊 **Relatórios Detalhados**
+
+O sistema agora oferece relatórios detalhados para todas as entidades:
+
+- **Funcionários Detalhado**: Dados completos pessoais e profissionais
+- **Veículos Detalhado**: Informações técnicas e status da frota
+- **Rotas Detalhado**: Detalhes de rotas e associações
+- **Folgas Detalhado**: Histórico de solicitações e aprovações
+- **Cidades Detalhado**: Dados geográficos e regionais
+- **Vendedores Detalhado**: Informações comerciais e contatos
+
+### 📤 **Exportação Avançada**
+
+#### **Formatos Suportados**
+
+- **Excel (XLSX)**: Planilha para análise de dados
+- **PDF**: Documento formatado para impressão
+
+#### **Características**
+
+- **Formatação Brasileira**: Datas DD/MM/YYYY, CPF, telefone
+- **Layout Minimalista**: Interface preto e branco
+- **Nomenclatura Padrão**: `entity_dd-MM-YYYY.xlsx`
+- **Arquitetura Modular**: Serviços especializados por entidade
+
+#### **Como Exportar**
+
+1. Acesse o módulo "Relatórios"
+2. Clique em "Relatórios Detalhados"
+3. Escolha o tipo de relatório
+4. Clique no botão de download
+5. Selecione o formato (Excel ou PDF)
+6. Baixe o arquivo automaticamente
 
 ## 📱 Recursos Avançados
 
@@ -205,7 +269,7 @@ src/
 
 - Relatórios detalhados
 - Gráficos interativos
-- Exportação de dados
+- Exportação de dados em Excel e PDF
 
 ## 🔧 Scripts Disponíveis
 
@@ -259,10 +323,18 @@ A documentação completa do projeto está organizada na pasta [`docs/`](./docs/
 ### 3. Comece a Usar
 
 - **Dashboard**: Veja KPIs e gráficos
-- **Motoristas**: Adicione motoristas da equipe
+- **Funcionários**: Adicione funcionários da equipe
 - **Veículos**: Cadastre a frota
 - **Rotas**: Crie rotas de entrega
-- **Relatórios**: Analise dados
+- **Relatórios**: Analise dados e exporte relatórios
+
+### 4. Exporte Relatórios
+
+- **Acesse**: Módulo "Relatórios"
+- **Clique**: "Relatórios Detalhados"
+- **Escolha**: Tipo de relatório
+- **Selecione**: Formato (Excel ou PDF)
+- **Baixe**: Arquivo automaticamente
 
 ## 🐛 Troubleshooting
 
@@ -281,6 +353,12 @@ A documentação completa do projeto está organizada na pasta [`docs/`](./docs/
 
 - Configurar domínios no Firebase Console
 - Verificar configuração de hosting
+
+### Erro na Exportação
+
+- Verificar se há dados para exportar
+- Aguardar processamento completo
+- Verificar se o navegador permite downloads
 
 ## 📞 Suporte
 
@@ -308,13 +386,17 @@ Este projeto é desenvolvido para uso interno da empresa.
 - [x] Login com Google testado e aprovado
 - [x] Firestore Database configurado
 - [x] Domínios autorizados configurados
+- [x] **Sistema de exportação Excel e PDF**
+- [x] **Relatórios detalhados implementados**
+- [x] **Formatação brasileira de dados**
+- [x] **Arquitetura modular de exportação**
 
 ### 🔄 Próximas Melhorias
 
 - [ ] Integração com Google Maps
 - [ ] App mobile (React Native)
 - [ ] Integração com sistemas ERP
-- [ ] Relatórios avançados
+- [ ] Relatórios customizáveis
 - [ ] Machine Learning para otimização
 
 ## 🚀 Configuração Final Realizada
@@ -352,4 +434,5 @@ const firebaseConfig = {
 **🌐 Sistema Online:** https://logistica-c7afc.web.app  
 **🔐 Login Testado:** ✅ Funcionando  
 **📊 Dashboard Operacional:** ✅ Funcionando  
+**📤 Exportação Excel/PDF:** ✅ Funcionando  
 **Desenvolvido com ❤️ para otimizar a logística empresarial**
