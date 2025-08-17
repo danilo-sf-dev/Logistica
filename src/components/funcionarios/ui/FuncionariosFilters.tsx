@@ -55,7 +55,6 @@ export const FuncionariosFilters: React.FC<FuncionariosFiltersProps> = ({
             className="input-field"
           >
             <option value="todos">Todos os Status</option>
-            <option value="trabalhando">Trabalhando</option>
             <option value="disponivel">Disponível</option>
             <option value="folga">Folga</option>
             <option value="ferias">Férias</option>

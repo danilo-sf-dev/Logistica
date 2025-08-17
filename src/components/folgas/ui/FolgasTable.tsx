@@ -13,6 +13,18 @@ import type { TipoFolga } from "../../../types";
 import type { OrdenacaoCampo } from "../state/useFolgas";
 import type { DirecaoOrdenacao } from "../../../types";
 
+// Função para formatar data no padrão brasileiro
+const formatarDataBR = (dataString: string): string => {
+  try {
+    // Garantir que a data seja interpretada como local, não UTC
+    const [ano, mes, dia] = dataString.split("-").map(Number);
+    const data = new Date(ano, mes - 1, dia); // mes - 1 porque JavaScript usa 0-11
+    return data.toLocaleDateString("pt-BR");
+  } catch (error) {
+    return dataString; // Retorna a string original se não conseguir formatar
+  }
+};
+
 interface FolgasTableProps {
   folgas: Folga[];
   loading: boolean;
@@ -211,8 +223,8 @@ export function FolgasTable({
                 </td>
                 <td className="table-cell">
                   <div className="text-sm text-gray-900">
-                    <div>Início: {folga.dataInicio}</div>
-                    <div>Fim: {folga.dataFim}</div>
+                    <div>Início: {formatarDataBR(folga.dataInicio)}</div>
+                    <div>Fim: {formatarDataBR(folga.dataFim)}</div>
                     {(folga.tipo === "banco_horas" ||
                       folga.tipo === "compensacao") &&
                       folga.horas && (

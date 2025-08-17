@@ -58,11 +58,18 @@ export const relatoriosService = {
   // Buscar dados dos motoristas
   async buscarMotoristas(periodo?: string): Promise<MotoristaData[]> {
     try {
-      const motoristasSnapshot = await getDocs(collection(db, "motoristas"));
-      let motoristas = motoristasSnapshot.docs.map((doc) => ({
+      const funcionariosSnapshot = await getDocs(
+        collection(db, "funcionarios"),
+      );
+      let funcionarios = funcionariosSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      })) as MotoristaData[];
+      })) as any[];
+
+      // Filtrar apenas funcionários que são motoristas
+      let motoristas = funcionarios.filter(
+        (funcionario) => funcionario.funcao === "motorista",
+      ) as MotoristaData[];
 
       // Aplicar filtro por período se especificado
       if (periodo) {

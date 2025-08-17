@@ -27,16 +27,26 @@ export class DashboardService {
       const funcionariosSnapshot = await getDocs(
         collection(db, "funcionarios"),
       );
-      const motoristasSnapshot = await getDocs(collection(db, "motoristas"));
       const vendedoresSnapshot = await getDocs(collection(db, "vendedores"));
       const cidadesSnapshot = await getDocs(collection(db, "cidades"));
       const veiculosSnapshot = await getDocs(collection(db, "veiculos"));
       const rotasSnapshot = await getDocs(collection(db, "rotas"));
       const folgasSnapshot = await getDocs(collection(db, "folgas"));
 
+      // Contar funcionários e motoristas da tabela funcionarios
+      const funcionariosData = funcionariosSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const totalFuncionarios = funcionariosData.length;
+      const totalMotoristas = funcionariosData.filter(
+        (funcionario: any) => funcionario.funcao === "motorista",
+      ).length;
+
       return {
-        funcionarios: funcionariosSnapshot.size,
-        motoristas: motoristasSnapshot.size,
+        funcionarios: totalFuncionarios,
+        motoristas: totalMotoristas,
         vendedores: vendedoresSnapshot.size,
         cidades: cidadesSnapshot.size,
         veiculos: veiculosSnapshot.size,
@@ -101,11 +111,18 @@ export class DashboardService {
 
   static async getMotoristasStatus(): Promise<MotoristaStatus[]> {
     try {
-      const motoristasSnapshot = await getDocs(collection(db, "motoristas"));
-      const motoristasData = motoristasSnapshot.docs.map((doc) => ({
+      const funcionariosSnapshot = await getDocs(
+        collection(db, "funcionarios"),
+      );
+      const funcionariosData = funcionariosSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
+
+      // Filtrar apenas funcionários com função "motorista"
+      const motoristasData = funcionariosData.filter(
+        (funcionario: any) => funcionario.funcao === "motorista",
+      );
 
       const statusCount = motoristasData.reduce(
         (acc, motorista: any) => {
@@ -305,7 +322,6 @@ export class DashboardService {
       });
 
       // Buscar dados adicionais
-      const motoristasSnapshot = await getDocs(collection(db, "motoristas"));
       const cidadesSnapshot = await getDocs(collection(db, "cidades"));
       const vendedoresSnapshot = await getDocs(collection(db, "vendedores"));
 
@@ -313,8 +329,12 @@ export class DashboardService {
       const quinzeDiasAtras = new Date();
       quinzeDiasAtras.setDate(quinzeDiasAtras.getDate() - 15);
 
-      motoristasSnapshot.docs.forEach((doc) => {
-        const motorista: any = { id: doc.id, ...doc.data() };
+      // Filtrar funcionários que são motoristas
+      const motoristasData = funcionariosSnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((funcionario: any) => funcionario.funcao === "motorista");
+
+      motoristasData.forEach((motorista: any) => {
         const dataCriacao = safeToDate(
           motorista.dataCriacao || motorista.createdAt,
         );

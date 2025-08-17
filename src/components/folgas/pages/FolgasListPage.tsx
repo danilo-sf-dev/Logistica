@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { useFolgas } from "../state/useFolgas";
+import { folgasService } from "../data/folgasService";
 import { FolgasFilters } from "../ui/FolgasFilters";
 import { FolgasTable } from "../ui/FolgasTable";
 import { FolgaFormModal } from "../ui/FolgaFormModal";
@@ -46,6 +47,15 @@ export function FolgasListPage() {
 
   useEffect(() => {
     carregar();
+    // Sincronizar status dos funcionários automaticamente ao carregar a página
+    const sincronizarStatusAutomaticamente = async () => {
+      try {
+        await folgasService.sincronizarStatusFuncionarios();
+      } catch (error) {
+        console.error("Erro na sincronização automática:", error);
+      }
+    };
+    sincronizarStatusAutomaticamente();
   }, [carregar]);
 
   // Gerar nome do arquivo para exportação
