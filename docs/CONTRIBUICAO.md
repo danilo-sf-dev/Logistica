@@ -1,12 +1,37 @@
-# 👨‍💻 Guia de Contribuição - SGL
+# 🤝 Guia de Contribuição - SGL
 
-## 🎯 Visão Geral
+## 📋 Visão Geral
 
-Este guia é destinado a desenvolvedores que desejam contribuir com o projeto SGL (Sistema de Gestão de Logística).
+Este documento fornece diretrizes para contribuir com o desenvolvimento do Sistema de Gestão de Logística (SGL).
 
-## 🚀 Primeiros Passos
+## 🎯 Como Contribuir
 
-### 1. Configuração do Ambiente
+### 📝 **Tipos de Contribuição**
+
+1. **🐛 Reportar Bugs**
+2. **💡 Sugerir Melhorias**
+3. **📚 Melhorar Documentação**
+4. **🔧 Implementar Funcionalidades**
+5. **🧪 Adicionar Testes**
+
+### 🚀 **Primeiros Passos**
+
+1. **Fork** o repositório
+2. **Clone** o fork localmente
+3. **Instale** as dependências
+4. **Configure** o ambiente de desenvolvimento
+5. **Crie** uma branch para sua contribuição
+
+## 🛠️ Ambiente de Desenvolvimento
+
+### 📋 **Pré-requisitos**
+
+- **Node.js**: 18.x ou superior
+- **npm**: 9.x ou superior
+- **Git**: 2.x ou superior
+- **Firebase CLI**: Última versão
+
+### 🔧 **Configuração Inicial**
 
 ```bash
 # Clone o repositório
@@ -16,439 +41,561 @@ cd logistica
 # Instale as dependências
 npm install
 
-# Configure as variáveis de ambiente
-cp .env.example .env
-# Edite o arquivo .env com suas credenciais
+# Configure o Firebase
+npm run setup-firebase
 
-# Execute o projeto
+# Inicie o servidor de desenvolvimento
 npm start
 ```
 
-### 2. Estrutura do Projeto
+### 🔑 **Configuração Firebase**
+
+1. **Crie** um projeto no Firebase Console
+2. **Configure** Authentication (Google)
+3. **Configure** Firestore Database
+4. **Configure** Hosting
+5. **Copie** as credenciais para `.env`
+
+```env
+# .env
+REACT_APP_FIREBASE_API_KEY=sua-api-key
+REACT_APP_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=seu-projeto-id
+REACT_APP_FIREBASE_STORAGE_BUCKET=seu-projeto.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=seu-sender-id
+REACT_APP_FIREBASE_APP_ID=seu-app-id
+REACT_APP_FIREBASE_MEASUREMENT_ID=seu-measurement-id
+```
+
+## 📁 **Estrutura do Projeto**
+
+### 🏗️ **Arquitetura**
 
 ```
 src/
-├── components/          # Componentes React organizados por módulo
-│   ├── auth/           # Autenticação
-│   ├── dashboard/      # Dashboard principal
-│   ├── funcionarios/   # Gestão de funcionários
-│   ├── veiculos/       # Gestão de veículos
-│   ├── rotas/          # Gestão de rotas
-│   ├── folgas/         # Gestão de folgas
-│   ├── cidades/        # Gestão de cidades
-│   ├── vendedores/     # Gestão de vendedores
-│   ├── relatorios/     # Relatórios e analytics
-│   ├── configuracoes/  # Configurações do sistema
-│   └── layout/         # Layout e navegação
-├── contexts/           # Contextos React
-├── firebase/           # Configuração Firebase
-├── utils/              # Utilitários e helpers
-└── types/              # Definições de tipos TypeScript
+├── components/           # Componentes React
+│   ├── auth/            # Autenticação
+│   ├── cidades/         # Gestão de cidades
+│   ├── common/          # Componentes comuns
+│   ├── dashboard/       # Dashboard
+│   ├── folgas/          # Gestão de folgas
+│   ├── funcionarios/    # Gestão de funcionários
+│   ├── layout/          # Layout da aplicação
+│   ├── relatorios/      # 🆕 Sistema de relatórios
+│   ├── rotas/           # Gestão de rotas
+│   ├── veiculos/        # Gestão de veículos
+│   └── vendedores/      # Gestão de vendedores
+├── contexts/            # Contextos React
+├── firebase/            # Configuração Firebase
+├── hooks/               # Custom hooks
+├── types/               # Tipos TypeScript
+└── utils/               # Utilitários
 ```
 
-## 🏗️ Arquitetura
+### 🆕 **Novas Funcionalidades (v1.1.0)**
 
-### Padrão Modular
-
-Cada módulo segue a estrutura:
+#### 📊 **Sistema de Relatórios**
 
 ```
-modulo/
-├── data/               # Serviços de dados
-│   └── moduloService.ts
-├── state/              # Hooks de estado
-│   └── useModulo.ts
-├── ui/                 # Componentes de interface
-│   ├── ModuloFormModal.tsx
-│   ├── ModuloTable.tsx
-│   └── ModuloFilters.tsx
-├── pages/              # Páginas do módulo
-│   └── ModuloListPage.tsx
-├── types.ts            # Tipos TypeScript
-└── index.tsx           # Export principal
+src/components/relatorios/
+├── export/              # 🆕 Sistema de exportação
+│   ├── BaseExportService.ts
+│   ├── BaseTableExportService.ts
+│   ├── FuncionariosExportService.ts
+│   ├── VeiculosExportService.ts
+│   ├── RotasExportService.ts
+│   ├── FolgasExportService.ts
+│   ├── CidadesExportService.ts
+│   ├── VendedoresExportService.ts
+│   └── index.ts
+├── ui/
+│   ├── ExportModal.tsx          # 🆕 Modal de exportação
+│   ├── RelatoriosDetalhados.tsx # 🆕 Relatórios detalhados
+│   └── ...
+└── ...
 ```
 
-### Tecnologias Utilizadas
+#### 🔧 **Melhorias Técnicas**
 
-- **React 18**: Framework principal
-- **TypeScript**: Tipagem estática
-- **Tailwind CSS**: Estilização
-- **Firebase**: Backend como serviço
-- **React Router**: Roteamento
-- **Recharts**: Gráficos
-- **Lucide React**: Ícones
+- **Formatação Brasileira**: Datas DD/MM/YYYY
+- **Layout Minimalista**: Interface preto e branco
+- **Tipos Separados**: Arquivos de tipos independentes
+- **Nomenclatura Padrão**: entity_dd-MM-YYYY.xlsx
 
-## 📝 Convenções de Código
+## 📝 **Padrões de Código**
 
-### Nomenclatura
+### 🎨 **Convenções**
+
+#### **Nomenclatura**
 
 ```typescript
-// Componentes: PascalCase
-const UserProfile: React.FC<UserProfileProps> = () => {};
+// Arquivos e pastas
+camelCase.tsx          // Componentes
+PascalCase.tsx         // Componentes principais
+kebab-case.ts          // Utilitários
 
-// Hooks: camelCase com prefixo 'use'
-const useUserData = () => {};
+// Variáveis e funções
+const userName = '';    // camelCase
+const getUserData = () => {}; // camelCase
 
-// Serviços: camelCase com sufixo 'Service'
-const userService = {};
+// Constantes
+const API_BASE_URL = ''; // UPPER_SNAKE_CASE
 
-// Tipos: PascalCase
-interface UserData {
-  id: string;
-  name: string;
-}
-
-// Constantes: UPPER_SNAKE_CASE
-const API_ENDPOINTS = {
-  USERS: "/users",
-  VEHICLES: "/vehicles",
-};
+// Tipos e interfaces
+interface UserData {}   // PascalCase
+type UserStatus = '';   // PascalCase
 ```
 
-### Estrutura de Componentes
+#### **Estrutura de Componentes**
 
 ```typescript
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import type { ComponentProps } from "./types";
+// 1. Imports
+import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
+// 2. Types
 interface ComponentProps {
-  // Props do componente
+  title: string;
+  onAction?: () => void;
 }
 
-export const Component: React.FC<ComponentProps> = ({ prop1, prop2 }) => {
-  // Estados
-  const [state, setState] = useState<StateType>(initialValue);
+// 3. Component
+export const Component: React.FC<ComponentProps> = ({
+  title,
+  onAction,
+}) => {
+  // 4. Hooks
+  const { user } = useAuth();
 
-  // Hooks customizados
-  const { data, loading, error } = useCustomHook();
-
-  // Handlers
-  const handleAction = () => {
-    // Lógica do handler
+  // 5. Handlers
+  const handleClick = () => {
+    onAction?.();
   };
 
-  // Renderização condicional
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage error={error} />;
-
+  // 6. Render
   return (
-    <div className="component-container">
-      {/* JSX do componente */}
+    <div>
+      <h1>{title}</h1>
+      <button onClick={handleClick}>Ação</button>
     </div>
   );
 };
 ```
 
-### Estilização com Tailwind
+#### **Estrutura de Pacotes**
 
-```typescript
-// Classes organizadas por categoria
-<div className="
-  // Layout
-  flex items-center justify-between
-  // Espaçamento
-  p-4 space-y-2
-  // Cores
-  bg-white text-gray-900
-  // Bordas
-  border border-gray-200 rounded-lg
-  // Estados
-  hover:bg-gray-50 focus:ring-2 focus:ring-primary-500
-">
+```
+package/
+├── data/               # Serviços de dados
+├── export/             # 🆕 Serviços de exportação
+├── state/              # Hooks de estado
+├── ui/                 # Componentes de interface
+├── pages/              # Páginas
+├── types.ts            # Tipos do pacote
+├── index.ts            # Exportações
+├── index.tsx           # Ponto de entrada
+└── README.md           # Documentação
 ```
 
-## 🔧 Desenvolvimento
+### 🔧 **Configurações**
 
-### Comandos Úteis
+#### **ESLint**
 
-```bash
-# Executar em desenvolvimento
-npm start
-
-# Build de produção
-npm run build
-
-# Executar testes
-npm test
-
-# Linting
-npm run lint
-
-# Formatação
-npm run format
-
-# Verificar formatação
-npm run format:check
-
-# Corrigir warnings
-npm run lint:fix
-```
-
-### Configuração do Firebase
-
-1. **Crie um projeto** no Firebase Console
-2. **Habilite** Authentication (Google)
-3. **Configure** Firestore Database
-4. **Adicione** aplicação web
-5. **Copie** as credenciais para `.env`
-
-### Estrutura de Dados
-
-#### Firestore Collections
-
-```typescript
-// users
-interface User {
-  uid: string;
-  email: string;
-  displayName: string;
-  role: "admin" | "gerente" | "dispatcher" | "user";
-  telefone?: string;
-  cargo?: string;
-  createdAt: Timestamp;
-  lastLogin: Timestamp;
-}
-
-// funcionarios (antigo motoristas)
-interface Funcionario {
-  id: string;
-  nome: string;
-  cpf: string;
-  cnh: string;
-  telefone: string;
-  email?: string;
-  endereco: string;
-  cidade: string;
-  status: "trabalhando" | "disponivel" | "folga" | "ferias";
-  funcao: "motorista" | "ajudante" | "outro";
-  dataAdmissao?: string;
-  salario?: number;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+```json
+{
+  "extends": ["react-app", "react-app/jest"],
+  "rules": {
+    "prefer-const": "error",
+    "no-unused-vars": "warn",
+    "react-hooks/exhaustive-deps": "warn"
+  }
 }
 ```
 
-## 🧪 Testes
+#### **Prettier**
 
-### Estrutura de Testes
+```json
+{
+  "semi": true,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "printWidth": 80,
+  "tabWidth": 2
+}
+```
+
+## 🧪 **Testes**
+
+### 📋 **Estrutura de Testes**
+
+```
+src/
+├── __tests__/          # Testes globais
+├── components/
+│   └── component/
+│       ├── __tests__/  # Testes do componente
+│       └── Component.test.tsx
+└── utils/
+    └── __tests__/      # Testes de utilitários
+```
+
+### 🧪 **Tipos de Testes**
+
+#### **Testes Unitários**
 
 ```typescript
-// __tests__/Component.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Component } from '../Component';
+import { render, screen } from '@testing-library/react';
+import { Component } from './Component';
 
 describe('Component', () => {
   it('should render correctly', () => {
-    render(<Component />);
-    expect(screen.getByText('Expected Text')).toBeInTheDocument();
-  });
-
-  it('should handle user interaction', () => {
-    render(<Component />);
-    fireEvent.click(screen.getByRole('button'));
-    // Assertions
+    render(<Component title="Test" />);
+    expect(screen.getByText('Test')).toBeInTheDocument();
   });
 });
 ```
 
-### Testes de Integração
+#### **Testes de Integração**
 
 ```typescript
-// Testes com Firebase Emulator
-import { initializeTestEnvironment } from "@firebase/rules-unit-testing";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Component } from './Component';
 
-beforeAll(async () => {
-  const testEnv = await initializeTestEnvironment({
-    projectId: "test-project",
-    firestore: { rules: fs.readFileSync("firestore.rules", "utf8") },
+describe('Component Integration', () => {
+  it('should handle user interaction', () => {
+    const mockAction = jest.fn();
+    render(<Component title="Test" onAction={mockAction} />);
+
+    fireEvent.click(screen.getByRole('button'));
+    expect(mockAction).toHaveBeenCalled();
   });
 });
 ```
 
-## 📦 Deploy
-
-### Firebase Hosting
+### 🚀 **Executar Testes**
 
 ```bash
-# Build do projeto
-npm run build
+# Todos os testes
+npm test
 
-# Deploy
-npm run deploy
+# Testes em modo watch
+npm test -- --watch
 
-# Ou manualmente
-firebase deploy
+# Testes com coverage
+npm test -- --coverage
+
+# Testes específicos
+npm test -- Component.test.tsx
 ```
 
-### Configuração de Domínio
+## 🆕 **Contribuindo com Novas Funcionalidades**
 
-1. **Firebase Console** → Hosting
-2. **Adicionar domínio** personalizado
-3. **Configurar DNS** conforme instruções
+### 📊 **Sistema de Relatórios**
 
-## 🐛 Debugging
-
-### Ferramentas Recomendadas
-
-- **React Developer Tools**: Extensão do navegador
-- **Firebase Console**: Para debug do backend
-- **Chrome DevTools**: Para debug geral
-
-### Logs Estruturados
+#### **Criando um Novo Serviço de Exportação**
 
 ```typescript
-// Utilitário de logging
-const logger = {
-  info: (message: string, data?: any) => {
-    console.log(`[INFO] ${message}`, data);
-  },
-  error: (message: string, error?: any) => {
-    console.error(`[ERROR] ${message}`, error);
-  },
-  warn: (message: string, data?: any) => {
-    console.warn(`[WARN] ${message}`, data);
-  },
-};
+// src/components/relatorios/export/NovoExportService.ts
+import { BaseExportService } from "./BaseExportService";
+import type { ExportConfig } from "./BaseExportService";
+
+export class NovoExportService extends BaseExportService {
+  protected config: ExportConfig = {
+    campos: ["campo1", "campo2", "campo3"],
+    formatacao: {
+      campo1: (valor) => this.formatValue("campo1", valor),
+      campo2: (valor) => this.formatValue("campo2", valor),
+    },
+    ordenacao: ["campo1", "campo2"],
+    titulo: "Novo Relatório",
+  };
+
+  protected formatValue(field: string, value: any): any {
+    // Implementar formatação específica
+    return super.formatValue(field, value);
+  }
+}
 ```
 
-## 🔒 Segurança
+#### **Adicionando ao Factory**
 
-### Boas Práticas
-
-1. **Validação de dados** no frontend e backend
-2. **Regras do Firestore** configuradas adequadamente
-3. **Autenticação** obrigatória para rotas protegidas
-4. **Sanitização** de inputs do usuário
-5. **Rate limiting** para APIs
-
-### Regras do Firestore
-
-```javascript
-// firestore.rules
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Usuários podem ler/escrever apenas seus próprios dados
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Funcionários: apenas admins podem escrever
-    match /funcionarios/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+```typescript
+// src/components/relatorios/export/index.ts
+export class ExportServiceFactory {
+  static createService(tipo: string): BaseExportService {
+    switch (tipo.toLowerCase()) {
+      // ... casos existentes
+      case "novo_tipo":
+      case "novo_tipo_detalhado":
+        return new NovoExportService();
+      default:
+        throw new Error(`Tipo de relatório não suportado: ${tipo}`);
     }
   }
 }
 ```
 
-## 📚 Recursos Adicionais
+### 🔧 **Melhorias Técnicas**
 
-### Documentação
+#### **Formatação Brasileira**
 
-- **[Arquitetura](./ARQUITETURA.md)**: Documentação técnica detalhada
-- **[API](./API.md)**: Documentação da API
-- **[Guia do Usuário](./GUIA_USUARIO.md)**: Manual do usuário final
+```typescript
+// src/utils/formatters.ts
+export const formatDateBR = (date: Date | string): string => {
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [year, month, day] = date.split("-");
+    return `${day}/${month}/${year}`;
+  }
+  if (date instanceof Date) {
+    return date.toLocaleDateString("pt-BR");
+  }
+  return date.toString();
+};
 
-### Links Úteis
+export const formatCPF = (cpf: string): string => {
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+};
 
-- **React Docs**: https://react.dev/
-- **TypeScript Docs**: https://www.typescriptlang.org/docs/
-- **Tailwind CSS**: https://tailwindcss.com/docs
-- **Firebase Docs**: https://firebase.google.com/docs
-- **Recharts**: https://recharts.org/
+export const formatPhone = (phone: string): string => {
+  return phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+};
+```
 
-## 🤝 Como Contribuir
+#### **Nomenclatura de Arquivos**
 
-### 1. Fork e Clone
+```typescript
+// src/utils/fileNaming.ts
+export const generateFileName = (
+  entity: string,
+  date: Date = new Date()
+): string => {
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${entity}_${day}-${month}-${year}.xlsx`;
+};
+```
+
+## 🔄 **Fluxo de Desenvolvimento**
+
+### 🌿 **Branches**
+
+- **main**: Código em produção
+- **develop**: Código em desenvolvimento
+- **feature/nome-da-feature**: Novas funcionalidades
+- **bugfix/nome-do-bug**: Correções de bugs
+- **hotfix/nome-do-hotfix**: Correções urgentes
+
+### 📝 **Commits**
 
 ```bash
-# Fork o repositório no GitHub
-# Clone seu fork
-git clone https://github.com/seu-usuario/logistica.git
-cd logistica
-
-# Adicione o repositório original como upstream
-git remote add upstream https://github.com/original/logistica.git
+# Padrão de commits
+git commit -m "feat: adiciona sistema de exportação Excel"
+git commit -m "fix: corrige formatação de datas brasileiras"
+git commit -m "docs: atualiza documentação de relatórios"
+git commit -m "test: adiciona testes para exportação"
+git commit -m "refactor: reorganiza estrutura de exportação"
 ```
 
-### 2. Criar Branch
+#### **Tipos de Commit**
+
+- **feat**: Nova funcionalidade
+- **fix**: Correção de bug
+- **docs**: Documentação
+- **style**: Formatação
+- **refactor**: Refatoração
+- **test**: Testes
+- **chore**: Tarefas de manutenção
+
+### 🔄 **Pull Requests**
+
+#### **Template de PR**
+
+```markdown
+## 📋 Descrição
+
+Breve descrição das mudanças.
+
+## 🎯 Tipo de Mudança
+
+- [ ] Bug fix
+- [ ] Nova funcionalidade
+- [ ] Breaking change
+- [ ] Documentação
+
+## 🧪 Testes
+
+- [ ] Testes unitários passando
+- [ ] Testes de integração passando
+- [ ] Testes manuais realizados
+
+## 📸 Screenshots
+
+Adicione screenshots se aplicável.
+
+## ✅ Checklist
+
+- [ ] Código segue os padrões do projeto
+- [ ] Documentação atualizada
+- [ ] Testes adicionados/atualizados
+- [ ] Build passando
+- [ ] Lint passando
+```
+
+## 🚀 **Deploy**
+
+### 📦 **Build de Produção**
 
 ```bash
-# Crie uma branch para sua feature
-git checkout -b feature/nova-funcionalidade
+# Build
+npm run build
 
-# Ou para correção de bug
-git checkout -b fix/correcao-bug
+# Deploy para Firebase
+npm run deploy
+
+# Verificar deploy
+firebase hosting:channel:list
 ```
 
-### 3. Desenvolver
+### 🔧 **Configuração de Ambiente**
 
 ```bash
-# Faça suas alterações
-# Execute os testes
-npm test
+# Variáveis de ambiente
+cp .env.example .env
 
-# Verifique a formatação
-npm run format:check
-
-# Corrija problemas de linting
-npm run lint:fix
+# Configurar Firebase
+firebase use production
+firebase deploy --only hosting
 ```
 
-### 4. Commit e Push
+## 📚 **Documentação**
 
-```bash
-# Adicione suas alterações
-git add .
+### 📝 **Atualizando Documentação**
 
-# Faça commit com mensagem descritiva
-git commit -m "feat: adiciona nova funcionalidade de exportação"
+1. **README.md**: Visão geral do projeto
+2. **docs/**: Documentação detalhada
+3. **JSDoc**: Documentação de código
+4. **CHANGELOG.md**: Histórico de mudanças
 
-# Push para sua branch
-git push origin feature/nova-funcionalidade
+### 📖 **Padrões de Documentação**
+
+```typescript
+/**
+ * Serviço para exportação de dados em Excel
+ * @class ExcelExportService
+ * @extends BaseExportService
+ */
+export class ExcelExportService extends BaseExportService {
+  /**
+   * Exporta dados para arquivo Excel
+   * @param {any[]} dados - Dados a serem exportados
+   * @param {string} nomeArquivo - Nome do arquivo
+   * @returns {Promise<void>}
+   */
+  async exportToExcel(dados: any[], nomeArquivo: string): Promise<void> {
+    // Implementação
+  }
+}
 ```
 
-### 5. Pull Request
+## 🐛 **Reportando Bugs**
 
-1. **Crie um PR** no GitHub
-2. **Descreva** suas alterações
-3. **Referencie** issues relacionadas
-4. **Aguarde** review
+### 📋 **Template de Bug Report**
 
-### Convenções de Commit
+```markdown
+## 🐛 Descrição do Bug
 
+Descrição clara e concisa do bug.
+
+## 🔄 Passos para Reproduzir
+
+1. Vá para '...'
+2. Clique em '...'
+3. Role até '...'
+4. Veja o erro
+
+## ✅ Comportamento Esperado
+
+O que deveria acontecer.
+
+## 📸 Screenshots
+
+Adicione screenshots se aplicável.
+
+## 💻 Ambiente
+
+- OS: [ex: Windows 10]
+- Browser: [ex: Chrome 90]
+- Versão: [ex: 1.1.0]
+
+## 📋 Informações Adicionais
+
+Qualquer informação adicional sobre o problema.
 ```
-feat: nova funcionalidade
-fix: correção de bug
-docs: documentação
-style: formatação
-refactor: refatoração
-test: testes
-chore: tarefas de manutenção
+
+## 💡 **Sugerindo Melhorias**
+
+### 📋 **Template de Feature Request**
+
+```markdown
+## 💡 Descrição da Melhoria
+
+Descrição clara da funcionalidade desejada.
+
+## 🎯 Problema que Resolve
+
+Qual problema esta melhoria resolve.
+
+## 💭 Solução Proposta
+
+Como você gostaria que fosse implementada.
+
+## 🔄 Alternativas Consideradas
+
+Outras soluções que você considerou.
+
+## 📋 Informações Adicionais
+
+Qualquer informação adicional.
 ```
 
-## 📞 Suporte
+## 🤝 **Código de Conduta**
 
-### Para Dúvidas
+### 📋 **Diretrizes**
 
-- **Issues**: Abra uma issue no GitHub
-- **Discussions**: Use as discussions do repositório
-- **Email**: contato@empresa.com
+1. **Respeito**: Trate todos com respeito
+2. **Inclusão**: Seja inclusivo e acolhedor
+3. **Colaboração**: Trabalhe em equipe
+4. **Qualidade**: Mantenha alta qualidade de código
+5. **Documentação**: Documente suas mudanças
 
-### Para Bugs
+### 🚫 **Comportamentos Inaceitáveis**
 
-1. **Verifique** se já existe uma issue
-2. **Crie** uma nova issue com:
-   - Descrição do bug
-   - Passos para reproduzir
-   - Comportamento esperado vs atual
-   - Screenshots se aplicável
-   - Informações do ambiente
+- Linguagem ofensiva ou discriminatória
+- Assédio ou bullying
+- Spam ou propaganda
+- Violação de privacidade
+- Comportamento não profissional
+
+## 📞 **Contato**
+
+### 👥 **Equipe**
+
+- **Tech Lead**: [Nome do Tech Lead]
+- **Frontend**: [Nome do Frontend]
+- **Backend**: [Nome do Backend]
+- **QA**: [Nome do QA]
+
+### 📧 **Canais**
+
+- **Email**: desenvolvimento@empresa.com
+- **Slack**: #sgl-desenvolvimento
+- **GitHub**: Issues e Discussions
+- **Jira**: Projeto SGL
 
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.0.0
+**Versão:** 1.1.0  
+**Status:** ✅ Documentação atualizada com novas funcionalidades

@@ -35,6 +35,7 @@
 - **Editar**: Informações do motorista
 - **Excluir**: Remover motorista
 - **Filtrar**: Buscar por nome ou status
+- **Exportar**: Excel e PDF
 
 ### 🚛 Veículos
 
@@ -42,6 +43,7 @@
 - **Editar**: Informações do veículo
 - **Excluir**: Remover veículo
 - **Filtrar**: Buscar por placa ou status
+- **Exportar**: Excel e PDF
 
 ### 🗺️ Rotas
 
@@ -49,24 +51,28 @@
 - **Editar**: Detalhes da rota
 - **Excluir**: Remover rota
 - **Otimização**: Preparado para Google Maps
+- **Exportar**: Excel e PDF
 
 ### 📅 Folgas
 
 - **Solicitar**: Motorista, data, tipo
 - **Aprovar/Rejeitar**: Gestão de solicitações
 - **Histórico**: Folgas anteriores
+- **Exportar**: Excel e PDF
 
 ### 🏙️ Cidades
 
 - **Adicionar**: Nome, estado, região
 - **Editar**: Informações da cidade
 - **Excluir**: Remover cidade
+- **Exportar**: Excel e PDF
 
 ### 👨‍💼 Vendedores
 
 - **Adicionar**: Nome, email, telefone, região
 - **Editar**: Informações do vendedor
 - **Excluir**: Remover vendedor
+- **Exportar**: Excel e PDF
 
 ### 📈 Relatórios
 
@@ -74,6 +80,67 @@
 - **Detalhado**: Relatórios específicos
 - **Exportar**: Download de dados
 - **Gráficos**: Visualizações interativas
+
+## 🆕 **Novas Funcionalidades**
+
+### 📊 **Relatórios Detalhados**
+
+#### Funcionários Detalhado
+
+- Dados completos: Nome, CPF, CNH, telefone, email, endereço
+- Informações profissionais: Função, data de admissão, salário
+- Status atual: Trabalhando, Disponível, Folga, Férias
+
+#### Veículos Detalhado
+
+- Dados técnicos: Placa, modelo, marca, ano, capacidade
+- Status operacional: Disponível, Em Uso, Manutenção, Inativo
+- Manutenção: Última e próxima manutenção
+
+#### Rotas Detalhado
+
+- Informações da rota: Origem, destino, funcionário, veículo
+- Datas: Partida e chegada
+- Status: Agendada, Em Andamento, Concluída, Cancelada
+
+#### Folgas Detalhado
+
+- Dados da solicitação: Funcionário, datas, tipo, motivo
+- Status: Pendente, Aprovada, Rejeitada
+- Observações: Comentários e justificativas
+
+#### Cidades Detalhado
+
+- Dados geográficos: Nome, estado, região
+- Informações operacionais: Distância, peso mínimo
+- Vínculos: Rotas associadas
+
+#### Vendedores Detalhado
+
+- Dados pessoais: Nome, CPF, email, telefone
+- Informações comerciais: Código sistema, unidade de negócio
+- Cobertura: Estado, região, cidades atendidas
+
+### 📤 **Exportação Avançada**
+
+#### Formatos Disponíveis
+
+- **Excel (XLSX)**: Planilha para análise de dados
+- **PDF**: Documento formatado para impressão
+
+#### Como Exportar
+
+1. Acesse o módulo "Relatórios"
+2. Clique em "Relatórios Detalhados"
+3. Escolha o tipo de relatório
+4. Clique no botão de download
+5. Selecione o formato (Excel ou PDF)
+6. Baixe o arquivo automaticamente
+
+#### Nomenclatura dos Arquivos
+
+- **Padrão**: `entity_dd-MM-YYYY.xlsx` (ex: `funcionarios_16-01-2025.xlsx`)
+- **Formato de data**: DD/MM/YYYY (padrão brasileiro)
 
 ## 🔧 Configurações
 
@@ -99,100 +166,114 @@
 
 ### 📊 Analytics
 
-- **KPIs**: Indicadores de performance
-- **Tendências**: Análise temporal
-- **Comparativos**: Períodos diferentes
+- **Gráficos interativos**: Status de funcionários, veículos, rotas
+- **KPIs em tempo real**: Métricas atualizadas
+- **Relatórios customizáveis**: Períodos e filtros
 
-### 🗺️ Integração Maps
+### 🔍 Busca Avançada
 
-- **Rotas**: Visualização no mapa
-- **Otimização**: Melhor rota
-- **Tempo real**: Acompanhamento
+- **Filtros múltiplos**: Por nome, status, data, região
+- **Ordenação**: Por qualquer coluna
+- **Busca por texto**: Em todos os campos
 
-## 🚨 Troubleshooting
+## 🚀 Atalhos Rápidos
 
-### ❌ Erro de Login
+### 📋 **Operações Comuns**
 
-- Verificar conexão com internet
-- Limpar cache do navegador
-- Tentar login com email/senha
+1. **Adicionar Funcionário**
+   - Módulo: Funcionários → Novo Funcionário
+   - Campos: Nome, CPF, CNH, telefone, status
 
-### ❌ Dados não carregam
+2. **Criar Rota**
+   - Módulo: Rotas → Nova Rota
+   - Campos: Origem, destino, funcionário, veículo
 
-- Verificar permissões do usuário
-- Recarregar a página
-- Verificar console do navegador
+3. **Solicitar Folga**
+   - Módulo: Folgas → Nova Folga
+   - Campos: Funcionário, datas, tipo, motivo
 
-### ❌ Sistema lento
+4. **Exportar Relatório**
+   - Módulo: Relatórios → Relatórios Detalhados
+   - Escolha: Tipo de relatório → Formato → Download
 
-- Verificar conexão com internet
-- Fechar outras abas
-- Limpar cache do navegador
+### ⚡ **Dicas Rápidas**
 
-## 📞 Suporte
+- **Filtros**: Use os filtros para encontrar dados específicos
+- **Exportação**: Todos os módulos têm exportação Excel/PDF
+- **Gráficos**: Clique nos gráficos para ver detalhes
+- **Notificações**: Configure alertas para eventos importantes
+- **Responsivo**: Funciona em desktop, tablet e mobile
 
-### 🔧 Problemas Técnicos
+## 🆘 Suporte
 
-1. Verificar console do navegador (F12)
-2. Tentar recarregar a página
-3. Limpar cache e cookies
-4. Tentar navegador diferente
+### ❓ **Problemas Comuns**
 
-### 📧 Contato
+**Login não funciona:**
+
+- Verifique a conta Google
+- Limpe o cache do navegador
+- Tente modo incógnito
+
+**Dados não carregam:**
+
+- Verifique a conexão com a internet
+- Recarregue a página (F5)
+- Aguarde alguns segundos
+
+**Erro na exportação:**
+
+- Verifique se há dados para exportar
+- Aguarde o processamento completo
+- Verifique se o navegador permite downloads
+
+### 📞 **Contato**
 
 - **Email**: suporte@empresa.com
-- **Telefone**: (11) 99999-9999
-- **WhatsApp**: (11) 99999-9999
-
-## 🎯 Dicas de Uso
-
-### 💡 Produtividade
-
-- Use filtros para encontrar dados rapidamente
-- Configure notificações importantes
-- Use atalhos do teclado (Ctrl+F para buscar)
-
-### 📊 Relatórios
-
-- Exporte dados regularmente
-- Configure dashboards personalizados
-- Analise tendências mensais
-
-### 🔐 Segurança
-
-- Faça logout ao sair
-- Não compartilhe credenciais
-- Use senhas fortes (se usar email/senha)
-
-## 🎉 Status Atual do Sistema
-
-### ✅ Funcionando Perfeitamente
-
-- **🌐 URL**: https://logistica-c7afc.web.app
-- **🔐 Login Google**: ✅ Testado e funcionando
-- **📊 Dashboard**: ✅ Totalmente operacional
-- **🚛 Módulos**: ✅ Todos funcionando
-- **📱 Responsivo**: ✅ Funciona em qualquer dispositivo
-- **🔒 Seguro**: ✅ Autenticação Google configurada
-
-### 🚀 Configuração Realizada
-
-- **Firebase Project**: logistica-c7afc
-- **Authentication**: Google habilitado
-- **Firestore Database**: Criado e configurado
-- **Hosting**: Deploy realizado com sucesso
-- **Domínios**: Autorizados corretamente
-
-### 📈 Próximos Passos
-
-1. **Configure um usuário admin** (instruções acima)
-2. **Adicione dados** (motoristas, veículos, etc.)
-3. **Teste todos os módulos**
-4. **Configure notificações** (opcional)
-5. **Personalize** conforme necessário
+- **Telefone**: (73) 99999-9999
+- **Horário**: Segunda a Sexta, 8h às 18h
 
 ---
 
-**🌐 Sistema Online:** https://your-project.web.app  
-**📱 Acesse de qualquer dispositivo!**  
-**✅ TESTADO E FUNCIONANDO PERFEITAMENTE**
+## ✅ **Checklist de Uso**
+
+### 🔐 **Primeiro Acesso**
+
+- [ ] Login com Google
+- [ ] Configurar permissões de admin
+- [ ] Verificar acesso aos módulos
+
+### 📊 **Funcionalidades Básicas**
+
+- [ ] Adicionar funcionário
+- [ ] Cadastrar veículo
+- [ ] Criar rota
+- [ ] Solicitar folga
+- [ ] Adicionar cidade
+- [ ] Cadastrar vendedor
+
+### 📈 **Relatórios e Exportação**
+
+- [ ] Visualizar dashboard
+- [ ] Acessar relatórios detalhados
+- [ ] Exportar relatório em Excel
+- [ ] Exportar relatório em PDF
+- [ ] Testar filtros e busca
+
+### ⚙️ **Configurações**
+
+- [ ] Editar perfil
+- [ ] Configurar notificações
+- [ ] Testar responsividade
+
+---
+
+**🌐 Sistema Online:** https://logistica-c7afc.web.app  
+**🔐 Login:** ✅ Funcionando  
+**📊 Dashboard:** ✅ Operacional  
+**🚛 Módulos:** ✅ Todos funcionando  
+**📱 Responsivo:** ✅ Qualquer dispositivo  
+**📤 Exportação:** ✅ Excel e PDF funcionando
+
+**Última atualização:** Janeiro 2025  
+**Versão:** 1.1.0  
+**Status:** ✅ Sistema operacional com novas funcionalidades

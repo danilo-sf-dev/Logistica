@@ -40,6 +40,33 @@ Esta pasta contém toda a documentação do projeto SGL, organizada por público
 1. Veja **[RESUMO_PROJETO.md](./RESUMO_PROJETO.md)** para status atual
 2. Consulte **[ROADMAP.md](./ROADMAP.md)** para planejamento futuro
 
+## 🆕 **Novas Funcionalidades Implementadas**
+
+### 📊 **Sistema de Relatórios Avançado**
+
+- **Relatórios Detalhados**: Listas completas com todos os dados de cada entidade
+- **Exportação Excel**: Arquivos XLSX com formatação profissional
+- **Exportação PDF**: Documentos formatados para impressão
+- **Gráficos Interativos**: Visualizações dinâmicas com Recharts
+- **Filtros Avançados**: Busca e filtragem por múltiplos critérios
+
+### 🔧 **Melhorias Técnicas**
+
+- **Arquitetura Modular**: Serviços de exportação especializados por entidade
+- **Formatação Brasileira**: Datas no formato DD/MM/YYYY
+- **Layout Minimalista**: Interface em preto e branco
+- **Nomenclatura de Arquivos**: Padrão entity_dd-MM-YYYY.xlsx
+- **Tipos Separados**: Arquivos de tipos independentes por pacote
+
+### 📈 **Funcionalidades de Exportação**
+
+- **Funcionários**: Relatório completo com dados pessoais e profissionais
+- **Veículos**: Informações técnicas e status da frota
+- **Rotas**: Detalhes de rotas e associações
+- **Folgas**: Histórico de solicitações e aprovações
+- **Cidades**: Dados geográficos e regionais
+- **Vendedores**: Informações comerciais e contatos
+
 ## 🔗 **Links Úteis**
 
 - **Sistema Online**: https://your-project.web.app
@@ -49,5 +76,5 @@ Esta pasta contém toda a documentação do projeto SGL, organizada por público
 ## 📝 **Última Atualização**
 
 **Data**: Janeiro 2025  
-**Versão**: 1.0.0  
-**Status**: ✅ Sistema em produção
+**Versão**: 1.1.0  
+**Status**: ✅ Sistema em produção com novas funcionalidades

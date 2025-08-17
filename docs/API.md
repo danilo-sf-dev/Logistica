@@ -113,18 +113,16 @@ interface Funcionario {
 ```typescript
 interface Veiculo {
   id: string; // ID único do documento
-  placa: string; // Placa (formato Mercosul: ABC1234)
+  placa: string; // Placa do veículo
   modelo: string; // Modelo do veículo
-  marca: string; // Marca/fabricante
+  marca: string; // Marca do veículo
   ano: number; // Ano de fabricação
   capacidade: number; // Capacidade em kg
   status: "disponivel" | "em_uso" | "manutencao" | "inativo";
-  tipoCarroceria: string; // Tipo de carroceria
-  tipoBau: string; // Tipo de baú
-  unidadeNegocio: "frigorifico" | "ovos" | "ambos";
-  ultimaManutencao?: string; // Data da última manutenção
-  proximaManutencao?: string; // Data da próxima manutenção
-  motorista?: string; // ID do motorista responsável
+  unidadeNegocio?: "frigorifico" | "ovos" | "ambos";
+  ultimaManutencao?: string; // Data da última manutenção (YYYY-MM-DD)
+  proximaManutencao?: string; // Data da próxima manutenção (YYYY-MM-DD)
+  funcionario?: string; // ID do funcionário responsável
   observacoes?: string; // Observações adicionais
   createdAt: Timestamp; // Data de criação
   updatedAt: Timestamp; // Data de atualização
@@ -137,17 +135,15 @@ interface Veiculo {
 {
   "id": "veic_001",
   "placa": "ABC1234",
-  "modelo": "Truck 2428",
-  "marca": "Volkswagen",
-  "ano": 2020,
-  "capacidade": 5000,
+  "modelo": "Sprinter",
+  "marca": "Mercedes-Benz",
+  "ano": 2022,
+  "capacidade": 3000,
   "status": "disponivel",
-  "tipoCarroceria": "Truck",
-  "tipoBau": "Frigorífico",
   "unidadeNegocio": "frigorifico",
   "ultimaManutencao": "2024-12-15",
-  "proximaManutencao": "2025-03-15",
-  "motorista": "func_001",
+  "proximaManutencao": "2025-06-15",
+  "funcionario": "func_001",
   "observacoes": "Veículo em excelente estado",
   "createdAt": "2025-01-15T10:30:00Z",
   "updatedAt": "2025-01-20T14:45:00Z"
@@ -159,15 +155,15 @@ interface Veiculo {
 ```typescript
 interface Rota {
   id: string; // ID único do documento
-  nome: string; // Nome da rota
-  dataRota: string; // Data da rota (YYYY-MM-DD)
-  pesoMinimo: number; // Peso mínimo em kg
-  diasSemana: string[]; // Dias da semana de operação
+  origem: string; // Cidade de origem
+  destino: string; // Cidade de destino
+  funcionario: string; // ID do funcionário responsável
+  veiculo: string; // ID do veículo
+  dataPartida: string; // Data e hora de partida (YYYY-MM-DD HH:mm)
+  dataChegada: string; // Data e hora de chegada (YYYY-MM-DD HH:mm)
   status: "agendada" | "em_andamento" | "concluida" | "cancelada";
-  motorista?: string; // ID do motorista
-  veiculo?: string; // ID do veículo
-  cidades: string[]; // IDs das cidades da rota
-  observacoes?: string; // Observações
+  unidadeNegocio?: "frigorifico" | "ovos" | "ambos";
+  observacoes?: string; // Observações da rota
   createdAt: Timestamp; // Data de criação
   updatedAt: Timestamp; // Data de atualização
 }
@@ -178,15 +174,15 @@ interface Rota {
 ```json
 {
   "id": "rota_001",
-  "nome": "Rota Sul da Bahia",
-  "dataRota": "2025-01-25",
-  "pesoMinimo": 2000,
-  "diasSemana": ["segunda", "terca", "quarta", "quinta", "sexta"],
-  "status": "agendada",
-  "motorista": "func_001",
+  "origem": "Ilhéus",
+  "destino": "Salvador",
+  "funcionario": "func_001",
   "veiculo": "veic_001",
-  "cidades": ["cidade_001", "cidade_002", "cidade_003"],
-  "observacoes": "Rota para entrega de produtos refrigerados",
+  "dataPartida": "2025-01-25 08:00",
+  "dataChegada": "2025-01-25 12:00",
+  "status": "agendada",
+  "unidadeNegocio": "frigorifico",
+  "observacoes": "Entrega de produtos refrigerados",
   "createdAt": "2025-01-15T10:30:00Z",
   "updatedAt": "2025-01-20T14:45:00Z"
 }
@@ -197,31 +193,15 @@ interface Rota {
 ```typescript
 interface Folga {
   id: string; // ID único do documento
-  funcionarioId: string; // ID do funcionário
-  tipo:
-    | "folga"
-    | "ferias"
-    | "licenca_medica"
-    | "atestado"
-    | "banco_horas"
-    | "compensacao"
-    | "suspensao"
-    | "afastamento"
-    | "maternidade"
-    | "paternidade"
-    | "luto"
-    | "casamento"
-    | "doacao_sangue"
-    | "servico_militar"
-    | "capacitacao"
-    | "outros";
+  funcionario: string; // ID do funcionário
   dataInicio: string; // Data de início (YYYY-MM-DD)
   dataFim: string; // Data de fim (YYYY-MM-DD)
+  tipo: "folga" | "ferias" | "outro";
   status: "pendente" | "aprovada" | "rejeitada";
-  observacoes?: string; // Observações do funcionário
-  comentariosGestor?: string; // Comentários do gestor
-  aprovadoPor?: string; // ID do gestor que aprovou
-  dataAprovacao?: Timestamp; // Data de aprovação
+  motivo: string; // Motivo da solicitação
+  observacoes?: string; // Observações adicionais
+  aprovadoPor?: string; // ID do usuário que aprovou
+  dataAprovacao?: Timestamp; // Data da aprovação
   createdAt: Timestamp; // Data de criação
   updatedAt: Timestamp; // Data de atualização
 }
@@ -232,13 +212,13 @@ interface Folga {
 ```json
 {
   "id": "folga_001",
-  "funcionarioId": "func_001",
-  "tipo": "ferias",
+  "funcionario": "func_001",
   "dataInicio": "2025-02-01",
-  "dataFim": "2025-02-15",
+  "dataFim": "2025-02-03",
+  "tipo": "folga",
   "status": "pendente",
-  "observacoes": "Férias programadas",
-  "comentariosGestor": null,
+  "motivo": "Compromisso pessoal",
+  "observacoes": "Solicitação com antecedência",
   "aprovadoPor": null,
   "dataAprovacao": null,
   "createdAt": "2025-01-15T10:30:00Z",
@@ -252,12 +232,12 @@ interface Folga {
 interface Cidade {
   id: string; // ID único do documento
   nome: string; // Nome da cidade
-  estado: string; // Estado (UF)
-  regiao: string; // Região (preenchida automaticamente)
-  distancia?: number; // Distância em km
-  pesoMinimo?: number; // Peso mínimo em kg
-  rotaId?: string; // ID da rota vinculada
-  observacoes?: string; // Observações
+  estado: string; // Estado
+  regiao: string; // Região (Sudeste, Sul, Nordeste, etc.)
+  distancia?: number; // Distância em km (opcional)
+  pesoMinimo?: number; // Peso mínimo em kg (opcional)
+  rota?: string; // ID da rota associada (opcional)
+  observacao?: string; // Observações adicionais
   createdAt: Timestamp; // Data de criação
   updatedAt: Timestamp; // Data de atualização
 }
@@ -268,13 +248,13 @@ interface Cidade {
 ```json
 {
   "id": "cidade_001",
-  "nome": "Ilhéus",
+  "nome": "Salvador",
   "estado": "BA",
-  "regiao": "Sul da Bahia",
-  "distancia": 0,
+  "regiao": "Nordeste",
+  "distancia": 450,
   "pesoMinimo": 1000,
-  "rotaId": "rota_001",
-  "observacoes": "Cidade sede da empresa",
+  "rota": "rota_001",
+  "observacao": "Capital do estado",
   "createdAt": "2025-01-15T10:30:00Z",
   "updatedAt": "2025-01-20T14:45:00Z"
 }
@@ -287,13 +267,15 @@ interface Vendedor {
   id: string; // ID único do documento
   nome: string; // Nome completo
   cpf: string; // CPF (formato: 000.000.000-00)
-  codigoVendSistema?: string; // Código interno do vendedor
-  email?: string; // Email
-  telefone?: string; // Telefone (formato: (73) 99999-9999)
+  codigoVendSistema: string; // Código interno do sistema
+  email: string; // Email corporativo
+  telefone: string; // Telefone (formato: (73) 99999-9999)
   estado: string; // Estado de atuação
   regiao: string; // Região de atuação
-  cidades: string[]; // IDs das cidades atendidas
-  observacoes?: string; // Observações
+  cidadesAtendidas: string[]; // Array de cidades atendidas
+  unidadeNegocio?: "frigorifico" | "ovos" | "ambos";
+  tipoContrato?: string; // Tipo de contrato
+  ativo: boolean; // Status ativo/inativo
   createdAt: Timestamp; // Data de criação
   updatedAt: Timestamp; // Data de atualização
 }
@@ -310,161 +292,230 @@ interface Vendedor {
   "email": "carlos@empresa.com",
   "telefone": "(73) 88888-8888",
   "estado": "BA",
-  "regiao": "Sul da Bahia",
-  "cidades": ["cidade_001", "cidade_002"],
-  "observacoes": "Vendedor experiente na região",
+  "regiao": "Nordeste",
+  "cidadesAtendidas": ["Salvador", "Ilhéus", "Itabuna"],
+  "unidadeNegocio": "frigorifico",
+  "tipoContrato": "CLT",
+  "ativo": true,
   "createdAt": "2025-01-15T10:30:00Z",
   "updatedAt": "2025-01-20T14:45:00Z"
 }
 ```
 
-## 🔌 Operações da API
+## 🆕 **Novas Funcionalidades de Exportação**
 
-### Autenticação
+### 📊 **Sistema de Relatórios**
+
+#### Estrutura de Dados para Relatórios
 
 ```typescript
-// Login com Google
-const signInWithGoogle = async () => {
-  const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+interface RelatorioData {
+  name: string; // Nome do item
+  value: number; // Valor/quantidade
+  color: string; // Cor para gráficos
+}
+
+interface ExportConfig {
+  campos: string[]; // Campos a serem exportados
+  formatacao?: Record<string, (valor: any) => any>; // Formatação personalizada
+  ordenacao?: string[]; // Ordem dos campos
+  titulo?: string; // Título do relatório
+}
+
+interface ExportData {
+  dados: any[]; // Dados brutos
+  dadosProcessados: RelatorioData[]; // Dados processados para gráficos
+  periodo: string; // Período do relatório
+}
+```
+
+#### Tipos de Relatórios Disponíveis
+
+1. **Relatórios de Status**
+   - Status dos Funcionários
+   - Status dos Veículos
+   - Status das Rotas
+   - Status das Folgas
+
+2. **Relatórios Detalhados**
+   - Funcionários Detalhado
+   - Veículos Detalhado
+   - Rotas Detalhado
+   - Folgas Detalhado
+   - Cidades Detalhado
+   - Vendedores Detalhado
+
+### 📤 **Sistema de Exportação**
+
+#### Formatos Suportados
+
+- **Excel (XLSX)**: Planilha para análise de dados
+- **PDF**: Documento formatado para impressão
+
+#### Configurações de Exportação
+
+```typescript
+interface TableExportConfig extends ExportConfig {
+  titulo: string; // Título do relatório
+  campos: string[]; // Campos a serem exportados
+  formatacao?: Record<string, (valor: any) => any | Promise<any>>; // Formatação personalizada
+}
+
+interface TableExportFilters {
+  termoBusca?: string; // Termo de busca
+  filtroRegiao?: string; // Filtro por região
+  filtroStatus?: string; // Filtro por status
+  filtroContrato?: string; // Filtro por tipo de contrato
+  filtroFuncao?: string; // Filtro por função
+  filtroAtivo?: string; // Filtro por status ativo
+  filtroUnidadeNegocio?: string; // Filtro por unidade de negócio
+  filtroCidade?: string; // Filtro por cidade
+  filtroTipo?: string; // Filtro por tipo
+  ordenarPor?: string; // Campo para ordenação
+  direcaoOrdenacao?: string; // Direção da ordenação (asc/desc)
+  [key: string]: any; // Outros filtros dinâmicos
+}
+```
+
+#### Nomenclatura de Arquivos
+
+- **Padrão**: `entity_dd-MM-YYYY.xlsx`
+- **Exemplos**:
+  - `funcionarios_16-01-2025.xlsx`
+  - `veiculos_16-01-2025.xlsx`
+  - `rotas_16-01-2025.xlsx`
+  - `folgas_16-01-2025.xlsx`
+  - `cidades_16-01-2025.xlsx`
+  - `vendedores_16-01-2025.xlsx`
+
+#### Formatação Brasileira
+
+```typescript
+// Formatação de datas
+const formatDate = (date: Date | string): string => {
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [year, month, day] = date.split("-");
+    return `${day}/${month}/${year}`;
+  }
+  if (date instanceof Date) {
+    return date.toLocaleDateString("pt-BR");
+  }
+  return date.toString();
 };
 
-// Login com email/senha
-const signInWithEmail = async (email: string, password: string) => {
-  return signInWithEmailAndPassword(auth, email, password);
+// Formatação de CPF
+const formatCPF = (cpf: string): string => {
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 };
 
-// Logout
-const signOut = async () => {
-  return signOut(auth);
+// Formatação de telefone
+const formatPhone = (phone: string): string => {
+  return phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
 };
 ```
 
-### Operações CRUD
+## 🔧 **Serviços de API**
 
-#### Funcionários
-
-```typescript
-// Buscar todos os funcionários
-const getFuncionarios = async () => {
-  const snapshot = await getDocs(collection(db, "funcionarios"));
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-};
-
-// Buscar funcionário por ID
-const getFuncionario = async (id: string) => {
-  const doc = await getDoc(doc(db, "funcionarios", id));
-  return doc.exists() ? { id: doc.id, ...doc.data() } : null;
-};
-
-// Criar funcionário
-const createFuncionario = async (
-  data: Omit<Funcionario, "id" | "createdAt" | "updatedAt">
-) => {
-  const now = serverTimestamp();
-  return addDoc(collection(db, "funcionarios"), {
-    ...data,
-    createdAt: now,
-    updatedAt: now,
-  });
-};
-
-// Atualizar funcionário
-const updateFuncionario = async (id: string, data: Partial<Funcionario>) => {
-  return updateDoc(doc(db, "funcionarios", id), {
-    ...data,
-    updatedAt: serverTimestamp(),
-  });
-};
-
-// Deletar funcionário
-const deleteFuncionario = async (id: string) => {
-  return deleteDoc(doc(db, "funcionarios", id));
-};
-```
-
-#### Veículos
+### Relatórios Service
 
 ```typescript
-// Buscar todos os veículos
-const getVeiculos = async () => {
-  const snapshot = await getDocs(collection(db, "veiculos"));
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-};
+class RelatoriosService {
+  // Buscar dados para relatórios
+  async buscarMotoristas(): Promise<Funcionario[]>;
+  async buscarVeiculos(): Promise<Veiculo[]>;
+  async buscarRotas(): Promise<Rota[]>;
+  async buscarFolgas(): Promise<Folga[]>;
+  async buscarCidades(): Promise<Cidade[]>;
+  async buscarVendedores(): Promise<Vendedor[]>;
 
-// Buscar veículos por status
-const getVeiculosByStatus = async (status: Veiculo["status"]) => {
-  const q = query(collection(db, "veiculos"), where("status", "==", status));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-};
+  // Processar dados para gráficos
+  processarDadosMotoristas(motoristas: Funcionario[]): RelatorioData[];
+  processarDadosVeiculos(veiculos: Veiculo[]): RelatorioData[];
+  processarDadosRotas(rotas: Rota[]): RelatorioData[];
+  processarDadosFolgas(folgas: Folga[]): RelatorioData[];
+}
 ```
 
-### Queries Avançadas
-
-#### Dashboard Stats
+### Export Service
 
 ```typescript
-// Buscar estatísticas do dashboard
-const getDashboardStats = async () => {
-  const [
-    funcionariosSnapshot,
-    veiculosSnapshot,
-    rotasSnapshot,
-    folgasSnapshot,
-    cidadesSnapshot,
-    vendedoresSnapshot,
-  ] = await Promise.all([
-    getDocs(collection(db, "funcionarios")),
-    getDocs(collection(db, "veiculos")),
-    getDocs(collection(db, "rotas")),
-    getDocs(collection(db, "folgas")),
-    getDocs(collection(db, "cidades")),
-    getDocs(collection(db, "vendedores")),
-  ]);
+abstract class BaseExportService {
+  protected abstract config: ExportConfig;
 
-  return {
-    funcionarios: funcionariosSnapshot.size,
-    veiculos: veiculosSnapshot.size,
-    rotas: rotasSnapshot.size,
-    folgas: folgasSnapshot.size,
-    cidades: cidadesSnapshot.size,
-    vendedores: vendedoresSnapshot.size,
-  };
-};
+  // Exportar para PDF
+  async exportToPDF(
+    titulo: string,
+    dados: any[],
+    dadosProcessados: RelatorioData[],
+    periodo: string
+  ): Promise<void>;
+
+  // Exportar para Excel
+  async exportToCSV(
+    titulo: string,
+    dados: any[],
+    dadosProcessados: RelatorioData[],
+    periodo: string
+  ): Promise<void>;
+
+  // Métodos auxiliares
+  protected formatValue(field: string, value: any): any;
+  protected getFilteredData(dados: any[]): any[];
+  protected getColumnHeaders(): string[];
+  protected generateFileName(titulo: string): string;
+}
+
+abstract class BaseTableExportService {
+  protected abstract config: TableExportConfig;
+
+  // Exportar tabela para Excel
+  async exportToExcel(
+    dados: any[],
+    filtros?: TableExportFilters
+  ): Promise<void>;
+
+  // Métodos auxiliares
+  protected async formatValue(field: string, value: any): Promise<any>;
+  protected async getFilteredData(dados: any[]): Promise<any[]>;
+  protected getColumnHeaders(): string[];
+  protected generateFileName(): string;
+}
 ```
 
-#### Atividades Recentes
+### Factory Pattern
 
 ```typescript
-// Buscar atividades recentes
-const getAtividadesRecentes = async (limit: number = 10) => {
-  const atividades: AtividadeRecente[] = [];
-
-  // Buscar dados de diferentes coleções
-  const [funcionarios, veiculos, rotas, folgas, cidades, vendedores] =
-    await Promise.all([
-      getDocs(collection(db, "funcionarios")),
-      getDocs(collection(db, "veiculos")),
-      getDocs(collection(db, "rotas")),
-      getDocs(collection(db, "folgas")),
-      getDocs(collection(db, "cidades")),
-      getDocs(collection(db, "vendedores")),
-    ]);
-
-  // Processar e combinar dados
-  // ... lógica de processamento
-
-  // Ordenar por data e limitar
-  return atividades
-    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-    .slice(0, limit);
-};
+class ExportServiceFactory {
+  static createService(tipo: string): BaseExportService {
+    switch (tipo.toLowerCase()) {
+      case "funcionarios":
+      case "funcionarios_detalhado":
+        return new FuncionariosExportService();
+      case "veiculos":
+      case "veiculos_detalhado":
+        return new VeiculosExportService();
+      case "rotas":
+      case "rotas_detalhado":
+        return new RotasExportService();
+      case "folgas":
+      case "folgas_detalhado":
+        return new FolgasExportService();
+      case "cidades":
+      case "cidades_detalhado":
+        return new CidadesExportService();
+      case "vendedores":
+      case "vendedores_detalhado":
+        return new VendedoresExportService();
+      default:
+        throw new Error(`Tipo de relatório não suportado: ${tipo}`);
+    }
+  }
+}
 ```
 
-## 🔒 Regras de Segurança
+## 🔒 **Segurança e Validação**
 
-### Firestore Rules
+### Regras do Firestore
 
 ```javascript
 rules_version = '2';
@@ -475,130 +526,129 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Funcionários: apenas admins podem escrever
+    // Funcionários - apenas usuários autenticados
     match /funcionarios/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow read, write: if request.auth != null;
     }
 
-    // Veículos: apenas admins podem escrever
+    // Veículos - apenas usuários autenticados
     match /veiculos/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow read, write: if request.auth != null;
     }
 
-    // Rotas: admins e dispatchers podem escrever
+    // Rotas - apenas usuários autenticados
     match /rotas/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'dispatcher'];
+      allow read, write: if request.auth != null;
     }
 
-    // Folgas: usuários podem criar, admins podem aprovar
+    // Folgas - apenas usuários autenticados
     match /folgas/{docId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null &&
-        (request.auth.uid == resource.data.funcionarioId ||
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow read, write: if request.auth != null;
+    }
+
+    // Cidades - apenas usuários autenticados
+    match /cidades/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Vendedores - apenas usuários autenticados
+    match /vendedores/{docId} {
+      allow read, write: if request.auth != null;
     }
   }
 }
 ```
 
-## 📊 Índices
-
-### Índices Compostos
-
-```javascript
-// firestore.indexes.json
-{
-  "indexes": [
-    {
-      "collectionGroup": "funcionarios",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "nome", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "veiculos",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "placa", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "folgas",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "dataInicio", "order": "DESCENDING" }
-      ]
-    }
-  ]
-}
-```
-
-## 🚀 Performance
-
-### Otimizações
-
-1. **Índices**: Criados para queries frequentes
-2. **Paginação**: Implementada para listas grandes
-3. **Cache**: Dados em cache no cliente
-4. **Lazy Loading**: Carregamento sob demanda
-5. **Offline**: Suporte a operações offline
-
-### Limites
-
-- **Documento**: Máximo 1MB
-- **Coleção**: Sem limite prático
-- **Query**: Máximo 1MB de resultados
-- **Rate Limiting**: 10.000 writes/segundo por projeto
-
-## 🔧 Utilitários
-
 ### Validação de Dados
 
 ```typescript
 // Validação de CPF
-export const validateCPF = (cpf: string): boolean => {
-  const cleanCPF = cpf.replace(/\D/g, "");
-  if (cleanCPF.length !== 11) return false;
+const validarCPF = (cpf: string): boolean => {
+  const cpfLimpo = cpf.replace(/\D/g, "");
+  if (cpfLimpo.length !== 11) return false;
 
-  // Lógica de validação do CPF
-  // ...
+  // Verificar dígitos repetidos
+  if (/^(\d)\1{10}$/.test(cpfLimpo)) return false;
+
+  // Validar dígitos verificadores
+  let soma = 0;
+  for (let i = 0; i < 9; i++) {
+    soma += parseInt(cpfLimpo.charAt(i)) * (10 - i);
+  }
+  let resto = 11 - (soma % 11);
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpfLimpo.charAt(9))) return false;
+
+  soma = 0;
+  for (let i = 0; i < 10; i++) {
+    soma += parseInt(cpfLimpo.charAt(i)) * (11 - i);
+  }
+  resto = 11 - (soma % 11);
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpfLimpo.charAt(10))) return false;
 
   return true;
 };
 
-// Validação de placa
-export const validatePlaca = (placa: string): boolean => {
-  const pattern = /^[A-Z]{3}[0-9][0-9A-Z][0-9]{2}$/;
-  return pattern.test(placa);
+// Validação de email
+const validarEmail = (email: string): boolean => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
+// Validação de telefone
+const validarTelefone = (telefone: string): boolean => {
+  const telefoneLimpo = telefone.replace(/\D/g, "");
+  return telefoneLimpo.length === 11;
 };
 ```
 
-### Formatação
+## 📊 **Métricas e Monitoramento**
+
+### KPIs Disponíveis
 
 ```typescript
-// Formatação de CPF
-export const formatCPF = (cpf: string): string => {
-  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-};
+interface KPIs {
+  totalFuncionarios: number;
+  funcionariosAtivos: number;
+  funcionariosFolga: number;
+  funcionariosFerias: number;
+  totalVeiculos: number;
+  veiculosDisponiveis: number;
+  veiculosEmUso: number;
+  veiculosManutencao: number;
+  totalRotas: number;
+  rotasAgendadas: number;
+  rotasEmAndamento: number;
+  rotasConcluidas: number;
+  totalFolgas: number;
+  folgasPendentes: number;
+  folgasAprovadas: number;
+  totalCidades: number;
+  totalVendedores: number;
+  vendedoresAtivos: number;
+}
+```
 
-// Formatação de telefone
-export const formatTelefone = (telefone: string): string => {
-  return telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-};
+### Logs de Auditoria
+
+```typescript
+interface AuditLog {
+  id: string;
+  usuario: string; // ID do usuário
+  acao: string; // Ação realizada
+  entidade: string; // Entidade afetada
+  entidadeId: string; // ID da entidade
+  dadosAnteriores?: any; // Dados antes da alteração
+  dadosNovos?: any; // Dados após a alteração
+  timestamp: Timestamp; // Data/hora da ação
+  ip?: string; // IP do usuário
+  userAgent?: string; // User agent do navegador
+}
 ```
 
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.0.0
+**Versão:** 1.1.0  
+**Status:** ✅ API operacional com novas funcionalidades de exportação
