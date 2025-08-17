@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { cidadesService } from "../data/cidadesService";
 import { CidadesTableExportService } from "../export/CidadesTableExportService";
+import { useRotasForCidades } from "./useRotasForCidades";
 import type { Cidade, CidadeInput, CidadeFormData } from "../types";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
@@ -11,12 +12,14 @@ export type OrdenacaoCampo =
   | "regiao"
   | "distancia"
   | "pesoMinimo"
+  | "rotaId"
   | "dataCriacao"
   | "dataAtualizacao";
 export type DirecaoOrdenacao = "asc" | "desc";
 
 export function useCidades() {
   const { showNotification } = useNotification();
+  const { rotas } = useRotasForCidades();
 
   const [lista, setLista] = useState<Cidade[]>([]);
   const [loading, setLoading] = useState(true);
@@ -203,16 +206,24 @@ export function useCidades() {
     copia.sort((a, b) => {
       let aValue: any = (a as any)[ordenarPor];
       let bValue: any = (b as any)[ordenarPor];
+
       if (["nome", "estado", "regiao"].includes(ordenarPor)) {
         aValue = aValue?.toLowerCase() || "";
         bValue = bValue?.toLowerCase() || "";
+      } else if (ordenarPor === "rotaId") {
+        // Ordenar pelo nome da rota, não pelo ID
+        const rotaA = rotas.find((r) => r.id === aValue);
+        const rotaB = rotas.find((r) => r.id === bValue);
+        aValue = rotaA?.nome?.toLowerCase() || "";
+        bValue = rotaB?.nome?.toLowerCase() || "";
       }
+
       if (aValue < bValue) return direcaoOrdenacao === "asc" ? -1 : 1;
       if (aValue > bValue) return direcaoOrdenacao === "asc" ? 1 : -1;
       return 0;
     });
     return copia;
-  }, [direcaoOrdenacao, listaFiltrada, ordenarPor]);
+  }, [direcaoOrdenacao, listaFiltrada, ordenarPor, rotas]);
 
   // Funcionalidade de exportação
   const handleExportExcel = useCallback(async () => {

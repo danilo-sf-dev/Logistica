@@ -18,7 +18,11 @@ export type OrdenacaoCampo =
   | "unidadeNegocio"
   | "status"
   | "dataCriacao"
-  | "dataAtualizacao";
+  | "dataAtualizacao"
+  | "cpf"
+  | "celular"
+  | "tipoContrato"
+  | "ativo";
 export type DirecaoOrdenacao = "asc" | "desc";
 
 export function useVendedores() {
@@ -277,14 +281,21 @@ export function useVendedores() {
     copia.sort((a, b) => {
       let aValue: any = (a as any)[ordenarPor];
       let bValue: any = (b as any)[ordenarPor];
+
       if (
         ordenarPor === "nome" ||
         ordenarPor === "email" ||
-        ordenarPor === "regiao"
+        ordenarPor === "regiao" ||
+        ordenarPor === "tipoContrato"
       ) {
         aValue = aValue?.toLowerCase() || "";
         bValue = bValue?.toLowerCase() || "";
+      } else if (ordenarPor === "ativo") {
+        // Boolean para ordenação (ativos primeiro)
+        aValue = aValue ? 1 : 0;
+        bValue = bValue ? 1 : 0;
       }
+
       if (aValue < bValue) return direcaoOrdenacao === "asc" ? -1 : 1;
       if (aValue > bValue) return direcaoOrdenacao === "asc" ? 1 : -1;
       return 0;

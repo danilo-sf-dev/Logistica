@@ -14,7 +14,10 @@ export type OrdenacaoCampo =
   | "tipoContrato"
   | "dataCriacao"
   | "dataAtualizacao"
-  | "salario";
+  | "salario"
+  | "funcao"
+  | "cnhCategoria"
+  | "ativo";
 export type DirecaoOrdenacao = "asc" | "desc";
 
 export function useFuncionarios() {
@@ -322,14 +325,24 @@ export function useFuncionarios() {
     copia.sort((a, b) => {
       let aValue: any = (a as any)[ordenarPor];
       let bValue: any = (b as any)[ordenarPor];
-      if (ordenarPor === "nome") {
+
+      if (
+        ordenarPor === "nome" ||
+        ordenarPor === "funcao" ||
+        ordenarPor === "cnhCategoria"
+      ) {
         aValue = aValue?.toLowerCase() || "";
         bValue = bValue?.toLowerCase() || "";
       } else if (ordenarPor === "salario") {
         // Converte salário para número para ordenação correta
         aValue = aValue ? parseFloat(aValue) : 0;
         bValue = bValue ? parseFloat(bValue) : 0;
+      } else if (ordenarPor === "ativo") {
+        // Boolean para ordenação (ativos primeiro)
+        aValue = aValue ? 1 : 0;
+        bValue = bValue ? 1 : 0;
       }
+
       if (aValue < bValue) return direcaoOrdenacao === "asc" ? -1 : 1;
       if (aValue > bValue) return direcaoOrdenacao === "asc" ? 1 : -1;
       return 0;

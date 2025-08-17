@@ -169,7 +169,15 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
                   {getSortIcon("capacidade")}
                 </div>
               </th>
-              <th className="table-header">Carroceria/Baú</th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("tipoCarroceria")}
+              >
+                <div className="flex items-center">
+                  Carroceria/Baú
+                  {getSortIcon("tipoCarroceria")}
+                </div>
+              </th>
               <th
                 className="table-header cursor-pointer hover:bg-gray-100"
                 onClick={() => onSort("status")}
@@ -179,7 +187,15 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
                   {getSortIcon("status")}
                 </div>
               </th>
-              <th className="table-header">Unidade</th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("unidadeNegocio")}
+              >
+                <div className="flex items-center">
+                  Unidade
+                  {getSortIcon("unidadeNegocio")}
+                </div>
+              </th>
               <th className="table-header">Ações</th>
             </tr>
           </thead>

@@ -28,7 +28,7 @@ const formatarDataBR = (dataString: string): string => {
 interface FolgasTableProps {
   folgas: Folga[];
   loading: boolean;
-  ordenarPor: OrdenacaoCampo;
+  ordenarPor: OrdenacaoCampo | null;
   direcaoOrdenacao: DirecaoOrdenacao;
   alternarOrdenacao: (campo: OrdenacaoCampo) => void;
   editarFolga: (folga: Folga) => void;
@@ -116,13 +116,11 @@ export function FolgasTable({
   };
 
   const renderSortIcon = (campo: OrdenacaoCampo) => {
-    if (ordenarPor !== campo) {
-      return <ChevronUp className="h-4 w-4 text-gray-400" />;
-    }
+    if (ordenarPor !== campo) return null;
     return direcaoOrdenacao === "asc" ? (
-      <ChevronUp className="h-4 w-4 text-gray-600" />
+      <ChevronUp className="h-4 w-4" />
     ) : (
-      <ChevronDown className="h-4 w-4 text-gray-600" />
+      <ChevronDown className="h-4 w-4" />
     );
   };
 

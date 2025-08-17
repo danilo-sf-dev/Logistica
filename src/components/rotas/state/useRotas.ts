@@ -1,7 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { rotasService } from "../data/rotasService";
 import { RotasTableExportService } from "../export/RotasTableExportService";
-import { Rota, RotaFormData, RotaFilters } from "../types";
+import {
+  Rota,
+  RotaFormData,
+  RotaFilters,
+  RotaSortConfig,
+  RotaOrdenacaoCampo,
+} from "../types";
 import { useNotification } from "../../../contexts/NotificationContext";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
@@ -11,6 +17,11 @@ export const useRotas = () => {
   const [filters, setFilters] = useState<RotaFilters>({
     searchTerm: "",
     diaSemana: "",
+  });
+
+  const [sortConfig, setSortConfig] = useState<RotaSortConfig>({
+    field: null,
+    direction: "asc",
   });
 
   const { showNotification } = useNotification();
@@ -86,12 +97,20 @@ export const useRotas = () => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
 
+  const handleSort = useCallback((field: RotaOrdenacaoCampo) => {
+    setSortConfig((prev) => ({
+      field,
+      direction:
+        prev.field === field && prev.direction === "asc" ? "desc" : "asc",
+    }));
+  }, []);
+
   const filteredRotas = useCallback(() => {
     if (!rotas || !Array.isArray(rotas)) {
       return [];
     }
 
-    let filtered = rotas;
+    let filtered = [...rotas];
 
     if (filters.searchTerm) {
       filtered = filtered.filter(
@@ -114,8 +133,37 @@ export const useRotas = () => {
       );
     }
 
+    // Aplicar ordenação
+    if (sortConfig.field) {
+      filtered.sort((a, b) => {
+        let aValue: any = a[sortConfig.field!];
+        let bValue: any = b[sortConfig.field!];
+
+        // Tratar valores específicos por campo
+        if (sortConfig.field === "dataRota") {
+          aValue = new Date(aValue).getTime();
+          bValue = new Date(bValue).getTime();
+        } else if (sortConfig.field === "cidades") {
+          // Para cidades, ordenar pela quantidade de cidades
+          aValue = Array.isArray(aValue) ? aValue.length : 0;
+          bValue = Array.isArray(bValue) ? bValue.length : 0;
+        } else if (typeof aValue === "string") {
+          aValue = aValue.toLowerCase();
+          bValue = bValue.toLowerCase();
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
     return filtered;
-  }, [rotas, filters]);
+  }, [rotas, filters, sortConfig]);
 
   useEffect(() => {
     fetchRotas();
@@ -161,11 +209,13 @@ export const useRotas = () => {
     rotas: rotas || [],
     loading,
     filters,
+    sortConfig,
     filteredRotas: filteredRotas(),
     createRota,
     updateRota,
     deleteRota,
     updateFilters,
+    handleSort,
     refreshRotas: fetchRotas,
     handleExportExcel,
   };

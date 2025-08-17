@@ -25,7 +25,7 @@ export class DashboardService {
   static async getDashboardStats(): Promise<DashboardStats> {
     try {
       const funcionariosSnapshot = await getDocs(
-        collection(db, "funcionarios")
+        collection(db, "funcionarios"),
       );
       const vendedoresSnapshot = await getDocs(collection(db, "vendedores"));
       const cidadesSnapshot = await getDocs(collection(db, "cidades"));
@@ -41,7 +41,7 @@ export class DashboardService {
 
       const totalFuncionarios = funcionariosData.length;
       const totalMotoristas = funcionariosData.filter(
-        (funcionario: any) => funcionario.funcao === "motorista"
+        (funcionario: any) => funcionario.funcao === "motorista",
       ).length;
 
       return {
@@ -62,7 +62,7 @@ export class DashboardService {
   static async getFuncionariosStatus(): Promise<MotoristaStatus[]> {
     try {
       const funcionariosSnapshot = await getDocs(
-        collection(db, "funcionarios")
+        collection(db, "funcionarios"),
       );
       const funcionariosData = funcionariosSnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -75,7 +75,7 @@ export class DashboardService {
           acc[status] = (acc[status] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
 
       const statusData = [
@@ -112,7 +112,7 @@ export class DashboardService {
   static async getMotoristasStatus(): Promise<MotoristaStatus[]> {
     try {
       const funcionariosSnapshot = await getDocs(
-        collection(db, "funcionarios")
+        collection(db, "funcionarios"),
       );
       const funcionariosData = funcionariosSnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -121,7 +121,7 @@ export class DashboardService {
 
       // Filtrar apenas funcionários com função "motorista"
       const motoristasData = funcionariosData.filter(
-        (funcionario: any) => funcionario.funcao === "motorista"
+        (funcionario: any) => funcionario.funcao === "motorista",
       );
 
       const statusCount = motoristasData.reduce(
@@ -130,7 +130,7 @@ export class DashboardService {
           acc[status] = (acc[status] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
 
       const statusData = [
@@ -178,7 +178,7 @@ export class DashboardService {
           acc[status] = (acc[status] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
 
       const statusData = [
@@ -227,7 +227,7 @@ export class DashboardService {
           acc[data] = (acc[data] || 0) + 1;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       );
 
       return Object.entries(rotasPorDia).map(([data, quantidade]) => ({
@@ -246,7 +246,7 @@ export class DashboardService {
       const rotasSnapshot = await getDocs(collection(db, "rotas"));
       const folgasSnapshot = await getDocs(collection(db, "folgas"));
       const funcionariosSnapshot = await getDocs(
-        collection(db, "funcionarios")
+        collection(db, "funcionarios"),
       );
       const veiculosSnapshot = await getDocs(collection(db, "veiculos"));
 
@@ -261,7 +261,7 @@ export class DashboardService {
         let motoristaNome = "Motorista não informado";
         if (rota.motoristaId) {
           const motoristaDoc = funcionariosSnapshot.docs.find(
-            (d) => d.id === rota.motoristaId
+            (d) => d.id === rota.motoristaId,
           );
           if (motoristaDoc) {
             motoristaNome = motoristaDoc.data().nome || motoristaNome;
@@ -289,7 +289,7 @@ export class DashboardService {
         let funcionarioNome = "Funcionário não informado";
         if (folga.funcionarioId) {
           const funcionarioDoc = funcionariosSnapshot.docs.find(
-            (d) => d.id === folga.funcionarioId
+            (d) => d.id === folga.funcionarioId,
           );
           if (funcionarioDoc) {
             funcionarioNome = funcionarioDoc.data().nome || funcionarioNome;
@@ -336,7 +336,7 @@ export class DashboardService {
 
       motoristasData.forEach((motorista: any) => {
         const dataCriacao = safeToDate(
-          motorista.dataCriacao || motorista.createdAt
+          motorista.dataCriacao || motorista.createdAt,
         );
 
         if (dataCriacao > quinzeDiasAtras) {
@@ -356,7 +356,7 @@ export class DashboardService {
       veiculosSnapshot.docs.forEach((doc) => {
         const veiculo: any = { id: doc.id, ...doc.data() };
         const dataCriacao = safeToDate(
-          veiculo.dataCriacao || veiculo.createdAt
+          veiculo.dataCriacao || veiculo.createdAt,
         );
 
         if (dataCriacao > quinzeDiasAtras) {
@@ -376,7 +376,7 @@ export class DashboardService {
       funcionariosSnapshot.docs.forEach((doc) => {
         const funcionario: any = { id: doc.id, ...doc.data() };
         const dataCriacao = safeToDate(
-          funcionario.dataCriacao || funcionario.createdAt
+          funcionario.dataCriacao || funcionario.createdAt,
         );
 
         if (dataCriacao > quinzeDiasAtras) {
@@ -414,7 +414,7 @@ export class DashboardService {
       vendedoresSnapshot.docs.forEach((doc) => {
         const vendedor: any = { id: doc.id, ...doc.data() };
         const dataCriacao = safeToDate(
-          vendedor.dataCriacao || vendedor.createdAt
+          vendedor.dataCriacao || vendedor.createdAt,
         );
 
         if (dataCriacao > quinzeDiasAtras) {
