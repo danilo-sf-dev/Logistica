@@ -30,10 +30,9 @@ export function useFolgas() {
   );
   const [filtroTipo, setFiltroTipo] = useState<"todos" | TipoFolga>("todos");
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const [ordenarPor, setOrdenarPor] =
-    useState<OrdenacaoCampo>("funcionarioNome");
+  const [ordenarPor, setOrdenarPor] = useState<OrdenacaoCampo | null>(null);
   const [direcaoOrdenacao, setDirecaoOrdenacao] =
-    useState<DirecaoOrdenacao>("desc");
+    useState<DirecaoOrdenacao>("asc");
   const [valores, setValores] = useState<FolgaInput>({
     funcionarioId: "",
     funcionarioNome: "",
@@ -275,6 +274,12 @@ export function useFolgas() {
 
   const listaOrdenada = useMemo(() => {
     const copia = [...listaFiltrada];
+
+    // Se não há ordenação definida, retorna a lista sem ordenar
+    if (!ordenarPor) {
+      return copia;
+    }
+
     copia.sort((a, b) => {
       let aValue: any = (a as any)[ordenarPor];
       let bValue: any = (b as any)[ordenarPor];

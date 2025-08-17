@@ -1,12 +1,21 @@
 import React from "react";
-import { Edit, Trash2, Map, Calendar } from "lucide-react";
-import { Rota } from "../types";
+import {
+  Edit,
+  Trash2,
+  Map,
+  Calendar,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
+import { Rota, RotaSortConfig, RotaOrdenacaoCampo } from "../types";
 
 interface RotasTableProps {
   rotas: Rota[];
   onEdit: (rota: Rota) => void;
   onDelete: (rota: Rota) => void;
   loading: boolean;
+  sortConfig: RotaSortConfig;
+  onSort: (field: RotaOrdenacaoCampo) => void;
 }
 
 export const RotasTable: React.FC<RotasTableProps> = ({
@@ -14,10 +23,21 @@ export const RotasTable: React.FC<RotasTableProps> = ({
   onEdit,
   onDelete,
   loading,
+  sortConfig,
+  onSort,
 }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("pt-BR");
+  };
+
+  const getSortIcon = (field: RotaOrdenacaoCampo) => {
+    if (sortConfig.field !== field) return null;
+    return sortConfig.direction === "asc" ? (
+      <ChevronUp className="h-4 w-4" />
+    ) : (
+      <ChevronDown className="h-4 w-4" />
+    );
   };
 
   const getDiaSemanaColor = (diaSemana: string | string[]) => {
@@ -71,11 +91,43 @@ export const RotasTable: React.FC<RotasTableProps> = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="table-header">Rota</th>
-              <th className="table-header">Data</th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("nome")}
+              >
+                <div className="flex items-center">
+                  Rota
+                  {getSortIcon("nome")}
+                </div>
+              </th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("dataRota")}
+              >
+                <div className="flex items-center">
+                  Data
+                  {getSortIcon("dataRota")}
+                </div>
+              </th>
               <th className="table-header">Dia da Semana</th>
-              <th className="table-header">Peso Mínimo</th>
-              <th className="table-header">Cidades</th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("pesoMinimo")}
+              >
+                <div className="flex items-center">
+                  Peso Mínimo
+                  {getSortIcon("pesoMinimo")}
+                </div>
+              </th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("cidades")}
+              >
+                <div className="flex items-center">
+                  Cidades
+                  {getSortIcon("cidades")}
+                </div>
+              </th>
               <th className="table-header">Ações</th>
             </tr>
           </thead>

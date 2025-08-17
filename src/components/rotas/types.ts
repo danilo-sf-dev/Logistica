@@ -17,3 +17,12 @@ export interface RotaFilters {
   searchTerm: string;
   diaSemana?: string; // Mantido como string para filtros simples
 }
+
+// Tipos para ordenação
+export type RotaOrdenacaoCampo = "nome" | "dataRota" | "pesoMinimo" | "cidades";
+export type DirecaoOrdenacao = "asc" | "desc";
+
+export interface RotaSortConfig {
+  field: RotaOrdenacaoCampo | null;
+  direction: DirecaoOrdenacao;
+}

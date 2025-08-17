@@ -15,11 +15,13 @@ export const RotasListPage: React.FC = () => {
     rotas,
     loading,
     filters,
+    sortConfig,
     filteredRotas,
     createRota,
     updateRota,
     deleteRota,
     updateFilters,
+    handleSort,
     handleExportExcel,
   } = useRotas();
 
@@ -199,6 +201,8 @@ export const RotasListPage: React.FC = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
         loading={loading}
+        sortConfig={sortConfig}
+        onSort={handleSort}
       />
 
       {/* Modal de Formulário */}

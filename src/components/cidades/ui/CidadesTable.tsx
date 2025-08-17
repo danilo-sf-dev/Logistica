@@ -77,7 +77,14 @@ export const CidadesTable: React.FC<Props> = ({
                 Peso Mínimo {renderSeta("pesoMinimo")}
               </div>
             </th>
-            <th className="table-header">Rota</th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("rotaId")}
+            >
+              <div className="flex items-center">
+                Rota {renderSeta("rotaId")}
+              </div>
+            </th>
             <th className="table-header">Ações</th>
           </tr>
         </thead>

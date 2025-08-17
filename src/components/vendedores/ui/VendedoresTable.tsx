@@ -119,8 +119,24 @@ export const VendedoresTable: React.FC<VendedoresTableProps> = ({
                 {getSortIcon("nome")}
               </div>
             </th>
-            <th className="table-header">CPF</th>
-            <th className="table-header">Contato</th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("cpf")}
+            >
+              <div className="flex items-center">
+                CPF
+                {getSortIcon("cpf")}
+              </div>
+            </th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("celular")}
+            >
+              <div className="flex items-center">
+                Contato
+                {getSortIcon("celular")}
+              </div>
+            </th>
             <th
               className="table-header cursor-pointer hover:bg-gray-100"
               onClick={() => onOrdenar("regiao")}
@@ -139,9 +155,25 @@ export const VendedoresTable: React.FC<VendedoresTableProps> = ({
                 {getSortIcon("unidadeNegocio")}
               </div>
             </th>
-            <th className="table-header">Tipo Contrato</th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("tipoContrato")}
+            >
+              <div className="flex items-center">
+                Tipo Contrato
+                {getSortIcon("tipoContrato")}
+              </div>
+            </th>
             <th className="table-header">Cidades Atendidas</th>
-            <th className="table-header">Ativo</th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("ativo")}
+            >
+              <div className="flex items-center">
+                Ativo
+                {getSortIcon("ativo")}
+              </div>
+            </th>
             <th className="table-header">Ações</th>
           </tr>
         </thead>

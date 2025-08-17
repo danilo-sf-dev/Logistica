@@ -86,8 +86,20 @@ export const FuncionariosTable: React.FC<Props> = ({
               <div className="flex items-center">CPF {seta("cpf")}</div>
             </th>
             <th className="table-header">Contato</th>
-            <th className="table-header">Função</th>
-            <th className="table-header">Cat. CNH</th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("funcao")}
+            >
+              <div className="flex items-center">Função {seta("funcao")}</div>
+            </th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("cnhCategoria")}
+            >
+              <div className="flex items-center">
+                Cat. CNH {seta("cnhCategoria")}
+              </div>
+            </th>
             <th
               className="table-header cursor-pointer hover:bg-gray-100"
               onClick={() => onOrdenar("salario")}
@@ -100,7 +112,12 @@ export const FuncionariosTable: React.FC<Props> = ({
             >
               <div className="flex items-center">Status {seta("status")}</div>
             </th>
-            <th className="table-header">Ativo</th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("ativo")}
+            >
+              <div className="flex items-center">Ativo {seta("ativo")}</div>
+            </th>
             <th className="table-header">Ações</th>
           </tr>
         </thead>
