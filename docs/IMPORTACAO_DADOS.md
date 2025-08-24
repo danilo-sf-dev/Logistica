@@ -98,6 +98,14 @@ src/
 - Atualiza automaticamente após nova importação
 - Histórico visual para controle de operações
 
+### 8. Flexibilidade de Uso do Template
+
+- **Uso Padrão**: Preencher apenas a planilha "Template" e fazer upload
+- **Personalização**: Usuário pode excluir planilhas "Instruções" e "Exemplo"
+- **Renomeação**: Usuário pode renomear a planilha "Template" para qualquer nome
+- **Detecção Inteligente**: Sistema detecta automaticamente a planilha com dados
+- **Compatibilidade**: Funciona com arquivos de uma ou múltiplas planilhas
+
 ## 📊 Entidades Suportadas
 
 ### 1. Funcionários
@@ -162,8 +170,9 @@ src/
 - Região
 - Distância
 - Peso Mínimo
-- Rota
 - Observação
+
+**Nota:** O campo "Rota" foi removido do template de importação para simplificar o processo. As cidades devem ser vinculadas às rotas manualmente após a importação através da interface do sistema.
 
 ### 4. Vendedores
 
@@ -917,9 +926,19 @@ export const FuncionariosListPage: React.FC = () => {
 
 Cada template terá 3 planilhas:
 
-1. **Instruções**: Guia completo de preenchimento
-2. **Template**: Planilha vazia com cabeçalhos
+1. **Instruções**: Guia completo de preenchimento com opções de uso
+2. **Template**: Planilha vazia com cabeçalhos para preenchimento
 3. **Exemplo**: Dados fictícios para referência
+
+### Flexibilidade dos Templates
+
+O sistema foi projetado para máxima flexibilidade:
+
+- **Uso Simples**: Preencher apenas a planilha "Template" e fazer upload
+- **Personalização**: Usuário pode excluir planilhas "Instruções" e "Exemplo"
+- **Renomeação**: Usuário pode renomear a planilha "Template" para qualquer nome
+- **Detecção Automática**: Sistema identifica automaticamente a planilha com dados
+- **Compatibilidade**: Funciona com arquivos de uma ou múltiplas planilhas
 
 ### Exemplo: Template de Funcionários
 
@@ -928,30 +947,41 @@ Cada template terá 3 planilhas:
 ```
 IMPORTAÇÃO DE FUNCIONÁRIOS - INSTRUÇÕES
 
-1. PREENCHIMENTO OBRIGATÓRIO
+📋 COMO USAR ESTE TEMPLATE:
+
+✅ OPÇÃO 1 - USO SIMPLES (RECOMENDADO):
+   1. Vá para a planilha 'Template'
+   2. Preencha seus dados na planilha 'Template'
+   3. Salve o arquivo
+   4. Faça upload no sistema
+   5. Pronto! Os dados serão importados automaticamente
+
+✅ OPÇÃO 2 - PERSONALIZAÇÃO:
+   - Você pode excluir as planilhas 'Instruções' e 'Exemplo'
+   - Você pode renomear a planilha 'Template' para qualquer nome
+   - O sistema detectará automaticamente a planilha com dados
+
+📝 REGRAS DE PREENCHIMENTO:
    - Todos os campos marcados com * são obrigatórios
    - Não deixe linhas em branco entre os dados
+   - Preencha apenas na planilha 'Template' (ou sua planilha renomeada)
 
-2. FORMATO DOS DADOS
+📊 FORMATO DOS DADOS:
    - Nome: Texto (será convertido para maiúsculas)
    - CPF: 11 dígitos sem pontos ou traços
    - CNH: Número da CNH
    - Celular: 10 ou 11 dígitos
    - Email: Formato válido (opcional)
 
-3. VALORES PERMITIDOS
-   - Função: motorista, auxiliar, supervisor
-   - Status: disponivel, trabalhando, folga, ferias
-   - Tipo Contrato: clt, pj, autonomo, outro
-   - Unidade Negócio: frigorifico, ovos, ambos
-
-4. VALIDAÇÕES
+🔍 VALIDAÇÕES:
    - CPF deve ser único no sistema
    - CNH deve ser única no sistema
    - Email deve ser único (se fornecido)
 
-5. EXEMPLO DE PREENCHIMENTO
-   Veja a planilha "Exemplo" para referência
+💡 DICA:
+   - Veja a planilha 'Exemplo' para referência de preenchimento
+   - O sistema aceita o arquivo mesmo se você excluir outras planilhas
+   - O sistema aceita o arquivo mesmo se você renomear a planilha 'Template'
 ```
 
 #### Planilha 2: Template
@@ -968,6 +998,67 @@ JOÃO SILVA | 12345678901 | 12345678901 | 11999999999 | joao@email.com | São Pa
 MARIA SANTOS | 98765432100 | 98765432100 | 11888888888 | maria@email.com | Rio de Janeiro | auxiliar | trabalhando | pj | ovos
 ```
 
+### Exemplo: Template de Cidades
+
+#### Planilha 1: Instruções
+
+```
+IMPORTAÇÃO DE CIDADES - INSTRUÇÕES
+
+📋 COMO USAR ESTE TEMPLATE:
+
+✅ OPÇÃO 1 - USO SIMPLES (RECOMENDADO):
+   1. Vá para a planilha 'Template'
+   2. Preencha seus dados na planilha 'Template'
+   3. Salve o arquivo
+   4. Faça upload no sistema
+   5. Pronto! Os dados serão importados automaticamente
+
+✅ OPÇÃO 2 - PERSONALIZAÇÃO:
+   - Você pode excluir as planilhas 'Instruções' e 'Exemplo'
+   - Você pode renomear a planilha 'Template' para qualquer nome
+   - O sistema detectará automaticamente a planilha com dados
+
+📝 REGRAS DE PREENCHIMENTO:
+   - Todos os campos marcados com * são obrigatórios
+   - Não deixe linhas em branco entre os dados
+   - Preencha apenas na planilha 'Template' (ou sua planilha renomeada)
+
+📊 FORMATO DOS DADOS:
+   - Nome: Nome da cidade (será convertido para maiúsculas)
+   - Estado: Sigla do estado (será convertido para maiúsculas)
+   - Região: Região geográfica (opcional, será convertido para minúsculas)
+   - Distância: Distância em km da sede (opcional, apenas números)
+   - Peso Mínimo: Peso mínimo em kg para entrega (opcional, apenas números)
+   - Observação: Observações adicionais (opcional)
+
+🔍 VALIDAÇÕES:
+   - Nome e Estado são obrigatórios
+   - Nome da cidade deve ser único no sistema
+   - Distância e Peso Mínimo devem ser números válidos
+   - Estado deve ser uma sigla válida (SP, RJ, MG, etc.)
+
+💡 DICA:
+   - Veja a planilha 'Exemplo' para referência de preenchimento
+   - O sistema aceita o arquivo mesmo se você excluir outras planilhas
+   - O sistema aceita o arquivo mesmo se você renomear a planilha 'Template'
+```
+
+#### Planilha 2: Template
+
+```
+Nome* | Estado* | Região | Distância (km) | Peso Mínimo (kg) | Observação
+```
+
+#### Planilha 3: Exemplo
+
+```
+Nome* | Estado* | Região | Distância (km) | Peso Mínimo (kg) | Observação
+SÃO PAULO | SP | sudeste | 0 | 1000 | Capital do estado
+RIO DE JANEIRO | RJ | sudeste | 430 | 500 | Cidade maravilhosa
+BELO HORIZONTE | MG | sudeste | 586 | 800 | Capital de Minas
+```
+
 ## 🔒 Segurança e Validação
 
 ### Regras de Validação
@@ -977,6 +1068,25 @@ MARIA SANTOS | 98765432100 | 98765432100 | 11888888888 | maria@email.com | Rio d
 3. **Unicidade**: Verificação de duplicatas
 4. **Integridade**: Validação de relacionamentos
 5. **Tamanho**: Limite de registros por importação
+
+### Detecção Inteligente de Planilhas
+
+O sistema possui detecção automática de planilhas com dados:
+
+- **Palavras-chave**: Procura por planilhas com nomes como "template", "dados", "cidades", etc.
+- **Fallback**: Se não encontrar, usa a segunda planilha (assumindo que a primeira é instruções)
+- **Validação**: Verifica se a planilha contém dados reais
+- **Logs**: Informa qual planilha está sendo lida para debug
+
+### Cenários Suportados
+
+| Cenário                 | Funciona? | Detalhes                      |
+| ----------------------- | --------- | ----------------------------- |
+| **Template original**   | ✅        | Planilha "Template" detectada |
+| **Template renomeado**  | ✅        | "Cidades", "Dados", etc.      |
+| **Apenas 1 planilha**   | ✅        | Se contiver dados             |
+| **Múltiplas planilhas** | ✅        | Detecta automaticamente       |
+| **Planilha vazia**      | ❌        | Erro informativo              |
 
 ### Tratamento de Erros
 
@@ -993,7 +1103,7 @@ MARIA SANTOS | 98765432100 | 98765432100 | 11888888888 | maria@email.com | Rio d
 interface ImportLog {
   id: string;
   userId: string;
-  userName: string; // Nome do usuário que realizou a importação
+  userName: string;
   entityType: string;
   fileName: string;
   fileSize: number;
@@ -1020,17 +1130,21 @@ interface ImportLog {
 
 ## 🚀 Cronograma de Implementação
 
-### Fase 1 (2 semanas)
+### Fase 1 (2 semanas) ✅ **CONCLUÍDA**
 
-- [ ] Estrutura base de importação
-- [ ] Serviço de parsing Excel
-- [ ] Validação básica
-- [ ] Template de Funcionários
-- [ ] Modal de importação
+- [x] Estrutura base de importação
+- [x] Serviço de parsing Excel
+- [x] Validação básica
+- [x] Template de Cidades
+- [x] Modal de importação
+- [x] Detecção inteligente de planilhas
+- [x] Flexibilidade de uso do template
 
 ### Fase 2 (2 semanas)
 
-- [ ] Templates de Veículos e Cidades
+- [x] Templates de Cidades ✅
+- [ ] Templates de Veículos
+- [ ] Templates de Funcionários
 - [ ] Validações específicas
 - [ ] Tratamento de erros
 - [ ] Logs de importação
@@ -1073,8 +1187,42 @@ interface ImportLog {
 3. **Performance**
 4. **Feedback dos usuários**
 
+## 📋 Resumo das Melhorias Implementadas
+
+### ✅ **Funcionalidades Adicionadas:**
+
+1. **Flexibilidade Total de Templates**
+   - Usuário pode excluir planilhas desnecessárias
+   - Usuário pode renomear planilhas
+   - Sistema detecta automaticamente a planilha com dados
+
+2. **Instruções Melhoradas**
+   - Instruções claras com emojis e formatação
+   - Duas opções de uso (simples e personalizado)
+   - Dicas sobre flexibilidade do sistema
+
+3. **Detecção Inteligente**
+   - Busca por palavras-chave em nomes de planilhas
+   - Fallback para segunda planilha
+   - Validação de dados reais
+   - Logs informativos
+
+4. **Simplificação de Campos**
+   - Remoção do campo "Rota" do template de cidades
+   - Foco em dados essenciais
+   - Vinculação manual após importação
+
+### 🎯 **Benefícios Alcançados:**
+
+- **🎯 Simplicidade**: Template mais limpo e fácil de usar
+- **🔧 Flexibilidade**: Usuário pode personalizar como quiser
+- **📝 Clareza**: Instruções muito mais claras e organizadas
+- **⚡ Eficiência**: Processo de importação mais rápido
+- **🛡️ Robustez**: Funciona em diversos cenários
+
 ---
 
 **Documento criado em:** Janeiro 2025  
-**Versão:** 1.0  
+**Versão:** 1.1  
+**Última atualização:** Janeiro 2025  
 **Responsável:** Equipe de Desenvolvimento SGL

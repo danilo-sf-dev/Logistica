@@ -8,9 +8,12 @@ import { CidadeFormModal } from "components/cidades/ui/CidadeFormModal";
 import { ConfirmationModal, TableExportModal } from "components/common/modals";
 import { CidadesTableExportService } from "../export/CidadesTableExportService";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
+import { ImportModal } from "../../import/ui/ImportModal";
+import type { ImportResult } from "../../import/types/importTypes";
 
 const CidadesListPage: React.FC = () => {
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const {
     loading,
@@ -65,6 +68,20 @@ const CidadesListPage: React.FC = () => {
     handleExportExcel();
   };
 
+  const handleImportSuccess = (result: ImportResult) => {
+    // Recarregar dados da tabela após importação
+    carregar();
+
+    // Mostrar notificação de sucesso
+    const message =
+      result.failedRows === 0
+        ? `Importação concluída com sucesso! ${result.importedRows} registros importados.`
+        : `Importação parcial: ${result.importedRows} registros importados, ${result.failedRows} falharam.`;
+
+    // Aqui você pode usar um sistema de notificação se disponível
+    console.log(message);
+  };
+
   useEffect(() => {
     if (editando) {
       setValores({
@@ -116,6 +133,25 @@ const CidadesListPage: React.FC = () => {
             </svg>
             Exportar Excel
           </button>
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+          >
+            <svg
+              className="h-4 w-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+            Importar Excel
+          </button>
           <button onClick={abrirCriacao} className="btn-primary">
             Nova Cidade
           </button>
@@ -155,7 +191,7 @@ const CidadesListPage: React.FC = () => {
               </button>
               {Array.from(
                 { length: totalPaginado.totalPaginas },
-                (_, i) => i + 1,
+                (_, i) => i + 1
               ).map((page) => (
                 <button
                   key={page}
@@ -172,7 +208,7 @@ const CidadesListPage: React.FC = () => {
               <button
                 onClick={() =>
                   setPaginaAtual(
-                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
+                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}
@@ -228,6 +264,13 @@ const CidadesListPage: React.FC = () => {
         onExport={handleExportConfirm}
         titulo="Cidades"
         nomeArquivo={generateFileName()}
+      />
+
+      <ImportModal
+        entityType="cidades"
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onSuccess={handleImportSuccess}
       />
     </div>
   );
