@@ -42,15 +42,37 @@ async function getById(id: string): Promise<Cidade | null> {
 }
 
 async function criar(input: CidadeInput): Promise<string> {
+  // Sanitizar dados para remover campos undefined
+  const sanitizedInput = Object.fromEntries(
+    Object.entries(input).filter(([_, value]) => value !== undefined),
+  );
+
   const payload = {
-    ...input,
+    ...sanitizedInput,
+    // Garantir que nome e estado estejam em maiúsculas
+    nome: input.nome?.toString().toUpperCase() || "",
+    estado: input.estado?.toString().toUpperCase() || "",
+    // Garantir que região esteja em maiúsculas se existir
+    ...(input.regiao && { regiao: input.regiao.toString().toUpperCase() }),
+    // Garantir que observação esteja em maiúsculas se existir
+    ...(input.observacao && {
+      observacao: input.observacao.toString().toUpperCase(),
+    }),
     distancia: input.distancia ? Number(input.distancia) : null,
     pesoMinimo: input.pesoMinimo ? Number(input.pesoMinimo) : null,
     rotaId: input.rotaId || null,
     dataCriacao: serverTimestamp(),
     dataAtualizacao: serverTimestamp(),
   };
-  const ref = await addDoc(collection(db, COLLECTION), payload);
+
+  // Remover campos null/undefined do payload final
+  const finalPayload = Object.fromEntries(
+    Object.entries(payload).filter(
+      ([_, value]) => value !== undefined && value !== null,
+    ),
+  );
+
+  const ref = await addDoc(collection(db, COLLECTION), finalPayload);
 
   // Se uma rota foi vinculada, atualizar a lista de cidades da rota
   if (input.rotaId) {
@@ -74,6 +96,15 @@ async function atualizar(id: string, input: CidadeInput): Promise<void> {
 
   const payload = {
     ...input,
+    // Garantir que nome e estado estejam em maiúsculas
+    nome: input.nome?.toString().toUpperCase() || "",
+    estado: input.estado?.toString().toUpperCase() || "",
+    // Garantir que região esteja em maiúsculas se existir
+    ...(input.regiao && { regiao: input.regiao.toString().toUpperCase() }),
+    // Garantir que observação esteja em maiúsculas se existir
+    ...(input.observacao && {
+      observacao: input.observacao.toString().toUpperCase(),
+    }),
     distancia: input.distancia ? Number(input.distancia) : null,
     pesoMinimo: input.pesoMinimo ? Number(input.pesoMinimo) : null,
     rotaId: input.rotaId || null,
