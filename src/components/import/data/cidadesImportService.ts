@@ -107,16 +107,8 @@ export class CidadesImportService extends BaseImportService {
       // Combinar todos os resultados
       const result = ValidationService.combineValidationResults(validations);
 
-      console.log(
-        `📊 Resumo da validação: ${result.errors.length} erros, ${result.warnings.length} avisos`,
-      );
-
       return result;
     } catch (error) {
-      console.warn(
-        "⚠️ Erro ao buscar cidades existentes para validação:",
-        error,
-      );
       // Retornar apenas validação de campos obrigatórios se houver erro
       return ValidationService.validateRequiredFields(data, [
         { index: 0, name: "Nome" },
@@ -152,7 +144,6 @@ export class CidadesImportService extends BaseImportService {
 
         return cidade;
       } catch (error) {
-        console.error(`❌ Erro ao transformar linha ${index + 1}:`, error, row);
         throw new Error(
           `Erro ao processar linha ${index + 1}: ${error.message}`,
         );
@@ -161,8 +152,6 @@ export class CidadesImportService extends BaseImportService {
   }
 
   protected async saveToDatabase(data: CidadeInput[]): Promise<ImportResult> {
-    console.log("📊 Dados para importar:", data);
-
     const result: ImportResult = {
       success: true,
       totalRows: data.length,
@@ -176,23 +165,9 @@ export class CidadesImportService extends BaseImportService {
     for (let i = 0; i < data.length; i++) {
       try {
         const cidade = data[i];
-        console.log(`🔄 Importando cidade ${i + 1}:`, cidade);
-
-        // Log detalhado dos dados antes de enviar
-        console.log(
-          `🔍 Dados sanitizados para cidade ${i + 1}:`,
-          Object.fromEntries(
-            Object.entries(cidade).filter(
-              ([_, value]) => value !== undefined && value !== null,
-            ),
-          ),
-        );
-
         await cidadesService.criar(cidade);
         result.importedRows++;
-        console.log(`✅ Cidade ${i + 1} importada com sucesso`);
       } catch (error) {
-        console.error(`❌ Erro ao importar cidade ${i + 1}:`, error);
         result.failedRows++;
         result.errors.push({
           row: i + 2,
@@ -205,7 +180,6 @@ export class CidadesImportService extends BaseImportService {
     }
 
     result.success = result.failedRows === 0;
-    console.log("📈 Resultado final:", result);
     return result;
   }
 }

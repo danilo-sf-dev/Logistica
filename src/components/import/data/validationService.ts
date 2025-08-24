@@ -36,7 +36,7 @@ export class ValidationService {
           errors.push({
             row: rowNumber,
             field: fieldName,
-            message: `❌ ${entityName} já existe no sistema. Remova esta linha ou altere os dados.`,
+            message: `${entityName} já existe no sistema. Remova esta linha ou altere os dados.`,
             value: row[0],
             severity: "error",
           });
@@ -46,7 +46,7 @@ export class ValidationService {
           errors.push({
             row: rowNumber,
             field: fieldName,
-            message: `❌ ${entityName} duplicado no arquivo. Remova uma das linhas duplicadas.`,
+            message: `${entityName} duplicado no arquivo. Remova uma das linhas duplicadas.`,
             value: row[0],
             severity: "error",
           });

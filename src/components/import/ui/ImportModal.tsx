@@ -70,7 +70,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
       const lastImportInfo = await getLastImportInfo(entityType);
       setLastImport(lastImportInfo);
     } catch (error) {
-      console.error("Erro ao carregar última importação:", error);
+      // Silenciar erro de última importação para não poluir o console
     }
   };
 
@@ -82,7 +82,6 @@ export const ImportModal: React.FC<ImportModalProps> = ({
       saveAs(template, `template_${entityType}.xlsx`);
     } catch (error) {
       console.error("Erro ao gerar template:", error);
-      // Aqui você pode mostrar uma notificação de erro
     } finally {
       setLoading(false);
     }
@@ -112,10 +111,10 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         await loadLastImportInfo(entityType);
       }
     } catch (error) {
-      console.error("❌ Erro na importação:", error);
+      console.error("Erro na importação:", error);
       setProgress({
         status: "error",
-        message: `Erro na importação: ${error.message}. Verifique o console para mais detalhes.`,
+        message: `Erro na importação: ${error.message}`,
       });
     }
   };

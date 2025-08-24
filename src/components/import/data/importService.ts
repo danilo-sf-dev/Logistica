@@ -38,7 +38,6 @@ export abstract class BaseImportService {
 
       // Verificar se há erros de validação
       if (!validationResult.isValid) {
-        console.log("❌ Validação falhou:", validationResult.errors);
         return {
           success: false,
           totalRows: data.length,
@@ -165,14 +164,6 @@ export abstract class BaseImportService {
               );
             }
           }
-
-          // Log para debug - informar qual planilha está sendo lida
-          console.log(
-            `📊 Importação: Lendo planilha "${sheetName}" do arquivo ${file.name}`,
-          );
-          console.log(
-            `📋 Planilhas disponíveis: ${workbook.SheetNames.join(", ")}`,
-          );
 
           // Converter para JSON
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
@@ -323,7 +314,6 @@ export abstract class BaseImportService {
 
       await addDoc(collection(db, "import_logs"), sanitizedLog);
     } catch (error) {
-      console.error("Erro ao salvar log de importação:", error);
       // Não falhar a importação se o log falhar
     }
   }
@@ -334,8 +324,6 @@ export async function getLastImportInfo(
   entityType: string,
 ): Promise<LastImportInfo | null> {
   try {
-    console.log(`🔍 Iniciando busca de última importação para: ${entityType}`);
-
     const importLogsRef = collection(db, "import_logs");
 
     // Primeiro, buscar apenas por entityType (sem orderBy para evitar necessidade de índice)
@@ -343,14 +331,7 @@ export async function getLastImportInfo(
 
     const snapshot = await getDocs(q);
 
-    console.log(
-      `🔍 Buscando última importação para ${entityType}: ${snapshot.size} registros encontrados`,
-    );
-
     if (snapshot.empty) {
-      console.log(
-        `📭 Nenhuma importação anterior encontrada para ${entityType}`,
-      );
       return null;
     }
 
@@ -371,10 +352,8 @@ export async function getLastImportInfo(
       userName: data.userName || "Usuário",
     };
 
-    console.log(`✅ Última importação encontrada:`, lastImport);
     return lastImport;
   } catch (error) {
-    console.error("Erro ao buscar última importação:", error);
     return null;
   }
 }
