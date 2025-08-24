@@ -1,11 +1,10 @@
 import { BaseImportService } from "./importService";
+import { ValidationService } from "./validationService";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type {
   ImportConfig,
   ValidationResult,
   ImportResult,
-  ImportError,
-  ImportWarning,
 } from "../types/importTypes";
 import type { CidadeInput } from "../../cidades/types";
 
@@ -72,116 +71,98 @@ export class CidadesImportService extends BaseImportService {
   };
 
   protected async validateData(data: any[]): Promise<ValidationResult> {
-    const errors: ImportError[] = [];
-    const warnings: ImportWarning[] = [];
+    try {
+      // Buscar cidades existentes para validação de unicidade
+      const cidadesExistentes = await cidadesService.listar();
 
-    // Buscar cidades existentes para validação de unicidade
-    const cidadesExistentes = await cidadesService.listar();
-    const nomesExistentes = new Set(
-      cidadesExistentes.map(
-        (c) => `${c.nome.toUpperCase()}-${c.estado.toUpperCase()}`
-      )
-    );
+      // Validações usando o serviço padronizado
+      const validations = [
+        // Validação de campos obrigatórios
+        ValidationService.validateRequiredFields(data, [
+          { index: 0, name: "Nome" },
+          { index: 1, name: "Estado" },
+        ]),
 
-    for (let i = 0; i < data.length; i++) {
-      const row = data[i];
-      const rowNumber = i + 2; // +2 porque começamos do índice 0 e pulamos o cabeçalho
+        // Validação de unicidade
+        ValidationService.validateUniqueness(
+          data,
+          cidadesExistentes,
+          (cidade) =>
+            `${cidade.nome.toUpperCase()}-${cidade.estado.toUpperCase()}`,
+          (row) =>
+            row[0] && row[1]
+              ? `${row[0].toString().toUpperCase()}-${row[1].toString().toUpperCase()}`
+              : "",
+          "Cidade",
+          "nome"
+        ),
 
-      // Validar campos obrigatórios
-      if (!row[0] || !row[0].toString().trim()) {
-        errors.push({
-          row: rowNumber,
-          field: "nome",
-          message: "Nome da cidade é obrigatório",
-          value: row[0],
-          severity: "error",
-        });
-      }
+        // Validação de campos numéricos
+        ValidationService.validateNumericFields(data, [
+          { index: 3, name: "Distância" },
+          { index: 4, name: "Peso Mínimo" },
+        ]),
+      ];
 
-      if (!row[1] || !row[1].toString().trim()) {
-        errors.push({
-          row: rowNumber,
-          field: "estado",
-          message: "Estado é obrigatório",
-          value: row[1],
-          severity: "error",
-        });
-      }
+      // Combinar todos os resultados
+      const result = ValidationService.combineValidationResults(validations);
 
-      // Validar unicidade (nome + estado)
-      if (row[0] && row[1]) {
-        const nomeEstado = `${row[0].toString().toUpperCase()}-${row[1].toString().toUpperCase()}`;
-        if (nomesExistentes.has(nomeEstado)) {
-          errors.push({
-            row: rowNumber,
-            field: "nome",
-            message: `Cidade ${row[0]} (${row[1]}) já cadastrada`,
-            value: row[0],
-            severity: "error",
-          });
-        }
-      }
+      console.log(
+        `📊 Resumo da validação: ${result.errors.length} erros, ${result.warnings.length} avisos`
+      );
 
-      // Validar formato de números
-      if (row[3] && isNaN(Number(row[3]))) {
-        errors.push({
-          row: rowNumber,
-          field: "distancia",
-          message: "Distância deve ser um número válido",
-          value: row[3],
-          severity: "error",
-        });
-      }
-
-      if (row[4] && isNaN(Number(row[4]))) {
-        errors.push({
-          row: rowNumber,
-          field: "pesoMinimo",
-          message: "Peso mínimo deve ser um número válido",
-          value: row[4],
-          severity: "error",
-        });
-      }
-
-      // Avisos para valores muito altos ou baixos
-      if (row[3] && Number(row[3]) > 10000) {
-        warnings.push({
-          row: rowNumber,
-          field: "distancia",
-          message: "Distância muito alta, verifique se está em km",
-          value: row[3],
-        });
-      }
-
-      if (row[4] && Number(row[4]) > 50000) {
-        warnings.push({
-          row: rowNumber,
-          field: "pesoMinimo",
-          message: "Peso mínimo muito alto, verifique se está em kg",
-          value: row[4],
-        });
-      }
+      return result;
+    } catch (error) {
+      console.warn(
+        "⚠️ Erro ao buscar cidades existentes para validação:",
+        error
+      );
+      // Retornar apenas validação de campos obrigatórios se houver erro
+      return ValidationService.validateRequiredFields(data, [
+        { index: 0, name: "Nome" },
+        { index: 1, name: "Estado" },
+      ]);
     }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-      warnings,
-    };
   }
 
   protected async transformData(data: any[]): Promise<CidadeInput[]> {
-    return data.map((row) => ({
-      nome: row[0]?.toString().trim().toUpperCase() || "",
-      estado: row[1]?.toString().trim().toUpperCase() || "",
-      regiao: row[2]?.toString().trim().toLowerCase() || undefined,
-      distancia: row[3] ? Number(row[3]) : null,
-      pesoMinimo: row[4] ? Number(row[4]) : null,
-      observacao: row[5]?.toString().trim() || undefined,
-    }));
+    return data.map((row, index) => {
+      try {
+        const cidade: CidadeInput = {
+          nome: row[0]?.toString().trim().toUpperCase() || "",
+          estado: row[1]?.toString().trim().toUpperCase() || "",
+        };
+
+        // Adicionar campos opcionais apenas se tiverem valor
+        if (row[2]?.toString().trim()) {
+          cidade.regiao = row[2].toString().trim().toUpperCase();
+        }
+
+        if (row[3] !== undefined && row[3] !== null && row[3] !== "") {
+          cidade.distancia = Number(row[3]);
+        }
+
+        if (row[4] !== undefined && row[4] !== null && row[4] !== "") {
+          cidade.pesoMinimo = Number(row[4]);
+        }
+
+        if (row[5]?.toString().trim()) {
+          cidade.observacao = row[5].toString().trim().toUpperCase();
+        }
+
+        return cidade;
+      } catch (error) {
+        console.error(`❌ Erro ao transformar linha ${index + 1}:`, error, row);
+        throw new Error(
+          `Erro ao processar linha ${index + 1}: ${error.message}`
+        );
+      }
+    });
   }
 
   protected async saveToDatabase(data: CidadeInput[]): Promise<ImportResult> {
+    console.log("📊 Dados para importar:", data);
+
     const result: ImportResult = {
       success: true,
       totalRows: data.length,
@@ -195,9 +176,23 @@ export class CidadesImportService extends BaseImportService {
     for (let i = 0; i < data.length; i++) {
       try {
         const cidade = data[i];
+        console.log(`🔄 Importando cidade ${i + 1}:`, cidade);
+
+        // Log detalhado dos dados antes de enviar
+        console.log(
+          `🔍 Dados sanitizados para cidade ${i + 1}:`,
+          Object.fromEntries(
+            Object.entries(cidade).filter(
+              ([_, value]) => value !== undefined && value !== null
+            )
+          )
+        );
+
         await cidadesService.criar(cidade);
         result.importedRows++;
+        console.log(`✅ Cidade ${i + 1} importada com sucesso`);
       } catch (error) {
+        console.error(`❌ Erro ao importar cidade ${i + 1}:`, error);
         result.failedRows++;
         result.errors.push({
           row: i + 2,
@@ -210,6 +205,7 @@ export class CidadesImportService extends BaseImportService {
     }
 
     result.success = result.failedRows === 0;
+    console.log("📈 Resultado final:", result);
     return result;
   }
 }

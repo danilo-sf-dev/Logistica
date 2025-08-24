@@ -172,6 +172,14 @@ src/
 - Peso Mínimo
 - Observação
 
+**Validações Específicas:**
+
+- **Unicidade**: Nome + Estado deve ser único no sistema
+- **Formato**: Nome e Estado são convertidos para maiúsculas
+- **Região**: Convertida para maiúsculas
+- **Observação**: Convertida para maiúsculas
+- **Números**: Distância e Peso Mínimo devem ser números válidos
+
 **Nota:** O campo "Rota" foi removido do template de importação para simplificar o processo. As cidades devem ser vinculadas às rotas manualmente após a importação através da interface do sistema.
 
 ### 4. Vendedores
@@ -1065,9 +1073,37 @@ BELO HORIZONTE | MG | sudeste | 586 | 800 | Capital de Minas
 
 1. **Campos Obrigatórios**: Verificação de preenchimento
 2. **Formato de Dados**: Validação de formato (CPF, email, etc.)
-3. **Unicidade**: Verificação de duplicatas
+3. **Unicidade**: Verificação de duplicatas no sistema e no arquivo
 4. **Integridade**: Validação de relacionamentos
 5. **Tamanho**: Limite de registros por importação
+6. **Formatação**: Conversão automática de maiúsculas/minúsculas
+
+### Validação de Duplicidade
+
+O sistema possui validação robusta de duplicidade que funciona em dois níveis:
+
+#### **1. Duplicatas no Sistema**
+
+- Verifica se o registro já existe no banco de dados
+- **Cidades**: Nome + Estado deve ser único
+- **Funcionários**: CPF e CNH devem ser únicos
+- **Veículos**: Placa deve ser única
+- **Vendedores**: CPF deve ser único
+- **Rotas**: Nome deve ser único
+- **Folgas**: Funcionário + Data deve ser único
+
+#### **2. Duplicatas no Arquivo**
+
+- Verifica se há registros duplicados dentro do próprio arquivo
+- Impede importação de múltiplas linhas com os mesmos dados
+- Mensagem clara indicando qual linha está duplicada
+
+#### **3. Feedback ao Usuário**
+
+- **Modal de Resultado**: Exibe todos os erros encontrados
+- **Mensagens Específicas**: Indica exatamente qual campo está duplicado
+- **Sugestões**: Orienta o usuário sobre como corrigir
+- **Botão "Tentar Novamente"**: Permite nova tentativa após correção
 
 ### Detecção Inteligente de Planilhas
 
@@ -1090,10 +1126,12 @@ O sistema possui detecção automática de planilhas com dados:
 
 ### Tratamento de Erros
 
-1. **Erros Críticos**: Impedem importação
+1. **Erros Críticos**: Impedem importação completamente
 2. **Avisos**: Permitem importação com alerta
 3. **Logs**: Registro completo de operações
 4. **Rollback**: Desfazer em caso de falha
+5. **Feedback Visual**: Modal com detalhes dos erros
+6. **Sugestões**: Orientações para correção dos problemas
 
 ## 📊 Logs e Auditoria
 
@@ -1212,6 +1250,17 @@ interface ImportLog {
    - Foco em dados essenciais
    - Vinculação manual após importação
 
+5. **Validação Robusta de Duplicidade**
+   - Verificação de duplicatas no sistema
+   - Verificação de duplicatas no arquivo
+   - Mensagens de erro específicas e claras
+   - Feedback visual completo ao usuário
+
+6. **Formatação Automática**
+   - Conversão automática para maiúsculas
+   - Padronização de dados
+   - Validação de formatos numéricos
+
 ### 🎯 **Benefícios Alcançados:**
 
 - **🎯 Simplicidade**: Template mais limpo e fácil de usar
@@ -1219,6 +1268,8 @@ interface ImportLog {
 - **📝 Clareza**: Instruções muito mais claras e organizadas
 - **⚡ Eficiência**: Processo de importação mais rápido
 - **🛡️ Robustez**: Funciona em diversos cenários
+- **🔒 Segurança**: Validação completa de duplicidade
+- **👥 Usabilidade**: Feedback claro e orientações para correção
 
 ---
 

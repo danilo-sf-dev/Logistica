@@ -42,7 +42,21 @@ export abstract class BaseImportService {
       const data = await this.parseExcelFile(file);
 
       // 2. Validação
-      await this.validateData(data);
+      const validationResult = await this.validateData(data);
+
+      // Verificar se há erros de validação
+      if (!validationResult.isValid) {
+        console.log("❌ Validação falhou:", validationResult.errors);
+        return {
+          success: false,
+          totalRows: data.length,
+          importedRows: 0,
+          failedRows: data.length,
+          errors: validationResult.errors,
+          warnings: validationResult.warnings,
+          duration: Date.now() - startTime,
+        };
+      }
 
       // 3. Transformação
       const transformedData = await this.transformData(data);
@@ -50,9 +64,11 @@ export abstract class BaseImportService {
       // 4. Importação
       const result = await this.saveToDatabase(transformedData);
 
-      // 5. Salvar log de importação
+      // 5. Salvar log de importação (apenas se houver dados processados)
       result.duration = Date.now() - startTime;
-      await this.saveImportLog(result, file.name, file.size);
+      if (result.totalRows > 0) {
+        await this.saveImportLog(result, file.name, file.size);
+      }
 
       return result;
     } catch (error) {
@@ -286,8 +302,8 @@ export abstract class BaseImportService {
         totalRows: result.totalRows,
         importedRows: result.importedRows,
         failedRows: result.failedRows,
-        errors: result.errors,
-        warnings: result.warnings,
+        errors: result.errors || [],
+        warnings: result.warnings || [],
         startTime: new Date(),
         endTime: new Date(),
         duration: result.duration,
@@ -301,9 +317,17 @@ export abstract class BaseImportService {
         userAgent: navigator.userAgent,
       };
 
-      await addDoc(collection(db, "import_logs"), importLog);
+      // Verificar se todos os campos obrigatórios estão definidos
+      const sanitizedLog = Object.fromEntries(
+        Object.entries(importLog).filter(
+          ([_, value]) => value !== undefined && value !== null
+        )
+      );
+
+      await addDoc(collection(db, "import_logs"), sanitizedLog);
     } catch (error) {
       console.error("Erro ao salvar log de importação:", error);
+      // Não falhar a importação se o log falhar
     }
   }
 }

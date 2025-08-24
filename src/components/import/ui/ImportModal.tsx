@@ -32,11 +32,11 @@ const Modal: React.FC<{
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        {children}
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+        <div className="flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
@@ -56,6 +56,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const [result, setResult] = useState<ImportResult | null>(null);
   const [lastImport, setLastImport] = useState<LastImportInfoType | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showAllErrors, setShowAllErrors] = useState(false);
 
   // Carregar informações da última importação
   useEffect(() => {
@@ -103,13 +104,19 @@ export const ImportModal: React.FC<ImportModalProps> = ({
       const result = await service.importFromExcel(file);
       setResult(result);
       setStep("result");
-      onSuccess(result);
 
-      // Atualizar informações da última importação
-      await loadLastImportInfo(entityType);
+      // Só chamar onSuccess se a importação foi bem-sucedida
+      if (result.success) {
+        onSuccess(result);
+        // Atualizar informações da última importação apenas se foi bem-sucedida
+        await loadLastImportInfo(entityType);
+      }
     } catch (error) {
-      console.error("Erro na importação:", error);
-      setProgress({ status: "error", message: `Erro: ${error.message}` });
+      console.error("❌ Erro na importação:", error);
+      setProgress({
+        status: "error",
+        message: `Erro na importação: ${error.message}. Verifique o console para mais detalhes.`,
+      });
     }
   };
 
@@ -130,12 +137,13 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     setFile(null);
     setProgress(null);
     setResult(null);
+    setShowAllErrors(false);
     onClose();
   };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6 min-h-0">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-medium">
             Importar {getEntityName(entityType)}
@@ -336,27 +344,78 @@ export const ImportModal: React.FC<ImportModalProps> = ({
               )}
             </div>
             <h4 className="mt-2 text-lg font-medium text-gray-900">
-              {result.success ? "Importação Concluída" : "Importação Parcial"}
+              {result.success ? "Importação Concluída" : "Importação Falhou"}
             </h4>
             <p className="mt-1 text-sm text-gray-500">
               {result.importedRows} de {result.totalRows} registros importados
+              {result.failedRows > 0 && (
+                <span className="text-red-600 font-medium">
+                  {" "}
+                  ({result.failedRows} falharam)
+                </span>
+              )}
             </p>
+            {result.errors.length > 10 && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-orange-800">
+                    ⚠️ Muitos erros encontrados ({result.errors.length})
+                  </p>
+                  <button
+                    onClick={() => setShowAllErrors(!showAllErrors)}
+                    className="text-xs bg-orange-200 hover:bg-orange-300 px-2 py-1 rounded"
+                  >
+                    {showAllErrors ? "Recolher" : "Ver Todos"}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {result.errors.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <h5 className="text-sm font-medium text-red-900 mb-2">
+                <h5 className="text-sm font-medium text-red-900 mb-2 flex items-center">
+                  <svg
+                    className="h-4 w-4 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                   Erros encontrados ({result.errors.length}):
                 </h5>
-                <div className="max-h-32 overflow-y-auto space-y-1">
-                  {result.errors.slice(0, 5).map((error, index) => (
-                    <p key={index} className="text-xs text-red-700">
-                      Linha {error.row}: {error.message}
-                    </p>
+                <div
+                  className={`overflow-y-auto space-y-2 pr-2 ${
+                    result.errors.length > 10 && !showAllErrors
+                      ? "max-h-40"
+                      : "max-h-60"
+                  }`}
+                >
+                  {(result.errors.length > 10 && !showAllErrors
+                    ? result.errors.slice(0, 5)
+                    : result.errors
+                  ).map((error, index) => (
+                    <div
+                      key={index}
+                      className="bg-red-100 border border-red-300 rounded p-2"
+                    >
+                      <p className="text-sm font-medium text-red-800">
+                        Linha {error.row}: {error.field}
+                      </p>
+                      <p className="text-xs text-red-700 mt-1">
+                        {error.message}
+                      </p>
+                    </div>
                   ))}
-                  {result.errors.length > 5 && (
-                    <p className="text-xs text-red-600">
-                      ... e mais {result.errors.length - 5} erros
-                    </p>
+                  {result.errors.length > 10 && !showAllErrors && (
+                    <div className="text-center py-2">
+                      <p className="text-xs text-gray-500">
+                        ... e mais {result.errors.length - 5} erros
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -367,22 +426,30 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 <h5 className="text-sm font-medium text-yellow-900 mb-2">
                   Avisos ({result.warnings.length}):
                 </h5>
-                <div className="max-h-32 overflow-y-auto space-y-1">
-                  {result.warnings.slice(0, 3).map((warning, index) => (
-                    <p key={index} className="text-xs text-yellow-700">
-                      Linha {warning.row}: {warning.message}
-                    </p>
+                <div className="max-h-40 overflow-y-auto space-y-1 pr-2">
+                  {result.warnings.map((warning, index) => (
+                    <div
+                      key={index}
+                      className="bg-yellow-100 border border-yellow-300 rounded p-2"
+                    >
+                      <p className="text-xs text-yellow-700">
+                        Linha {warning.row}: {warning.message}
+                      </p>
+                    </div>
                   ))}
-                  {result.warnings.length > 3 && (
-                    <p className="text-xs text-yellow-600">
-                      ... e mais {result.warnings.length - 3} avisos
-                    </p>
-                  )}
                 </div>
               </div>
             )}
 
-            <div className="flex justify-center">
+            <div className="flex justify-center space-x-3">
+              {!result.success && (
+                <button
+                  onClick={() => setStep("template")}
+                  className="btn-secondary"
+                >
+                  Tentar Novamente
+                </button>
+              )}
               <button onClick={handleClose} className="btn-primary">
                 Fechar
               </button>
