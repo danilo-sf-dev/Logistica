@@ -94,7 +94,7 @@ export class CidadesImportService extends BaseImportService {
               ? `${row[0].toString().toUpperCase()}-${row[1].toString().toUpperCase()}`
               : "",
           "Cidade",
-          "nome"
+          "nome",
         ),
 
         // Validação de campos numéricos
@@ -108,14 +108,14 @@ export class CidadesImportService extends BaseImportService {
       const result = ValidationService.combineValidationResults(validations);
 
       console.log(
-        `📊 Resumo da validação: ${result.errors.length} erros, ${result.warnings.length} avisos`
+        `📊 Resumo da validação: ${result.errors.length} erros, ${result.warnings.length} avisos`,
       );
 
       return result;
     } catch (error) {
       console.warn(
         "⚠️ Erro ao buscar cidades existentes para validação:",
-        error
+        error,
       );
       // Retornar apenas validação de campos obrigatórios se houver erro
       return ValidationService.validateRequiredFields(data, [
@@ -154,7 +154,7 @@ export class CidadesImportService extends BaseImportService {
       } catch (error) {
         console.error(`❌ Erro ao transformar linha ${index + 1}:`, error, row);
         throw new Error(
-          `Erro ao processar linha ${index + 1}: ${error.message}`
+          `Erro ao processar linha ${index + 1}: ${error.message}`,
         );
       }
     });
@@ -183,9 +183,9 @@ export class CidadesImportService extends BaseImportService {
           `🔍 Dados sanitizados para cidade ${i + 1}:`,
           Object.fromEntries(
             Object.entries(cidade).filter(
-              ([_, value]) => value !== undefined && value !== null
-            )
-          )
+              ([_, value]) => value !== undefined && value !== null,
+            ),
+          ),
         );
 
         await cidadesService.criar(cidade);

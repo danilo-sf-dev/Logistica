@@ -94,7 +94,8 @@ src/
 ### 7. Informações da Última Importação
 
 - Modal exibe informações da última importação realizada
-- Mostra nome do arquivo, data e quantidade de registros
+- Mostra nome do arquivo, data, status e usuário que fez a importação
+- Captura automaticamente o usuário logado no sistema
 - Atualiza automaticamente após nova importação
 - Histórico visual para controle de operações
 
@@ -229,7 +230,35 @@ src/
 
 ## 🛠️ Implementação Técnica
 
-### 1. Tipos e Interfaces
+### 1. Serviços de Validação
+
+#### ValidationService
+
+Serviço base para validação padronizada de todas as entidades:
+
+```typescript
+export class ValidationService {
+  // Validação de unicidade genérica
+  static validateUniqueness<T>(...)
+
+  // Validação de campos obrigatórios
+  static validateRequiredFields(...)
+
+  // Validação de campos numéricos
+  static validateNumericFields(...)
+
+  // Combinação de múltiplas validações
+  static combineValidationResults(...)
+}
+```
+
+**Benefícios:**
+
+- **Reutilização**: Código padronizado para todas as entidades
+- **Consistência**: Mesmo padrão de validação e mensagens
+- **Manutenibilidade**: Centralização da lógica de validação
+
+### 2. Tipos e Interfaces
 
 ```typescript
 // src/components/import/types/importTypes.ts
@@ -576,6 +605,15 @@ export class FuncionariosImportService extends BaseImportService {
 ### 4. Componentes de Interface
 
 #### 4.1 Modal Base de Importação
+
+**Características do Modal:**
+
+- **Layout Responsivo**: Adapta-se a diferentes tamanhos de tela
+- **Rolagem Inteligente**: Área de conteúdo com scroll independente
+- **Gerenciamento de Erros**: Interface otimizada para grandes volumes
+- **Botões Contextuais**: "Ver Todos" para expandir/recolher erros
+- **Cards Visuais**: Erros e avisos organizados em cards separados
+- **Indicadores Visuais**: Cores e ícones para melhor identificação
 
 ```typescript
 // src/components/import/ui/ImportModal.tsx
@@ -1104,6 +1142,9 @@ O sistema possui validação robusta de duplicidade que funciona em dois níveis
 - **Mensagens Específicas**: Indica exatamente qual campo está duplicado
 - **Sugestões**: Orienta o usuário sobre como corrigir
 - **Botão "Tentar Novamente"**: Permite nova tentativa após correção
+- **Gerenciamento de Muitos Erros**: Interface otimizada para grandes volumes de erros
+- **Rolagem Inteligente**: Área com scroll para visualizar todos os erros
+- **Botão "Ver Todos"**: Expande/recolhe lista quando há muitos erros
 
 ### Detecção Inteligente de Planilhas
 
@@ -1132,6 +1173,8 @@ O sistema possui detecção automática de planilhas com dados:
 4. **Rollback**: Desfazer em caso de falha
 5. **Feedback Visual**: Modal com detalhes dos erros
 6. **Sugestões**: Orientações para correção dos problemas
+7. **Interface Responsiva**: Modal adaptável para qualquer quantidade de erros
+8. **Gerenciamento de Volume**: Otimizado para grandes volumes de dados
 
 ## 📊 Logs e Auditoria
 
@@ -1261,6 +1304,12 @@ interface ImportLog {
    - Padronização de dados
    - Validação de formatos numéricos
 
+7. **Interface Responsiva**
+   - Modal adaptável para qualquer quantidade de erros
+   - Rolagem inteligente para grandes volumes
+   - Gerenciamento visual de muitos erros
+   - Cards visuais para melhor organização
+
 ### 🎯 **Benefícios Alcançados:**
 
 - **🎯 Simplicidade**: Template mais limpo e fácil de usar
@@ -1270,10 +1319,20 @@ interface ImportLog {
 - **🛡️ Robustez**: Funciona em diversos cenários
 - **🔒 Segurança**: Validação completa de duplicidade
 - **👥 Usabilidade**: Feedback claro e orientações para correção
+- **📱 Responsividade**: Interface adaptável para qualquer dispositivo
+- **📊 Escalabilidade**: Suporte a grandes volumes de dados
 
 ---
 
 **Documento criado em:** Janeiro 2025  
-**Versão:** 1.1  
+**Versão:** 1.2  
 **Última atualização:** Janeiro 2025  
 **Responsável:** Equipe de Desenvolvimento SGL
+
+**Principais Atualizações v1.2:**
+
+- ✅ Validação robusta de duplicidade (sistema + arquivo)
+- ✅ Serviço padronizado de validação (ValidationService)
+- ✅ Interface responsiva para grandes volumes de erros
+- ✅ Modal com rolagem inteligente e gerenciamento visual
+- ✅ Feedback completo e orientações para correção

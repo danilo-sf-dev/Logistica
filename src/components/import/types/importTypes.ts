@@ -81,14 +81,9 @@ export interface TemplateConfig {
 }
 
 export interface LastImportInfo {
-  id: string;
-  entityType: string;
   fileName: string;
   date: Date;
-  importedRows: number;
-  totalRows: number;
   status: "success" | "partial" | "failed";
-  userId: string;
   userName: string;
 }
 

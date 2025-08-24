@@ -16,12 +16,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     (file: File): boolean => {
       // Validar tipo de arquivo
       const isValidType = acceptedTypes.some((type) =>
-        file.name.toLowerCase().endsWith(type.toLowerCase())
+        file.name.toLowerCase().endsWith(type.toLowerCase()),
       );
 
       if (!isValidType) {
         alert(
-          `Tipo de arquivo não suportado. Tipos aceitos: ${acceptedTypes.join(", ")}`
+          `Tipo de arquivo não suportado. Tipos aceitos: ${acceptedTypes.join(", ")}`,
         );
         return false;
       }
@@ -29,14 +29,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       // Validar tamanho
       if (file.size > maxSize) {
         alert(
-          `Arquivo muito grande. Tamanho máximo: ${maxSize / 1024 / 1024}MB`
+          `Arquivo muito grande. Tamanho máximo: ${maxSize / 1024 / 1024}MB`,
         );
         return false;
       }
 
       return true;
     },
-    [acceptedTypes, maxSize]
+    [acceptedTypes, maxSize],
   );
 
   const handleDrop = useCallback(
@@ -50,7 +50,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         }
       }
     },
-    [onFileSelect, validateFile]
+    [onFileSelect, validateFile],
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -67,7 +67,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         }
       }
     },
-    [onFileSelect, validateFile]
+    [onFileSelect, validateFile],
   );
 
   return (

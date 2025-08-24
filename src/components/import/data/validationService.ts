@@ -14,7 +14,7 @@ export class ValidationService {
     getUniqueKey: (item: T) => string,
     getDataKey: (row: any[], index: number) => string,
     entityName: string,
-    fieldName: string
+    fieldName: string,
   ): ValidationResult {
     const errors: ImportError[] = [];
     const warnings: ImportWarning[] = [];
@@ -68,7 +68,7 @@ export class ValidationService {
    */
   static validateRequiredFields(
     data: any[],
-    requiredFields: { index: number; name: string }[]
+    requiredFields: { index: number; name: string }[],
   ): ValidationResult {
     const errors: ImportError[] = [];
     const warnings: ImportWarning[] = [];
@@ -102,7 +102,7 @@ export class ValidationService {
    */
   static validateNumericFields(
     data: any[],
-    numericFields: { index: number; name: string }[]
+    numericFields: { index: number; name: string }[],
   ): ValidationResult {
     const errors: ImportError[] = [];
     const warnings: ImportWarning[] = [];
@@ -135,7 +135,7 @@ export class ValidationService {
    * Combina múltiplos resultados de validação
    */
   static combineValidationResults(
-    results: ValidationResult[]
+    results: ValidationResult[],
   ): ValidationResult {
     const allErrors: ImportError[] = [];
     const allWarnings: ImportWarning[] = [];

@@ -1,13 +1,5 @@
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  orderBy,
-  limit,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "../../../firebase/config";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { db, auth } from "../../../firebase/config";
 import type {
   ImportConfig,
   ImportResult,
@@ -140,8 +132,8 @@ export abstract class BaseImportService {
 
             const templateSheetIndex = workbook.SheetNames.findIndex((name) =>
               dataSheetKeywords.some((keyword) =>
-                name.toLowerCase().includes(keyword)
-              )
+                name.toLowerCase().includes(keyword),
+              ),
             );
 
             if (templateSheetIndex !== -1) {
@@ -164,22 +156,22 @@ export abstract class BaseImportService {
                 (row) =>
                   Array.isArray(row) &&
                   row.length > 0 &&
-                  row.some((cell) => cell && cell.toString().trim() !== "")
+                  row.some((cell) => cell && cell.toString().trim() !== ""),
               );
 
             if (!hasData) {
               throw new Error(
-                "Nenhuma planilha com dados encontrada. Certifique-se de preencher a planilha 'Template' ou uma planilha com dados."
+                "Nenhuma planilha com dados encontrada. Certifique-se de preencher a planilha 'Template' ou uma planilha com dados.",
               );
             }
           }
 
           // Log para debug - informar qual planilha está sendo lida
           console.log(
-            `📊 Importação: Lendo planilha "${sheetName}" do arquivo ${file.name}`
+            `📊 Importação: Lendo planilha "${sheetName}" do arquivo ${file.name}`,
           );
           console.log(
-            `📋 Planilhas disponíveis: ${workbook.SheetNames.join(", ")}`
+            `📋 Planilhas disponíveis: ${workbook.SheetNames.join(", ")}`,
           );
 
           // Converter para JSON
@@ -191,14 +183,14 @@ export abstract class BaseImportService {
             .filter((row: any) =>
               row.some(
                 (cell: any) =>
-                  cell !== null && cell !== undefined && cell !== ""
-              )
+                  cell !== null && cell !== undefined && cell !== "",
+              ),
             );
 
           resolve(cleanData);
         } catch (error) {
           reject(
-            new Error(`Erro ao processar arquivo Excel: ${error.message}`)
+            new Error(`Erro ao processar arquivo Excel: ${error.message}`),
           );
         }
       };
@@ -289,13 +281,18 @@ export abstract class BaseImportService {
   protected async saveImportLog(
     result: ImportResult,
     fileName: string,
-    fileSize: number
+    fileSize: number,
   ): Promise<void> {
     try {
-      // Obter usuário atual (simplificado - em produção usar contexto)
+      // Obter usuário atual
+      const currentUser = auth.currentUser;
+      const userName =
+        currentUser?.displayName || currentUser?.email || "Usuário";
+      const userId = currentUser?.uid || "unknown";
+
       const importLog: Omit<ImportLog, "id"> = {
-        userId: "current-user", // Implementar captura do usuário atual
-        userName: "Usuário", // Implementar captura do nome do usuário
+        userId,
+        userName,
         entityType: this.config.entityType,
         fileName,
         fileSize,
@@ -320,8 +317,8 @@ export abstract class BaseImportService {
       // Verificar se todos os campos obrigatórios estão definidos
       const sanitizedLog = Object.fromEntries(
         Object.entries(importLog).filter(
-          ([_, value]) => value !== undefined && value !== null
-        )
+          ([_, value]) => value !== undefined && value !== null,
+        ),
       );
 
       await addDoc(collection(db, "import_logs"), sanitizedLog);
@@ -334,37 +331,48 @@ export abstract class BaseImportService {
 
 // Serviço para buscar informações da última importação
 export async function getLastImportInfo(
-  entityType: string
+  entityType: string,
 ): Promise<LastImportInfo | null> {
   try {
+    console.log(`🔍 Iniciando busca de última importação para: ${entityType}`);
+
     const importLogsRef = collection(db, "import_logs");
-    const q = query(
-      importLogsRef,
-      where("entityType", "==", entityType),
-      orderBy("startTime", "desc"),
-      limit(1)
-    );
+
+    // Primeiro, buscar apenas por entityType (sem orderBy para evitar necessidade de índice)
+    const q = query(importLogsRef, where("entityType", "==", entityType));
 
     const snapshot = await getDocs(q);
 
+    console.log(
+      `🔍 Buscando última importação para ${entityType}: ${snapshot.size} registros encontrados`,
+    );
+
     if (snapshot.empty) {
+      console.log(
+        `📭 Nenhuma importação anterior encontrada para ${entityType}`,
+      );
       return null;
     }
 
-    const doc = snapshot.docs[0];
+    // Ordenar os resultados no cliente
+    const docs = snapshot.docs.sort((a, b) => {
+      const aTime = a.data().startTime?.toDate?.() || new Date(0);
+      const bTime = b.data().startTime?.toDate?.() || new Date(0);
+      return bTime.getTime() - aTime.getTime(); // Ordem decrescente
+    });
+
+    const doc = docs[0];
     const data = doc.data();
 
-    return {
-      id: doc.id,
-      entityType: data.entityType,
+    const lastImport = {
       fileName: data.fileName,
-      date: data.startTime.toDate(),
-      importedRows: data.importedRows,
-      totalRows: data.totalRows,
+      date: data.startTime?.toDate?.() || new Date(),
       status: data.status,
-      userId: data.userId,
       userName: data.userName || "Usuário",
     };
+
+    console.log(`✅ Última importação encontrada:`, lastImport);
+    return lastImport;
   } catch (error) {
     console.error("Erro ao buscar última importação:", error);
     return null;
@@ -380,7 +388,7 @@ export function getImportService(entityType: string): BaseImportService {
     // Adicionar outros serviços conforme implementados
     default:
       throw new Error(
-        `Serviço de importação não encontrado para: ${entityType}`
+        `Serviço de importação não encontrado para: ${entityType}`,
       );
   }
 }

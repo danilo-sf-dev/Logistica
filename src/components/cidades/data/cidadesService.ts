@@ -44,7 +44,7 @@ async function getById(id: string): Promise<Cidade | null> {
 async function criar(input: CidadeInput): Promise<string> {
   // Sanitizar dados para remover campos undefined
   const sanitizedInput = Object.fromEntries(
-    Object.entries(input).filter(([_, value]) => value !== undefined)
+    Object.entries(input).filter(([_, value]) => value !== undefined),
   );
 
   const payload = {
@@ -68,8 +68,8 @@ async function criar(input: CidadeInput): Promise<string> {
   // Remover campos null/undefined do payload final
   const finalPayload = Object.fromEntries(
     Object.entries(payload).filter(
-      ([_, value]) => value !== undefined && value !== null
-    )
+      ([_, value]) => value !== undefined && value !== null,
+    ),
   );
 
   const ref = await addDoc(collection(db, COLLECTION), finalPayload);

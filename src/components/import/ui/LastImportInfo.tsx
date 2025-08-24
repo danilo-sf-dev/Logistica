@@ -88,13 +88,6 @@ export const LastImportInfo: React.FC<LastImportInfoProps> = ({
             </div>
 
             <div className="flex justify-between">
-              <span className="text-sm text-blue-700">Registros:</span>
-              <span className="text-sm font-medium text-blue-900">
-                {lastImport.importedRows} de {lastImport.totalRows}
-              </span>
-            </div>
-
-            <div className="flex justify-between">
               <span className="text-sm text-blue-700">Status:</span>
               <span
                 className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(lastImport.status)}`}
