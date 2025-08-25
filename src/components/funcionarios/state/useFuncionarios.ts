@@ -48,6 +48,9 @@ export function useFuncionarios() {
   const [ordenarPor, setOrdenarPor] = useState<OrdenacaoCampo>("dataCriacao");
   const [direcaoOrdenacao, setDirecaoOrdenacao] =
     useState<DirecaoOrdenacao>("desc");
+  const [erros, setErros] = useState<
+    Partial<Record<keyof FuncionarioInput, string>>
+  >({});
   const [valores, setValores] = useState<FuncionarioInput>({
     nome: "",
     cpf: "",
@@ -90,19 +93,46 @@ export function useFuncionarios() {
 
   const validar = useCallback((input: FuncionarioInput) => {
     const novosErros: Partial<Record<keyof FuncionarioInput, string>> = {};
-    if (!input.nome.trim()) novosErros.nome = "Nome é obrigatório";
-    if (!input.cpf.trim()) novosErros.cpf = "CPF é obrigatório";
-    if (!input.cnh.trim()) novosErros.cnh = "CNH é obrigatório";
-    if (!input.celular.trim()) novosErros.celular = "Celular é obrigatório";
-    if (!input.endereco.trim()) novosErros.endereco = "Endereço é obrigatório";
-    if (input.cep && input.cep.replace(/\D/g, "").length !== 8)
-      novosErros.cep = "CEP inválido";
-    if (!input.cidade.trim()) novosErros.cidade = "Cidade é obrigatório";
-    if (input.cpf && !validateCPF(input.cpf)) novosErros.cpf = "CPF inválido";
-    if (input.email && !validateEmail(input.email))
-      novosErros.email = "Email inválido";
-    if (input.celular && !validateCelular(input.celular))
+
+    // Se o funcionário estiver inativo, não validar nada (não pode ser editado)
+    if (!input.ativo) {
+      setErros({});
+      return true;
+    }
+
+    // Validação apenas para funcionários ativos
+    if (!input.nome.trim()) {
+      novosErros.nome = "Nome é obrigatório";
+    }
+    if (!input.cpf.trim()) {
+      novosErros.cpf = "CPF é obrigatório";
+    } else if (!validateCPF(input.cpf)) {
+      novosErros.cpf = "CPF inválido";
+    }
+    if (!input.cnh.trim()) {
+      novosErros.cnh = "CNH é obrigatório";
+    }
+    if (!input.celular.trim()) {
+      novosErros.celular = "Celular é obrigatório";
+    } else if (!validateCelular(input.celular)) {
       novosErros.celular = "Celular deve ter DDD e começar com 9";
+    }
+    if (!input.endereco.trim()) {
+      novosErros.endereco = "Endereço é obrigatório";
+    }
+    if (!input.cidade.trim()) {
+      novosErros.cidade = "Cidade é obrigatório";
+    }
+    if (!input.cep?.trim()) {
+      novosErros.cep = "CEP é obrigatório";
+    } else if (input.cep.replace(/\D/g, "").length !== 8) {
+      novosErros.cep = "CEP inválido";
+    }
+    if (input.email && !validateEmail(input.email)) {
+      novosErros.email = "Email inválido";
+    }
+
+    setErros(novosErros);
     return Object.keys(novosErros).length === 0;
   }, []);
 
@@ -282,7 +312,7 @@ export function useFuncionarios() {
         setDirecaoOrdenacao("asc");
       }
     },
-    [direcaoOrdenacao, ordenarPor],
+    [direcaoOrdenacao, ordenarPor]
   );
 
   const listaFiltrada = useMemo(() => {
@@ -439,5 +469,6 @@ export function useFuncionarios() {
     confirmar,
     carregar,
     handleExportExcel,
+    erros,
   };
 }

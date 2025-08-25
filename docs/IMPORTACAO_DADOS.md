@@ -1351,6 +1351,214 @@ interface ImportLog {
 3. **Performance**
 4. **Feedback dos usuários**
 
+## 🛡️ Validações de Formulário - Padrão Implementado
+
+### 📋 Visão Geral
+
+O sistema implementou um padrão consistente de validação de formulários em todas as entidades, garantindo uma experiência uniforme para o usuário e prevenindo inconsistências nos dados.
+
+### 🎯 Padrão de Validação
+
+#### **1. Validação no Hook (State)**
+
+- ✅ **Centralizada**: Toda validação é feita no hook da entidade
+- ✅ **Consistente**: Mesmo padrão em todas as entidades
+- ✅ **Reutilizável**: Lógica de validação compartilhada
+
+#### **2. Validação Condicional para Entidades Inativas**
+
+- ✅ **Funcionários Inativos**: Não podem ser editados, validação desabilitada
+- ✅ **Vendedores Inativos**: Não podem ser editados, validação desabilitada
+- ✅ **Veículos Inativos**: Não podem ser editados, validação desabilitada
+
+#### **3. Feedback Visual Padronizado**
+
+- ✅ **Bordas Vermelhas**: Campos com erro recebem borda vermelha
+- ✅ **Mensagens Específicas**: Cada campo tem sua mensagem de erro
+- ✅ **Push de Notificação**: Lista todos os erros ao submeter
+- ✅ **Asteriscos Pretos**: Campos obrigatórios marcados com \*
+
+### 📝 Entidades com Validação Implementada
+
+#### **1. Cidades** ✅
+
+**Campos Obrigatórios:**
+
+- Nome <span className="text-black">\*</span>
+- Estado <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Unicidade**: Nome + Estado deve ser único (considerando acentuação)
+- **Formato**: Nome e Estado convertidos para maiúsculas
+- **Normalização**: Remove acentos e pontuação para comparação
+
+#### **2. Vendedores** ✅
+
+**Campos Obrigatórios:**
+
+- Nome <span className="text-black">\*</span>
+- CPF <span className="text-black">\*</span>
+- Celular <span className="text-black">\*</span>
+- Região <span className="text-black">\*</span>
+- Unidade de Negócio <span className="text-black">\*</span>
+- Tipo de Contrato <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **CPF**: Formato válido e único no sistema
+- **Email**: Formato válido e único (se fornecido)
+- **Celular**: Formato válido (DDD + 9 dígitos)
+- **Formato**: Nome e Região em maiúsculas, Unidade em minúsculas
+
+#### **3. Folgas** ✅
+
+**Campos Obrigatórios:**
+
+- Funcionário <span className="text-black">\*</span>
+- Data de Início <span className="text-black">\*</span>
+- Data de Fim <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Datas**: Data de fim deve ser posterior à data de início
+- **Horas**: Validação específica para tipos `banco_horas` e `compensacao`
+- **Funcionário**: Deve ser um funcionário válido do sistema
+
+#### **4. Rotas** ✅
+
+**Campos Obrigatórios:**
+
+- Nome <span className="text-black">\*</span>
+- Data da Rota <span className="text-black">\*</span>
+- Dia da Semana <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Data**: Não pode ser anterior ao dia atual
+- **Peso Mínimo**: Deve ser um valor positivo
+- **Dias**: Pelo menos um dia da semana deve ser selecionado
+
+#### **5. Veículos** ✅
+
+**Campos Obrigatórios:**
+
+- Placa <span className="text-black">\*</span>
+- Modelo <span className="text-black">\*</span>
+- Marca <span className="text-black">\*</span>
+- Ano <span className="text-black">\*</span>
+- Capacidade <span className="text-black">\*</span>
+- Quantidade de Eixos <span className="text-black">\*</span>
+- Tipo de Baú <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Ano**: Entre 1900 e o próximo ano
+- **Capacidade**: Número positivo
+- **Eixos**: Entre 2 e 10 eixos
+- **Formato**: Placa, modelo e marca em maiúsculas
+
+#### **6. Funcionários** ✅
+
+**Campos Obrigatórios:**
+
+- Nome <span className="text-black">\*</span>
+- CPF <span className="text-black">\*</span>
+- CNH <span className="text-black">\*</span>
+- Celular <span className="text-black">\*</span>
+- CEP <span className="text-black">\*</span>
+- Endereço <span className="text-black">\*</span>
+- Cidade <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **CPF**: Formato válido
+- **CNH**: Campo obrigatório
+- **Celular**: Formato válido (DDD + 9 dígitos)
+- **CEP**: Formato válido (8 dígitos)
+- **Email**: Formato válido (se fornecido)
+- **Formato**: Nome em maiúsculas
+
+### 🔧 Implementação Técnica
+
+#### **Estrutura do Hook**
+
+```typescript
+// Estado de erros
+const [erros, setErros] = useState<Partial<Record<keyof EntityInput, string>>>(
+  {}
+);
+
+// Função de validação
+const validar = useCallback((input: EntityInput) => {
+  const novosErros: Partial<Record<keyof EntityInput, string>> = {};
+
+  // Validação condicional para entidades inativas
+  if (!input.ativo) {
+    setErros({});
+    return true;
+  }
+
+  // Validações específicas
+  if (!input.campo?.trim()) {
+    novosErros.campo = "Campo é obrigatório";
+  }
+
+  setErros(novosErros);
+  return Object.keys(novosErros).length === 0;
+}, []);
+
+// Integração na função de confirmação
+const confirmar = useCallback(async () => {
+  if (!validar(valores)) {
+    showNotification("Por favor, corrija os erros no formulário", "error");
+    return;
+  }
+  // ... resto da lógica
+}, [validar, valores]);
+```
+
+#### **Estrutura do Modal**
+
+```typescript
+// Props do modal
+interface EntityFormModalProps {
+  erros?: Partial<Record<keyof EntityInput, string>>;
+  // ... outras props
+}
+
+// Uso nos campos
+<input
+  className={`input-field ${erros.campo ? "border-red-500" : ""}`}
+  // ... outras props
+/>
+{erros.campo && (
+  <p className="text-red-500 text-xs mt-1">{erros.campo}</p>
+)}
+```
+
+### 🎯 Benefícios do Padrão
+
+1. **Consistência**: Mesmo comportamento em todas as entidades
+2. **Manutenibilidade**: Validação centralizada e reutilizável
+3. **Experiência do Usuário**: Feedback visual uniforme
+4. **Prevenção de Erros**: Validação robusta antes de salvar
+5. **Flexibilidade**: Fácil adição de novas validações
+6. **Performance**: Validação apenas no submit, sem loops
+
+### 📊 Status de Implementação
+
+| Entidade     | Validação | Asteriscos | Status       |
+| ------------ | --------- | ---------- | ------------ |
+| Cidades      | ✅        | ✅         | **Completo** |
+| Vendedores   | ✅        | ✅         | **Completo** |
+| Folgas       | ✅        | ✅         | **Completo** |
+| Rotas        | ✅        | ✅         | **Completo** |
+| Veículos     | ✅        | ✅         | **Completo** |
+| Funcionários | ✅        | ✅         | **Completo** |
+
+---
+
 ## 📋 Resumo das Melhorias Implementadas
 
 ### ✅ **Funcionalidades Adicionadas:**
@@ -1393,6 +1601,15 @@ interface ImportLog {
    - Gerenciamento visual de muitos erros
    - Cards visuais para melhor organização
 
+8. **Validação de Formulários Padronizada**
+   - Padrão consistente em todas as entidades
+   - Validação centralizada no hook
+   - Feedback visual uniforme (bordas vermelhas, mensagens)
+   - Asteriscos pretos nos campos obrigatórios
+   - Validação condicional para entidades inativas
+   - Push de notificação com lista de erros
+   - Prevenção de salvamento com dados inválidos
+
 ### 🎯 **Benefícios Alcançados:**
 
 - **🎯 Simplicidade**: Template mais limpo e fácil de usar
@@ -1404,6 +1621,10 @@ interface ImportLog {
 - **👥 Usabilidade**: Feedback claro e orientações para correção
 - **📱 Responsividade**: Interface adaptável para qualquer dispositivo
 - **📊 Escalabilidade**: Suporte a grandes volumes de dados
+- **✅ Consistência**: Validação uniforme em todos os formulários
+- **🛡️ Prevenção**: Evita salvamento de dados inválidos
+- **🎨 Experiência**: Interface visual consistente e intuitiva
+- **🔧 Manutenibilidade**: Código padronizado e reutilizável
 
 ---
 
@@ -1423,3 +1644,8 @@ interface ImportLog {
 - ✅ Validações específicas para CPF, Email, Código Sistema
 - ✅ Formatação automática de dados (maiúsculas/minúsculas)
 - ✅ Conversão de cidades atendidas de string para array
+- ✅ **Validação de Formulários Padronizada** em todas as entidades
+- ✅ **Feedback Visual Uniforme** (bordas vermelhas, mensagens específicas)
+- ✅ **Asteriscos nos Campos Obrigatórios** para melhor usabilidade
+- ✅ **Validação Condicional** para entidades inativas
+- ✅ **Prevenção de Salvamento** com dados inválidos

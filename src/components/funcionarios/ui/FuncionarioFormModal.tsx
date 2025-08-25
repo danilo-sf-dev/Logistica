@@ -196,7 +196,7 @@ const FuncionarioFormModal: React.FC<Props> = ({
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                CEP
+                CEP <span className="text-black">*</span>
               </label>
               <input
                 type="text"

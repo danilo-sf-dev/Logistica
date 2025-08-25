@@ -81,6 +81,14 @@
 - **Exportar**: Download de dados
 - **Gráficos**: Visualizações interativas
 
+### ✅ Validações
+
+- **Campos obrigatórios**: Marcados com asterisco (\*)
+- **Feedback visual**: Bordas vermelhas em campos com erro
+- **Mensagens específicas**: Erro detalhado abaixo do campo
+- **Entidades inativas**: Não podem ser editadas
+- **Formato de dados**: CPF, celular, CEP, email validados
+
 ## 🆕 **Novas Funcionalidades**
 
 ### 📊 **Relatórios Detalhados**

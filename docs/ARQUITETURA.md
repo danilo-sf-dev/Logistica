@@ -468,6 +468,33 @@ const formatPhone = (phone: string): string => {
 - **Sanitização**: Remoção de caracteres especiais
 - **Limites**: Controle de tamanho de arquivos
 
+### Validação de Formulários
+
+O sistema implementa um padrão consistente de validação em todas as entidades:
+
+#### **Padrão de Validação**
+
+- **Hook-based**: Validação centralizada no hook de cada entidade
+- **Submit-only**: Validação apenas no momento do submit
+- **Visual feedback**: Bordas vermelhas e mensagens específicas
+- **Conditional**: Validação desabilitada para entidades inativas
+
+#### **Entidades com Validação**
+
+- **Cidades**: Unicidade nome+estado, normalização de acentos
+- **Vendedores**: CPF único, email único, formato de dados
+- **Funcionários**: CPF, CNH, celular, CEP obrigatórios
+- **Veículos**: Ano, capacidade, eixos, formato de placa
+- **Rotas**: Data futura, peso mínimo, dias da semana
+- **Folgas**: Datas válidas, funcionário, horas específicas
+
+#### **Feedback Visual**
+
+- **Asteriscos pretos**: Campos obrigatórios
+- **Bordas vermelhas**: Campos com erro
+- **Mensagens específicas**: Erro detalhado por campo
+- **Push de notificação**: Lista consolidada de erros
+
 ### Permissões
 
 - **Controle de acesso**: Verificação de permissões por relatório
