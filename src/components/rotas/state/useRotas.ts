@@ -24,7 +24,47 @@ export const useRotas = () => {
     direction: "asc",
   });
 
+  const [erros, setErros] = useState<
+    Partial<Record<keyof RotaFormData, string>>
+  >({});
+
   const { showNotification } = useNotification();
+
+  const validar = useCallback((input: RotaFormData) => {
+    const novosErros: Partial<Record<keyof RotaFormData, string>> = {};
+
+    if (!input.nome?.trim()) {
+      novosErros.nome = "Nome da rota é obrigatório";
+    }
+
+    if (!input.dataRota) {
+      novosErros.dataRota = "Data da rota é obrigatória";
+    } else {
+      // Obter a data de hoje no fuso horário local
+      const hoje = new Date();
+      const hojeLocal =
+        hoje.getFullYear() +
+        "-" +
+        String(hoje.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(hoje.getDate()).padStart(2, "0");
+
+      if (input.dataRota < hojeLocal) {
+        novosErros.dataRota = "Data da rota não pode ser anterior ao dia atual";
+      }
+    }
+
+    if (!input.diaSemana || input.diaSemana.length === 0) {
+      novosErros.diaSemana = "Pelo menos um dia da semana deve ser selecionado";
+    }
+
+    if (input.pesoMinimo !== undefined && input.pesoMinimo < 0) {
+      novosErros.pesoMinimo = "Peso mínimo deve ser um valor positivo";
+    }
+
+    setErros(novosErros);
+    return Object.keys(novosErros).length === 0;
+  }, []);
 
   const fetchRotas = useCallback(async () => {
     try {
@@ -47,6 +87,12 @@ export const useRotas = () => {
 
   const createRota = useCallback(
     async (rotaData: RotaFormData) => {
+      // Validar formulário
+      if (!validar(rotaData)) {
+        showNotification("Por favor, corrija os erros no formulário", "error");
+        return false;
+      }
+
       try {
         await rotasService.create(rotaData);
         showNotification("Rota criada com sucesso!", "success");
@@ -58,11 +104,17 @@ export const useRotas = () => {
         return false;
       }
     },
-    [fetchRotas, showNotification],
+    [fetchRotas, showNotification, validar],
   );
 
   const updateRota = useCallback(
     async (id: string, rotaData: Partial<RotaFormData>) => {
+      // Validar formulário
+      if (!validar(rotaData as RotaFormData)) {
+        showNotification("Por favor, corrija os erros no formulário", "error");
+        return false;
+      }
+
       try {
         await rotasService.update(id, rotaData);
         showNotification("Rota atualizada com sucesso!", "success");
@@ -74,7 +126,7 @@ export const useRotas = () => {
         return false;
       }
     },
-    [fetchRotas, showNotification],
+    [fetchRotas, showNotification, validar],
   );
 
   const deleteRota = useCallback(
@@ -218,6 +270,7 @@ export const useRotas = () => {
     handleSort,
     refreshRotas: fetchRotas,
     handleExportExcel,
+    erros,
   };
 
   return result;

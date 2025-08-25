@@ -23,6 +23,7 @@ export const RotasListPage: React.FC = () => {
     updateFilters,
     handleSort,
     handleExportExcel,
+    erros,
   } = useRotas();
 
   const [showModal, setShowModal] = useState(false);
@@ -211,6 +212,7 @@ export const RotasListPage: React.FC = () => {
         onClose={handleCloseModal}
         onSubmit={editingRota ? handleUpdateRota : handleCreateRota}
         editingRota={editingRota}
+        erros={erros}
       />
 
       {/* Modal de Confirmação de Exclusão */}
