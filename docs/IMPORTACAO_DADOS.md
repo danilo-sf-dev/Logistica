@@ -968,6 +968,7 @@ interface ImportError {
 2. **Facilita Correção**: Sabe qual linha e campo corrigir
 3. **Padrão Consistente**: Igual em todas as entidades
 4. **Experiência Melhorada**: Feedback visual organizado e profissional
+5. **Valores Específicos**: Mostra o valor exato que está causando o problema
 
 #### **Entidades Afetadas**
 
@@ -978,7 +979,85 @@ interface ImportError {
 - ✅ **Rotas**: Já implementado corretamente
 - ✅ **Folgas**: Já implementado corretamente
 
-### 4.5 Validação de Template por Entidade
+### 4.5 Padrão de Mensagens de Erro - Valores Específicos
+
+#### **Padrão Implementado no Projeto**
+
+**Estrutura Padronizada de Mensagens de Erro:**
+
+- ✅ **Linha + Campo**: "Linha 2: Nome"
+- ✅ **Valor Específico**: Mostra o valor exato que está causando o problema
+- ✅ **Mensagem Clara**: Descrição específica do erro
+
+#### **Exemplos por Entidade**
+
+**Cidades:**
+
+```
+Linha 2: Nome
+Cidade "SÃO PAULO" já cadastrada no sistema
+```
+
+**Vendedores:**
+
+```
+Linha 2: cpf
+CPF "12345678901" já cadastrado no sistema
+
+Linha 2: email
+Email "joao@email.com" já cadastrado no sistema
+
+Linha 2: codigoVendSistema
+Código "VEND001" já cadastrado no sistema
+```
+
+**Veículos:**
+
+```
+Linha 2: Placa
+Placa "DBT1P50" já existe no sistema
+```
+
+#### **Implementação Técnica**
+
+```typescript
+// Padrão para validação de unicidade
+errors.push({
+  row: rowNumber,
+  field: "Nome do Campo",
+  message: `Campo "${row[0].toString().trim()}" já cadastrado no sistema`,
+});
+
+// Padrão para validação de formato
+errors.push({
+  row: rowNumber,
+  field: "CPF",
+  message: `CPF "${row[1].toString().trim()}" deve ter exatamente 11 dígitos`,
+});
+
+// Padrão para validação de opções válidas
+errors.push({
+  row: rowNumber,
+  field: "Status",
+  message: `Status "${row[8]}" inválido. Opções válidas: Ativo, Inativo, Manutenção`,
+});
+```
+
+#### **Benefícios do Padrão**
+
+1. **Identificação Precisa**: Usuário sabe exatamente qual valor está causando o problema
+2. **Correção Facilitada**: Pode identificar e corrigir o problema específico
+3. **Consistência**: Todas as entidades seguem o mesmo padrão
+4. **UX Melhorada**: Feedback mais claro e útil
+5. **Debugging**: Facilita a identificação de problemas durante testes
+
+#### **Entidades com Padrão Implementado**
+
+- ✅ **Cidades**: Valores específicos em todas as validações
+- ✅ **Vendedores**: Valores específicos em todas as validações
+- ✅ **Veículos**: Valores específicos em todas as validações
+
+### 4.6 Validação de Template por Entidade
 
 #### **Problema Crítico Identificado e Resolvido**
 
@@ -1623,6 +1702,13 @@ O sistema implementou um padrão consistente de validação de formulários em t
 - ✅ **Push de Notificação**: Lista todos os erros ao submeter
 - ✅ **Asteriscos Pretos**: Campos obrigatórios marcados com \*
 
+#### **4. Padrão de Mensagens de Erro - Valores Específicos**
+
+- ✅ **Linha + Campo**: "Linha 2: Nome"
+- ✅ **Valor Específico**: Mostra o valor exato que está causando o problema
+- ✅ **Mensagem Clara**: Descrição específica do erro
+- ✅ **Consistência**: Todas as entidades seguem o mesmo padrão
+
 ### 📝 Entidades com Validação Implementada
 
 #### **1. Cidades** ✅
@@ -1900,6 +1986,7 @@ interface EntityFormModalProps {
 - **🛡️ Segurança**: Validação de template por entidade previne corrupção de dados
 - **🔒 Integridade**: Garante compatibilidade de templates e dados
 - **🎨 Interface Limpa**: Mensagens sem redundância e botões proeminentes
+- **🎯 Valores Específicos**: Mensagens de erro mostram valores exatos que causam problemas
 
 ---
 
@@ -1935,3 +2022,4 @@ interface EntityFormModalProps {
 - ✅ **Detecção Inteligente de Templates** - identifica automaticamente o tipo correto
 - ✅ **Mensagens de Erro Limpas** - sem redundância e mais claras
 - ✅ **Interface de Erro Melhorada** - botões proeminentes e centralizados
+- ✅ **Padrão de Valores Específicos** - mensagens mostram valores exatos que causam problemas

@@ -180,7 +180,7 @@ export class VendedoresImportService extends BaseImportService {
             errors.push({
               row: rowNumber,
               field: "cpf",
-              message: "CPF já cadastrado no sistema",
+              message: `CPF "${row[1].toString().trim()}" já cadastrado no sistema`,
             });
           }
         }
@@ -190,7 +190,7 @@ export class VendedoresImportService extends BaseImportService {
           errors.push({
             row: rowNumber,
             field: "email",
-            message: "Email já cadastrado no sistema",
+            message: `Email "${row[2].toString().trim()}" já cadastrado no sistema`,
           });
         }
 
@@ -199,7 +199,7 @@ export class VendedoresImportService extends BaseImportService {
           errors.push({
             row: rowNumber,
             field: "codigoVendSistema",
-            message: "Código já cadastrado no sistema",
+            message: `Código "${row[5].toString().trim()}" já cadastrado no sistema`,
           });
         }
 
