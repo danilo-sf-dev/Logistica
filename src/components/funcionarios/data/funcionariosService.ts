@@ -8,6 +8,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  where,
 } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import type { Funcionario, FuncionarioInput } from "../types";
@@ -43,7 +44,51 @@ function normalizeMoneyString(valor?: string | null): string | null {
 
 const limpar = (s: string) => s.replace(/\D/g, "");
 
+async function verificarCPFExistente(
+  cpf: string,
+  idExcluir?: string,
+): Promise<boolean> {
+  const cpfLimpo = limpar(cpf);
+  const q = query(collection(db, COLLECTION), where("cpf", "==", cpfLimpo));
+  const snapshot = await getDocs(q);
+
+  // Se estamos editando, excluir o próprio registro da verificação
+  if (idExcluir) {
+    return snapshot.docs.some((doc) => doc.id !== idExcluir);
+  }
+
+  return !snapshot.empty;
+}
+
+async function verificarCNHExistente(
+  cnh: string,
+  idExcluir?: string,
+): Promise<boolean> {
+  const cnhLimpo = limpar(cnh);
+  const q = query(collection(db, COLLECTION), where("cnh", "==", cnhLimpo));
+  const snapshot = await getDocs(q);
+
+  // Se estamos editando, excluir o próprio registro da verificação
+  if (idExcluir) {
+    return snapshot.docs.some((doc) => doc.id !== idExcluir);
+  }
+
+  return !snapshot.empty;
+}
+
 async function criar(input: FuncionarioInput): Promise<string> {
+  // Verificar se CPF já existe
+  const cpfExiste = await verificarCPFExistente(input.cpf);
+  if (cpfExiste) {
+    throw new Error("CPF já cadastrado no sistema");
+  }
+
+  // Verificar se CNH já existe
+  const cnhExiste = await verificarCNHExistente(input.cnh);
+  if (cnhExiste) {
+    throw new Error("CNH já cadastrada no sistema");
+  }
+
   const payload = {
     ...input,
     cpf: limpar(input.cpf),
@@ -59,6 +104,18 @@ async function criar(input: FuncionarioInput): Promise<string> {
 }
 
 async function atualizar(id: string, input: FuncionarioInput): Promise<void> {
+  // Verificar se CPF já existe (excluindo o próprio registro)
+  const cpfExiste = await verificarCPFExistente(input.cpf, id);
+  if (cpfExiste) {
+    throw new Error("CPF já cadastrado no sistema");
+  }
+
+  // Verificar se CNH já existe (excluindo o próprio registro)
+  const cnhExiste = await verificarCNHExistente(input.cnh, id);
+  if (cnhExiste) {
+    throw new Error("CNH já cadastrada no sistema");
+  }
+
   const payload = {
     ...input,
     cpf: limpar(input.cpf),

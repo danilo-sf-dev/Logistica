@@ -17,7 +17,7 @@ const loadXLSX = async () => {
       const module = await import("xlsx");
       XLSX = module;
     } catch (error) {
-      console.error("Erro ao carregar XLSX:", error);
+      // Erro silencioso ao carregar XLSX
     }
   }
   return XLSX;
@@ -63,6 +63,10 @@ export abstract class BaseImportService {
 
       return result;
     } catch (error) {
+      // Se o erro já contém "Erro na importação", não duplicar
+      if (error.message.includes("Erro na importação")) {
+        throw error;
+      }
       throw new Error(`Erro na importação: ${error.message}`);
     }
   }
@@ -168,6 +172,35 @@ export abstract class BaseImportService {
           // Converter para JSON
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
+          // VALIDAÇÃO CRÍTICA: Verificar se o template é correto para a entidade
+          if (jsonData.length > 0) {
+            const headers = jsonData[0];
+            const expectedHeaders = this.config.templateConfig.headers;
+
+            // Verificar se pelo menos 70% dos cabeçalhos esperados estão presentes
+            const matchingHeaders = expectedHeaders.filter((expectedHeader) =>
+              headers.some(
+                (header) =>
+                  header &&
+                  header
+                    .toString()
+                    .toLowerCase()
+                    .includes(
+                      expectedHeader.toLowerCase().replace("*", "").trim(),
+                    ),
+              ),
+            );
+
+            const matchPercentage =
+              (matchingHeaders.length / expectedHeaders.length) * 100;
+
+            if (matchPercentage < 70) {
+              throw new Error(
+                `Este arquivo parece ser um template de ${this.detectEntityTypeFromHeaders(headers)}, mas você está tentando importar para ${this.getEntityDisplayName()}. Por favor, use o template correto.`,
+              );
+            }
+          }
+
           // Remover cabeçalhos e linhas vazias
           const cleanData = jsonData
             .slice(1) // Remove cabeçalho
@@ -180,14 +213,57 @@ export abstract class BaseImportService {
 
           resolve(cleanData);
         } catch (error) {
-          reject(
-            new Error(`Erro ao processar arquivo Excel: ${error.message}`),
-          );
+          // Se o erro já contém nossa mensagem personalizada, não adicionar prefixo
+          if (
+            error.message.includes("Este arquivo parece ser um template de")
+          ) {
+            reject(error);
+          } else {
+            reject(
+              new Error(`Erro ao processar arquivo Excel: ${error.message}`),
+            );
+          }
         }
       };
       reader.onerror = () => reject(new Error("Erro ao ler arquivo"));
       reader.readAsArrayBuffer(file);
     });
+  }
+
+  // Método para detectar o tipo de entidade baseado nos cabeçalhos
+  private detectEntityTypeFromHeaders(headers: any[]): string {
+    const headerText = headers.join(" ").toLowerCase();
+
+    if (
+      headerText.includes("placa") ||
+      headerText.includes("marca") ||
+      headerText.includes("carroceria")
+    ) {
+      return "Veículos";
+    }
+    if (headerText.includes("cpf") && headerText.includes("cnh")) {
+      return "Funcionários";
+    }
+    if (headerText.includes("cpf") && headerText.includes("região")) {
+      return "Vendedores";
+    }
+    if (headerText.includes("nome") && headerText.includes("estado")) {
+      return "Cidades";
+    }
+    if (
+      headerText.includes("funcionário") ||
+      headerText.includes("data início")
+    ) {
+      return "Folgas";
+    }
+    if (
+      headerText.includes("peso mínimo") ||
+      headerText.includes("dia semana")
+    ) {
+      return "Rotas";
+    }
+
+    return "Entidade Desconhecida";
   }
 
   protected createInstructionsSheet() {
@@ -367,6 +443,14 @@ export function getImportService(entityType: string): BaseImportService {
     case "vendedores":
       const { VendedoresImportService } = require("./vendedoresImportService");
       return new VendedoresImportService();
+    case "veiculos":
+      const { VeiculosImportService } = require("./veiculosImportService");
+      return new VeiculosImportService();
+    case "funcionarios":
+      const {
+        FuncionariosImportService,
+      } = require("./funcionariosImportService");
+      return new FuncionariosImportService();
     // Adicionar outros serviços conforme implementados
     default:
       throw new Error(

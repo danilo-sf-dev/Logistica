@@ -78,6 +78,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
               }`}
               disabled={somenteLeitura}
             />
+            {erros.nome && (
+              <p className="text-red-500 text-xs mt-1">{erros.nome}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -98,6 +101,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
                 placeholder="000.000.000-00"
                 disabled={somenteLeitura}
               />
+              {erros.cpf && (
+                <p className="text-red-500 text-xs mt-1">{erros.cpf}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -112,6 +118,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
                 }`}
                 disabled={somenteLeitura}
               />
+              {erros.cnh && (
+                <p className="text-red-500 text-xs mt-1">{erros.cnh}</p>
+              )}
             </div>
           </div>
 
@@ -174,6 +183,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
                 placeholder="(73) 99999-9999"
                 disabled={somenteLeitura}
               />
+              {erros.celular && (
+                <p className="text-red-500 text-xs mt-1">{erros.celular}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -190,6 +202,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
                 }`}
                 disabled={somenteLeitura}
               />
+              {erros.email && (
+                <p className="text-red-500 text-xs mt-1">{erros.email}</p>
+              )}
             </div>
           </div>
 
@@ -211,6 +226,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
                 placeholder="00000-000"
                 disabled={somenteLeitura}
               />
+              {erros.cep && (
+                <p className="text-red-500 text-xs mt-1">{erros.cep}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -261,6 +279,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
               }`}
               disabled={somenteLeitura}
             />
+            {erros.endereco && (
+              <p className="text-red-500 text-xs mt-1">{erros.endereco}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -279,6 +300,9 @@ const FuncionarioFormModal: React.FC<Props> = ({
                 }`}
                 disabled={somenteLeitura}
               />
+              {erros.cidade && (
+                <p className="text-red-500 text-xs mt-1">{erros.cidade}</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

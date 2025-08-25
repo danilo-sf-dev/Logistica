@@ -122,7 +122,7 @@ export class CidadesImportService extends BaseImportService {
             errors.push({
               row: rowNumber,
               field: "Nome",
-              message: "Cidade já cadastrada no sistema",
+              message: `Cidade "${row[0].toString().trim()}" já cadastrada no sistema`,
             });
           }
         }

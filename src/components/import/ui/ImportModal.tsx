@@ -111,10 +111,9 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         await loadLastImportInfo(entityType);
       }
     } catch (error) {
-      console.error("Erro na importação:", error);
       setProgress({
         status: "error",
-        message: `Erro na importação: ${error.message}`,
+        message: error.message,
       });
     }
   };
@@ -284,19 +283,23 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 Importando...
               </h4>
               <p className="mt-1 text-sm text-gray-500">
-                {progress?.message || "Processando arquivo..."}
+                {progress?.status === "error"
+                  ? "Erro detectado"
+                  : "Processando arquivo..."}
               </p>
             </div>
 
             {progress?.status === "error" && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-sm text-red-700">{progress.message}</p>
-                <button
-                  onClick={() => setStep("upload")}
-                  className="mt-2 text-sm text-red-600 hover:text-red-500"
-                >
-                  Tentar novamente
-                </button>
+                <div className="mt-3 flex justify-center">
+                  <button
+                    onClick={() => setStep("upload")}
+                    className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  >
+                    Tentar novamente
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -431,8 +434,11 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                       key={index}
                       className="bg-yellow-100 border border-yellow-300 rounded p-2"
                     >
-                      <p className="text-xs text-yellow-700">
-                        Linha {warning.row}: {warning.message}
+                      <p className="text-sm font-medium text-yellow-800">
+                        Linha {warning.row}: {warning.field}
+                      </p>
+                      <p className="text-xs text-yellow-700 mt-1">
+                        {warning.message}
                       </p>
                     </div>
                   ))}

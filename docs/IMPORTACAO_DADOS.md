@@ -912,6 +912,258 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 };
 ```
 
+### 4.4 Estrutura de Erros Padronizada
+
+#### **Problema Identificado e Resolvido**
+
+**Situação Anterior:**
+
+- Erros retornados como strings simples: `"Linha 2: Placa é obrigatória"`
+- Modal não conseguia exibir detalhes específicos (linha, campo, mensagem)
+- Interface mostrava apenas "Linha :" vazio
+
+**Solução Implementada:**
+
+- **Estrutura Padronizada**: Todos os erros agora retornam objetos estruturados
+- **Formato Consistente**: `{ row: number, field: string, message: string }`
+- **Exibição Detalhada**: Modal mostra linha, campo e mensagem específica
+
+#### **Estrutura de Erro Padronizada**
+
+```typescript
+interface ImportError {
+  row: number;      // Número da linha no Excel
+  field: string;    // Nome do campo com erro
+  message: string;  // Mensagem descritiva do erro
+}
+
+// Exemplo de erro estruturado:
+{
+  row: 2,
+  field: "Placa",
+  message: "Placa 'ABC1234' já existe no sistema"
+}
+```
+
+#### **Exibição no Modal**
+
+```typescript
+// src/components/import/ui/ImportModal.tsx
+
+{result.errors.map((error, index) => (
+  <div key={index} className="bg-red-100 border border-red-300 rounded p-2">
+    <p className="text-sm font-medium text-red-800">
+      Linha {error.row}: {error.field}
+    </p>
+    <p className="text-xs text-red-700 mt-1">
+      {error.message}
+    </p>
+  </div>
+))}
+```
+
+#### **Benefícios da Correção**
+
+1. **Informação Clara**: Usuário vê exatamente onde está o problema
+2. **Facilita Correção**: Sabe qual linha e campo corrigir
+3. **Padrão Consistente**: Igual em todas as entidades
+4. **Experiência Melhorada**: Feedback visual organizado e profissional
+5. **Valores Específicos**: Mostra o valor exato que está causando o problema
+
+#### **Entidades Afetadas**
+
+- ✅ **Cidades**: Já implementado corretamente
+- ✅ **Vendedores**: Já implementado corretamente
+- ✅ **Veículos**: **Corrigido** - agora retorna erros estruturados
+- ✅ **Funcionários**: Já implementado corretamente
+- ✅ **Rotas**: Já implementado corretamente
+- ✅ **Folgas**: Já implementado corretamente
+
+### 4.5 Padrão de Mensagens de Erro - Valores Específicos
+
+#### **Padrão Implementado no Projeto**
+
+**Estrutura Padronizada de Mensagens de Erro:**
+
+- ✅ **Linha + Campo**: "Linha 2: Nome"
+- ✅ **Valor Específico**: Mostra o valor exato que está causando o problema
+- ✅ **Mensagem Clara**: Descrição específica do erro
+
+#### **Exemplos por Entidade**
+
+**Cidades:**
+
+```
+Linha 2: Nome
+Cidade "SÃO PAULO" já cadastrada no sistema
+```
+
+**Vendedores:**
+
+```
+Linha 2: cpf
+CPF "12345678901" já cadastrado no sistema
+
+Linha 2: email
+Email "joao@email.com" já cadastrado no sistema
+
+Linha 2: codigoVendSistema
+Código "VEND001" já cadastrado no sistema
+```
+
+**Veículos:**
+
+```
+Linha 2: Placa
+Placa "DBT1P50" já existe no sistema
+```
+
+#### **Implementação Técnica**
+
+```typescript
+// Padrão para validação de unicidade
+errors.push({
+  row: rowNumber,
+  field: "Nome do Campo",
+  message: `Campo "${row[0].toString().trim()}" já cadastrado no sistema`,
+});
+
+// Padrão para validação de formato
+errors.push({
+  row: rowNumber,
+  field: "CPF",
+  message: `CPF "${row[1].toString().trim()}" deve ter exatamente 11 dígitos`,
+});
+
+// Padrão para validação de opções válidas
+errors.push({
+  row: rowNumber,
+  field: "Status",
+  message: `Status "${row[8]}" inválido. Opções válidas: Ativo, Inativo, Manutenção`,
+});
+```
+
+#### **Benefícios do Padrão**
+
+1. **Identificação Precisa**: Usuário sabe exatamente qual valor está causando o problema
+2. **Correção Facilitada**: Pode identificar e corrigir o problema específico
+3. **Consistência**: Todas as entidades seguem o mesmo padrão
+4. **UX Melhorada**: Feedback mais claro e útil
+5. **Debugging**: Facilita a identificação de problemas durante testes
+
+#### **Entidades com Padrão Implementado**
+
+- ✅ **Cidades**: Valores específicos em todas as validações
+- ✅ **Vendedores**: Valores específicos em todas as validações
+- ✅ **Veículos**: Valores específicos em todas as validações
+
+### 4.6 Validação de Template por Entidade
+
+#### **Problema Crítico Identificado e Resolvido**
+
+**Situação Anterior:**
+
+- **Falha Grave**: Sistema permitia importar template de veículos na entidade Cidades
+- **Corrupção de Dados**: Risco de inconsistências no banco
+- **Sem Validação**: Nenhuma verificação de compatibilidade de template
+
+**Solução Implementada:**
+
+- **Validação de Cabeçalhos**: Compara cabeçalhos do arquivo com os esperados
+- **Threshold de 70%**: Exige pelo menos 70% de compatibilidade
+- **Detecção Inteligente**: Identifica automaticamente o tipo de template
+- **Mensagem Clara**: Informa exatamente qual template deveria ser usado
+
+#### **Implementação Técnica**
+
+```typescript
+// Validação de template por entidade
+if (jsonData.length > 0) {
+  const headers = jsonData[0];
+  const expectedHeaders = this.config.templateConfig.headers;
+
+  // Verificar se pelo menos 70% dos cabeçalhos esperados estão presentes
+  const matchingHeaders = expectedHeaders.filter((expectedHeader) =>
+    headers.some(
+      (header) =>
+        header &&
+        header
+          .toString()
+          .toLowerCase()
+          .includes(expectedHeader.toLowerCase().replace("*", "").trim())
+    )
+  );
+
+  const matchPercentage =
+    (matchingHeaders.length / expectedHeaders.length) * 100;
+
+  if (matchPercentage < 70) {
+    throw new Error(
+      `Este arquivo parece ser um template de ${this.detectEntityTypeFromHeaders(headers)}, mas você está tentando importar para ${this.getEntityDisplayName()}. Por favor, use o template correto.`
+    );
+  }
+}
+```
+
+#### **Detecção de Entidade por Cabeçalhos**
+
+```typescript
+private detectEntityTypeFromHeaders(headers: any[]): string {
+  const headerText = headers.join(' ').toLowerCase();
+
+  if (headerText.includes('placa') || headerText.includes('marca') || headerText.includes('carroceria')) {
+    return 'Veículos';
+  }
+  if (headerText.includes('cpf') && headerText.includes('cnh')) {
+    return 'Funcionários';
+  }
+  if (headerText.includes('cpf') && headerText.includes('região')) {
+    return 'Vendedores';
+  }
+  if (headerText.includes('nome') && headerText.includes('estado')) {
+    return 'Cidades';
+  }
+  if (headerText.includes('funcionário') || headerText.includes('data início')) {
+    return 'Folgas';
+  }
+  if (headerText.includes('peso mínimo') || headerText.includes('dia semana')) {
+    return 'Rotas';
+  }
+
+  return 'Entidade Desconhecida';
+}
+```
+
+#### **Mensagem de Erro Limpa**
+
+**Antes (Redundante):**
+
+```
+"Erro na importação: Erro ao processar arquivo Excel: Template incorreto para esta entidade. Este arquivo parece ser um template de Veículos, mas você está tentando importar para Cidades. Por favor, use o template correto."
+```
+
+**Depois (Limpo):**
+
+```
+"Erro na importação: Este arquivo parece ser um template de Veículos, mas você está tentando importar para Cidades. Por favor, use o template correto."
+```
+
+#### **Interface de Erro Melhorada**
+
+- ✅ **Mensagem Única**: Sem duplicação de texto
+- ✅ **Botão Preenchido**: "Tentar novamente" com estilo proeminente
+- ✅ **Centralização**: Botão centralizado para melhor UX
+- ✅ **Console Limpo**: Removidos console.error desnecessários
+
+#### **Benefícios da Correção**
+
+1. **Segurança**: Previne corrupção de dados
+2. **Integridade**: Garante compatibilidade de templates
+3. **Feedback Claro**: Usuário sabe exatamente o que está errado
+4. **Detecção Automática**: Sistema identifica o tipo correto de template
+5. **Interface Limpa**: Mensagens sem redundância
+6. **UX Melhorada**: Botões proeminentes e centralizados
+
 ### 5. Integração nas Páginas Existentes
 
 #### 5.1 Exemplo: FuncionariosListPage
@@ -1030,15 +1282,24 @@ IMPORTAÇÃO DE FUNCIONÁRIOS - INSTRUÇÕES
 
 📊 FORMATO DOS DADOS:
    - Nome: Texto (será convertido para maiúsculas)
-   - CPF: 11 dígitos sem pontos ou traços
-   - CNH: Número da CNH
+   - CPF: 11 dígitos sem pontos ou traços e deve ser válido
+   - CNH: Número da CNH (deve ser único)
    - Celular: 10 ou 11 dígitos
    - Email: Formato válido (opcional)
+   - CEP: 8 dígitos
+   - Endereço: Logradouro completo
+   - Cidade: Nome da cidade (será convertido para maiúsculas)
+   - Função: motorista, ajudante, outro
+   - Datas: Formato DD/MM/AAAA
+   - Salário: Valor numérico (ex: 3500,00)
 
 🔍 VALIDAÇÕES:
-   - CPF deve ser único no sistema
-   - CNH deve ser única no sistema
+   - CPF deve ser único no sistema e válido
+   - CNH deve ser único no sistema
    - Email deve ser único (se fornecido)
+   - CEP deve ter 8 dígitos
+   - Endereço e Cidade são obrigatórios
+   - Datas devem estar no formato correto
 
 💡 DICA:
    - Veja a planilha 'Exemplo' para referência de preenchimento
@@ -1049,15 +1310,15 @@ IMPORTAÇÃO DE FUNCIONÁRIOS - INSTRUÇÕES
 #### Planilha 2: Template
 
 ```
-Nome* | CPF* | CNH* | Celular* | Email | Cidade* | Função* | Status* | Tipo Contrato* | Unidade Negócio*
+Nome* | CPF* | CNH* | Celular* | Email | CEP* | Número | Complemento | Endereço* | Cidade* | Função | CNH Vencimento | CNH Categoria | Tóxico Último Exame | Tóxico Vencimento | Data Admissão | Salário | Observação
 ```
 
 #### Planilha 3: Exemplo
 
 ```
-Nome* | CPF* | CNH* | Celular* | Email | Cidade* | Função* | Status* | Tipo Contrato* | Unidade Negócio*
-JOÃO SILVA | 12345678901 | 12345678901 | 11999999999 | joao@email.com | São Paulo | motorista | disponivel | clt | frigorifico
-MARIA SANTOS | 98765432100 | 98765432100 | 11888888888 | maria@email.com | Rio de Janeiro | auxiliar | trabalhando | pj | ovos
+Nome* | CPF* | CNH* | Celular* | Email | CEP* | Número | Complemento | Endereço* | Cidade* | Função | CNH Vencimento | CNH Categoria | Tóxico Último Exame | Tóxico Vencimento | Data Admissão | Salário | Observação
+JOÃO SILVA | 11144477735 | 11144477735 | 11999999999 | joao@email.com | 01234567 | 123 | Apto 45 | Rua das Flores, 123 | São Paulo | motorista | 15/12/2025 | E | 15/01/2024 | 15/04/2024 | 01/01/2024 | 3500,00 | Funcionário dedicado e pontual
+MARIA SANTOS | 52998224725 | 52998224725 | 11888888888 | maria@email.com | 01310100 | 1000 | Sala 200 | Av. Paulista, 1000 | São Paulo | ajudante | 20/10/2025 | B | 20/02/2024 | 20/05/2024 | 15/02/2024 | 2800,00 | Ajudante experiente
 ```
 
 ### Exemplo: Template de Cidades
@@ -1187,6 +1448,78 @@ JOÃO SILVA | 12345678901 | joao@empresa.com | 11999999999 | SUDESTE | VEND001 |
 MARIA SANTOS | 98765432100 | maria@empresa.com | 11888888888 | NORDESTE | VEND002 | ovos | pj | Salvador,Ilhéus
 ```
 
+### Exemplo: Template de Veículos
+
+#### Planilha 1: Instruções
+
+```
+IMPORTAÇÃO DE VEÍCULOS - INSTRUÇÕES
+
+📋 COMO USAR ESTE TEMPLATE:
+
+✅ OPÇÃO 1 - USO SIMPLES (RECOMENDADO):
+   1. Vá para a planilha 'Template'
+   2. Preencha seus dados na planilha 'Template'
+   3. Salve o arquivo
+   4. Faça upload no sistema
+   5. Pronto! Os dados serão importados automaticamente
+
+✅ OPÇÃO 2 - PERSONALIZAÇÃO:
+   - Você pode excluir as planilhas 'Instruções' e 'Exemplo'
+   - Você pode renomear a planilha 'Template' para qualquer nome
+   - O sistema detectará automaticamente a planilha com dados
+
+📝 REGRAS DE PREENCHIMENTO:
+   - Todos os campos marcados com * são obrigatórios
+   - Não deixe linhas em branco entre os dados
+   - Preencha apenas na planilha 'Template' (ou sua planilha renomeada)
+   - Placa deve ser única no sistema
+
+📊 FORMATO DOS DADOS:
+   - Placa: Placa do veículo (será convertida para maiúsculas)
+   - Modelo: Modelo do veículo (opcional, será convertido para maiúsculas)
+   - Marca: Marca do veículo (será convertida para maiúsculas)
+   - Ano: Ano de fabricação (opcional)
+   - Capacidade: Capacidade em kg (deve ser número)
+   - Tipo Carroceria: Truck, Toco, Bitruck, Carreta, Carreta LS, Carreta 3 Eixos, Truck 3 Eixos, Truck 4 Eixos
+   - Quantidade Eixos: 2, 3, 4, 5, 6, 7, 8, 9 (apenas o número)
+   - Tipo Baú: Frigorífico, Carga Seca, Baucher, Graneleiro, Tanque, Caçamba, Plataforma
+   - Status: Disponível, Em Uso, Manutenção, Inativo
+   - Unidade Negócio: Frigorífico, Ovos, Ambos
+   - Última Manutenção: Data no formato DD/MM/AAAA (opcional)
+   - Próxima Manutenção: Data no formato DD/MM/AAAA (opcional)
+   - Motorista: Nome do motorista (opcional, será convertido para maiúsculas)
+   - Observação: Observações sobre o veículo (opcional, será convertida para maiúsculas)
+
+🔍 VALIDAÇÕES:
+   - Placa deve ser única no sistema
+   - Capacidade e Quantidade Eixos devem ser números válidos
+   - Tipo Carroceria deve ser uma das opções válidas (exatamente como aparece no sistema)
+   - Status deve ser uma das opções válidas (exatamente como aparece no sistema)
+   - Unidade Negócio deve ser uma das opções válidas (exatamente como aparece no sistema)
+   - Tipo Baú deve ser uma das opções válidas (exatamente como aparece no sistema)
+   - Datas devem estar no formato DD/MM/AAAA (se fornecidas)
+
+💡 DICA:
+   - Veja a planilha 'Exemplo' para referência de preenchimento
+   - O sistema aceita o arquivo mesmo se você excluir outras planilhas
+   - O sistema aceita o arquivo mesmo se você renomear a planilha 'Template'
+```
+
+#### Planilha 2: Template
+
+```
+Placa* | Modelo | Marca* | Ano | Capacidade* | Tipo Carroceria* | Quantidade Eixos* | Tipo Baú* | Status* | Unidade Negócio* | Última Manutenção | Próxima Manutenção | Motorista | Observação
+```
+
+#### Planilha 3: Exemplo
+
+```
+Placa* | Modelo | Marca* | Ano | Capacidade* | Tipo Carroceria* | Quantidade Eixos* | Tipo Baú* | Status* | Unidade Negócio* | Última Manutenção | Próxima Manutenção | Motorista | Observação
+ABC1234 | FH 460 | VOLVO | 2020 | 25000 | Truck | 3 | Frigorífico | Disponível | Frigorífico | 15/01/2024 | 15/04/2024 | JOÃO SILVA | Veículo em excelente estado
+XYZ5678 | Actros 2651 | MERCEDES-BENZ | 2021 | 30000 | Carreta | 6 | Frigorífico | Disponível | Ovos | 20/02/2024 | 20/05/2024 | MARIA SANTOS | Veículo para transporte de ovos
+```
+
 ## 🔒 Segurança e Validação
 
 ### Regras de Validação
@@ -1307,8 +1640,8 @@ interface ImportLog {
 
 - [x] Templates de Cidades ✅
 - [x] Templates de Vendedores ✅
-- [ ] Templates de Veículos
-- [ ] Templates de Funcionários
+- [x] Templates de Veículos ✅
+- [x] Templates de Funcionários ✅
 - [x] Validações específicas ✅
 - [x] Tratamento de erros ✅
 - [x] Logs de importação ✅
@@ -1378,6 +1711,13 @@ O sistema implementou um padrão consistente de validação de formulários em t
 - ✅ **Push de Notificação**: Lista todos os erros ao submeter
 - ✅ **Asteriscos Pretos**: Campos obrigatórios marcados com \*
 
+#### **4. Padrão de Mensagens de Erro - Valores Específicos**
+
+- ✅ **Linha + Campo**: "Linha 2: Nome"
+- ✅ **Valor Específico**: Mostra o valor exato que está causando o problema
+- ✅ **Mensagem Clara**: Descrição específica do erro
+- ✅ **Consistência**: Todas as entidades seguem o mesmo padrão
+
 ### 📝 Entidades com Validação Implementada
 
 #### **1. Cidades** ✅
@@ -1411,7 +1751,31 @@ O sistema implementou um padrão consistente de validação de formulários em t
 - **Celular**: Formato válido (DDD + 9 dígitos)
 - **Formato**: Nome e Região em maiúsculas, Unidade em minúsculas
 
-#### **3. Folgas** ✅
+#### **3. Veículos** ✅
+
+**Campos Obrigatórios:**
+
+- Placa <span className="text-black">\*</span>
+- Marca <span className="text-black">\*</span>
+- Capacidade <span className="text-black">\*</span>
+- Tipo Carroceria <span className="text-black">\*</span>
+- Quantidade Eixos <span className="text-black">\*</span>
+- Tipo Baú <span className="text-black">\*</span>
+- Status <span className="text-black">\*</span>
+- Unidade Negócio <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Placa**: Deve ser única no sistema
+- **Capacidade**: Deve ser um número válido maior que zero
+- **Quantidade Eixos**: Deve ser um número válido maior que zero
+- **Tipo Carroceria**: Deve ser uma das opções válidas (truck, toco, bitruck, carreta, carreta_ls, carreta_3_eixos, truck_3_eixos, truck_4_eixos)
+- **Status**: Deve ser uma das opções válidas (ativo, inativo, manutencao, acidentado, disponivel, em_uso)
+- **Unidade Negócio**: Deve ser uma das opções válidas (frigorifico, ovos, ambos)
+- **Datas**: Última e Próxima Manutenção devem estar no formato DD/MM/AAAA (se fornecidas)
+- **Formato**: Placa, modelo, marca, motorista e observação convertidos para maiúsculas
+
+#### **4. Folgas** ✅
 
 **Campos Obrigatórios:**
 
@@ -1425,7 +1789,7 @@ O sistema implementou um padrão consistente de validação de formulários em t
 - **Horas**: Validação específica para tipos `banco_horas` e `compensacao`
 - **Funcionário**: Deve ser um funcionário válido do sistema
 
-#### **4. Rotas** ✅
+#### **5. Rotas** ✅
 
 **Campos Obrigatórios:**
 
@@ -1439,7 +1803,7 @@ O sistema implementou um padrão consistente de validação de formulários em t
 - **Peso Mínimo**: Deve ser um valor positivo
 - **Dias**: Pelo menos um dia da semana deve ser selecionado
 
-#### **5. Veículos** ✅
+#### **6. Veículos** ✅
 
 **Campos Obrigatórios:**
 
@@ -1458,7 +1822,7 @@ O sistema implementou um padrão consistente de validação de formulários em t
 - **Eixos**: Entre 2 e 10 eixos
 - **Formato**: Placa, modelo e marca em maiúsculas
 
-#### **6. Funcionários** ✅
+#### **7. Funcionários** ✅
 
 **Campos Obrigatórios:**
 
@@ -1472,12 +1836,17 @@ O sistema implementou um padrão consistente de validação de formulários em t
 
 **Validações Específicas:**
 
-- **CPF**: Formato válido
-- **CNH**: Campo obrigatório
-- **Celular**: Formato válido (DDD + 9 dígitos)
-- **CEP**: Formato válido (8 dígitos)
-- **Email**: Formato válido (se fornecido)
-- **Formato**: Nome em maiúsculas
+- **CPF**: Deve ser válido e único no sistema (validação no modal e importação)
+- **CNH**: Deve ser única no sistema (validação no modal e importação)
+- **Celular**: Deve ter 10 ou 11 dígitos
+- **CEP**: Deve ter 8 dígitos
+- **Email**: Deve ser válido (se fornecido) - **não valida duplicidade**
+- **Função**: motorista, ajudante, outro
+- **Datas**: Formato DD/MM/AAAA
+- **Salário**: Deve ser numérico válido
+- **Endereço**: Construção automática combinando Endereço, Número e Complemento
+- **Campos Inativos**: Não podem ser editados, validação desabilitada
+- **Firebase**: Tratamento de campos undefined para evitar erros
 
 ### 🔧 Implementação Técnica
 
@@ -1625,15 +1994,29 @@ interface EntityFormModalProps {
 - **🛡️ Prevenção**: Evita salvamento de dados inválidos
 - **🎨 Experiência**: Interface visual consistente e intuitiva
 - **🔧 Manutenibilidade**: Código padronizado e reutilizável
+- **🔍 Feedback Detalhado**: Erros estruturados com linha, campo e mensagem específica
+- **🎯 Precisão**: Usuário sabe exatamente onde corrigir problemas
+- **📋 Padronização**: Estrutura de erros consistente em todas as entidades
+- **🛡️ Segurança**: Validação de template por entidade previne corrupção de dados
+- **🔒 Integridade**: Garante compatibilidade de templates e dados
+- **🎨 Interface Limpa**: Mensagens sem redundância e botões proeminentes
+- **🎯 Valores Específicos**: Mensagens de erro mostram valores exatos que causam problemas
 
 ---
 
 **Documento criado em:** Janeiro 2025  
-**Versão:** 1.2  
+**Versão:** 1.4  
 **Última atualização:** Janeiro 2025  
 **Responsável:** Equipe de Desenvolvimento SGL
 
-**Principais Atualizações v1.2:**
+**Principais Atualizações v1.4:**
+
+- ✅ **Validação de duplicidade de CPF e CNH** no modal e importação de Funcionários
+- ✅ **Remoção da validação de duplicidade de Email** (permite emails duplicados)
+- ✅ **Tratamento específico de erros** com mensagens claras para CPF e CNH duplicados
+- ✅ **Consistência de validação** entre modal e importação para Funcionários
+
+**Principais Atualizações v1.3:**
 
 - ✅ Validação robusta de duplicidade (sistema + arquivo)
 - ✅ Serviço padronizado de validação (ValidationService)
@@ -1649,3 +2032,24 @@ interface EntityFormModalProps {
 - ✅ **Asteriscos nos Campos Obrigatórios** para melhor usabilidade
 - ✅ **Validação Condicional** para entidades inativas
 - ✅ **Prevenção de Salvamento** com dados inválidos
+- ✅ **Implementação completa da importação de Veículos**
+- ✅ **Validações específicas para Placa, Capacidade, Tipo Carroceria**
+- ✅ **Formatação automática de dados de veículos (maiúsculas)**
+- ✅ **Validação de datas de manutenção no formato DD/MM/AAAA**
+- ✅ **Estrutura de Erros Padronizada** em todas as entidades
+- ✅ **Feedback Detalhado** com linha, campo e mensagem específica
+- ✅ **Correção de Exibição de Erros** no modal de importação
+- ✅ **Validação de Template por Entidade** - prevenção de corrupção de dados
+- ✅ **Detecção Inteligente de Templates** - identifica automaticamente o tipo correto
+- ✅ **Mensagens de Erro Limpas** - sem redundância e mais claras
+- ✅ **Interface de Erro Melhorada** - botões proeminentes e centralizados
+- ✅ **Padrão de Valores Específicos** - mensagens mostram valores exatos que causam problemas
+- ✅ **Implementação completa da importação de Funcionários**
+- ✅ **Validações específicas para CPF, CNH, CEP, Endereço**
+- ✅ **Construção automática de endereço completo** (combina Endereço, Número, Complemento)
+- ✅ **Tratamento de campos undefined** para evitar erros no Firebase
+- ✅ **Validação de formato de datas** (DD/MM/AAAA) e salário numérico
+- ✅ **CPFs válidos nos exemplos** para evitar erros de validação
+- ✅ **Validação de duplicidade de CPF e CNH** no modal e importação
+- ✅ **Remoção da validação de duplicidade de Email** (permite emails duplicados)
+- ✅ **Tratamento específico de erros** com mensagens claras para CPF e CNH duplicados
