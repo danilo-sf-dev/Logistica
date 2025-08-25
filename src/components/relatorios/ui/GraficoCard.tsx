@@ -134,12 +134,12 @@ export const GraficoCard: React.FC<GraficoCardProps> = ({
           "name" in item &&
           "value" in item &&
           typeof item.value === "number" &&
-          item.value > 0,
+          item.value > 0
       );
 
       const total = dadosValidos.reduce((sum, item) => sum + item.value, 0);
       const dadosOrdenados = [...dadosValidos].sort(
-        (a, b) => b.value - a.value,
+        (a, b) => b.value - a.value
       );
 
       // Se não há dados válidos, mostrar mensagem
@@ -156,9 +156,6 @@ export const GraficoCard: React.FC<GraficoCardProps> = ({
                   ? "rotas"
                   : "folgas"}{" "}
                 para exibir
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Dados recebidos: {JSON.stringify(config.dados)}
               </p>
             </div>
           </div>
