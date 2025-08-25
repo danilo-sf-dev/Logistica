@@ -312,7 +312,7 @@ export function useFuncionarios() {
         setDirecaoOrdenacao("asc");
       }
     },
-    [direcaoOrdenacao, ordenarPor]
+    [direcaoOrdenacao, ordenarPor],
   );
 
   const listaFiltrada = useMemo(() => {
