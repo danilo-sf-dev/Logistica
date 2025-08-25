@@ -191,7 +191,19 @@ export function useFuncionarios() {
       await carregar();
     } catch (error) {
       console.error("Erro ao salvar funcionário:", error);
-      showNotification("Erro ao salvar funcionário", "error");
+      if (
+        error instanceof Error &&
+        error.message === "CPF já cadastrado no sistema"
+      ) {
+        showNotification("CPF já cadastrado no sistema", "error");
+      } else if (
+        error instanceof Error &&
+        error.message === "CNH já cadastrada no sistema"
+      ) {
+        showNotification("CNH já cadastrada no sistema", "error");
+      } else {
+        showNotification("Erro ao salvar funcionário", "error");
+      }
     }
   }, [carregar, editando, showNotification, validar, valores]);
 

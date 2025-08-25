@@ -1282,15 +1282,24 @@ IMPORTAÇÃO DE FUNCIONÁRIOS - INSTRUÇÕES
 
 📊 FORMATO DOS DADOS:
    - Nome: Texto (será convertido para maiúsculas)
-   - CPF: 11 dígitos sem pontos ou traços
-   - CNH: Número da CNH
+   - CPF: 11 dígitos sem pontos ou traços e deve ser válido
+   - CNH: Número da CNH (deve ser único)
    - Celular: 10 ou 11 dígitos
    - Email: Formato válido (opcional)
+   - CEP: 8 dígitos
+   - Endereço: Logradouro completo
+   - Cidade: Nome da cidade (será convertido para maiúsculas)
+   - Função: motorista, ajudante, outro
+   - Datas: Formato DD/MM/AAAA
+   - Salário: Valor numérico (ex: 3500,00)
 
 🔍 VALIDAÇÕES:
-   - CPF deve ser único no sistema
-   - CNH deve ser única no sistema
+   - CPF deve ser único no sistema e válido
+   - CNH deve ser único no sistema
    - Email deve ser único (se fornecido)
+   - CEP deve ter 8 dígitos
+   - Endereço e Cidade são obrigatórios
+   - Datas devem estar no formato correto
 
 💡 DICA:
    - Veja a planilha 'Exemplo' para referência de preenchimento
@@ -1301,15 +1310,15 @@ IMPORTAÇÃO DE FUNCIONÁRIOS - INSTRUÇÕES
 #### Planilha 2: Template
 
 ```
-Nome* | CPF* | CNH* | Celular* | Email | Cidade* | Função* | Status* | Tipo Contrato* | Unidade Negócio*
+Nome* | CPF* | CNH* | Celular* | Email | CEP* | Número | Complemento | Endereço* | Cidade* | Função | CNH Vencimento | CNH Categoria | Tóxico Último Exame | Tóxico Vencimento | Data Admissão | Salário | Observação
 ```
 
 #### Planilha 3: Exemplo
 
 ```
-Nome* | CPF* | CNH* | Celular* | Email | Cidade* | Função* | Status* | Tipo Contrato* | Unidade Negócio*
-JOÃO SILVA | 12345678901 | 12345678901 | 11999999999 | joao@email.com | São Paulo | motorista | disponivel | clt | frigorifico
-MARIA SANTOS | 98765432100 | 98765432100 | 11888888888 | maria@email.com | Rio de Janeiro | auxiliar | trabalhando | pj | ovos
+Nome* | CPF* | CNH* | Celular* | Email | CEP* | Número | Complemento | Endereço* | Cidade* | Função | CNH Vencimento | CNH Categoria | Tóxico Último Exame | Tóxico Vencimento | Data Admissão | Salário | Observação
+JOÃO SILVA | 11144477735 | 11144477735 | 11999999999 | joao@email.com | 01234567 | 123 | Apto 45 | Rua das Flores, 123 | São Paulo | motorista | 15/12/2025 | E | 15/01/2024 | 15/04/2024 | 01/01/2024 | 3500,00 | Funcionário dedicado e pontual
+MARIA SANTOS | 52998224725 | 52998224725 | 11888888888 | maria@email.com | 01310100 | 1000 | Sala 200 | Av. Paulista, 1000 | São Paulo | ajudante | 20/10/2025 | B | 20/02/2024 | 20/05/2024 | 15/02/2024 | 2800,00 | Ajudante experiente
 ```
 
 ### Exemplo: Template de Cidades
@@ -1632,7 +1641,7 @@ interface ImportLog {
 - [x] Templates de Cidades ✅
 - [x] Templates de Vendedores ✅
 - [x] Templates de Veículos ✅
-- [ ] Templates de Funcionários
+- [x] Templates de Funcionários ✅
 - [x] Validações específicas ✅
 - [x] Tratamento de erros ✅
 - [x] Logs de importação ✅
@@ -1827,12 +1836,17 @@ O sistema implementou um padrão consistente de validação de formulários em t
 
 **Validações Específicas:**
 
-- **CPF**: Formato válido
-- **CNH**: Campo obrigatório
-- **Celular**: Formato válido (DDD + 9 dígitos)
-- **CEP**: Formato válido (8 dígitos)
-- **Email**: Formato válido (se fornecido)
-- **Formato**: Nome em maiúsculas
+- **CPF**: Deve ser válido e único no sistema (validação no modal e importação)
+- **CNH**: Deve ser única no sistema (validação no modal e importação)
+- **Celular**: Deve ter 10 ou 11 dígitos
+- **CEP**: Deve ter 8 dígitos
+- **Email**: Deve ser válido (se fornecido) - **não valida duplicidade**
+- **Função**: motorista, ajudante, outro
+- **Datas**: Formato DD/MM/AAAA
+- **Salário**: Deve ser numérico válido
+- **Endereço**: Construção automática combinando Endereço, Número e Complemento
+- **Campos Inativos**: Não podem ser editados, validação desabilitada
+- **Firebase**: Tratamento de campos undefined para evitar erros
 
 ### 🔧 Implementação Técnica
 
@@ -1991,11 +2005,18 @@ interface EntityFormModalProps {
 ---
 
 **Documento criado em:** Janeiro 2025  
-**Versão:** 1.2  
+**Versão:** 1.4  
 **Última atualização:** Janeiro 2025  
 **Responsável:** Equipe de Desenvolvimento SGL
 
-**Principais Atualizações v1.2:**
+**Principais Atualizações v1.4:**
+
+- ✅ **Validação de duplicidade de CPF e CNH** no modal e importação de Funcionários
+- ✅ **Remoção da validação de duplicidade de Email** (permite emails duplicados)
+- ✅ **Tratamento específico de erros** com mensagens claras para CPF e CNH duplicados
+- ✅ **Consistência de validação** entre modal e importação para Funcionários
+
+**Principais Atualizações v1.3:**
 
 - ✅ Validação robusta de duplicidade (sistema + arquivo)
 - ✅ Serviço padronizado de validação (ValidationService)
@@ -2023,3 +2044,12 @@ interface EntityFormModalProps {
 - ✅ **Mensagens de Erro Limpas** - sem redundância e mais claras
 - ✅ **Interface de Erro Melhorada** - botões proeminentes e centralizados
 - ✅ **Padrão de Valores Específicos** - mensagens mostram valores exatos que causam problemas
+- ✅ **Implementação completa da importação de Funcionários**
+- ✅ **Validações específicas para CPF, CNH, CEP, Endereço**
+- ✅ **Construção automática de endereço completo** (combina Endereço, Número, Complemento)
+- ✅ **Tratamento de campos undefined** para evitar erros no Firebase
+- ✅ **Validação de formato de datas** (DD/MM/AAAA) e salário numérico
+- ✅ **CPFs válidos nos exemplos** para evitar erros de validação
+- ✅ **Validação de duplicidade de CPF e CNH** no modal e importação
+- ✅ **Remoção da validação de duplicidade de Email** (permite emails duplicados)
+- ✅ **Tratamento específico de erros** com mensagens claras para CPF e CNH duplicados
