@@ -117,7 +117,7 @@ export function useVendedores() {
         ...valores,
         nome: valores.nome.toUpperCase(),
         cpf: valores.cpf?.replace(/\D/g, "") || "",
-        regiao: valores.regiao,
+        regiao: valores.regiao.toUpperCase(),
         celular: valores.celular?.replace(/\D/g, "") || "",
       };
       if (editando) {
@@ -179,9 +179,9 @@ export function useVendedores() {
       cpf: v.cpf || "",
       email: v.email || "",
       celular: formatCelular(v.celular || ""),
-      regiao: v.regiao || "",
+      regiao: v.regiao?.toUpperCase() || "",
       codigoVendSistema: v.codigoVendSistema || "",
-      unidadeNegocio: v.unidadeNegocio || "frigorifico",
+      unidadeNegocio: (v.unidadeNegocio?.toLowerCase() as any) || "frigorifico",
       tipoContrato: v.tipoContrato || "clt",
       ativo: v.ativo !== undefined ? v.ativo : true,
       cidadesAtendidas: v.cidadesAtendidas || [],

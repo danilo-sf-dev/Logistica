@@ -200,6 +200,22 @@ src/
 - Código do Sistema
 - Cidades Atendidas
 
+**Validações Específicas:**
+
+- **Unicidade**: CPF deve ser único no sistema
+- **Email**: Deve ser único no sistema (se fornecido)
+- **Código Sistema**: Deve ser único no sistema (se fornecido)
+- **Formato**: Nome e Região são convertidos para maiúsculas
+- **Email**: Convertido para minúsculas
+- **Código Sistema**: Convertido para maiúsculas
+- **Unidade Negócio**: Convertida para minúsculas
+- **CPF**: Deve ter exatamente 11 dígitos
+- **Celular**: Deve ter 10 ou 11 dígitos
+- **Região**: Deve ser uma das opções válidas (SUDESTE, NORDESTE, SUL, NORTE, CENTRO-OESTE)
+- **Unidade Negócio**: Deve ser uma das opções válidas (frigorifico, ovos, ambos)
+- **Tipo Contrato**: Deve ser uma das opções válidas (clt, pj, autonomo, outro)
+- **Cidades Atendidas**: Separadas por vírgula e convertidas em array
+
 ### 5. Rotas
 
 **Campos Obrigatórios:**
@@ -1105,6 +1121,72 @@ RIO DE JANEIRO | RJ | sudeste | 430 | 500 | Cidade maravilhosa
 BELO HORIZONTE | MG | sudeste | 586 | 800 | Capital de Minas
 ```
 
+### Exemplo: Template de Vendedores
+
+#### Planilha 1: Instruções
+
+```
+IMPORTAÇÃO DE VENDEDORES - INSTRUÇÕES
+
+📋 COMO USAR ESTE TEMPLATE:
+
+✅ OPÇÃO 1 - USO SIMPLES (RECOMENDADO):
+   1. Vá para a planilha 'Template'
+   2. Preencha seus dados na planilha 'Template'
+   3. Salve o arquivo
+   4. Faça upload no sistema
+   5. Pronto! Os dados serão importados automaticamente
+
+✅ OPÇÃO 2 - PERSONALIZAÇÃO:
+   - Você pode excluir as planilhas 'Instruções' e 'Exemplo'
+   - Você pode renomear a planilha 'Template' para qualquer nome
+   - O sistema detectará automaticamente a planilha com dados
+
+📝 REGRAS DE PREENCHIMENTO:
+   - Todos os campos marcados com * são obrigatórios
+   - Não deixe linhas em branco entre os dados
+   - Preencha apenas na planilha 'Template' (ou sua planilha renomeada)
+   - CPF deve ser válido (não apenas 11 dígitos, mas um CPF real)
+
+📊 FORMATO DOS DADOS:
+   - Nome: Nome completo (será convertido para maiúsculas)
+   - CPF: 11 dígitos sem pontos ou traços (deve ser um CPF válido)
+   - Email: Formato válido (opcional, será convertido para minúsculas)
+   - Celular: 10 ou 11 dígitos sem formatação
+   - Região: SUDESTE, NORDESTE, SUL, NORTE, CENTRO-OESTE (será convertido para maiúsculas)
+   - Código Sistema: Código interno (opcional, será convertido para maiúsculas)
+   - Unidade Negócio: frigorifico, ovos, ambos
+   - Tipo Contrato: clt, pj, autonomo, outro
+   - Cidades Atendidas: Separadas por vírgula (opcional)
+
+🔍 VALIDAÇÕES:
+   - CPF deve ser único no sistema e válido
+   - Email deve ser único no sistema (se fornecido)
+   - Código do Sistema deve ser único no sistema (se fornecido)
+   - Região deve ser uma das opções válidas
+   - Unidade de Negócio deve ser uma das opções válidas
+   - Tipo de Contrato deve ser uma das opções válidas
+
+💡 DICA:
+   - Veja a planilha 'Exemplo' para referência de preenchimento
+   - O sistema aceita o arquivo mesmo se você excluir outras planilhas
+   - O sistema aceita o arquivo mesmo se você renomear a planilha 'Template'
+```
+
+#### Planilha 2: Template
+
+```
+Nome* | CPF* | Email | Celular* | Região* | Código Sistema | Unidade Negócio* | Tipo Contrato* | Cidades Atendidas
+```
+
+#### Planilha 3: Exemplo
+
+```
+Nome* | CPF* | Email | Celular* | Região* | Código Sistema | Unidade Negócio* | Tipo Contrato* | Cidades Atendidas
+JOÃO SILVA | 12345678901 | joao@empresa.com | 11999999999 | SUDESTE | VEND001 | frigorifico | clt | São Paulo,Rio de Janeiro
+MARIA SANTOS | 98765432100 | maria@empresa.com | 11888888888 | NORDESTE | VEND002 | ovos | pj | Salvador,Ilhéus
+```
+
 ## 🔒 Segurança e Validação
 
 ### Regras de Validação
@@ -1221,14 +1303,15 @@ interface ImportLog {
 - [x] Detecção inteligente de planilhas
 - [x] Flexibilidade de uso do template
 
-### Fase 2 (2 semanas)
+### Fase 2 (2 semanas) ✅ **EM ANDAMENTO**
 
 - [x] Templates de Cidades ✅
+- [x] Templates de Vendedores ✅
 - [ ] Templates de Veículos
 - [ ] Templates de Funcionários
-- [ ] Validações específicas
-- [ ] Tratamento de erros
-- [ ] Logs de importação
+- [x] Validações específicas ✅
+- [x] Tratamento de erros ✅
+- [x] Logs de importação ✅
 
 ### Fase 3 (1 semana)
 
@@ -1336,3 +1419,7 @@ interface ImportLog {
 - ✅ Interface responsiva para grandes volumes de erros
 - ✅ Modal com rolagem inteligente e gerenciamento visual
 - ✅ Feedback completo e orientações para correção
+- ✅ Implementação completa da importação de Vendedores
+- ✅ Validações específicas para CPF, Email, Código Sistema
+- ✅ Formatação automática de dados (maiúsculas/minúsculas)
+- ✅ Conversão de cidades atendidas de string para array

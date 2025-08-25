@@ -6,9 +6,11 @@ import VendedorFormModal from "../ui/VendedorFormModal";
 import { VendedoresFilters } from "../ui/VendedoresFilters";
 import { useVendedores } from "../state/useVendedores";
 import { maskCelular, formatCPF } from "../../../utils/masks";
+import { ImportModal } from "../../import";
 
 const VendedoresListPage: React.FC = () => {
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const {
     loading,
@@ -68,6 +70,11 @@ const VendedoresListPage: React.FC = () => {
     handleExportExcel();
   };
 
+  const handleImportSuccess = (result: any) => {
+    // Recarregar dados da tabela após importação bem-sucedida
+    carregar();
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -104,6 +111,25 @@ const VendedoresListPage: React.FC = () => {
               />
             </svg>
             Exportar Excel
+          </button>
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+          >
+            <svg
+              className="h-4 w-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+            Importar Excel
           </button>
           <button onClick={abrirCriacao} className="btn-primary">
             Novo Vendedor
@@ -287,6 +313,14 @@ const VendedoresListPage: React.FC = () => {
         onExport={handleExportConfirm}
         titulo="Vendedores"
         nomeArquivo={generateFileName()}
+      />
+
+      {/* Modal de Importação */}
+      <ImportModal
+        entityType="vendedores"
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onSuccess={handleImportSuccess}
       />
     </div>
   );
