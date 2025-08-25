@@ -6,6 +6,7 @@ import { VeiculosFiltersComponent as VeiculosFilters } from "../ui/VeiculosFilte
 import { VeiculoFormModal } from "../ui/VeiculoFormModal";
 import ConfirmationModal from "../../common/modals/ConfirmationModal";
 import { TableExportModal } from "../../common/modals";
+import { ImportModal } from "../../import";
 import { Veiculo, VeiculoFormData } from "../types";
 
 export const VeiculosListPage: React.FC = () => {
@@ -16,6 +17,7 @@ export const VeiculosListPage: React.FC = () => {
   const [veiculoToToggle, setVeiculoToToggle] = useState<Veiculo | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const {
     loading,
@@ -29,6 +31,7 @@ export const VeiculosListPage: React.FC = () => {
     updateSortConfig,
     getFilteredAndSortedVeiculos,
     handleExportExcel,
+    fetchVeiculos,
     erros,
   } = useVeiculos();
 
@@ -107,6 +110,12 @@ export const VeiculosListPage: React.FC = () => {
     handleExportExcel();
   };
 
+  const handleImportSuccess = () => {
+    setShowImportModal(false);
+    // Recarregar dados após importação
+    fetchVeiculos();
+  };
+
   const filteredAndSortedVeiculos = getFilteredAndSortedVeiculos();
   const totalPages = Math.ceil(filteredAndSortedVeiculos.length / itemsPerPage);
 
@@ -139,6 +148,25 @@ export const VeiculosListPage: React.FC = () => {
               />
             </svg>
             Exportar Excel
+          </button>
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+          >
+            <svg
+              className="h-4 w-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+            Importar Excel
           </button>
           <button
             onClick={() => setShowModal(true)}
@@ -273,6 +301,13 @@ export const VeiculosListPage: React.FC = () => {
         onExport={handleExportConfirm}
         titulo="Veículos"
         nomeArquivo={generateFileName()}
+      />
+
+      <ImportModal
+        entityType="veiculos"
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onSuccess={handleImportSuccess}
       />
     </div>
   );
