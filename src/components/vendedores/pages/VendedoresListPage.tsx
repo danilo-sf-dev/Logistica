@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ConfirmationModal from "../../common/modals/ConfirmationModal";
 import { TableExportModal } from "../../common/modals";
 import { VendedoresTable } from "../ui/VendedoresTable";
@@ -11,6 +11,7 @@ import { ImportModal } from "../../import";
 const VendedoresListPage: React.FC = () => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const hasLoaded = useRef(false);
 
   const {
     loading,
@@ -44,13 +45,17 @@ const VendedoresListPage: React.FC = () => {
     vendedorParaAtivar,
     valores,
     setValores,
+    erros,
     confirmar,
     editando,
     handleExportExcel,
   } = useVendedores();
 
   useEffect(() => {
-    carregar();
+    if (!hasLoaded.current) {
+      hasLoaded.current = true;
+      carregar();
+    }
   }, [carregar]);
 
   // Gerar nome do arquivo para exportação
@@ -217,6 +222,7 @@ const VendedoresListPage: React.FC = () => {
         aberto={mostrarModal}
         editando={editando}
         valores={valores}
+        erros={erros}
         onChange={setValores}
         onCancelar={() => setMostrarModal(false)}
         onConfirmar={confirmar}

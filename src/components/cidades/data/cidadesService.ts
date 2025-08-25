@@ -42,6 +42,34 @@ async function getById(id: string): Promise<Cidade | null> {
 }
 
 async function criar(input: CidadeInput): Promise<string> {
+  // Função para normalizar nomes de cidades (remover acentos e caracteres especiais)
+  const normalizeCityName = (name: string): string => {
+    return name
+      .normalize("NFD") // Decompor caracteres acentuados
+      .replace(/[\u0300-\u036f]/g, "") // Remover diacríticos (acentos)
+      .replace(/[^\w\s]/g, "") // Remover pontuação e caracteres especiais
+      .replace(/\s+/g, " ") // Normalizar espaços
+      .trim()
+      .toUpperCase();
+  };
+
+  // Validar unicidade da cidade
+  const cidadesExistentes = await listar();
+  const nomeNormalizado = normalizeCityName(input.nome);
+  const estado = input.estado.toUpperCase();
+
+  const cidadeExistente = cidadesExistentes.find(
+    (cidade) =>
+      normalizeCityName(cidade.nome) === nomeNormalizado &&
+      cidade.estado === estado,
+  );
+
+  if (cidadeExistente) {
+    throw new Error(
+      `Cidade "${input.nome}" já está cadastrada no estado ${estado}`,
+    );
+  }
+
   // Sanitizar dados para remover campos undefined
   const sanitizedInput = Object.fromEntries(
     Object.entries(input).filter(([_, value]) => value !== undefined),
@@ -88,6 +116,35 @@ async function criar(input: CidadeInput): Promise<string> {
 }
 
 async function atualizar(id: string, input: CidadeInput): Promise<void> {
+  // Função para normalizar nomes de cidades (remover acentos e caracteres especiais)
+  const normalizeCityName = (name: string): string => {
+    return name
+      .normalize("NFD") // Decompor caracteres acentuados
+      .replace(/[\u0300-\u036f]/g, "") // Remover diacríticos (acentos)
+      .replace(/[^\w\s]/g, "") // Remover pontuação e caracteres especiais
+      .replace(/\s+/g, " ") // Normalizar espaços
+      .trim()
+      .toUpperCase();
+  };
+
+  // Validar unicidade da cidade (excluindo a própria cidade sendo editada)
+  const cidadesExistentes = await listar();
+  const nomeNormalizado = normalizeCityName(input.nome);
+  const estado = input.estado.toUpperCase();
+
+  const cidadeExistente = cidadesExistentes.find(
+    (cidade) =>
+      cidade.id !== id && // Excluir a própria cidade sendo editada
+      normalizeCityName(cidade.nome) === nomeNormalizado &&
+      cidade.estado === estado,
+  );
+
+  if (cidadeExistente) {
+    throw new Error(
+      `Cidade "${input.nome}" já está cadastrada no estado ${estado}`,
+    );
+  }
+
   // Buscar a cidade atual para comparar o rotaId
   const cidadeRef = doc(db, COLLECTION, id);
   const cidadeSnap = await getDocs(collection(db, COLLECTION));

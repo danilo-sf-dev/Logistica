@@ -9,6 +9,7 @@ interface VendedorFormModalProps {
   aberto: boolean;
   editando: Vendedor | null;
   valores: VendedorInput;
+  erros?: Partial<Record<keyof VendedorInput, string>>;
   onChange: (valores: VendedorInput) => void;
   onCancelar: () => void;
   onConfirmar: () => void;
@@ -19,24 +20,13 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
   aberto,
   editando,
   valores,
+  erros = {},
   onChange,
   onCancelar,
   onConfirmar,
   somenteLeitura = false,
 }) => {
   if (!aberto) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!somenteLeitura) {
-      onConfirmar();
-    }
-  };
-
-  const updateField = (field: keyof VendedorInput, value: any) => {
-    if (somenteLeitura) return;
-    onChange({ ...valores, [field]: value });
-  };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
@@ -54,7 +44,7 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -64,10 +54,15 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                   type="text"
                   required
                   value={valores.nome}
-                  onChange={(e) => updateField("nome", e.target.value)}
+                  onChange={(e) =>
+                    onChange({ ...valores, nome: e.target.value })
+                  }
                   disabled={somenteLeitura}
-                  className={`input-field ${somenteLeitura ? "bg-gray-100" : ""}`}
+                  className={`input-field ${erros.nome ? "border-red-500" : ""}`}
                 />
+                {erros.nome && (
+                  <p className="text-red-500 text-xs mt-1">{erros.nome}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -79,12 +74,15 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                   value={maskCPF(valores.cpf || "")}
                   onChange={(e) => {
                     const valorLimpo = e.target.value.replace(/\D/g, "");
-                    updateField("cpf", valorLimpo);
+                    onChange({ ...valores, cpf: valorLimpo });
                   }}
                   disabled={somenteLeitura}
-                  className={`input-field ${somenteLeitura ? "bg-gray-100" : ""}`}
+                  className={`input-field ${erros.cpf ? "border-red-500" : ""}`}
                   placeholder="000.000.000-00"
                 />
+                {erros.cpf && (
+                  <p className="text-red-500 text-xs mt-1">{erros.cpf}</p>
+                )}
               </div>
             </div>
 
@@ -97,28 +95,44 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                   type="text"
                   value={valores.codigoVendSistema}
                   onChange={(e) =>
-                    updateField("codigoVendSistema", e.target.value)
+                    onChange({ ...valores, codigoVendSistema: e.target.value })
                   }
                   disabled={somenteLeitura}
-                  className={`input-field ${somenteLeitura ? "bg-gray-100" : ""}`}
+                  className={`input-field ${erros.codigoVendSistema ? "border-red-500" : ""}`}
                   placeholder="Ex: 12345"
                 />
+                {erros.codigoVendSistema && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {erros.codigoVendSistema}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Tipo de Contrato
+                  Tipo de Contrato *
                 </label>
                 <select
+                  required
                   value={valores.tipoContrato}
-                  onChange={(e) => updateField("tipoContrato", e.target.value)}
+                  onChange={(e) =>
+                    onChange({
+                      ...valores,
+                      tipoContrato: e.target.value as any,
+                    })
+                  }
                   disabled={somenteLeitura}
-                  className={`input-field ${somenteLeitura ? "bg-gray-100" : ""}`}
+                  className={`input-field ${erros.tipoContrato ? "border-red-500" : ""}`}
                 >
                   <option value="clt">CLT</option>
                   <option value="pj">PJ</option>
                   <option value="autonomo">Autônomo</option>
                   <option value="outro">Outro</option>
                 </select>
+                {erros.tipoContrato && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {erros.tipoContrato}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -130,11 +144,16 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 <input
                   type="email"
                   value={valores.email}
-                  onChange={(e) => updateField("email", e.target.value)}
+                  onChange={(e) =>
+                    onChange({ ...valores, email: e.target.value })
+                  }
                   disabled={somenteLeitura}
-                  className={`input-field ${somenteLeitura ? "bg-gray-100" : ""}`}
+                  className={`input-field ${erros.email ? "border-red-500" : ""}`}
                   placeholder="exemplo@email.com"
                 />
+                {erros.email && (
+                  <p className="text-red-500 text-xs mt-1">{erros.email}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -145,12 +164,18 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                   required
                   value={valores.celular}
                   onChange={(e) =>
-                    updateField("celular", maskCelular(e.target.value))
+                    onChange({
+                      ...valores,
+                      celular: maskCelular(e.target.value),
+                    })
                   }
                   disabled={somenteLeitura}
-                  className={`input-field ${somenteLeitura ? "bg-gray-100" : ""}`}
+                  className={`input-field ${erros.celular ? "border-red-500" : ""}`}
                   placeholder="(73) 99999-9999"
                 />
+                {erros.celular && (
+                  <p className="text-red-500 text-xs mt-1">{erros.celular}</p>
+                )}
               </div>
             </div>
 
@@ -162,9 +187,11 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 <select
                   required
                   value={valores.regiao}
-                  onChange={(e) => updateField("regiao", e.target.value)}
+                  onChange={(e) =>
+                    onChange({ ...valores, regiao: e.target.value })
+                  }
                   disabled={somenteLeitura}
-                  className={`input-field ${somenteLeitura ? "bg-gray-100" : ""}`}
+                  className={`input-field ${erros.regiao ? "border-red-500" : ""}`}
                 >
                   <option value="">Selecione uma região</option>
                   {REGIOES_BRASIL.map((regiao) => (
@@ -173,6 +200,9 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                     </option>
                   ))}
                 </select>
+                {erros.regiao && (
+                  <p className="mt-1 text-sm text-red-600">{erros.regiao}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -182,15 +212,23 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                   required
                   value={valores.unidadeNegocio}
                   onChange={(e) =>
-                    updateField("unidadeNegocio", e.target.value)
+                    onChange({
+                      ...valores,
+                      unidadeNegocio: e.target.value as any,
+                    })
                   }
                   disabled={somenteLeitura}
-                  className={`input-field ${somenteLeitura ? "bg-gray-100" : ""}`}
+                  className={`input-field ${erros.unidadeNegocio ? "border-red-500" : ""}`}
                 >
                   <option value="frigorifico">Frigorífico</option>
                   <option value="ovos">Ovos</option>
                   <option value="ambos">Ambos</option>
                 </select>
+                {erros.unidadeNegocio && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {erros.unidadeNegocio}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -198,7 +236,7 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
               <CidadesSelect
                 value={valores.cidadesAtendidas || []}
                 onChange={(cidadesIds) =>
-                  updateField("cidadesAtendidas", cidadesIds)
+                  onChange({ ...valores, cidadesAtendidas: cidadesIds })
                 }
                 disabled={somenteLeitura}
                 placeholder="Selecione as cidades que o vendedor atende"
@@ -214,12 +252,16 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 Cancelar
               </button>
               {!somenteLeitura && (
-                <button type="submit" className="btn-primary">
+                <button
+                  type="button"
+                  onClick={onConfirmar}
+                  className="btn-primary"
+                >
                   {editando ? "Atualizar" : "Cadastrar"}
                 </button>
               )}
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import { BaseImportService } from "./importService";
-import { ValidationService } from "./validationService";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type {
   ImportConfig,
@@ -9,6 +8,16 @@ import type {
 import type { CidadeInput } from "../../cidades/types";
 
 export class CidadesImportService extends BaseImportService {
+  // Função para normalizar nomes de cidades (remover acentos e caracteres especiais)
+  private normalizeCityName(name: string): string {
+    return name
+      .normalize("NFD") // Decompor caracteres acentuados
+      .replace(/[\u0300-\u036f]/g, "") // Remover diacríticos (acentos)
+      .replace(/[^\w\s]/g, "") // Remover pontuação e caracteres especiais
+      .replace(/\s+/g, " ") // Normalizar espaços
+      .trim()
+      .toUpperCase();
+  }
   protected config: ImportConfig = {
     entityType: "cidades",
     requiredFields: ["nome", "estado"],
@@ -71,49 +80,109 @@ export class CidadesImportService extends BaseImportService {
   };
 
   protected async validateData(data: any[]): Promise<ValidationResult> {
+    const errors: any[] = [];
+    const warnings: any[] = [];
+
     try {
       // Buscar cidades existentes para validação de unicidade
       const cidadesExistentes = await cidadesService.listar();
+      const nomesExistentes = new Set(
+        cidadesExistentes.map(
+          (cidade) =>
+            `${this.normalizeCityName(cidade.nome)}-${cidade.estado.toUpperCase()}`,
+        ),
+      );
 
-      // Validações usando o serviço padronizado
-      const validations = [
+      // Validar cada linha
+      data.forEach((row, index) => {
+        const rowNumber = index + 2; // +2 porque a primeira linha é cabeçalho
+
         // Validação de campos obrigatórios
-        ValidationService.validateRequiredFields(data, [
-          { index: 0, name: "Nome" },
-          { index: 1, name: "Estado" },
-        ]),
+        if (!row[0]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "Nome",
+            message: "Nome da cidade é obrigatório",
+          });
+        }
+
+        if (!row[1]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "Estado",
+            message: "Estado é obrigatório",
+          });
+        }
 
         // Validação de unicidade
-        ValidationService.validateUniqueness(
-          data,
-          cidadesExistentes,
-          (cidade) =>
-            `${cidade.nome.toUpperCase()}-${cidade.estado.toUpperCase()}`,
-          (row) =>
-            row[0] && row[1]
-              ? `${row[0].toString().toUpperCase()}-${row[1].toString().toUpperCase()}`
-              : "",
-          "Cidade",
-          "nome",
-        ),
+        if (row[0] && row[1]) {
+          const nomeNormalizado = this.normalizeCityName(row[0].toString());
+          const nomeEstado = `${nomeNormalizado}-${row[1].toString().toUpperCase()}`;
+          if (nomesExistentes.has(nomeEstado)) {
+            errors.push({
+              row: rowNumber,
+              field: "Nome",
+              message: "Cidade já cadastrada no sistema",
+            });
+          }
+        }
 
         // Validação de campos numéricos
-        ValidationService.validateNumericFields(data, [
-          { index: 3, name: "Distância" },
-          { index: 4, name: "Peso Mínimo" },
-        ]),
-      ];
+        if (row[3] !== undefined && row[3] !== null && row[3] !== "") {
+          const distancia = Number(row[3]);
+          if (isNaN(distancia) || distancia < 0) {
+            errors.push({
+              row: rowNumber,
+              field: "Distância",
+              message: "Distância deve ser um número válido",
+            });
+          }
+        }
 
-      // Combinar todos os resultados
-      const result = ValidationService.combineValidationResults(validations);
+        if (row[4] !== undefined && row[4] !== null && row[4] !== "") {
+          const pesoMinimo = Number(row[4]);
+          if (isNaN(pesoMinimo) || pesoMinimo < 0) {
+            errors.push({
+              row: rowNumber,
+              field: "Peso Mínimo",
+              message: "Peso mínimo deve ser um número válido",
+            });
+          }
+        }
+      });
 
-      return result;
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+      };
     } catch (error) {
-      // Retornar apenas validação de campos obrigatórios se houver erro
-      return ValidationService.validateRequiredFields(data, [
-        { index: 0, name: "Nome" },
-        { index: 1, name: "Estado" },
-      ]);
+      // Se houver erro ao buscar cidades existentes, retornar apenas validação básica
+      data.forEach((row, index) => {
+        const rowNumber = index + 2;
+
+        if (!row[0]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "Nome",
+            message: "Nome da cidade é obrigatório",
+          });
+        }
+
+        if (!row[1]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "Estado",
+            message: "Estado é obrigatório",
+          });
+        }
+      });
+
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+      };
     }
   }
 

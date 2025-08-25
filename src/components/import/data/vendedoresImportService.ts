@@ -1,5 +1,4 @@
 import { BaseImportService } from "./importService";
-import { ValidationService } from "./validationService";
 import { vendedoresService } from "../../vendedores/data/vendedoresService";
 import type {
   ImportConfig,
@@ -111,6 +110,7 @@ export class VendedoresImportService extends BaseImportService {
     try {
       // Buscar dados existentes para validação de unicidade
       const vendedoresExistentes = await vendedoresService.listar();
+      const cpfsExistentes = new Set(vendedoresExistentes.map((v) => v.cpf));
       const emailsExistentes = new Set(
         vendedoresExistentes.filter((v) => v.email).map((v) => v.email!),
       );
@@ -120,52 +120,90 @@ export class VendedoresImportService extends BaseImportService {
           .map((v) => v.codigoVendSistema!),
       );
 
-      // Validar campos obrigatórios
-      const requiredFields = [
-        { index: 0, name: "nome" },
-        { index: 1, name: "cpf" },
-        { index: 3, name: "celular" },
-        { index: 4, name: "regiao" },
-        { index: 6, name: "unidadeNegocio" },
-        { index: 7, name: "tipoContrato" },
-      ];
-
-      const requiredValidation = ValidationService.validateRequiredFields(
-        data,
-        requiredFields,
-      );
-      errors.push(...requiredValidation.errors);
-      warnings.push(...requiredValidation.warnings);
-
-      // Validar unicidade (CPF)
-      const uniquenessValidation = ValidationService.validateUniqueness(
-        data,
-        vendedoresExistentes,
-        (vendedor) => vendedor.cpf,
-        (row) => row[1]?.toString().replace(/\D/g, "") || "",
-        "Vendedor",
-        "cpf",
-      );
-      errors.push(...uniquenessValidation.errors);
-      warnings.push(...uniquenessValidation.warnings);
-
-      // Validar campos numéricos
-      const numericFields = [
-        { index: 1, name: "cpf" },
-        { index: 3, name: "celular" },
-      ];
-
-      const numericValidation = ValidationService.validateNumericFields(
-        data,
-        numericFields,
-      );
-      errors.push(...numericValidation.errors);
-      warnings.push(...numericValidation.warnings);
-
-      // Validações específicas
+      // Validar cada linha
       data.forEach((row, index) => {
-        const rowNumber = index + 2; // +2 porque a primeira linha é cabeçalho e index começa em 0
+        const rowNumber = index + 2; // +2 porque a primeira linha é cabeçalho
 
+        // Validação de campos obrigatórios
+        if (!row[0]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "nome",
+            message: "Nome é obrigatório",
+          });
+        }
+
+        if (!row[1]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "cpf",
+            message: "CPF é obrigatório",
+          });
+        }
+
+        if (!row[3]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "celular",
+            message: "Celular é obrigatório",
+          });
+        }
+
+        if (!row[4]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "regiao",
+            message: "Região é obrigatória",
+          });
+        }
+
+        if (!row[6]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "unidadeNegocio",
+            message: "Unidade de negócio é obrigatória",
+          });
+        }
+
+        if (!row[7]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "tipoContrato",
+            message: "Tipo de contrato é obrigatório",
+          });
+        }
+
+        // Validação de unicidade (CPF)
+        if (row[1]) {
+          const cpf = row[1].toString().replace(/\D/g, "");
+          if (cpfsExistentes.has(cpf)) {
+            errors.push({
+              row: rowNumber,
+              field: "cpf",
+              message: "CPF já cadastrado no sistema",
+            });
+          }
+        }
+
+        // Validação de unicidade (Email)
+        if (row[2] && emailsExistentes.has(row[2].toString().toLowerCase())) {
+          errors.push({
+            row: rowNumber,
+            field: "email",
+            message: "Email já cadastrado no sistema",
+          });
+        }
+
+        // Validação de unicidade (Código)
+        if (row[5] && codigosExistentes.has(row[5].toString())) {
+          errors.push({
+            row: rowNumber,
+            field: "codigoVendSistema",
+            message: "Código já cadastrado no sistema",
+          });
+        }
+
+        // Validações específicas
         // Validar formato de CPF (11 dígitos)
         if (row[1] && row[1].toString().replace(/\D/g, "").length !== 11) {
           errors.push({
@@ -232,7 +270,7 @@ export class VendedoresImportService extends BaseImportService {
           errors.push({
             row: rowNumber,
             field: "unidadeNegocio",
-            message: `Unidade de Negócio inválida. Opções válidas: ${unidadesValidas.join(", ")}`,
+            message: `Unidade de negócio inválida. Opções válidas: ${unidadesValidas.join(", ")}`,
             value: row[6],
             severity: "error",
           });
@@ -244,21 +282,24 @@ export class VendedoresImportService extends BaseImportService {
           errors.push({
             row: rowNumber,
             field: "tipoContrato",
-            message: `Tipo de Contrato inválido. Opções válidas: ${tiposValidos.join(", ")}`,
+            message: `Tipo de contrato inválido. Opções válidas: ${tiposValidos.join(", ")}`,
             value: row[7],
             severity: "error",
           });
         }
 
-        // Validar duplicatas de email no sistema (se fornecido)
-        if (row[2] && emailsExistentes.has(row[2].toString().toLowerCase())) {
-          errors.push({
-            row: rowNumber,
-            field: "email",
-            message: "Email já cadastrado no sistema",
-            value: row[2],
-            severity: "error",
-          });
+        // Validar código do sistema (se fornecido)
+        if (row[5]) {
+          const codigo = parseInt(row[5].toString());
+          if (isNaN(codigo) || codigo < 0) {
+            errors.push({
+              row: rowNumber,
+              field: "codigoVendSistema",
+              message: "Código deve ser um número inteiro positivo",
+              value: row[5],
+              severity: "error",
+            });
+          }
         }
 
         // Validar duplicatas de código no sistema (se fornecido)
@@ -273,14 +314,70 @@ export class VendedoresImportService extends BaseImportService {
         }
       });
 
-      return ValidationService.combineValidationResults([
-        requiredValidation,
-        uniquenessValidation,
-        numericValidation,
-        { isValid: errors.length === 0, errors, warnings },
-      ]);
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+      };
     } catch (error) {
-      throw new Error(`Erro ao processar validação: ${error.message}`);
+      // Se houver erro ao buscar dados existentes, retornar apenas validação básica
+      data.forEach((row, index) => {
+        const rowNumber = index + 2;
+
+        if (!row[0]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "nome",
+            message: "Nome é obrigatório",
+          });
+        }
+
+        if (!row[1]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "cpf",
+            message: "CPF é obrigatório",
+          });
+        }
+
+        if (!row[3]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "celular",
+            message: "Celular é obrigatório",
+          });
+        }
+
+        if (!row[4]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "regiao",
+            message: "Região é obrigatória",
+          });
+        }
+
+        if (!row[6]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "unidadeNegocio",
+            message: "Unidade de negócio é obrigatória",
+          });
+        }
+
+        if (!row[7]?.toString().trim()) {
+          errors.push({
+            row: rowNumber,
+            field: "tipoContrato",
+            message: "Tipo de contrato é obrigatório",
+          });
+        }
+      });
+
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+      };
     }
   }
 
