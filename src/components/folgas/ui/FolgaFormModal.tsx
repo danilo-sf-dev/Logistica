@@ -41,16 +41,10 @@ export function FolgaFormModal({
             </button>
           </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              onConfirmar();
-            }}
-            className="space-y-4"
-          >
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Funcionário
+                Funcionário *
               </label>
               <FuncionarioSelect
                 value={valores.funcionarioId}
@@ -134,7 +128,7 @@ export function FolgaFormModal({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Data de Início
+                  Data de Início *
                 </label>
                 <input
                   type="date"
@@ -143,12 +137,17 @@ export function FolgaFormModal({
                   onChange={(e) =>
                     setValores({ ...valores, dataInicio: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field ${erros.dataInicio ? "border-red-500" : ""}`}
                 />
+                {erros.dataInicio && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {erros.dataInicio}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Data de Fim
+                  Data de Fim *
                 </label>
                 <input
                   type="date"
@@ -157,8 +156,11 @@ export function FolgaFormModal({
                   onChange={(e) =>
                     setValores({ ...valores, dataFim: e.target.value })
                   }
-                  className="input-field"
+                  className={`input-field ${erros.dataFim ? "border-red-500" : ""}`}
                 />
+                {erros.dataFim && (
+                  <p className="text-red-500 text-xs mt-1">{erros.dataFim}</p>
+                )}
               </div>
             </div>
 
@@ -235,11 +237,15 @@ export function FolgaFormModal({
               >
                 Cancelar
               </button>
-              <button type="submit" className="btn-primary">
+              <button
+                type="button"
+                onClick={onConfirmar}
+                className="btn-primary"
+              >
                 {editando ? "Atualizar" : "Solicitar"}
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>

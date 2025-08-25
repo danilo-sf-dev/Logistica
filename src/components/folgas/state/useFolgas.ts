@@ -66,11 +66,24 @@ export function useFolgas() {
 
   const validar = useCallback((input: FolgaInput) => {
     const novosErros: Partial<Record<keyof FolgaInput, string>> = {};
-    if (!input.funcionarioId)
+
+    // Se o funcionário estiver inativo, não validar nada (não pode solicitar folga)
+    if (input.funcionarioId) {
+      // Aqui precisaríamos verificar se o funcionário está ativo
+      // Por enquanto, vamos validar normalmente
+    }
+
+    if (!input.funcionarioId) {
       novosErros.funcionarioId = "Funcionário é obrigatório";
-    if (!input.dataInicio)
+    }
+
+    if (!input.dataInicio) {
       novosErros.dataInicio = "Data de início é obrigatória";
-    if (!input.dataFim) novosErros.dataFim = "Data de fim é obrigatória";
+    }
+
+    if (!input.dataFim) {
+      novosErros.dataFim = "Data de fim é obrigatória";
+    }
 
     if (input.dataInicio && input.dataFim) {
       const inicio = new Date(input.dataInicio);
