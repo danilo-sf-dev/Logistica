@@ -419,6 +419,38 @@ O dashboard exibe os seguintes indicadores em tempo real:
 - **Esc**: Cancelar ação
 - **Enter**: Confirmar ação
 
+### ✅ Validações do Sistema
+
+O sistema possui validação robusta em todos os formulários:
+
+#### **Campos Obrigatórios**
+
+- Campos marcados com **asterisco (\*)** são obrigatórios
+- Sistema impede salvamento com campos vazios
+- Feedback visual com bordas vermelhas
+
+#### **Validação de Formato**
+
+- **CPF**: Formato válido e único no sistema
+- **Celular**: DDD + 9 dígitos
+- **CEP**: 8 dígitos
+- **Email**: Formato válido (se fornecido)
+- **CNH**: Campo obrigatório para funcionários
+
+#### **Entidades Inativas**
+
+- **Funcionários inativos**: Não podem ser editados
+- **Vendedores inativos**: Não podem ser editados
+- **Veículos inativos**: Não podem ser editados
+- Para editar, primeiro ative a entidade
+
+#### **Feedback Visual**
+
+- **Bordas vermelhas**: Campos com erro
+- **Mensagens específicas**: Erro detalhado abaixo do campo
+- **Push de notificação**: Lista todos os erros ao submeter
+- **Asteriscos pretos**: Campos obrigatórios
+
 ---
 
 ## 🆘 Suporte e Ajuda
@@ -439,9 +471,24 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 **Erro ao salvar:**
 
-1. Verifique se todos os campos obrigatórios estão preenchidos
-2. Verifique o formato dos dados
-3. Tente novamente
+1. **Verifique os campos obrigatórios** (marcados com \*):
+   - Campos com asterisco (\*) são obrigatórios
+   - Campos com erro ficam com borda vermelha
+   - Mensagens de erro aparecem abaixo dos campos
+
+2. **Verifique o formato dos dados**:
+   - **CPF**: Formato 000.000.000-00
+   - **Celular**: Formato (73) 99999-9999
+   - **CEP**: Formato 00000-000
+   - **Email**: Formato válido (se fornecido)
+
+3. **Entidades inativas**:
+   - Funcionários, vendedores e veículos inativos não podem ser editados
+   - Para editar, primeiro ative a entidade
+
+4. **Notificação de erro**:
+   - Sistema mostra push com lista de todos os erros
+   - Corrija os erros e tente novamente
 
 **Erro na exportação:**
 

@@ -206,6 +206,8 @@ const firebaseConfig = {
 - Proteção de rotas
 - Regras do Firestore
 - Validação de dados
+- **Validação de formulários** padronizada em todas as entidades
+- **Feedback visual** consistente (bordas vermelhas, asteriscos)
 - **Variáveis de ambiente** para credenciais
 - **Arquivo .env** no .gitignore
 

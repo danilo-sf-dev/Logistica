@@ -5,23 +5,21 @@ import { VendedoresTableExportService } from "../export/VendedoresTableExportSer
 import type { Vendedor, VendedorInput } from "../types";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 import {
-  validateEmail,
-  validateCelular,
   formatCelular,
   validateCPF,
+  validateEmail,
+  validateCelular,
 } from "../../../utils/masks";
 
 export type OrdenacaoCampo =
   | "nome"
+  | "cpf"
   | "email"
+  | "celular"
   | "regiao"
   | "unidadeNegocio"
-  | "status"
-  | "dataCriacao"
-  | "dataAtualizacao"
-  | "cpf"
-  | "celular"
   | "tipoContrato"
+  | "dataCriacao"
   | "ativo";
 export type DirecaoOrdenacao = "asc" | "desc";
 
@@ -62,8 +60,66 @@ export function useVendedores() {
     ativo: true,
     cidadesAtendidas: [],
   });
+  const [erros, setErros] = useState<
+    Partial<Record<keyof VendedorInput, string>>
+  >({});
 
   const itensPorPagina = 15;
+
+  // Função de validação por campo
+  const validar = useCallback((input: VendedorInput) => {
+    const novosErros: Partial<Record<keyof VendedorInput, string>> = {};
+
+    // Se o vendedor estiver inativo, não validar nada (não pode ser editado)
+    if (!input.ativo) {
+      setErros({});
+      return true;
+    }
+
+    // Validação apenas para vendedores ativos
+    if (!input.nome.trim()) {
+      novosErros.nome = "Nome é obrigatório";
+    }
+
+    if (!input.cpf?.trim()) {
+      novosErros.cpf = "CPF é obrigatório";
+    } else if (!validateCPF(input.cpf)) {
+      novosErros.cpf = "CPF inválido";
+    }
+
+    if (!input.celular?.trim()) {
+      novosErros.celular = "Celular é obrigatório";
+    } else if (!validateCelular(input.celular)) {
+      novosErros.celular = "Celular inválido";
+    }
+
+    if (!input.regiao?.trim()) {
+      novosErros.regiao = "Região é obrigatória";
+    }
+
+    if (!input.unidadeNegocio) {
+      novosErros.unidadeNegocio = "Unidade de negócio é obrigatória";
+    }
+
+    if (!input.tipoContrato) {
+      novosErros.tipoContrato = "Tipo de contrato é obrigatório";
+    }
+
+    if (input.email && !validateEmail(input.email)) {
+      novosErros.email = "Email inválido";
+    }
+
+    if (input.codigoVendSistema) {
+      const codigo = parseInt(input.codigoVendSistema);
+      if (isNaN(codigo) || codigo < 0) {
+        novosErros.codigoVendSistema =
+          "Código deve ser um número inteiro positivo";
+      }
+    }
+
+    setErros(novosErros);
+    return Object.keys(novosErros).length === 0;
+  }, []);
 
   const carregar = useCallback(async () => {
     try {
@@ -78,29 +134,6 @@ export function useVendedores() {
     }
   }, [showNotification]);
 
-  const validar = useCallback((input: VendedorInput) => {
-    const novosErros: Partial<Record<keyof VendedorInput, string>> = {};
-    if (!input.nome.trim()) novosErros.nome = "Nome é obrigatório";
-    if (!input.regiao.trim()) novosErros.regiao = "Região é obrigatória";
-    if (!input.unidadeNegocio)
-      novosErros.unidadeNegocio = "Unidade de negócio é obrigatória";
-    if (!input.cpf?.trim()) novosErros.cpf = "CPF é obrigatório";
-    if (input.cpf && !validateCPF(input.cpf)) novosErros.cpf = "CPF inválido";
-    if (!input.celular?.trim()) novosErros.celular = "Celular é obrigatório";
-    if (input.celular && !validateCelular(input.celular))
-      novosErros.celular = "Celular inválido (formato: (73) 99999-9999)";
-    if (input.email && !validateEmail(input.email))
-      novosErros.email = "Email inválido";
-    if (input.codigoVendSistema) {
-      const codigo = parseInt(input.codigoVendSistema);
-      if (isNaN(codigo) || codigo < 0) {
-        novosErros.codigoVendSistema =
-          "Código deve ser um número inteiro positivo";
-      }
-    }
-    return Object.keys(novosErros).length === 0;
-  }, []);
-
   const confirmar = useCallback(async () => {
     // Prevent updating inactive vendors
     if (editando && !editando.ativo) {
@@ -108,18 +141,21 @@ export function useVendedores() {
       return;
     }
 
+    // Validar formulário
     if (!validar(valores)) {
       showNotification("Por favor, corrija os erros no formulário", "error");
       return;
     }
+
     try {
       const payload: VendedorInput = {
         ...valores,
         nome: valores.nome.toUpperCase(),
         cpf: valores.cpf?.replace(/\D/g, "") || "",
-        regiao: valores.regiao,
+        regiao: valores.regiao.toUpperCase(),
         celular: valores.celular?.replace(/\D/g, "") || "",
       };
+
       if (editando) {
         await vendedoresService.atualizar(editando.id, payload);
         showNotification("Vendedor atualizado com sucesso!", "success");
@@ -127,6 +163,7 @@ export function useVendedores() {
         await vendedoresService.criar(payload);
         showNotification("Vendedor cadastrado com sucesso!", "success");
       }
+
       setMostrarModal(false);
       setEditando(null);
       setValores({
@@ -179,9 +216,9 @@ export function useVendedores() {
       cpf: v.cpf || "",
       email: v.email || "",
       celular: formatCelular(v.celular || ""),
-      regiao: v.regiao || "",
+      regiao: v.regiao?.toUpperCase() || "",
       codigoVendSistema: v.codigoVendSistema || "",
-      unidadeNegocio: v.unidadeNegocio || "frigorifico",
+      unidadeNegocio: (v.unidadeNegocio?.toLowerCase() as any) || "frigorifico",
       tipoContrato: v.tipoContrato || "clt",
       ativo: v.ativo !== undefined ? v.ativo : true,
       cidadesAtendidas: v.cidadesAtendidas || [],
@@ -371,6 +408,7 @@ export function useVendedores() {
     editando,
     valores,
     setValores,
+    erros,
     setMostrarModal,
     mostrarModalInativacao,
     vendedorParaInativar,

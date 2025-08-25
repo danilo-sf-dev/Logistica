@@ -57,7 +57,10 @@ export function useCidades() {
       setLista(dados);
     } catch (error) {
       console.error("Erro ao buscar cidades:", error);
-      showNotification("Erro ao carregar cidades", "error");
+      // Mostrar mensagem específica do erro se disponível
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao carregar cidades";
+      showNotification(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -115,7 +118,10 @@ export function useCidades() {
       await carregar();
     } catch (error) {
       console.error("Erro ao salvar cidade:", error);
-      showNotification("Erro ao salvar cidade", "error");
+      // Mostrar mensagem específica do erro se disponível
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao salvar cidade";
+      showNotification(errorMessage, "error");
     }
   }, [carregar, editando, showNotification, validar, valores]);
 
@@ -163,7 +169,10 @@ export function useCidades() {
       await carregar();
     } catch (error) {
       console.error("Erro ao excluir cidade:", error);
-      showNotification("Erro ao excluir cidade", "error");
+      // Mostrar mensagem específica do erro se disponível
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao excluir cidade";
+      showNotification(errorMessage, "error");
     }
   }, [cidadeParaExcluir, carregar, showNotification]);
 

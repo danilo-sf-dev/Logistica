@@ -9,6 +9,7 @@ interface RotaFormModalProps {
   onClose: () => void;
   onSubmit: (data: RotaFormData) => Promise<boolean>;
   editingRota?: Rota | null;
+  erros?: Partial<Record<keyof RotaFormData, string>>;
 }
 
 const DIAS_SEMANA = [
@@ -26,6 +27,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
   onClose,
   onSubmit,
   editingRota,
+  erros = {},
 }) => {
   const [formData, setFormData] = useState<RotaFormData>({
     nome: "",
@@ -91,17 +93,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !formData.nome ||
-      !formData.dataRota ||
-      formData.diaSemana.length === 0
-    ) {
-      return;
-    }
-
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     const success = await onSubmit(formData);
 
@@ -144,7 +136,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -157,9 +149,12 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, nome: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${erros.nome ? "border-red-500" : ""}`}
                 placeholder="Ex: Rota Sul"
               />
+              {erros.nome && (
+                <p className="text-red-500 text-xs mt-1">{erros.nome}</p>
+              )}
             </div>
 
             <div>
@@ -173,8 +168,11 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, dataRota: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${erros.dataRota ? "border-red-500" : ""}`}
               />
+              {erros.dataRota && (
+                <p className="text-red-500 text-xs mt-1">{erros.dataRota}</p>
+              )}
             </div>
           </div>
 
@@ -193,9 +191,12 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                   const peso = value === "" ? 0 : parseFloat(value) || 0;
                   setFormData({ ...formData, pesoMinimo: peso });
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${erros.pesoMinimo ? "border-red-500" : ""}`}
                 placeholder="0.00"
               />
+              {erros.pesoMinimo && (
+                <p className="text-red-500 text-xs mt-1">{erros.pesoMinimo}</p>
+              )}
             </div>
 
             <div>
@@ -215,6 +216,9 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                   </label>
                 ))}
               </div>
+              {erros.diaSemana && (
+                <p className="text-red-500 text-xs mt-1">{erros.diaSemana}</p>
+              )}
             </div>
           </div>
 
@@ -276,7 +280,8 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
               Cancelar
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               disabled={isSubmitting}
               className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -287,7 +292,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                   : "Criar"}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

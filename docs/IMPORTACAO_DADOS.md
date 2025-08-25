@@ -200,6 +200,22 @@ src/
 - Código do Sistema
 - Cidades Atendidas
 
+**Validações Específicas:**
+
+- **Unicidade**: CPF deve ser único no sistema
+- **Email**: Deve ser único no sistema (se fornecido)
+- **Código Sistema**: Deve ser único no sistema (se fornecido)
+- **Formato**: Nome e Região são convertidos para maiúsculas
+- **Email**: Convertido para minúsculas
+- **Código Sistema**: Convertido para maiúsculas
+- **Unidade Negócio**: Convertida para minúsculas
+- **CPF**: Deve ter exatamente 11 dígitos
+- **Celular**: Deve ter 10 ou 11 dígitos
+- **Região**: Deve ser uma das opções válidas (SUDESTE, NORDESTE, SUL, NORTE, CENTRO-OESTE)
+- **Unidade Negócio**: Deve ser uma das opções válidas (frigorifico, ovos, ambos)
+- **Tipo Contrato**: Deve ser uma das opções válidas (clt, pj, autonomo, outro)
+- **Cidades Atendidas**: Separadas por vírgula e convertidas em array
+
 ### 5. Rotas
 
 **Campos Obrigatórios:**
@@ -1105,6 +1121,72 @@ RIO DE JANEIRO | RJ | sudeste | 430 | 500 | Cidade maravilhosa
 BELO HORIZONTE | MG | sudeste | 586 | 800 | Capital de Minas
 ```
 
+### Exemplo: Template de Vendedores
+
+#### Planilha 1: Instruções
+
+```
+IMPORTAÇÃO DE VENDEDORES - INSTRUÇÕES
+
+📋 COMO USAR ESTE TEMPLATE:
+
+✅ OPÇÃO 1 - USO SIMPLES (RECOMENDADO):
+   1. Vá para a planilha 'Template'
+   2. Preencha seus dados na planilha 'Template'
+   3. Salve o arquivo
+   4. Faça upload no sistema
+   5. Pronto! Os dados serão importados automaticamente
+
+✅ OPÇÃO 2 - PERSONALIZAÇÃO:
+   - Você pode excluir as planilhas 'Instruções' e 'Exemplo'
+   - Você pode renomear a planilha 'Template' para qualquer nome
+   - O sistema detectará automaticamente a planilha com dados
+
+📝 REGRAS DE PREENCHIMENTO:
+   - Todos os campos marcados com * são obrigatórios
+   - Não deixe linhas em branco entre os dados
+   - Preencha apenas na planilha 'Template' (ou sua planilha renomeada)
+   - CPF deve ser válido (não apenas 11 dígitos, mas um CPF real)
+
+📊 FORMATO DOS DADOS:
+   - Nome: Nome completo (será convertido para maiúsculas)
+   - CPF: 11 dígitos sem pontos ou traços (deve ser um CPF válido)
+   - Email: Formato válido (opcional, será convertido para minúsculas)
+   - Celular: 10 ou 11 dígitos sem formatação
+   - Região: SUDESTE, NORDESTE, SUL, NORTE, CENTRO-OESTE (será convertido para maiúsculas)
+   - Código Sistema: Código interno (opcional, será convertido para maiúsculas)
+   - Unidade Negócio: frigorifico, ovos, ambos
+   - Tipo Contrato: clt, pj, autonomo, outro
+   - Cidades Atendidas: Separadas por vírgula (opcional)
+
+🔍 VALIDAÇÕES:
+   - CPF deve ser único no sistema e válido
+   - Email deve ser único no sistema (se fornecido)
+   - Código do Sistema deve ser único no sistema (se fornecido)
+   - Região deve ser uma das opções válidas
+   - Unidade de Negócio deve ser uma das opções válidas
+   - Tipo de Contrato deve ser uma das opções válidas
+
+💡 DICA:
+   - Veja a planilha 'Exemplo' para referência de preenchimento
+   - O sistema aceita o arquivo mesmo se você excluir outras planilhas
+   - O sistema aceita o arquivo mesmo se você renomear a planilha 'Template'
+```
+
+#### Planilha 2: Template
+
+```
+Nome* | CPF* | Email | Celular* | Região* | Código Sistema | Unidade Negócio* | Tipo Contrato* | Cidades Atendidas
+```
+
+#### Planilha 3: Exemplo
+
+```
+Nome* | CPF* | Email | Celular* | Região* | Código Sistema | Unidade Negócio* | Tipo Contrato* | Cidades Atendidas
+JOÃO SILVA | 12345678901 | joao@empresa.com | 11999999999 | SUDESTE | VEND001 | frigorifico | clt | São Paulo,Rio de Janeiro
+MARIA SANTOS | 98765432100 | maria@empresa.com | 11888888888 | NORDESTE | VEND002 | ovos | pj | Salvador,Ilhéus
+```
+
 ## 🔒 Segurança e Validação
 
 ### Regras de Validação
@@ -1221,14 +1303,15 @@ interface ImportLog {
 - [x] Detecção inteligente de planilhas
 - [x] Flexibilidade de uso do template
 
-### Fase 2 (2 semanas)
+### Fase 2 (2 semanas) ✅ **EM ANDAMENTO**
 
 - [x] Templates de Cidades ✅
+- [x] Templates de Vendedores ✅
 - [ ] Templates de Veículos
 - [ ] Templates de Funcionários
-- [ ] Validações específicas
-- [ ] Tratamento de erros
-- [ ] Logs de importação
+- [x] Validações específicas ✅
+- [x] Tratamento de erros ✅
+- [x] Logs de importação ✅
 
 ### Fase 3 (1 semana)
 
@@ -1267,6 +1350,214 @@ interface ImportLog {
 2. **Taxa de erro**
 3. **Performance**
 4. **Feedback dos usuários**
+
+## 🛡️ Validações de Formulário - Padrão Implementado
+
+### 📋 Visão Geral
+
+O sistema implementou um padrão consistente de validação de formulários em todas as entidades, garantindo uma experiência uniforme para o usuário e prevenindo inconsistências nos dados.
+
+### 🎯 Padrão de Validação
+
+#### **1. Validação no Hook (State)**
+
+- ✅ **Centralizada**: Toda validação é feita no hook da entidade
+- ✅ **Consistente**: Mesmo padrão em todas as entidades
+- ✅ **Reutilizável**: Lógica de validação compartilhada
+
+#### **2. Validação Condicional para Entidades Inativas**
+
+- ✅ **Funcionários Inativos**: Não podem ser editados, validação desabilitada
+- ✅ **Vendedores Inativos**: Não podem ser editados, validação desabilitada
+- ✅ **Veículos Inativos**: Não podem ser editados, validação desabilitada
+
+#### **3. Feedback Visual Padronizado**
+
+- ✅ **Bordas Vermelhas**: Campos com erro recebem borda vermelha
+- ✅ **Mensagens Específicas**: Cada campo tem sua mensagem de erro
+- ✅ **Push de Notificação**: Lista todos os erros ao submeter
+- ✅ **Asteriscos Pretos**: Campos obrigatórios marcados com \*
+
+### 📝 Entidades com Validação Implementada
+
+#### **1. Cidades** ✅
+
+**Campos Obrigatórios:**
+
+- Nome <span className="text-black">\*</span>
+- Estado <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Unicidade**: Nome + Estado deve ser único (considerando acentuação)
+- **Formato**: Nome e Estado convertidos para maiúsculas
+- **Normalização**: Remove acentos e pontuação para comparação
+
+#### **2. Vendedores** ✅
+
+**Campos Obrigatórios:**
+
+- Nome <span className="text-black">\*</span>
+- CPF <span className="text-black">\*</span>
+- Celular <span className="text-black">\*</span>
+- Região <span className="text-black">\*</span>
+- Unidade de Negócio <span className="text-black">\*</span>
+- Tipo de Contrato <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **CPF**: Formato válido e único no sistema
+- **Email**: Formato válido e único (se fornecido)
+- **Celular**: Formato válido (DDD + 9 dígitos)
+- **Formato**: Nome e Região em maiúsculas, Unidade em minúsculas
+
+#### **3. Folgas** ✅
+
+**Campos Obrigatórios:**
+
+- Funcionário <span className="text-black">\*</span>
+- Data de Início <span className="text-black">\*</span>
+- Data de Fim <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Datas**: Data de fim deve ser posterior à data de início
+- **Horas**: Validação específica para tipos `banco_horas` e `compensacao`
+- **Funcionário**: Deve ser um funcionário válido do sistema
+
+#### **4. Rotas** ✅
+
+**Campos Obrigatórios:**
+
+- Nome <span className="text-black">\*</span>
+- Data da Rota <span className="text-black">\*</span>
+- Dia da Semana <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Data**: Não pode ser anterior ao dia atual
+- **Peso Mínimo**: Deve ser um valor positivo
+- **Dias**: Pelo menos um dia da semana deve ser selecionado
+
+#### **5. Veículos** ✅
+
+**Campos Obrigatórios:**
+
+- Placa <span className="text-black">\*</span>
+- Modelo <span className="text-black">\*</span>
+- Marca <span className="text-black">\*</span>
+- Ano <span className="text-black">\*</span>
+- Capacidade <span className="text-black">\*</span>
+- Quantidade de Eixos <span className="text-black">\*</span>
+- Tipo de Baú <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **Ano**: Entre 1900 e o próximo ano
+- **Capacidade**: Número positivo
+- **Eixos**: Entre 2 e 10 eixos
+- **Formato**: Placa, modelo e marca em maiúsculas
+
+#### **6. Funcionários** ✅
+
+**Campos Obrigatórios:**
+
+- Nome <span className="text-black">\*</span>
+- CPF <span className="text-black">\*</span>
+- CNH <span className="text-black">\*</span>
+- Celular <span className="text-black">\*</span>
+- CEP <span className="text-black">\*</span>
+- Endereço <span className="text-black">\*</span>
+- Cidade <span className="text-black">\*</span>
+
+**Validações Específicas:**
+
+- **CPF**: Formato válido
+- **CNH**: Campo obrigatório
+- **Celular**: Formato válido (DDD + 9 dígitos)
+- **CEP**: Formato válido (8 dígitos)
+- **Email**: Formato válido (se fornecido)
+- **Formato**: Nome em maiúsculas
+
+### 🔧 Implementação Técnica
+
+#### **Estrutura do Hook**
+
+```typescript
+// Estado de erros
+const [erros, setErros] = useState<Partial<Record<keyof EntityInput, string>>>(
+  {}
+);
+
+// Função de validação
+const validar = useCallback((input: EntityInput) => {
+  const novosErros: Partial<Record<keyof EntityInput, string>> = {};
+
+  // Validação condicional para entidades inativas
+  if (!input.ativo) {
+    setErros({});
+    return true;
+  }
+
+  // Validações específicas
+  if (!input.campo?.trim()) {
+    novosErros.campo = "Campo é obrigatório";
+  }
+
+  setErros(novosErros);
+  return Object.keys(novosErros).length === 0;
+}, []);
+
+// Integração na função de confirmação
+const confirmar = useCallback(async () => {
+  if (!validar(valores)) {
+    showNotification("Por favor, corrija os erros no formulário", "error");
+    return;
+  }
+  // ... resto da lógica
+}, [validar, valores]);
+```
+
+#### **Estrutura do Modal**
+
+```typescript
+// Props do modal
+interface EntityFormModalProps {
+  erros?: Partial<Record<keyof EntityInput, string>>;
+  // ... outras props
+}
+
+// Uso nos campos
+<input
+  className={`input-field ${erros.campo ? "border-red-500" : ""}`}
+  // ... outras props
+/>
+{erros.campo && (
+  <p className="text-red-500 text-xs mt-1">{erros.campo}</p>
+)}
+```
+
+### 🎯 Benefícios do Padrão
+
+1. **Consistência**: Mesmo comportamento em todas as entidades
+2. **Manutenibilidade**: Validação centralizada e reutilizável
+3. **Experiência do Usuário**: Feedback visual uniforme
+4. **Prevenção de Erros**: Validação robusta antes de salvar
+5. **Flexibilidade**: Fácil adição de novas validações
+6. **Performance**: Validação apenas no submit, sem loops
+
+### 📊 Status de Implementação
+
+| Entidade     | Validação | Asteriscos | Status       |
+| ------------ | --------- | ---------- | ------------ |
+| Cidades      | ✅        | ✅         | **Completo** |
+| Vendedores   | ✅        | ✅         | **Completo** |
+| Folgas       | ✅        | ✅         | **Completo** |
+| Rotas        | ✅        | ✅         | **Completo** |
+| Veículos     | ✅        | ✅         | **Completo** |
+| Funcionários | ✅        | ✅         | **Completo** |
+
+---
 
 ## 📋 Resumo das Melhorias Implementadas
 
@@ -1310,6 +1601,15 @@ interface ImportLog {
    - Gerenciamento visual de muitos erros
    - Cards visuais para melhor organização
 
+8. **Validação de Formulários Padronizada**
+   - Padrão consistente em todas as entidades
+   - Validação centralizada no hook
+   - Feedback visual uniforme (bordas vermelhas, mensagens)
+   - Asteriscos pretos nos campos obrigatórios
+   - Validação condicional para entidades inativas
+   - Push de notificação com lista de erros
+   - Prevenção de salvamento com dados inválidos
+
 ### 🎯 **Benefícios Alcançados:**
 
 - **🎯 Simplicidade**: Template mais limpo e fácil de usar
@@ -1321,6 +1621,10 @@ interface ImportLog {
 - **👥 Usabilidade**: Feedback claro e orientações para correção
 - **📱 Responsividade**: Interface adaptável para qualquer dispositivo
 - **📊 Escalabilidade**: Suporte a grandes volumes de dados
+- **✅ Consistência**: Validação uniforme em todos os formulários
+- **🛡️ Prevenção**: Evita salvamento de dados inválidos
+- **🎨 Experiência**: Interface visual consistente e intuitiva
+- **🔧 Manutenibilidade**: Código padronizado e reutilizável
 
 ---
 
@@ -1336,3 +1640,12 @@ interface ImportLog {
 - ✅ Interface responsiva para grandes volumes de erros
 - ✅ Modal com rolagem inteligente e gerenciamento visual
 - ✅ Feedback completo e orientações para correção
+- ✅ Implementação completa da importação de Vendedores
+- ✅ Validações específicas para CPF, Email, Código Sistema
+- ✅ Formatação automática de dados (maiúsculas/minúsculas)
+- ✅ Conversão de cidades atendidas de string para array
+- ✅ **Validação de Formulários Padronizada** em todas as entidades
+- ✅ **Feedback Visual Uniforme** (bordas vermelhas, mensagens específicas)
+- ✅ **Asteriscos nos Campos Obrigatórios** para melhor usabilidade
+- ✅ **Validação Condicional** para entidades inativas
+- ✅ **Prevenção de Salvamento** com dados inválidos

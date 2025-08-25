@@ -27,6 +27,13 @@ export const RotasTable: React.FC<RotasTableProps> = ({
   onSort,
 }) => {
   const formatDate = (dateString: string) => {
+    // Se a data já está no formato YYYY-MM-DD, converter diretamente
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [ano, mes, dia] = dateString.split("-");
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    // Para outras datas, usar a conversão normal
     const date = new Date(dateString);
     return date.toLocaleDateString("pt-BR");
   };

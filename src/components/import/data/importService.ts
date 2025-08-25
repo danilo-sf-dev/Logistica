@@ -364,6 +364,9 @@ export function getImportService(entityType: string): BaseImportService {
     case "cidades":
       const { CidadesImportService } = require("./cidadesImportService");
       return new CidadesImportService();
+    case "vendedores":
+      const { VendedoresImportService } = require("./vendedoresImportService");
+      return new VendedoresImportService();
     // Adicionar outros serviços conforme implementados
     default:
       throw new Error(

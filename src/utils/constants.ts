@@ -1,10 +1,10 @@
 // Regiões oficiais do Brasil
 export const REGIOES_BRASIL = [
-  { valor: "norte", nome: "Norte" },
-  { valor: "nordeste", nome: "Nordeste" },
-  { valor: "centro-oeste", nome: "Centro-Oeste" },
-  { valor: "sudeste", nome: "Sudeste" },
-  { valor: "sul", nome: "Sul" },
+  { valor: "NORTE", nome: "Norte" },
+  { valor: "NORDESTE", nome: "Nordeste" },
+  { valor: "CENTRO-OESTE", nome: "Centro-Oeste" },
+  { valor: "SUDESTE", nome: "Sudeste" },
+  { valor: "SUL", nome: "Sul" },
 ] as const;
 
 // Estados brasileiros
@@ -41,41 +41,41 @@ export const ESTADOS_BRASIL = [
 // Mapeamento de estados para regiões
 export const ESTADO_PARA_REGIAO: Record<string, string> = {
   // Norte
-  AC: "norte",
-  AP: "norte",
-  AM: "norte",
-  PA: "norte",
-  RO: "norte",
-  RR: "norte",
-  TO: "norte",
+  AC: "NORTE",
+  AP: "NORTE",
+  AM: "NORTE",
+  PA: "NORTE",
+  RO: "NORTE",
+  RR: "NORTE",
+  TO: "NORTE",
 
   // Nordeste
-  AL: "nordeste",
-  BA: "nordeste",
-  CE: "nordeste",
-  MA: "nordeste",
-  PB: "nordeste",
-  PE: "nordeste",
-  PI: "nordeste",
-  RN: "nordeste",
-  SE: "nordeste",
+  AL: "NORDESTE",
+  BA: "NORDESTE",
+  CE: "NORDESTE",
+  MA: "NORDESTE",
+  PB: "NORDESTE",
+  PE: "NORDESTE",
+  PI: "NORDESTE",
+  RN: "NORDESTE",
+  SE: "NORDESTE",
 
   // Centro-Oeste
-  DF: "centro-oeste",
-  GO: "centro-oeste",
-  MT: "centro-oeste",
-  MS: "centro-oeste",
+  DF: "CENTRO-OESTE",
+  GO: "CENTRO-OESTE",
+  MT: "CENTRO-OESTE",
+  MS: "CENTRO-OESTE",
 
   // Sudeste
-  ES: "sudeste",
-  MG: "sudeste",
-  RJ: "sudeste",
-  SP: "sudeste",
+  ES: "SUDESTE",
+  MG: "SUDESTE",
+  RJ: "SUDESTE",
+  SP: "SUDESTE",
 
   // Sul
-  PR: "sul",
-  RS: "sul",
-  SC: "sul",
+  PR: "SUL",
+  RS: "SUL",
+  SC: "SUL",
 };
 
 // Função helper para obter a região de um estado

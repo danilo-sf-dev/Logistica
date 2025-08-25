@@ -6,11 +6,7 @@ import type {
   UnidadeNegocio,
   TipoCarroceria,
 } from "../../../types";
-import {
-  maskPlaca,
-  validatePlaca,
-  validateCapacidade,
-} from "../../../utils/masks";
+import { maskPlaca } from "../../../utils/masks";
 
 interface VeiculoFormModalProps {
   isOpen: boolean;
@@ -19,6 +15,7 @@ interface VeiculoFormModalProps {
   editingVeiculo?: Veiculo | null;
   checkPlacaExists: (placa: string, excludeId?: string) => Promise<boolean>;
   somenteLeitura?: boolean;
+  erros?: Partial<Record<keyof VeiculoFormData, string>>;
 }
 
 export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
@@ -28,6 +25,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
   editingVeiculo,
   checkPlacaExists,
   somenteLeitura = false,
+  erros = {},
 }) => {
   const [formData, setFormData] = useState<VeiculoFormData>({
     placa: "",
@@ -46,9 +44,6 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
     observacao: "",
   });
 
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof VeiculoFormData, string>>
-  >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -91,57 +86,9 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
       motorista: "",
       observacao: "",
     });
-    setErrors({});
   };
 
-  const validateForm = async (): Promise<boolean> => {
-    const newErrors: Partial<Record<keyof VeiculoFormData, string>> = {};
-
-    // Validações obrigatórias
-    if (!formData.placa.trim()) newErrors.placa = "Placa é obrigatória";
-    if (!formData.capacidade.trim())
-      newErrors.capacidade = "Capacidade é obrigatória";
-    if (!formData.tipoCarroceria)
-      newErrors.tipoCarroceria = "Tipo de carroceria é obrigatório";
-    if (!formData.tipoBau) newErrors.tipoBau = "Tipo de baú é obrigatório";
-
-    // Validações específicas
-    if (formData.placa && !validatePlaca(formData.placa)) {
-      newErrors.placa = "Placa inválida (formato: LWB9390 ou LWB9R90)";
-    }
-    if (formData.capacidade && !validateCapacidade(formData.capacidade)) {
-      newErrors.capacidade = "Capacidade deve ser um número maior que zero";
-    }
-    if (formData.ano) {
-      const anoAtual = new Date().getFullYear();
-      const anoVeiculo = parseInt(formData.ano);
-      if (anoVeiculo < 1900 || anoVeiculo > anoAtual + 1) {
-        newErrors.ano = `Ano deve estar entre 1900 e ${anoAtual + 1}`;
-      }
-    }
-
-    // Validação de placa duplicada
-    if (formData.placa && !newErrors.placa) {
-      const placaExists = await checkPlacaExists(
-        formData.placa,
-        editingVeiculo?.id,
-      );
-      if (placaExists) {
-        newErrors.placa = "Placa já cadastrada para outro veículo";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!(await validateForm())) {
-      return;
-    }
-
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
       const success = await onSubmit(formData);
@@ -181,11 +128,11 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Placa *
+                Placa <span className="text-black">*</span>
               </label>
               <input
                 type="text"
@@ -197,20 +144,20 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                     placa: maskPlaca(e.target.value),
                   })
                 }
-                className={`input-field ${errors.placa ? "border-red-500" : ""} ${
+                className={`input-field ${erros.placa ? "border-red-500" : ""} ${
                   somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 placeholder="ABC1234"
                 maxLength={7}
                 disabled={somenteLeitura}
               />
-              {errors.placa && (
-                <p className="text-red-500 text-xs mt-1">{errors.placa}</p>
+              {erros.placa && (
+                <p className="text-red-500 text-xs mt-1">{erros.placa}</p>
               )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Ano
+                Ano <span className="text-black">*</span>
               </label>
               <input
                 type="text"
@@ -218,14 +165,14 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, ano: e.target.value })
                 }
-                className={`input-field ${errors.ano ? "border-red-500" : ""} ${
+                className={`input-field ${erros.ano ? "border-red-500" : ""} ${
                   somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 placeholder="2024"
                 disabled={somenteLeitura}
               />
-              {errors.ano && (
-                <p className="text-red-500 text-xs mt-1">{errors.ano}</p>
+              {erros.ano && (
+                <p className="text-red-500 text-xs mt-1">{erros.ano}</p>
               )}
             </div>
           </div>
@@ -233,7 +180,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Marca
+                Marca <span className="text-black">*</span>
               </label>
               <input
                 type="text"
@@ -249,7 +196,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Modelo *
+                Modelo <span className="text-black">*</span>
               </label>
               <input
                 type="text"
@@ -258,13 +205,13 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, modelo: e.target.value })
                 }
-                className={`input-field ${errors.modelo ? "border-red-500" : ""} ${
+                className={`input-field ${erros.modelo ? "border-red-500" : ""} ${
                   somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 disabled={somenteLeitura}
               />
-              {errors.modelo && (
-                <p className="text-red-500 text-xs mt-1">{errors.modelo}</p>
+              {erros.modelo && (
+                <p className="text-red-500 text-xs mt-1">{erros.modelo}</p>
               )}
             </div>
           </div>
@@ -272,7 +219,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Capacidade (kg) *
+                Capacidade (kg) <span className="text-black">*</span>
               </label>
               <input
                 type="text"
@@ -281,14 +228,14 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, capacidade: e.target.value })
                 }
-                className={`input-field ${errors.capacidade ? "border-red-500" : ""} ${
+                className={`input-field ${erros.capacidade ? "border-red-500" : ""} ${
                   somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 placeholder="5000"
                 disabled={somenteLeitura}
               />
-              {errors.capacidade && (
-                <p className="text-red-500 text-xs mt-1">{errors.capacidade}</p>
+              {erros.capacidade && (
+                <p className="text-red-500 text-xs mt-1">{erros.capacidade}</p>
               )}
             </div>
             <div>
@@ -329,7 +276,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                     tipoCarroceria: e.target.value as TipoCarroceria,
                   })
                 }
-                className={`input-field ${errors.tipoCarroceria ? "border-red-500" : ""} ${
+                className={`input-field ${erros.tipoCarroceria ? "border-red-500" : ""} ${
                   somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 disabled={somenteLeitura}
@@ -343,15 +290,15 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                 <option value="truck_3_eixos">Truck 3 Eixos</option>
                 <option value="truck_4_eixos">Truck 4 Eixos</option>
               </select>
-              {errors.tipoCarroceria && (
+              {erros.tipoCarroceria && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.tipoCarroceria}
+                  {erros.tipoCarroceria}
                 </p>
               )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Quantidade de Eixos
+                Quantidade de Eixos <span className="text-black">*</span>
               </label>
               <select
                 value={formData.quantidadeEixos}
@@ -361,7 +308,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                     quantidadeEixos: e.target.value,
                   })
                 }
-                className={`input-field ${
+                className={`input-field ${erros.quantidadeEixos ? "border-red-500" : ""} ${
                   somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 disabled={somenteLeitura}
@@ -375,17 +322,22 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                 <option value="8">8 Eixos</option>
                 <option value="9">9 Eixos</option>
               </select>
+              {erros.quantidadeEixos && (
+                <p className="text-red-500 text-xs mt-1">
+                  {erros.quantidadeEixos}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Tipo de Baú *
+                Tipo de Baú <span className="text-black">*</span>
               </label>
               <select
                 value={formData.tipoBau}
                 onChange={(e) =>
                   setFormData({ ...formData, tipoBau: e.target.value })
                 }
-                className={`input-field ${errors.tipoBau ? "border-red-500" : ""} ${
+                className={`input-field ${erros.tipoBau ? "border-red-500" : ""} ${
                   somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
                 disabled={somenteLeitura}
@@ -398,8 +350,8 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                 <option value="caçamba">Caçamba</option>
                 <option value="plataforma">Plataforma</option>
               </select>
-              {errors.tipoBau && (
-                <p className="text-red-500 text-xs mt-1">{errors.tipoBau}</p>
+              {erros.tipoBau && (
+                <p className="text-red-500 text-xs mt-1">{erros.tipoBau}</p>
               )}
             </div>
           </div>
@@ -497,7 +449,8 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
             </button>
             {!somenteLeitura && (
               <button
-                type="submit"
+                type="button"
+                onClick={handleSubmit}
                 className="btn-primary"
                 disabled={isSubmitting}
               >
@@ -509,7 +462,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
               </button>
             )}
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

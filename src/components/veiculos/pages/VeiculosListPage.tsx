@@ -29,6 +29,7 @@ export const VeiculosListPage: React.FC = () => {
     updateSortConfig,
     getFilteredAndSortedVeiculos,
     handleExportExcel,
+    erros,
   } = useVeiculos();
 
   const itemsPerPage = 15;
@@ -221,6 +222,7 @@ export const VeiculosListPage: React.FC = () => {
         somenteLeitura={
           editingVeiculo ? editingVeiculo.status === "inativo" : false
         }
+        erros={erros}
       />
 
       {/* Modal de Confirmação de Ativação */}
