@@ -79,6 +79,21 @@ export interface SegurancaProps {
     provider?: string;
     telefone?: string;
     cargo?: string;
+    notificacoes?: {
+      email: boolean;
+      push: boolean;
+      rotas: boolean;
+      folgas: boolean;
+      manutencao: boolean;
+    };
+    sessionInfo?: {
+      ip: string;
+      device: string;
+      browser: string;
+      os: string;
+      userAgent: string;
+      timestamp: Date;
+    };
   } | null;
   className?: string;
 }

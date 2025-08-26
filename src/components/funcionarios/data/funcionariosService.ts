@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import type { Funcionario, FuncionarioInput } from "../types";
+import NotificationService from "../../../services/notificationService";
 
 const COLLECTION = "funcionarios";
 
@@ -100,6 +101,17 @@ async function criar(input: FuncionarioInput): Promise<string> {
     dataAtualizacao: serverTimestamp(),
   };
   const ref = await addDoc(collection(db, COLLECTION), payload);
+
+  // Enviar notificação sobre novo funcionário
+  try {
+    await NotificationService.notifyNewFuncionario({
+      nome: input.nome,
+      id: ref.id,
+    });
+  } catch (error) {
+    console.error("Erro ao enviar notificação:", error);
+  }
+
   return ref.id;
 }
 

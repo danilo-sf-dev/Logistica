@@ -12,7 +12,7 @@ export const NotificacoesForm: React.FC<NotificacoesFormProps> = ({
         Configurações de Notificações
       </h3>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between opacity-50">
           <div>
             <h4 className="text-sm font-medium text-gray-900">
               Notificações por Email
@@ -20,18 +20,15 @@ export const NotificacoesForm: React.FC<NotificacoesFormProps> = ({
             <p className="text-sm text-gray-500">
               Receber notificações importantes por email
             </p>
+            <p className="text-xs text-orange-600 mt-1">
+              ⚠️ Em breve - Em desenvolvimento
+            </p>
           </div>
           <button
-            onClick={() => onChange("email")}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              config.email ? "bg-primary-600" : "bg-gray-200"
-            }`}
+            disabled
+            className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 cursor-not-allowed"
           >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                config.email ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
+            <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-1" />
           </button>
         </div>
 

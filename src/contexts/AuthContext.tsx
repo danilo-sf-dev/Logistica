@@ -18,6 +18,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc, DocumentData } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
+import SessionService from "../services/sessionService";
 
 interface UserProfile {
   uid: string;
@@ -30,6 +31,21 @@ interface UserProfile {
   provider: string;
   telefone?: string;
   cargo?: string;
+  notificacoes?: {
+    email: boolean;
+    push: boolean;
+    rotas: boolean;
+    folgas: boolean;
+    manutencao: boolean;
+  };
+  sessionInfo?: {
+    ip: string;
+    device: string;
+    browser: string;
+    os: string;
+    userAgent: string;
+    timestamp: Date;
+  };
 }
 
 interface AuthContextType {
@@ -77,6 +93,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ): Promise<UserCredential> => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
+
+      // Capturar informações de sessão
+      try {
+        const sessionInfo = await SessionService.getSessionInfo();
+
+        // Atualizar perfil com informações de sessão
+        await setDoc(
+          doc(db, "users", result.user.uid),
+          {
+            lastLogin: new Date(),
+            sessionInfo: {
+              ...sessionInfo,
+              timestamp: new Date(),
+            },
+          },
+          { merge: true },
+        );
+      } catch (sessionError) {
+        console.error("Erro ao capturar informações de sessão:", sessionError);
+        // Continuar mesmo se falhar a captura de sessão
+      }
+
       return result;
     } catch (error) {
       throw error;
@@ -214,6 +252,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           provider: data.provider,
           telefone: data.telefone,
           cargo: data.cargo,
+          notificacoes: data.notificacoes,
+          sessionInfo: data.sessionInfo
+            ? {
+                ...data.sessionInfo,
+                timestamp: convertTimestampToDate(data.sessionInfo.timestamp),
+              }
+            : undefined,
         };
       }
       return null;
