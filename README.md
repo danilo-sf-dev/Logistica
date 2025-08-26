@@ -22,8 +22,27 @@ Sistema web completo para gestão de logística, desenvolvido com React e Fireba
 - **Relatórios**: Relatórios detalhados e analytics
 - **Autenticação**: Login com Google e Email/Senha
 - **Notificações**: Sistema de notificações em tempo real
+- **Configurações**: Perfil, notificações, sistema e segurança
+- **Segurança**: Informações de sessão e controle de acesso
 
-## 🆕 **Novas Funcionalidades (v1.1.0)**
+## 🆕 **Novas Funcionalidades (v1.2.0)**
+
+### 🔐 **Sistema de Segurança Firebase**
+
+- **Regras de Segurança Firestore**: Implementadas e ativas
+- **Controle de Acesso por Role**: admin, gerente, dispatcher, user
+- **Proteção de Dados**: Leitura/escrita controlada por permissões
+- **Modo Teste Desabilitado**: Sistema em produção segura
+
+### 🔔 **Sistema de Notificações Completo**
+
+- **NotificationService**: Serviço centralizado de notificações
+- **NotificationBell**: Sino de notificações no header
+- **Configurações de Notificação**: Interface para gerenciar preferências
+- **Notificações em Tempo Real**: Toast notifications para eventos
+- **Filtro por Preferências**: Só envia se usuário habilitou
+- **Salvamento no Firestore**: Notificações persistentes
+- **Tipos de Notificação**: funcionário, rota, folga, veículo
 
 ### 📊 **Sistema de Relatórios Avançado**
 
@@ -39,6 +58,8 @@ Sistema web completo para gestão de logística, desenvolvido com React e Fireba
 - **Layout Minimalista**: Interface em preto e branco
 - **Nomenclatura Padrão**: Arquivos nomeados como `entity_dd-MM-YYYY.xlsx`
 - **Tipos Separados**: Arquivos de tipos independentes por pacote
+- **Padrões de Código**: Eliminação de if/else com arrays de detectores
+- **SessionService**: Captura real de IP e informações de dispositivo
 
 ### 📈 **Funcionalidades de Exportação**
 
@@ -96,7 +117,7 @@ REACT_APP_VAPID_PUBLIC_KEY=your-vapid-public-key
 
 # App Configuration
 REACT_APP_NAME=SGL - Sistema de Gestão de Logística
-REACT_APP_VERSION=1.1.0
+REACT_APP_VERSION=1.2.0
 REACT_APP_ENVIRONMENT=development
 ```
 

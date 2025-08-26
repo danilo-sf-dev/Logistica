@@ -1,11 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Shield, Globe } from "lucide-react";
 import type { SegurancaProps } from "../types";
+import SessionService from "../../../services/sessionService";
 
 export const SegurancaForm: React.FC<SegurancaProps> = ({
   userProfile,
   className = "",
 }) => {
+  const [sessionInfo, setSessionInfo] = useState<{
+    ip: string;
+    device: string;
+    browser: string;
+    os: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
   // Função para formatar a data do último login
   const formatLastLogin = (lastLogin: any): string => {
     if (!lastLogin) return "N/A";
@@ -37,6 +46,40 @@ export const SegurancaForm: React.FC<SegurancaProps> = ({
       return "N/A";
     }
   };
+
+  // Carregar informações de sessão
+  useEffect(() => {
+    const loadSessionInfo = async () => {
+      try {
+        setLoading(true);
+
+        // Se temos informações salvas no perfil, usar elas
+        if (userProfile?.sessionInfo) {
+          const formatted = SessionService.formatSessionInfo(
+            userProfile.sessionInfo,
+          );
+          setSessionInfo(formatted);
+        } else {
+          // Caso contrário, capturar informações atuais
+          const currentSession = await SessionService.getSessionInfo();
+          const formatted = SessionService.formatSessionInfo(currentSession);
+          setSessionInfo(formatted);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar informações de sessão:", error);
+        setSessionInfo({
+          ip: "Não disponível",
+          device: "Não disponível",
+          browser: "Não disponível",
+          os: "Não disponível",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSessionInfo();
+  }, [userProfile?.sessionInfo]);
 
   return (
     <div className={`card ${className}`}>
@@ -72,8 +115,18 @@ export const SegurancaForm: React.FC<SegurancaProps> = ({
               </h3>
               <div className="mt-2 text-sm text-blue-700">
                 <p>Último login: {formatLastLogin(userProfile?.lastLogin)}</p>
-                <p>IP: 192.168.1.100</p>
-                <p>Dispositivo: Chrome - Windows</p>
+                <p>
+                  IP:{" "}
+                  {loading
+                    ? "Carregando..."
+                    : sessionInfo?.ip || "Não disponível"}
+                </p>
+                <p>
+                  Dispositivo:{" "}
+                  {loading
+                    ? "Carregando..."
+                    : sessionInfo?.device || "Não disponível"}
+                </p>
               </div>
             </div>
           </div>
