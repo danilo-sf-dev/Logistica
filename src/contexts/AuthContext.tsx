@@ -30,6 +30,13 @@ interface UserProfile {
   provider: string;
   telefone?: string;
   cargo?: string;
+  notificacoes?: {
+    email: boolean;
+    push: boolean;
+    rotas: boolean;
+    folgas: boolean;
+    manutencao: boolean;
+  };
 }
 
 interface AuthContextType {

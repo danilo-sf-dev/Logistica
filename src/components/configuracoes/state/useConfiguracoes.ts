@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { validateEmail, validateCelular } from "../../../utils/masks";
@@ -16,6 +16,7 @@ export const useConfiguracoes = () => {
   const [activeTab, setActiveTab] = useState("perfil");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [configLoaded, setConfigLoaded] = useState(false);
 
   const [perfilData, setPerfilData] = useState<PerfilData>({
     displayName: userProfile?.displayName || "",
@@ -25,18 +26,44 @@ export const useConfiguracoes = () => {
   });
 
   const [notificacoes, setNotificacoes] = useState<NotificacoesConfig>({
-    email: true,
-    push: true,
-    rotas: true,
-    folgas: true,
-    manutencao: true,
+    email: userProfile?.notificacoes?.email ?? false, // Desabilitado - não implementado
+    push: userProfile?.notificacoes?.push ?? true, // Habilitado - toast notifications funcionam
+    rotas: userProfile?.notificacoes?.rotas ?? true, // Habilitado - implementado
+    folgas: userProfile?.notificacoes?.folgas ?? true, // Habilitado - implementado
+    manutencao: userProfile?.notificacoes?.manutencao ?? true, // Habilitado - implementado
   });
 
   const [sistema, setSistema] = useState<SistemaConfig>({
     idioma: "pt-BR",
     timezone: "America/Sao_Paulo",
-    backup: true,
+    backup: false, // Desabilitado - não implementado
   });
+
+  // Carregar configurações apenas uma vez quando userProfile estiver disponível
+  useEffect(() => {
+    if (userProfile && !configLoaded) {
+      if (!userProfile.notificacoes) {
+        // Definir valores padrão se não existirem configurações salvas
+        setNotificacoes({
+          email: false, // Desabilitado - não implementado
+          push: true, // Habilitado - toast notifications funcionam
+          rotas: true, // Habilitado - implementado
+          folgas: true, // Habilitado - implementado
+          manutencao: true, // Habilitado - implementado
+        });
+      } else {
+        // Carregar configurações salvas do usuário
+        setNotificacoes({
+          email: userProfile.notificacoes.email ?? false,
+          push: userProfile.notificacoes.push ?? true,
+          rotas: userProfile.notificacoes.rotas ?? true,
+          folgas: userProfile.notificacoes.folgas ?? true,
+          manutencao: userProfile.notificacoes.manutencao ?? true,
+        });
+      }
+      setConfigLoaded(true);
+    }
+  }, [userProfile, configLoaded]);
 
   const validatePerfilForm = useCallback((): boolean => {
     const newErrors: FormErrors = {};
@@ -66,10 +93,15 @@ export const useConfiguracoes = () => {
           ...data,
           displayName: data.displayName.toUpperCase(),
           cargo: data.cargo.toUpperCase(),
+          // Incluir configurações de notificações
+          notificacoes,
         };
 
         await updateUserProfile(userProfile?.uid, perfilDataToSave);
-        showNotification("Perfil atualizado com sucesso!", "success");
+        showNotification(
+          "Perfil e configurações atualizados com sucesso!",
+          "success",
+        );
       } catch (error) {
         console.error("Erro ao atualizar perfil:", error);
         showNotification("Erro ao atualizar perfil", "error");
@@ -77,7 +109,13 @@ export const useConfiguracoes = () => {
         setLoading(false);
       }
     },
-    [validatePerfilForm, showNotification, updateUserProfile, userProfile?.uid],
+    [
+      validatePerfilForm,
+      showNotification,
+      updateUserProfile,
+      userProfile?.uid,
+      notificacoes,
+    ],
   );
 
   const handlePerfilChange = useCallback(
@@ -92,12 +130,19 @@ export const useConfiguracoes = () => {
 
   const handleNotificacoesChange = useCallback(
     (key: keyof NotificacoesConfig) => {
+      // Não permitir alterar email (desabilitado)
+      if (key === "email") {
+        showNotification("Notificações por email em breve!", "info");
+        return;
+      }
+
+      // Apenas alterar o estado local (não salva automaticamente)
       setNotificacoes((prev) => ({
         ...prev,
         [key]: !prev[key],
       }));
     },
-    [],
+    [showNotification],
   );
 
   const handleSistemaChange = useCallback(

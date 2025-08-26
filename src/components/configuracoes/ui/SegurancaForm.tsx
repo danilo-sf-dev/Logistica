@@ -78,10 +78,6 @@ export const SegurancaForm: React.FC<SegurancaProps> = ({
             </div>
           </div>
         </div>
-
-        <div className="flex justify-end">
-          <button className="btn-secondary">Encerrar Todas as Sessões</button>
-        </div>
       </div>
     </div>
   );

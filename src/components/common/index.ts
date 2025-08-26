@@ -9,3 +9,6 @@ export * from "./ErrorBoundary";
 
 // Filter Components
 export { FilterClearButton } from "./FilterClearButton";
+
+// Notification Components
+export { default as NotificationBell } from "./NotificationBell";
