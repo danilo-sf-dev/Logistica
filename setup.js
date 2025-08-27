@@ -76,12 +76,13 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
 // Configuração do Firebase - Configurado automaticamente
 const firebaseConfig = {
-  apiKey: "${config.apiKey}",
-  authDomain: "${config.authDomain}",
-  projectId: "${config.projectId}",
-  storageBucket: "${config.storageBucket}",
-  messagingSenderId: "${config.messagingSenderId}",
-  appId: "${config.appId}"
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID,
+  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Inicializar Firebase

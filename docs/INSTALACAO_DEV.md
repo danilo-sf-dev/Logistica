@@ -2,9 +2,23 @@
 
 ## 📋 Visão Geral
 
-Este documento contém todas as instruções necessárias para configurar o **Sistema de Gestão de Logística (SGL)** em uma nova máquina de desenvolvimento. Inclui as modificações recentes realizadas no sistema de relatórios e todas as dependências necessárias.
+Este documento contém todas as instruções necessárias para configurar o **Sistema de Gestão de Logística (SGL)** em uma nova máquina de desenvolvimento. Inclui as modificações recentes realizadas no sistema de relatórios, migração para TypeScript, uso do Vite e todas as dependências necessárias.
 
-## 🎯 Modificações Recentes Implementadas
+## 🎯 Modificações Recentes Implementadas (v1.2.0)
+
+### ✅ **Migração para TypeScript**
+
+- **Código Tipado**: Todo o projeto migrado para TypeScript
+- **Segurança de Tipos**: Verificação estática de tipos
+- **Melhor IntelliSense**: Autocompletar mais preciso
+- **Arquivos**: Todos os arquivos `.js` convertidos para `.ts`/`.tsx`
+
+### ✅ **Build Tool Vite**
+
+- **Desenvolvimento Mais Rápido**: Hot reload otimizado
+- **Build Otimizado**: Bundle menor e mais eficiente
+- **Configuração Simplificada**: Menos configuração necessária
+- **Porta Padrão**: http://localhost:3000
 
 ### ✅ **Sistema de Relatórios Atualizado**
 
@@ -24,13 +38,35 @@ Este documento contém todas as instruções necessárias para configurar o **Si
 - **Ícones Removidos**: Removidos ícones de download dos cards de gráfico (mantidos apenas na seção "Relatórios Detalhados")
 - **Layout Otimizado**: Grid responsivo ajustado para 4 cards de resumo
 
-#### **3. Correção de Erros de Console**
+#### **3. Sistema de Exportação Avançado**
+
+- **Excel (XLSX)**: Exportação com formatação profissional
+- **PDF**: Documentos formatados para impressão
+- **Formatação Brasileira**: Datas DD/MM/YYYY, CPF, telefone
+- **Arquitetura Modular**: Serviços especializados por entidade
+
+### ✅ **Sistema de Notificações Completo**
+
+- **NotificationService**: Serviço centralizado
+- **NotificationBell**: Sino de notificações no header
+- **Configurações**: Interface para gerenciar preferências
+- **Tempo Real**: Toast notifications para eventos
+- **Persistência**: Salvamento no Firestore
+
+### ✅ **Sistema de Segurança Avançado**
+
+- **Regras Firestore**: Implementadas e ativas
+- **Controle de Acesso**: Roles admin, gerente, dispatcher, user
+- **Proteção de Dados**: Leitura/escrita controlada
+- **SessionService**: Captura de IP e informações de dispositivo
+
+### ✅ **Correção de Erros de Console**
 
 - **Problema**: `b.createdAt.getTime is not a function` em notificações
 - **Solução**: Conversão adequada de timestamps do Firestore para objetos Date
 - **Arquivo Modificado**: `src/services/notificationService.ts`
 
-#### **4. Melhoria na Exibição de Funções**
+### ✅ **Melhoria na Exibição de Funções**
 
 - **Problema**: "Cargo não informado" em atividades recentes
 - **Solução**: Uso correto do campo `funcao` em vez de `cargo` para funcionários
@@ -98,106 +134,9 @@ sudo apt-get install -y nodejs
 # Usar NodeSource
 curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
 sudo yum install -y nodejs
-
-# Ou para Fedora
-sudo dnf install nodejs npm
 ```
 
-#### **2. Instalar Git**
-
-**Windows:**
-
-```bash
-# Baixar do site oficial
-# https://git-scm.com/download/win
-
-# Ou usar Chocolatey
-choco install git
-
-# Ou usar Scoop
-scoop install git
-```
-
-**macOS:**
-
-```bash
-# Usar Homebrew
-brew install git
-
-# Ou baixar do site oficial
-# https://git-scm.com/download/mac
-```
-
-**Linux (Ubuntu/Debian):**
-
-```bash
-sudo apt update
-sudo apt install git
-```
-
-**Linux (CentOS/RHEL/Fedora):**
-
-```bash
-sudo yum install git
-# Ou para Fedora
-sudo dnf install git
-```
-
-#### **3. Instalar Firebase CLI**
-
-```bash
-# Instalar globalmente via npm
-npm install -g firebase-tools
-
-# Verificar instalação
-firebase --version
-```
-
-**Alternativas de instalação:**
-
-**Windows:**
-
-```bash
-# Usar Chocolatey
-choco install firebase-cli
-
-# Ou usar Scoop
-scoop install firebase
-```
-
-**macOS:**
-
-```bash
-# Usar Homebrew
-brew install firebase-cli
-```
-
-#### **4. Instalar Vite (se necessário)**
-
-```bash
-# Instalar Vite globalmente (opcional)
-npm install -g create-vite
-
-# Ou usar npx (recomendado)
-npx create-vite@latest
-```
-
-#### **5. Instalar Editor de Código (Recomendado)**
-
-**Visual Studio Code:**
-
-```bash
-# Windows (Chocolatey)
-choco install vscode
-
-# macOS (Homebrew)
-brew install --cask visual-studio-code
-
-# Linux (Ubuntu/Debian)
-sudo snap install code --classic
-```
-
-### **Verificar Instalações**
+#### **2. Verificar Instalação**
 
 ```bash
 # Verificar Node.js
@@ -220,58 +159,61 @@ firebase --version
 vite --version
 ```
 
-## 📥 Instalação Passo a Passo
+#### **3. Instalar Firebase CLI**
+
+```bash
+# Instalar globalmente
+npm install -g firebase-tools
+
+# Verificar instalação
+firebase --version
+```
+
+#### **4. Instalar Git**
+
+**Windows:**
+
+- Baixar de: https://git-scm.com/download/win
+
+**macOS:**
+
+```bash
+brew install git
+```
+
+**Linux:**
+
+```bash
+sudo apt install git  # Ubuntu/Debian
+sudo yum install git  # CentOS/RHEL
+```
+
+## 🚀 Configuração do Projeto
 
 ### **1. Clonar o Repositório**
 
 ```bash
-# Navegar para o diretório desejado
-cd /caminho/para/seu/projeto
-
 # Clonar o repositório
-git clone https://github.com/seu-usuario/sistema-gestao-logistica.git
+git clone https://github.com/seu-usuario/logistica.git
 
-# Entrar no diretório do projeto
-cd sistema-gestao-logistica
+# Entrar no diretório
+cd logistica
+
+# Verificar se está no branch correto
+git branch
 ```
 
 ### **2. Instalar Dependências**
 
 ```bash
-# Instalar todas as dependências do projeto
+# Instalar todas as dependências
 npm install
 
-# Verificar se a instalação foi bem-sucedida
-npm list --depth=0
+# Verificar se não há erros
+npm run lint
 ```
 
-**Alternativas usando outros gerenciadores de pacotes:**
-
-```bash
-# Usando Yarn
-yarn install
-
-# Usando pnpm
-pnpm install
-
-# Usando Bun
-bun install
-```
-
-**Instalar gerenciadores alternativos:**
-
-```bash
-# Instalar Yarn
-npm install -g yarn
-
-# Instalar pnpm
-npm install -g pnpm
-
-# Instalar Bun (macOS/Linux)
-curl -fsSL https://bun.sh/install | bash
-```
-
-**⚠️ Possíveis Problemas e Soluções:**
+**Comandos Alternativos (se houver problemas):**
 
 ```bash
 # Se houver erro de permissão no Windows
@@ -285,223 +227,310 @@ npm cache clean --force
 npm install
 ```
 
-### **3. Configurar Firebase**
+### **3. Configurar Variáveis de Ambiente**
 
-#### **3.1 Configuração Inicial do Firebase CLI**
+**Criar arquivo `.env` na raiz do projeto:**
+
+```env
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=AIzaSyC_ExAmPlE_KeY_1234567890abcdef
+VITE_FIREBASE_AUTH_DOMAIN=seu-projeto-exemplo.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=seu-projeto-exemplo
+VITE_FIREBASE_STORAGE_BUCKET=seu-projeto-exemplo.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890
+VITE_FIREBASE_MEASUREMENT_ID=G-ABCDEF12345
+
+# VAPID Key para notificações push (opcional)
+VITE_VAPID_PUBLIC_KEY=BLh_ExAmPlE_VaPiD_KeY_1234567890abcdef
+
+# App Configuration
+VITE_APP_NAME=SGL - Sistema de Gestão de Logística
+VITE_APP_VERSION=1.2.0
+VITE_APP_ENVIRONMENT=development
+```
+
+**⚠️ Importante:**
+
+- Nunca commite o arquivo `.env` no Git
+- Use credenciais de desenvolvimento separadas
+- O arquivo `.env` já está no `.gitignore`
+
+### **4. Configurar Firebase**
+
+#### **Opção A: Configuração Automática (Recomendado)**
+
+```bash
+# Executar script de configuração
+npm run setup-firebase
+```
+
+Siga as instruções do script para:
+
+1. Criar projeto no Firebase Console
+2. Habilitar autenticação Google
+3. Configurar Firestore Database
+4. Adicionar aplicação web
+5. Copiar credenciais automaticamente
+
+#### **Opção B: Configuração Manual**
+
+1. **Acessar Firebase Console**: https://console.firebase.google.com
+2. **Criar Projeto**: "Logistica" ou nome desejado
+3. **Habilitar Authentication**:
+   - Método: Google
+   - Domínios autorizados: localhost, seu domínio
+4. **Criar Firestore Database**:
+   - Modo: Teste (para desenvolvimento)
+   - Região: us-central1 (padrão)
+5. **Adicionar Aplicação Web**:
+   - Nome: "SGL Web App"
+   - Copiar credenciais
+6. **Atualizar arquivo `.env`** com as credenciais
+
+### **5. Configurar Regras de Segurança**
+
+**Firestore Rules** (em `firestore.rules`):
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Função para verificar se usuário está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Função para verificar role do usuário
+    function hasRole(role) {
+      return isAuthenticated() &&
+             request.auth.token.role == role;
+    }
+
+    // Função para verificar se é admin
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
+    // Regras para usuários
+    match /users/{userId} {
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == userId || isAdmin());
+      allow write: if isAuthenticated() &&
+                      (request.auth.uid == userId || isAdmin());
+    }
+
+    // Regras para funcionários
+    match /funcionarios/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasRole('gerente');
+    }
+
+    // Regras para veículos
+    match /veiculos/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasRole('gerente');
+    }
+
+    // Regras para rotas
+    match /rotas/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasRole('dispatcher');
+    }
+
+    // Regras para folgas
+    match /folgas/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+                      (request.auth.uid == resource.data.funcionarioId ||
+                       isAdmin() || hasRole('gerente'));
+    }
+
+    // Regras para cidades
+    match /cidades/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Regras para vendedores
+    match /vendedores/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasRole('gerente');
+    }
+
+    // Regras para notificações
+    match /notifications/{docId} {
+      allow read: if isAuthenticated() &&
+                     request.auth.uid == resource.data.userId;
+      allow write: if isAuthenticated() &&
+                      request.auth.uid == request.resource.data.userId;
+    }
+  }
+}
+```
+
+### **6. Deploy das Regras**
 
 ```bash
 # Fazer login no Firebase
 firebase login
 
-# Verificar se o login foi bem-sucedido
-firebase projects:list
-
-# Inicializar Firebase no projeto (se necessário)
+# Inicializar projeto (se necessário)
 firebase init
-
-# Selecionar:
-# - Firestore
-# - Hosting
-# - Emulators (opcional)
-```
-
-#### **3.2 Obter Credenciais do Firebase**
-
-1. Acesse: https://console.firebase.google.com/
-2. Crie um novo projeto ou selecione um existente
-3. Vá em "Configurações do Projeto" > "Configurações do SDK"
-4. Copie as credenciais do `firebaseConfig`
-
-#### **3.2 Configurar o Projeto**
-
-```bash
-# Executar script de configuração do Firebase
-npm run setup-firebase
-```
-
-**Ou configurar manualmente:**
-
-```bash
-# Editar o arquivo de configuração
-code src/firebase/config.ts
-```
-
-**Conteúdo do arquivo `src/firebase/config.ts`:**
-
-```typescript
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
-
-const firebaseConfig = {
-  apiKey: "sua-api-key",
-  authDomain: "seu-projeto.firebaseapp.com",
-  projectId: "seu-projeto-id",
-  storageBucket: "seu-projeto.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123",
-};
-
-const app = initializeApp(firebaseConfig);
-
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-
-export default app;
-```
-
-### **4. Configurar Firestore**
-
-#### **4.1 Regras de Segurança**
-
-```bash
-# Copiar regras de segurança
-cp docs/firestore.rules firestore.rules
 
 # Deploy das regras
 firebase deploy --only firestore:rules
-```
-
-#### **4.2 Índices do Firestore**
-
-```bash
-# Copiar índices
-cp docs/firestore.indexes.json firestore.indexes.json
 
 # Deploy dos índices
 firebase deploy --only firestore:indexes
 ```
 
-### **5. Configurar Variáveis de Ambiente**
-
-```bash
-# Criar arquivo .env na raiz do projeto
-touch .env
-```
-
-**Conteúdo do arquivo `.env`:**
-
-```env
-# Firebase
-REACT_APP_FIREBASE_API_KEY=sua-api-key
-REACT_APP_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=seu-projeto-id
-REACT_APP_FIREBASE_STORAGE_BUCKET=seu-projeto.appspot.com
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=123456789
-REACT_APP_FIREBASE_APP_ID=1:123456789:web:abc123
-
-# Configurações da Aplicação
-REACT_APP_NAME="Sistema de Gestão de Logística"
-REACT_APP_VERSION="1.0.0"
-```
-
 ## 🚀 Executando o Projeto
 
-### **1. Modo de Desenvolvimento**
+### **1. Modo Desenvolvimento**
 
 ```bash
 # Iniciar servidor de desenvolvimento
 npm run dev
-
-# O projeto estará disponível em: http://localhost:3000
 ```
 
-### **2. Verificar Funcionamento**
+**Acesse:** http://localhost:3000
 
-1. Acesse: http://localhost:3000
-2. Faça login com uma conta Google
-3. Navegue para a seção "Relatórios"
-4. Verifique se os cards mostram:
-   - **Total Funcionários**: 18
-   - **Total Motoristas**: 8
-   - **Total Veículos**: 11
-   - **Folgas Pendentes**: 0
-
-### **3. Verificar Console**
+### **2. Build para Produção**
 
 ```bash
-# Abrir DevTools (F12)
-# Verificar se não há erros no console
-# Especialmente verificar se não há:
-# - "b.createdAt.getTime is not a function"
-# - "Cargo não informado"
-```
-
-## 🧪 Testes e Validação
-
-### **1. Teste de Build**
-
-```bash
-# Verificar se o projeto compila corretamente
+# Build otimizado
 npm run build
 
-# Verificar se não há erros de TypeScript
-npx tsc --noEmit
-```
-
-### **2. Teste de Linting**
-
-```bash
-# Verificar qualidade do código
-npm run lint
-
-# Corrigir problemas automaticamente
-npm run lint:fix
-```
-
-### **3. Teste de Formatação**
-
-```bash
-# Verificar formatação do código
-npm run format:check
-
-# Formatar código automaticamente
-npm run format
-```
-
-## 🔧 Comandos Úteis
-
-### **Desenvolvimento**
-
-```bash
-# Iniciar servidor de desenvolvimento
-npm run dev
-
-# Preview do build de produção
+# Preview do build
 npm run preview
-
-# Executar testes
-npm run test
 ```
 
-### **Build e Deploy**
+### **3. Deploy**
 
 ```bash
-# Build para produção
-npm run build
-
-# Deploy para Firebase
+# Deploy no Firebase Hosting
 npm run deploy
-
-# Build + Deploy em um comando
-npm run build && firebase deploy
 ```
 
-### **Manutenção**
+## 🔧 Scripts Disponíveis
 
 ```bash
-# Limpar cache do npm
-npm cache clean --force
+# Desenvolvimento
+npm run dev              # Iniciar servidor de desenvolvimento
+npm run build            # Build para produção
+npm run preview          # Preview do build
 
-# Reinstalar dependências
-rm -rf node_modules package-lock.json
-npm install
+# Qualidade de Código
+npm run lint             # Verificar código com ESLint
+npm run lint:fix         # Corrigir problemas do ESLint
+npm run format           # Formatar código com Prettier
+npm run format:check     # Verificar formatação
 
-# Atualizar dependências
-npm update
+# Testes
+npm run test             # Executar testes
+
+# Configuração
+npm run setup            # Configuração inicial
+npm run setup-firebase   # Configuração do Firebase
+
+# Deploy
+npm run deploy           # Deploy no Firebase
 ```
+
+## 🛠️ Configuração do IDE
+
+### **VS Code (Recomendado)**
+
+**Extensões Recomendadas:**
+
+```json
+{
+  "recommendations": [
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-json",
+    "firebase.firebase-explorer",
+    "ms-vscode.vscode-react-native"
+  ]
+}
+```
+
+**Configurações do Workspace** (`.vscode/settings.json`):
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "emmet.includeLanguages": {
+    "typescript": "html",
+    "typescriptreact": "html"
+  }
+}
+```
+
+### **Configuração do TypeScript**
+
+**`tsconfig.json`** (já configurado):
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+```
+
+## 🔍 Debugging
+
+### **1. Console do Navegador**
+
+```javascript
+// Verificar configuração do Firebase
+console.log('Firebase Config:', import.meta.env.VITE_FIREBASE_API_KEY);
+
+// Verificar autenticação
+console.log('User:', auth.currentUser);
+
+// Verificar dados do Firestore
+console.log('Funcionários:', funcionarios);
+```
+
+### **2. React Developer Tools**
+
+- Instalar extensão do Chrome/Firefox
+- Inspecionar componentes e props
+- Verificar estado dos hooks
+
+### **3. Firebase Console**
+
+- **Authentication**: Verificar usuários logados
+- **Firestore**: Inspecionar dados
+- **Hosting**: Verificar deploy
+- **Functions**: Verificar logs (se aplicável)
 
 ## 🐛 Troubleshooting
 
@@ -511,25 +540,38 @@ npm update
 
 ```bash
 # Verificar processos na porta 3000
-netstat -ano | findstr :3000
+lsof -i :3000  # macOS/Linux
+netstat -ano | findstr :3000  # Windows
 
-# Matar processo (Windows)
-taskkill /PID <PID> /F
-
-# Matar processo (Linux/Mac)
-kill -9 <PID>
+# Matar processo
+kill -9 <PID>  # macOS/Linux
+taskkill /PID <PID> /F  # Windows
 ```
 
 #### **2. Erro de Dependências**
 
 ```bash
-# Limpar cache e reinstalar
+# Limpar cache
 npm cache clean --force
+
+# Remover node_modules
 rm -rf node_modules package-lock.json
+
+# Reinstalar
 npm install
 ```
 
-#### **3. Erro de Firebase**
+#### **3. Erro de TypeScript**
+
+```bash
+# Verificar tipos
+npx tsc --noEmit
+
+# Corrigir problemas
+npm run lint:fix
+```
+
+#### **4. Erro de Firebase**
 
 ```bash
 # Verificar configuração
@@ -540,155 +582,46 @@ firebase logout
 firebase login
 ```
 
-#### **4. Erro de TypeScript**
+#### **5. Erro de Build**
 
 ```bash
-# Verificar tipos
-npx tsc --noEmit
+# Limpar build
+rm -rf dist
 
-# Reinstalar tipos
-npm install @types/node @types/react @types/react-dom
+# Rebuild
+npm run build
 ```
 
-### **Logs de Debug**
+## 📚 Recursos Adicionais
 
-```bash
-# Ver logs detalhados do Vite
-npm run dev -- --debug
+### **Documentação Oficial**
 
-# Ver logs do Firebase
-firebase emulators:start --debug
-```
+- **React**: https://react.dev/
+- **TypeScript**: https://www.typescriptlang.org/docs/
+- **Vite**: https://vitejs.dev/guide/
+- **Firebase**: https://firebase.google.com/docs
+- **Tailwind CSS**: https://tailwindcss.com/docs
 
-## 📁 Estrutura do Projeto
+### **Ferramentas Úteis**
 
-```
-sistema-gestao-logistica/
-├── src/
-│   ├── components/
-│   │   ├── relatorios/          # 🆕 Sistema de relatórios atualizado
-│   │   ├── dashboard/           # Dashboard com atividades recentes
-│   │   ├── funcionarios/        # Gestão de funcionários
-│   │   ├── veiculos/           # Gestão de veículos
-│   │   ├── rotas/              # Gestão de rotas
-│   │   ├── folgas/             # Gestão de folgas
-│   │   ├── cidades/            # Gestão de cidades
-│   │   ├── vendedores/         # Gestão de vendedores
-│   │   └── configuracoes/      # Configurações do sistema
-│   ├── services/
-│   │   └── notificationService.ts  # 🆕 Notificações corrigidas
-│   ├── contexts/               # Contextos React
-│   ├── hooks/                  # Hooks customizados
-│   ├── utils/                  # Utilitários
-│   └── types/                  # Tipos TypeScript
-├── docs/                       # Documentação
-├── build/                      # Build de produção
-└── public/                     # Arquivos públicos
-```
+- **Firebase CLI**: https://firebase.google.com/docs/cli
+- **React Developer Tools**: https://react.dev/learn/react-developer-tools
+- **TypeScript Playground**: https://www.typescriptlang.org/play
 
-## 🔄 Fluxo de Desenvolvimento
+### **Comunidade**
 
-### **1. Nova Feature**
+- **Stack Overflow**: Tagged com [react], [typescript], [firebase]
+- **GitHub Issues**: Reportar bugs e solicitar features
+- **Discord**: Comunidade de desenvolvedores
 
-```bash
-# Criar branch
-git checkout -b feature/nova-funcionalidade
+## 🎯 Próximos Passos
 
-# Desenvolver
-# ... código ...
-
-# Commit
-git add .
-git commit -m "feat: adiciona nova funcionalidade"
-
-# Push
-git push origin feature/nova-funcionalidade
-```
-
-### **2. Correção de Bug**
-
-```bash
-# Criar branch
-git checkout -b fix/correcao-bug
-
-# Corrigir
-# ... código ...
-
-# Commit
-git add .
-git commit -m "fix: corrige bug específico"
-
-# Push
-git push origin fix/correcao-bug
-```
-
-### **3. Merge**
-
-```bash
-# Voltar para main
-git checkout main
-
-# Atualizar
-git pull origin main
-
-# Merge
-git merge feature/nova-funcionalidade
-
-# Push
-git push origin main
-```
-
-## 📞 Suporte
-
-### **Contatos**
-
-- **Email**: dev@empresa.com
-- **Slack**: #sgl-dev
-- **Documentação**: Este arquivo
-
-### **Recursos**
-
-- **Firebase Console**: https://console.firebase.google.com/
-- **Vite Docs**: https://vitejs.dev/
-- **React Docs**: https://react.dev/
-- **TypeScript Docs**: https://www.typescriptlang.org/
-
-## ✅ Checklist de Instalação
-
-### **Pré-requisitos**
-
-- [ ] Node.js 18+ instalado
-- [ ] npm 9+ instalado
-- [ ] Git instalado
-- [ ] Firebase CLI instalado
-- [ ] Editor de código instalado (VS Code recomendado)
-
-### **Configuração do Projeto**
-
-- [ ] Repositório clonado
-- [ ] Dependências instaladas
-- [ ] Firebase CLI logado
-- [ ] Firebase inicializado no projeto
-- [ ] Firebase configurado
-- [ ] Variáveis de ambiente configuradas
-
-### **Validação**
-
-- [ ] Projeto executando em http://localhost:3000
-- [ ] Login funcionando
-- [ ] Relatórios mostrando dados corretos
-- [ ] Build funcionando
-- [ ] Linting passando
-- [ ] Testes passando
-
-## 🎉 Conclusão
-
-Após seguir todos os passos acima, você terá uma instância completa do **Sistema de Gestão de Logística** funcionando em sua máquina de desenvolvimento, incluindo todas as modificações recentes implementadas.
-
-**Lembre-se**: Sempre mantenha suas dependências atualizadas e siga as boas práticas de desenvolvimento ao contribuir com o projeto.
+1. **Configurar IDE** com as extensões recomendadas
+2. **Executar projeto** em modo desenvolvimento
+3. **Testar funcionalidades** principais
+4. **Configurar Firebase** com suas credenciais
+5. **Fazer primeiro deploy** para testar
 
 ---
 
-**Última atualização**: $(date)
-**Versão do documento**: 1.0.0
-**Autor**: Equipe de Desenvolvimento SGL
+**🚀 Sistema configurado e pronto para desenvolvimento!**

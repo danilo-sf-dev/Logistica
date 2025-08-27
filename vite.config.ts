@@ -25,15 +25,15 @@ export default defineConfig(({ mode }) => {
       open: true,
     },
     build: {
-      outDir: "build",
+      outDir: "dist",
       sourcemap: true,
     },
     define: {
       global: "globalThis",
-      // Expor apenas variáveis de ambiente com prefixo REACT_APP_
+      // Expor variáveis de ambiente com prefixo VITE_
       "process.env": Object.keys(env).reduce(
         (prev, key) => {
-          if (key.startsWith("REACT_APP_")) {
+          if (key.startsWith("VITE_")) {
             prev[key] = env[key];
           }
           return prev;

@@ -58,13 +58,14 @@ npm start
 
 ```env
 # .env
-REACT_APP_FIREBASE_API_KEY=sua-api-key
-REACT_APP_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=seu-projeto-id
-REACT_APP_FIREBASE_STORAGE_BUCKET=seu-projeto.appspot.com
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=seu-sender-id
-REACT_APP_FIREBASE_APP_ID=seu-app-id
-REACT_APP_FIREBASE_MEASUREMENT_ID=seu-measurement-id
+VITE_FIREBASE_API_KEY=AIzaSyC_ExAmPlE_KeY_1234567890abcdef
+VITE_FIREBASE_AUTH_DOMAIN=seu-projeto-exemplo.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=seu-projeto-exemplo
+VITE_FIREBASE_STORAGE_BUCKET=seu-projeto-exemplo.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890
+VITE_FIREBASE_MEASUREMENT_ID=G-ABCDEF12345
+VITE_VAPID_PUBLIC_KEY=BLh_ExAmPlE_VaPiD_KeY_1234567890abcdef
 ```
 
 ## 📁 **Estrutura do Projeto**
@@ -463,11 +464,15 @@ firebase hosting:channel:list
 ```bash
 # Variáveis de ambiente
 cp .env.example .env
+# Atualizar variáveis de REACT_APP_ para VITE_ no arquivo .env
+```
 
 # Configurar Firebase
+
 firebase use production
 firebase deploy --only hosting
-```
+
+````
 
 ## 📚 **Documentação**
 
@@ -497,7 +502,7 @@ export class ExcelExportService extends BaseExportService {
     // Implementação
   }
 }
-```
+````
 
 ## 🐛 **Reportando Bugs**
 

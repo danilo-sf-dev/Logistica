@@ -125,6 +125,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loginWithGoogle = async (): Promise<UserCredential> => {
     try {
       const provider = new GoogleAuthProvider();
+
+      // Configurar o popup para melhor compatibilidade
+      provider.setCustomParameters({
+        prompt: "select_account",
+      });
+
       const result = await signInWithPopup(auth, provider);
 
       // Verificar se o usuário já existe no Firestore

@@ -108,18 +108,21 @@ function processConfig(configLines) {
     
     // Criar arquivo .env
     const envContent = `# Firebase Configuration
-REACT_APP_FIREBASE_API_KEY="${configObj.apiKey}"
-REACT_APP_FIREBASE_AUTH_DOMAIN="${configObj.authDomain}"
-REACT_APP_FIREBASE_PROJECT_ID="${configObj.projectId}"
-REACT_APP_FIREBASE_STORAGE_BUCKET="${configObj.storageBucket}"
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID="${configObj.messagingSenderId}"
-REACT_APP_FIREBASE_APP_ID="${configObj.appId}"
-REACT_APP_FIREBASE_MEASUREMENT_ID="${configObj.measurementId || ''}"
+VITE_FIREBASE_API_KEY="${configObj.apiKey}"
+VITE_FIREBASE_AUTH_DOMAIN="${configObj.authDomain}"
+VITE_FIREBASE_PROJECT_ID="${configObj.projectId}"
+VITE_FIREBASE_STORAGE_BUCKET="${configObj.storageBucket}"
+VITE_FIREBASE_MESSAGING_SENDER_ID="${configObj.messagingSenderId}"
+VITE_FIREBASE_APP_ID="${configObj.appId}"
+VITE_FIREBASE_MEASUREMENT_ID="${configObj.measurementId || ''}"
+
+# VAPID Key para notificações push (opcional)
+VITE_VAPID_PUBLIC_KEY=""
 
 # App Configuration
-REACT_APP_NAME=SGL - Sistema de Gestão de Logística
-REACT_APP_VERSION=1.0.0
-REACT_APP_ENVIRONMENT=production
+VITE_APP_NAME=SGL - Sistema de Gestão de Logística
+VITE_APP_VERSION=1.2.0
+VITE_APP_ENVIRONMENT=development
 `;
     
     fs.writeFileSync(path.join(__dirname, '.env'), envContent);

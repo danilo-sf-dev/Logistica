@@ -1,6 +1,6 @@
 # SGL - Sistema de Gestão de Logística
 
-Sistema web completo para gestão de logística, desenvolvido com React e Firebase.
+Sistema web completo para gestão de logística, desenvolvido com React, TypeScript e Firebase.
 
 ## 🚀 **STATUS: ✅ FUNCIONANDO PERFEITAMENTE!**
 
@@ -12,14 +12,14 @@ Sistema web completo para gestão de logística, desenvolvido com React e Fireba
 
 ## 🚀 Funcionalidades
 
-- **Dashboard**: Visão geral com KPIs e gráficos
-- **Gestão de Motoristas**: CRUD completo de motoristas
-- **Gestão de Veículos**: Controle de frota
-- **Rotas**: Otimização e gestão de rotas
-- **Folgas**: Controle de folgas dos motoristas
-- **Cidades**: Cadastro de cidades
-- **Vendedores**: Gestão de vendedores
-- **Relatórios**: Relatórios detalhados e analytics
+- **Dashboard**: Visão geral com KPIs e gráficos interativos
+- **Gestão de Funcionários**: CRUD completo com dados pessoais e profissionais
+- **Gestão de Veículos**: Controle de frota com informações técnicas
+- **Rotas**: Otimização e gestão de rotas de entrega
+- **Folgas**: Controle de folgas dos funcionários
+- **Cidades**: Cadastro de cidades e regiões
+- **Vendedores**: Gestão de vendedores e contatos
+- **Relatórios**: Sistema avançado de relatórios e analytics
 - **Autenticação**: Login com Google e Email/Senha
 - **Notificações**: Sistema de notificações em tempo real
 - **Configurações**: Perfil, notificações, sistema e segurança
@@ -72,16 +72,18 @@ Sistema web completo para gestão de logística, desenvolvido com React e Fireba
 
 ## 🛠️ Tecnologias
 
-- **Frontend**: React 18, Tailwind CSS, React Router
+- **Frontend**: React 18, TypeScript, Tailwind CSS, React Router
 - **Backend**: Firebase (Firestore, Authentication, Hosting)
+- **Build Tool**: Vite
 - **Charts**: Recharts
 - **Icons**: Lucide React
 - **Notifications**: React Hot Toast
-- **Export**: XLSX, jsPDF, file-saver
+- **Export**: ExcelJS, jsPDF, file-saver
+- **UI Components**: Headless UI, Heroicons
 
 ## 📋 Pré-requisitos
 
-- Node.js 16+
+- Node.js 18+
 - npm ou yarn
 - Conta Google (para Firebase)
 
@@ -100,25 +102,23 @@ npm install
 
 1. **Crie o arquivo `.env`** com suas credenciais do Firebase:
 
-2. **Edite o arquivo `.env`** com suas credenciais do Firebase:
-
 ```env
 # Firebase Configuration
-REACT_APP_FIREBASE_API_KEY=your-api-key-here
-REACT_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=your-project-id
-REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-REACT_APP_FIREBASE_APP_ID=your-app-id
-REACT_APP_FIREBASE_MEASUREMENT_ID=your-measurement-id
+VITE_FIREBASE_API_KEY=AIzaSyC_ExAmPlE_KeY_1234567890abcdef
+VITE_FIREBASE_AUTH_DOMAIN=seu-projeto-exemplo.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=seu-projeto-exemplo
+VITE_FIREBASE_STORAGE_BUCKET=seu-projeto-exemplo.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890
+VITE_FIREBASE_MEASUREMENT_ID=G-ABCDEF12345
 
-# VAPID Key for Push Notifications (optional)
-REACT_APP_VAPID_PUBLIC_KEY=your-vapid-public-key
+# VAPID Key para notificações push (opcional)
+VITE_VAPID_PUBLIC_KEY=BLh_ExAmPlE_VaPiD_KeY_1234567890abcdef
 
 # App Configuration
-REACT_APP_NAME=SGL - Sistema de Gestão de Logística
-REACT_APP_VERSION=1.2.0
-REACT_APP_ENVIRONMENT=development
+VITE_APP_NAME=SGL - Sistema de Gestão de Logística
+VITE_APP_VERSION=1.2.0
+VITE_APP_ENVIRONMENT=development
 ```
 
 **⚠️ Segurança:** Nunca commite o arquivo `.env` no Git. Ele já está no `.gitignore`.
@@ -145,12 +145,19 @@ Siga as instruções do script para:
 3. **Authentication**: Habilitar Google Sign-in
 4. **Firestore Database**: Criar em modo teste
 5. **Aplicação Web**: Adicionar e copiar credenciais
-6. **Atualizar**: `src/firebase/config.js` com suas credenciais
+6. **Atualizar**: `src/firebase/config.ts` com suas credenciais
 
 ### 4. Execute o Projeto
 
 ```bash
-npm start
+# Desenvolvimento
+npm run dev
+
+# Build para produção
+npm run build
+
+# Preview do build
+npm run preview
 ```
 
 Acesse: http://localhost:3000
@@ -228,12 +235,15 @@ src/
 │   ├── cidades/        # Cadastro de cidades
 │   ├── vendedores/     # Gestão de vendedores
 │   ├── relatorios/     # 🆕 Sistema de relatórios
-│   └── configuracao/   # Configurações
+│   ├── configuracao/   # Configurações
+│   └── import/         # Sistema de importação
 ├── contexts/           # Contextos React
 ├── firebase/           # Configuração Firebase
 ├── hooks/              # Custom hooks
+├── services/           # Serviços
+├── types/              # Tipos TypeScript
 ├── utils/              # Utilitários
-└── App.js              # Componente principal
+└── App.tsx             # Componente principal
 ```
 
 ## 🆕 **Sistema de Relatórios**
@@ -295,39 +305,18 @@ O sistema agora oferece relatórios detalhados para todas as entidades:
 ## 🔧 Scripts Disponíveis
 
 ```bash
-npm start              # Iniciar servidor de desenvolvimento
-npm run build          # Build para produção
-npm run test           # Executar testes
-npm run setup          # Configuração inicial
-npm run setup-firebase # Configuração do Firebase
-npm run deploy         # Deploy no Firebase
+npm run dev              # Iniciar servidor de desenvolvimento
+npm run build            # Build para produção
+npm run preview          # Preview do build
+npm run test             # Executar testes
+npm run setup            # Configuração inicial
+npm run setup-firebase   # Configuração do Firebase
+npm run deploy           # Deploy no Firebase
+npm run lint             # Verificar código
+npm run format           # Formatar código
 ```
 
 ## 🎯 Como Usar o Sistema
-
-## 📚 Documentação
-
-A documentação completa do projeto está organizada na pasta [`docs/`](./docs/):
-
-### 🚀 **Para Usuários Finais**
-
-- **[Guia do Usuário](./docs/GUIA_USUARIO.md)** - Manual completo de uso do sistema
-- **[Instruções Rápidas](./docs/INSTRUCOES_RAPIDAS.md)** - Guia rápido para começar
-
-### 👨‍💻 **Para Desenvolvedores**
-
-- **[Arquitetura](./docs/ARQUITETURA.md)** - Documentação técnica e arquitetura
-- **[API](./docs/API.md)** - Documentação da API e estrutura de dados
-- **[Guia de Contribuição](./docs/CONTRIBUICAO.md)** - Como contribuir com o projeto
-
-### 📊 **Para Gestores**
-
-- **[Resumo do Projeto](./docs/RESUMO_PROJETO.md)** - Resumo executivo e status atual
-- **[Roadmap](./docs/ROADMAP.md)** - Planejamento futuro e melhorias
-
-### 📋 **Índice da Documentação**
-
-- **[README da Documentação](./docs/README.md)** - Visão geral de toda a documentação
 
 ### 1. Acesse o Sistema
 
@@ -356,6 +345,30 @@ A documentação completa do projeto está organizada na pasta [`docs/`](./docs/
 - **Escolha**: Tipo de relatório
 - **Selecione**: Formato (Excel ou PDF)
 - **Baixe**: Arquivo automaticamente
+
+## 📚 Documentação
+
+A documentação completa do projeto está organizada na pasta [`docs/`](./docs/):
+
+### 🚀 **Para Usuários Finais**
+
+- **[Guia do Usuário](./docs/GUIA_USUARIO.md)** - Manual completo de uso do sistema
+- **[Instruções Rápidas](./docs/INSTRUCOES_RAPIDAS.md)** - Guia rápido para começar
+
+### 👨‍💻 **Para Desenvolvedores**
+
+- **[Arquitetura](./docs/ARQUITETURA.md)** - Documentação técnica e arquitetura
+- **[API](./docs/API.md)** - Documentação da API e estrutura de dados
+- **[Guia de Contribuição](./docs/CONTRIBUICAO.md)** - Como contribuir com o projeto
+
+### 📊 **Para Gestores**
+
+- **[Resumo do Projeto](./docs/RESUMO_PROJETO.md)** - Resumo executivo e status atual
+- **[Roadmap](./docs/ROADMAP.md)** - Planejamento futuro e melhorias
+
+### 📋 **Índice da Documentação**
+
+- **[README da Documentação](./docs/README.md)** - Visão geral de toda a documentação
 
 ## 🐛 Troubleshooting
 
@@ -411,6 +424,8 @@ Este projeto é desenvolvido para uso interno da empresa.
 - [x] **Relatórios detalhados implementados**
 - [x] **Formatação brasileira de dados**
 - [x] **Arquitetura modular de exportação**
+- [x] **Sistema de notificações completo**
+- [x] **Controle de acesso por roles**
 
 ### 🔄 Próximas Melhorias
 
@@ -456,4 +471,6 @@ const firebaseConfig = {
 **🔐 Login Testado:** ✅ Funcionando  
 **📊 Dashboard Operacional:** ✅ Funcionando  
 **📤 Exportação Excel/PDF:** ✅ Funcionando  
+**🔔 Notificações:** ✅ Funcionando  
+**🔐 Segurança:** ✅ Implementada  
 **Desenvolvido com ❤️ para otimizar a logística empresarial**
