@@ -28,14 +28,19 @@ async function listar(): Promise<Funcionario[]> {
 function normalizeMoneyString(valor?: string | null): string | null {
   if (!valor) return null;
 
-  // Remove todos os caracteres não numéricos
-  const cleaned = String(valor).replace(/\D/g, "");
+  // Remove todos os caracteres não numéricos, exceto ponto e vírgula
+  let cleaned = String(valor).replace(/[^\d.,]/g, "");
 
   // Se não há números, retorna null
   if (!cleaned) return null;
 
-  // Converte para número (em centavos) e depois para reais
-  const num = Number(cleaned) / 100;
+  // Se contém vírgula, substituir por ponto
+  if (cleaned.includes(",")) {
+    cleaned = cleaned.replace(",", ".");
+  }
+
+  // Converter para número
+  const num = Number(cleaned);
 
   if (Number.isNaN(num)) return null;
 

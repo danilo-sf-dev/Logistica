@@ -1,6 +1,6 @@
-import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import type { ExportConfig } from "./BaseExportService";
+import * as ExcelJS from "exceljs";
 
 export interface TableExportConfig extends ExportConfig {
   titulo: string;
@@ -336,7 +336,7 @@ export abstract class BaseTableExportService {
       ];
 
       // Criar workbook
-      const workbook = XLSX.utils.book_new();
+      const workbook = new ExcelJS.Workbook();
 
       // Preparar dados para a planilha
       const sheetData: any[][] = [];
@@ -360,23 +360,24 @@ export abstract class BaseTableExportService {
       });
 
       // Criar worksheet
-      const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
+      const worksheet = workbook.addWorksheet(this.config.titulo);
+
+      // Adicionar dados à planilha
+      sheetData.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          worksheet.getCell(rowIndex + 1, colIndex + 1).value = cell;
+        });
+      });
 
       // Configurar largura das colunas
       const colWidths = this.getColumnHeaders().map((header) => ({
-        wch: Math.max(header.length, 15),
+        width: Math.max(header.length, 15),
       }));
-      worksheet["!cols"] = colWidths;
-
-      // Adicionar worksheet ao workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, this.config.titulo);
+      worksheet.columns = colWidths;
 
       // Gerar arquivo e fazer download
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      const blob = new Blob([excelBuffer], {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
       const fileName = this.generateFileName(filtros);

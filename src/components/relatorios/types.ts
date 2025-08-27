@@ -111,6 +111,7 @@ export interface RelatorioHeaderProps {
 
 export interface ResumoCardsProps {
   dadosMotoristas: RelatorioData[];
+  dadosFuncionarios: RelatorioData[];
   dadosVeiculos: RelatorioData[];
   dadosRotas: RelatorioData[];
   dadosFolgas: RelatorioData[];
@@ -119,7 +120,7 @@ export interface ResumoCardsProps {
 
 export interface GraficoCardProps {
   config: GraficoConfig;
-  onDownload: (tipo: string, formato?: "pdf" | "csv") => void;
+  onDownload?: (tipo: string, formato?: "pdf" | "csv") => void;
   className?: string;
 }
 
@@ -133,6 +134,7 @@ export interface RelatoriosState {
   loading: boolean;
   periodo: string;
   dadosMotoristas: RelatorioData[];
+  dadosFuncionarios: RelatorioData[];
   dadosVeiculos: RelatorioData[];
   dadosRotas: RelatorioData[];
   dadosFolgas: RelatorioData[];

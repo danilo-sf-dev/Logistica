@@ -77,11 +77,12 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const handleDownloadTemplate = async () => {
     try {
       setLoading(true);
-      const service = getImportService(entityType);
+      const service = await getImportService(entityType);
       const template = await service.generateTemplate();
       saveAs(template, `template_${entityType}.xlsx`);
     } catch (error) {
       console.error("Erro ao gerar template:", error);
+      alert(`Erro ao gerar template: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -96,7 +97,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     if (!file) return;
 
     setStep("progress");
-    const service = getImportService(entityType);
+    const service = await getImportService(entityType);
 
     try {
       setProgress({ status: "importing", message: "Importando dados..." });

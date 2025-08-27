@@ -255,22 +255,26 @@ export const GraficoCard: React.FC<GraficoCardProps> = ({
             </p>
           )}
         </div>
-        <button
-          onClick={handleDownloadClick}
-          className="text-primary-600 hover:text-primary-900"
-          title="Exportar relatório"
-        >
-          <Download className="h-5 w-5" />
-        </button>
+        {onDownload && (
+          <button
+            onClick={handleDownloadClick}
+            className="text-primary-600 hover:text-primary-900"
+            title="Exportar relatório"
+          >
+            <Download className="h-5 w-5" />
+          </button>
+        )}
       </div>
       <div>{renderGrafico()}</div>
 
-      <ExportModal
-        isOpen={showExportModal}
-        onClose={() => setShowExportModal(false)}
-        onExport={handleExport}
-        titulo={config.titulo}
-      />
+      {onDownload && (
+        <ExportModal
+          isOpen={showExportModal}
+          onClose={() => setShowExportModal(false)}
+          onExport={handleExport}
+          titulo={config.titulo}
+        />
+      )}
     </div>
   );
 };
