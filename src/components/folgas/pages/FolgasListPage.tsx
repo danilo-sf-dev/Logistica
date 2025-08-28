@@ -182,7 +182,7 @@ export function FolgasListPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="space-y-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">
             Gestão de Folgas
@@ -191,10 +191,12 @@ export function FolgasListPage() {
             Gerencie solicitações de folgas e férias
           </p>
         </div>
-        <div className="flex space-x-3">
+
+        {/* Botões de ação - Layout responsivo */}
+        <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
           <button
             onClick={handleExportClick}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+            className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
           >
             <svg
               className="h-4 w-4 mr-2"
@@ -213,7 +215,7 @@ export function FolgasListPage() {
           </button>
           <button
             onClick={abrirCriacao}
-            className="btn-primary flex items-center"
+            className="w-full sm:w-auto btn-primary flex items-center justify-center"
           >
             <Plus className="h-4 w-4 mr-2" />
             Nova Solicitação
