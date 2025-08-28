@@ -63,7 +63,9 @@ const App: React.FC = () => {
       <ResizeObserverErrorBoundary>
         <AuthProvider>
           <NotificationProvider>
-            <Router>
+            <Router
+              future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+            >
               <div className="App">
                 <Toaster
                   position="top-right"

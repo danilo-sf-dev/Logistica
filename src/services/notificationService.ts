@@ -218,7 +218,17 @@ export class NotificationService {
 
       const notifications: NotificationData[] = [];
       snapshot.forEach((doc) => {
-        notifications.push({ id: doc.id, ...doc.data() } as NotificationData);
+        const data = doc.data();
+        // Converter o timestamp do Firestore para Date
+        const createdAt = data.createdAt?.toDate
+          ? data.createdAt.toDate()
+          : new Date(data.createdAt);
+
+        notifications.push({
+          id: doc.id,
+          ...data,
+          createdAt,
+        } as NotificationData);
       });
 
       return notifications.sort(

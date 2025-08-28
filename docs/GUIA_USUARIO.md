@@ -22,7 +22,7 @@
 **Para usuários que precisam de acesso administrativo:**
 
 1. Faça login pela primeira vez
-2. Acesse o **Firebase Console**: https://console.firebase.google.com/project/logistica-c7afc
+2. Acesse o **Firebase Console**: https://console.firebase.google.com/project/your-project-id
 3. Vá em **Firestore Database**
 4. Encontre a coleção `users`
 5. Localize seu documento de usuário
@@ -43,31 +43,36 @@
 
 O dashboard exibe os seguintes indicadores em tempo real:
 
-- **👥 Funcionários**: Total de funcionários cadastrados
-- **🚛 Motoristas**: Motoristas ativos no sistema
-- **👨‍💼 Vendedores**: Vendedores cadastrados
-- **🏙️ Cidades**: Cidades atendidas
-- **🚚 Veículos**: Total de veículos
-- **🗺️ Rotas Ativas**: Rotas em andamento
+- **👥 Total Funcionários**: Total de funcionários cadastrados
+- **🚛 Total Motoristas**: Motoristas ativos no sistema
+- **🚚 Total Veículos**: Total de veículos da frota
+- **📅 Folgas Pendentes**: Solicitações de folga aguardando aprovação
 
 ### Gráficos Interativos
 
-- **Status dos Motoristas**: Distribuição por status (Trabalhando, Disponível, Folga, Férias)
+- **Status dos Funcionários**: Distribuição por status (Trabalhando, Disponível, Folga, Férias)
 - **Status dos Veículos**: Distribuição por status (Disponível, Em Uso, Manutenção, Inativo)
 - **Atividades Recentes**: Últimas 10 atividades do sistema (últimos 15 dias)
 
+### 🔔 Notificações
+
+- **Sino de Notificações**: Localizado no header da aplicação
+- **Contador**: Mostra número de notificações não lidas
+- **Dropdown**: Lista de notificações recentes
+- **Marcar como Lida**: Clique na notificação para marcar
+
 ---
 
-## 👥 Gestão de Motoristas
+## 👥 Gestão de Funcionários
 
-### Adicionar Novo Motorista
+### Adicionar Novo Funcionário
 
 1. **Acesse** o módulo "Funcionários"
 2. **Clique** em "Novo Funcionário"
 3. **Preencha** os campos obrigatórios:
    - Nome completo
    - CPF (formato: 000.000.000-00)
-   - CNH (número da carteira)
+   - CNH (número da carteira - opcional)
    - Celular (formato: (73) 99999-9999)
    - Email (opcional)
    - Endereço completo
@@ -75,11 +80,12 @@ O dashboard exibe os seguintes indicadores em tempo real:
    - Função (Motorista, Ajudante, Outro)
    - Data de Admissão
    - Salário (opcional)
+   - Unidade de Negócio (Frigorífico, Ovos)
 4. **Clique** em "Cadastrar"
 
-### Editar Motorista
+### Editar Funcionário
 
-1. **Localize** o motorista na lista
+1. **Localize** o funcionário na lista
 2. **Clique** no ícone de edição (lápis)
 3. **Modifique** os campos necessários
 4. **Salve** as alterações
@@ -97,14 +103,15 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 - **Buscar por nome**: Digite o nome no campo de busca
 - **Filtrar por status**: Use o dropdown de status
+- **Filtrar por função**: Use o dropdown de função
 - **Ordenar**: Clique nos cabeçalhos das colunas
 
-### Exportar Dados
+### Exportação de Dados
 
-1. **Acesse** a lista de funcionários
-2. **Aplique** filtros se necessário
-3. **Clique** no botão "Exportar Excel"
-4. **Escolha** o formato (Excel ou PDF)
+1. **Acesse** o módulo "Relatórios"
+2. **Clique** em "Relatórios Detalhados"
+3. **Escolha** "Funcionários Detalhado"
+4. **Selecione** formato (Excel ou PDF)
 5. **Baixe** o arquivo automaticamente
 
 ---
@@ -115,32 +122,29 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 1. **Acesse** o módulo "Veículos"
 2. **Clique** em "Novo Veículo"
-3. **Preencha** os dados:
-   - **Placa**: Placa do veículo
-   - **Modelo**: Modelo do veículo
-   - **Marca**: Marca do veículo
-   - **Ano**: Ano de fabricação
-   - **Capacidade**: Capacidade em kg
-   - **Status**: Disponível, Em Uso, Manutenção, Inativo
-   - **Última Manutenção**: Data da última manutenção
-   - **Próxima Manutenção**: Data da próxima manutenção
+3. **Preencha** os campos obrigatórios:
+   - Placa (formato: ABC-1234)
+   - Modelo
+   - Marca
+   - Ano
+   - Capacidade (em toneladas)
+   - Status (Disponível, Em Uso, Manutenção, Inativo)
+   - Unidade de Negócio (Frigorífico, Ovos)
+   - Funcionário responsável (opcional)
 4. **Clique** em "Cadastrar"
 
-### Gerenciar Status
+### Gerenciar Manutenção
 
-**Status disponíveis:**
+- **Última Manutenção**: Data da última manutenção
+- **Próxima Manutenção**: Data programada para próxima manutenção
+- **Status de Manutenção**: Controle automático baseado nas datas
 
-- **Disponível**: Pronto para uso
-- **Em Uso**: Em rota ativa
-- **Manutenção**: Em manutenção
-- **Inativo**: Temporariamente indisponível
+### Exportação de Dados
 
-### Exportar Dados
-
-1. **Acesse** a lista de veículos
-2. **Aplique** filtros se necessário
-3. **Clique** no botão "Exportar Excel"
-4. **Escolha** o formato (Excel ou PDF)
+1. **Acesse** o módulo "Relatórios"
+2. **Clique** em "Relatórios Detalhados"
+3. **Escolha** "Veículos Detalhado"
+4. **Selecione** formato (Excel ou PDF)
 5. **Baixe** o arquivo automaticamente
 
 ---
@@ -151,30 +155,39 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 1. **Acesse** o módulo "Rotas"
 2. **Clique** em "Nova Rota"
-3. **Preencha** os dados:
-   - **Origem**: Cidade de origem
-   - **Destino**: Cidade de destino
-   - **Funcionário**: Motorista responsável
-   - **Veículo**: Veículo a ser utilizado
-   - **Data de Partida**: Data e hora de saída
-   - **Data de Chegada**: Data e hora de chegada
-   - **Status**: Agendada, Em Andamento, Concluída, Cancelada
-   - **Observações**: Informações adicionais
-4. **Clique** em "Criar"
+3. **Preencha** os campos obrigatórios:
+   - Origem (cidade)
+   - Destino (cidade)
+   - Funcionário responsável
+   - Veículo
+   - Data de Partida
+   - Data de Chegada
+   - Status (Agendada, Em Andamento, Concluída, Cancelada)
+   - Unidade de Negócio (Frigorífico, Ovos)
+   - Observações (opcional)
+4. **Clique** em "Cadastrar"
 
-### Acompanhar Rotas
+### Acompanhar Status
 
-- **Visualize** o status em tempo real
-- **Atualize** o progresso
-- **Registre** observações
-- **Finalize** quando concluída
+**Status disponíveis:**
 
-### Exportar Dados
+- **Agendada**: Rota programada
+- **Em Andamento**: Rota em execução
+- **Concluída**: Rota finalizada
+- **Cancelada**: Rota cancelada
 
-1. **Acesse** a lista de rotas
-2. **Aplique** filtros se necessário
-3. **Clique** no botão "Exportar Excel"
-4. **Escolha** o formato (Excel ou PDF)
+### Otimização de Rotas
+
+- **Preparado para Google Maps**: Integração futura
+- **Cálculo de Distâncias**: Automático
+- **Tempo Estimado**: Baseado em distância
+
+### Exportação de Dados
+
+1. **Acesse** o módulo "Relatórios"
+2. **Clique** em "Relatórios Detalhados"
+3. **Escolha** "Rotas Detalhado"
+4. **Selecione** formato (Excel ou PDF)
 5. **Baixe** o arquivo automaticamente
 
 ---
@@ -185,29 +198,42 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 1. **Acesse** o módulo "Folgas"
 2. **Clique** em "Nova Folga"
-3. **Preencha** os dados:
-   - **Funcionário**: Nome do funcionário
-   - **Data de Início**: Data de início da folga
-   - **Data de Fim**: Data de fim da folga
-   - **Tipo**: Folga, Férias, Outro
-   - **Motivo**: Justificativa da solicitação
-   - **Observações**: Informações adicionais
+3. **Preencha** os campos obrigatórios:
+   - Funcionário
+   - Tipo (Folga, Férias, Licença)
+   - Data de Início
+   - Data de Fim
+   - Motivo
+   - Observações (opcional)
 4. **Clique** em "Solicitar"
 
 ### Aprovar/Rejeitar Folgas
 
-1. **Acesse** a lista de folgas
-2. **Localize** a solicitação
-3. **Clique** em "Aprovar" ou "Rejeitar"
-4. **Adicione** comentários se necessário
-5. **Confirme** a ação
+**Para usuários com permissão de aprovação:**
 
-### Exportar Dados
+1. **Localize** a solicitação na lista
+2. **Clique** no ícone de aprovação (✓) ou rejeição (✗)
+3. **Adicione** observações (opcional)
+4. **Confirme** a ação
 
-1. **Acesse** a lista de folgas
-2. **Aplique** filtros se necessário
-3. **Clique** no botão "Exportar Excel"
-4. **Escolha** o formato (Excel ou PDF)
+### Histórico de Folgas
+
+- **Todas as solicitações**: Histórico completo
+- **Status**: Pendente, Aprovada, Rejeitada
+- **Filtros**: Por funcionário, período, status
+
+### Notificações Automáticas
+
+- **Solicitação**: Notificação para aprovadores
+- **Aprovação/Rejeição**: Notificação para solicitante
+- **Lembrete**: Notificação de folgas próximas
+
+### Exportação de Dados
+
+1. **Acesse** o módulo "Relatórios"
+2. **Clique** em "Relatórios Detalhados"
+3. **Escolha** "Folgas Detalhado"
+4. **Selecione** formato (Excel ou PDF)
 5. **Baixe** o arquivo automaticamente
 
 ---
@@ -218,28 +244,25 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 1. **Acesse** o módulo "Cidades"
 2. **Clique** em "Nova Cidade"
-3. **Preencha** os dados:
-   - **Nome da Cidade**: Nome completo
-   - **Estado**: Selecione o estado
-   - **Região**: Preenchida automaticamente
-   - **Distância**: Em km (opcional)
-   - **Peso Mínimo**: Em kg (opcional)
-   - **Rota**: Vincular a uma rota (opcional)
-   - **Observações**: Informações adicionais
+3. **Preencha** os campos obrigatórios:
+   - Nome da cidade
+   - Estado
+   - Região
+   - Unidade de Negócio (Frigorífico, Ovos)
 4. **Clique** em "Cadastrar"
 
-### Vincular a Rotas
+### Organização Regional
 
-1. **Edite** a cidade
-2. **Selecione** a rota no dropdown
-3. **Salve** as alterações
+- **Regiões**: Organização geográfica
+- **Estados**: Controle por estado
+- **Unidades**: Separação por negócio
 
-### Exportar Dados
+### Exportação de Dados
 
-1. **Acesse** a lista de cidades
-2. **Aplique** filtros se necessário
-3. **Clique** no botão "Exportar Excel"
-4. **Escolha** o formato (Excel ou PDF)
+1. **Acesse** o módulo "Relatórios"
+2. **Clique** em "Relatórios Detalhados"
+3. **Escolha** "Cidades Detalhado"
+4. **Selecione** formato (Excel ou PDF)
 5. **Baixe** o arquivo automaticamente
 
 ---
@@ -250,99 +273,85 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 1. **Acesse** o módulo "Vendedores"
 2. **Clique** em "Novo Vendedor"
-3. **Preencha** os dados:
-   - **Nome**: Nome completo
-   - **CPF**: Formato 000.000.000-00
-   - **Código Vend.Sistema**: Código interno
-   - **Email**: Email corporativo
-   - **Telefone**: Formato (73) 99999-9999
-   - **Estado**: Estado de atuação
-   - **Região**: Região de atuação
-   - **Cidades**: Cidades atendidas
+3. **Preencha** os campos obrigatórios:
+   - Nome completo
+   - CPF (formato: 000.000.000-00)
+   - Email
+   - Telefone (formato: (73) 99999-9999)
+   - Região
+   - Unidade de Negócio (Frigorífico, Ovos)
+   - Data de Admissão
+   - Salário (opcional)
 4. **Clique** em "Cadastrar"
 
-### Exportar Dados
+### Gestão de Territórios
 
-1. **Acesse** a lista de vendedores
-2. **Aplique** filtros se necessário
-3. **Clique** no botão "Exportar Excel"
-4. **Escolha** o formato (Excel ou PDF)
+- **Regiões**: Atribuição por região
+- **Cidades**: Cidades atendidas
+- **Cobertura**: Área de atuação
+
+### Exportação de Dados
+
+1. **Acesse** o módulo "Relatórios"
+2. **Clique** em "Relatórios Detalhados"
+3. **Escolha** "Vendedores Detalhado"
+4. **Selecione** formato (Excel ou PDF)
 5. **Baixe** o arquivo automaticamente
 
 ---
 
-## 📈 Relatórios e Analytics
+## 📊 Relatórios e Analytics
 
-### Dashboard Analítico
+### Dashboard de Relatórios
 
-**Métricas disponíveis:**
+O módulo de relatórios oferece:
 
-- Total de funcionários por status
-- Total de veículos por status
-- Rotas criadas por período
-- Folgas pendentes e aprovadas
-- Atividades recentes do sistema
+- **4 Cards de Resumo**: Total Funcionários, Total Motoristas, Total Veículos, Folgas Pendentes
+- **Gráficos Interativos**: Status dos funcionários e veículos
+- **Relatórios Detalhados**: Exportação completa de dados
 
 ### Relatórios Detalhados
 
-1. **Acesse** o módulo "Relatórios"
-2. **Selecione** o período desejado
-3. **Escolha** o tipo de relatório
-4. **Visualize** os dados em gráficos
-5. **Exporte** se necessário
+**Tipos disponíveis:**
 
-### 🆕 **Novos Relatórios Detalhados**
+1. **Funcionários Detalhado**
+   - Dados pessoais e profissionais
+   - Status atual
+   - Informações de contato
 
-#### Funcionários Detalhado
+2. **Veículos Detalhado**
+   - Informações técnicas
+   - Status da frota
+   - Dados de manutenção
 
-- **Dados completos**: Nome, CPF, CNH, telefone, email, endereço
-- **Informações profissionais**: Função, data de admissão, salário
-- **Status atual**: Trabalhando, Disponível, Folga, Férias
-- **Exportação**: Excel (XLSX) e PDF
+3. **Rotas Detalhado**
+   - Detalhes de rotas
+   - Associações funcionário/veículo
+   - Status de execução
 
-#### Veículos Detalhado
+4. **Folgas Detalhado**
+   - Histórico de solicitações
+   - Status de aprovação
+   - Observações
 
-- **Dados técnicos**: Placa, modelo, marca, ano, capacidade
-- **Status operacional**: Disponível, Em Uso, Manutenção, Inativo
-- **Manutenção**: Última e próxima manutenção
-- **Exportação**: Excel (XLSX) e PDF
+5. **Cidades Detalhado**
+   - Dados geográficos
+   - Organização regional
+   - Vínculos com rotas
 
-#### Rotas Detalhado
+6. **Vendedores Detalhado**
+   - Informações comerciais
+   - Territórios de atuação
+   - Dados de contato
 
-- **Informações da rota**: Origem, destino, funcionário, veículo
-- **Datas**: Partida e chegada
-- **Status**: Agendada, Em Andamento, Concluída, Cancelada
-- **Exportação**: Excel (XLSX) e PDF
+### Exportação Avançada
 
-#### Folgas Detalhado
+#### Formatos Disponíveis
 
-- **Dados da solicitação**: Funcionário, datas, tipo, motivo
-- **Status**: Pendente, Aprovada, Rejeitada
-- **Observações**: Comentários e justificativas
-- **Exportação**: Excel (XLSX) e PDF
-
-#### Cidades Detalhado
-
-- **Dados geográficos**: Nome, estado, região
-- **Informações operacionais**: Distância, peso mínimo
-- **Vínculos**: Rotas associadas
-- **Exportação**: Excel (XLSX) e PDF
-
-#### Vendedores Detalhado
-
-- **Dados pessoais**: Nome, CPF, email, telefone
-- **Informações comerciais**: Código sistema, unidade de negócio
-- **Cobertura**: Estado, região, cidades atendidas
-- **Exportação**: Excel (XLSX) e PDF
-
-### Exportação de Dados
-
-**Formatos disponíveis:**
-
-- **Excel (XLSX)**: Planilha para análise de dados
+- **Excel (XLSX)**: Planilha com formatação profissional
 - **PDF**: Documento formatado para impressão
 
-**Como exportar:**
+#### Como Exportar
 
 1. **Acesse** o módulo "Relatórios"
 2. **Clique** em "Relatórios Detalhados"
@@ -351,10 +360,12 @@ O dashboard exibe os seguintes indicadores em tempo real:
 5. **Selecione** o formato (Excel ou PDF)
 6. **Baixe** o arquivo automaticamente
 
-**Nomenclatura dos arquivos:**
+#### Características da Exportação
 
-- **Padrão**: `entity_dd-MM-YYYY.xlsx` (ex: `funcionarios_16-01-2025.xlsx`)
-- **Formato de data**: DD/MM/YYYY (padrão brasileiro)
+- **Formatação Brasileira**: Datas DD/MM/YYYY, CPF, telefone
+- **Layout Profissional**: Cabeçalhos formatados
+- **Nomenclatura Padrão**: `entity_dd-MM-YYYY.xlsx`
+- **Dados Completos**: Todas as informações da entidade
 
 ---
 
@@ -362,178 +373,207 @@ O dashboard exibe os seguintes indicadores em tempo real:
 
 ### Perfil do Usuário
 
-1. **Acesse** "Configurações" → "Perfil"
-2. **Edite** suas informações:
+1. **Acesse** o módulo "Configurações"
+2. **Clique** em "Perfil"
+3. **Edite** os dados pessoais:
    - Nome
    - Email
    - Telefone
    - Cargo
-3. **Salve** as alterações
+4. **Salve** as alterações
 
-### Notificações
+### Configurações de Notificação
 
-**Configurar alertas:**
+1. **Acesse** o módulo "Configurações"
+2. **Clique** em "Notificações"
+3. **Configure** as preferências:
+   - **Funcionários**: Notificações sobre funcionários
+   - **Rotas**: Notificações sobre rotas
+   - **Folgas**: Notificações sobre folgas
+   - **Veículos**: Notificações sobre veículos
+   - **Email**: Receber notificações por email
+   - **Push**: Receber notificações push
+4. **Salve** as configurações
 
-- **Email**: Notificações por email
-- **Push**: Notificações em tempo real
-- **Rotas**: Alertas de rotas
-- **Folgas**: Alertas de folgas
-- **Manutenção**: Alertas de manutenção
+### Configurações do Sistema
 
-### Segurança
+1. **Acesse** o módulo "Configurações"
+2. **Clique** em "Sistema"
+3. **Configure** as opções:
+   - **Idioma**: Português (Brasil)
+   - **Fuso Horário**: Configurável
+   - **Tema**: Claro/Escuro (futuro)
+4. **Salve** as configurações
 
-**Alterar senha** (se usar login com email/senha):
+### Segurança e Sessão
 
-1. **Acesse** "Configurações" → "Segurança"
-2. **Digite** a senha atual
-3. **Digite** a nova senha
-4. **Confirme** a nova senha
-5. **Salve** as alterações
-
----
-
-## 🔔 Recursos Avançados
-
-### Notificações Push
-
-**Para receber notificações:**
-
-1. **Autorize** as notificações quando solicitado
-2. **Configure** as preferências em "Configurações"
-3. **Receba** alertas em tempo real
-
-### Busca Avançada
-
-**Filtros disponíveis:**
-
-- Por nome
-- Por status
-- Por data
-- Por região
-- Por unidade de negócio
-
-### Atalhos de Teclado
-
-- **Ctrl + F**: Buscar na página atual
-- **Ctrl + S**: Salvar formulário
-- **Esc**: Cancelar ação
-- **Enter**: Confirmar ação
-
-### ✅ Validações do Sistema
-
-O sistema possui validação robusta em todos os formulários:
-
-#### **Campos Obrigatórios**
-
-- Campos marcados com **asterisco (\*)** são obrigatórios
-- Sistema impede salvamento com campos vazios
-- Feedback visual com bordas vermelhas
-
-#### **Validação de Formato**
-
-- **CPF**: Formato válido e único no sistema
-- **Celular**: DDD + 9 dígitos
-- **CEP**: 8 dígitos
-- **Email**: Formato válido (se fornecido)
-- **CNH**: Campo obrigatório para funcionários
-
-#### **Entidades Inativas**
-
-- **Funcionários inativos**: Não podem ser editados
-- **Vendedores inativos**: Não podem ser editados
-- **Veículos inativos**: Não podem ser editados
-- Para editar, primeiro ative a entidade
-
-#### **Feedback Visual**
-
-- **Bordas vermelhas**: Campos com erro
-- **Mensagens específicas**: Erro detalhado abaixo do campo
-- **Push de notificação**: Lista todos os erros ao submeter
-- **Asteriscos pretos**: Campos obrigatórios
+1. **Acesse** o módulo "Configurações"
+2. **Clique** em "Segurança"
+3. **Visualize** as informações:
+   - **IP Real**: Endereço IP da sessão
+   - **Dispositivo**: Informações do dispositivo
+   - **Browser**: Navegador utilizado
+   - **Sistema**: Sistema operacional
+   - **Último Login**: Data e hora
 
 ---
 
-## 🆘 Suporte e Ajuda
+## 📤 Sistema de Importação
+
+### Importação em Lote
+
+1. **Acesse** o módulo "Importação"
+2. **Escolha** o tipo de dados:
+   - Funcionários
+   - Veículos
+   - Cidades
+   - Vendedores
+3. **Selecione** o arquivo (Excel ou CSV)
+4. **Configure** o mapeamento de colunas
+5. **Valide** os dados
+6. **Execute** a importação
+
+### Validação de Dados
+
+- **Verificação automática**: Formato de dados
+- **Relatório de erros**: Dados inválidos
+- **Confirmação**: Antes da importação
+
+### Relatórios de Importação
+
+- **Status**: Sucesso ou erro
+- **Quantidade**: Registros importados
+- **Detalhes**: Log da importação
+
+---
+
+## 🔔 Sistema de Notificações
+
+### NotificationBell
+
+**Localização**: Header da aplicação (canto superior direito)
+
+**Funcionalidades**:
+
+- **Contador**: Número de notificações não lidas
+- **Dropdown**: Lista de notificações recentes
+- **Marcar como Lida**: Clique na notificação
+- **Configurações**: Link para configurações
+
+### Tipos de Notificação
+
+- **Funcionários**: Novos cadastros, alterações de status
+- **Rotas**: Novas rotas, alterações de status
+- **Folgas**: Solicitações, aprovações, rejeições
+- **Veículos**: Manutenções, alterações de status
+
+### Configurações de Notificação
+
+**Acesse**: Configurações → Notificações
+
+**Opções**:
+
+- **Habilitar/Desabilitar** por tipo
+- **Email**: Receber por email
+- **Push**: Receber no navegador
+- **Salvar**: Configurações persistentes
+
+---
+
+## 🎯 Dicas e Melhores Práticas
+
+### Organização de Dados
+
+- **Mantenha dados atualizados**: Status de funcionários e veículos
+- **Use filtros**: Para encontrar informações rapidamente
+- **Exporte regularmente**: Para backup e análise
+- **Configure notificações**: Para acompanhar mudanças importantes
+
+### Uso Eficiente
+
+- **Filtros avançados**: Combine múltiplos critérios
+- **Busca rápida**: Use o campo de busca
+- **Ordenação**: Clique nos cabeçalhos das tabelas
+- **Atalhos**: Use o teclado para navegação
+
+### Relatórios
+
+- **Exporte regularmente**: Para acompanhamento
+- **Use diferentes formatos**: Excel para análise, PDF para apresentação
+- **Mantenha histórico**: Para análise de tendências
+- **Compartilhe dados**: Com equipes relevantes
+
+---
+
+## 🐛 Solução de Problemas
 
 ### Problemas Comuns
 
-**Login não funciona:**
+#### Erro de Login
 
-1. Verifique se está usando a conta Google correta
-2. Limpe o cache do navegador
-3. Tente em modo incógnito
+- **Verificar**: Conexão com internet
+- **Solução**: Limpar cache do navegador
+- **Alternativa**: Tentar modo incógnito
 
-**Dados não carregam:**
+#### Dados Não Carregam
 
-1. Verifique a conexão com a internet
-2. Recarregue a página (F5)
-3. Aguarde alguns segundos
+- **Verificar**: Permissões de acesso
+- **Solução**: Recarregar página (F5)
+- **Alternativa**: Aguardar alguns segundos
 
-**Erro ao salvar:**
+#### Erro na Exportação
 
-1. **Verifique os campos obrigatórios** (marcados com \*):
-   - Campos com asterisco (\*) são obrigatórios
-   - Campos com erro ficam com borda vermelha
-   - Mensagens de erro aparecem abaixo dos campos
+- **Verificar**: Dados disponíveis para exportar
+- **Solução**: Aguardar processamento completo
+- **Alternativa**: Verificar permissões de download
 
-2. **Verifique o formato dos dados**:
-   - **CPF**: Formato 000.000.000-00
-   - **Celular**: Formato (73) 99999-9999
-   - **CEP**: Formato 00000-000
-   - **Email**: Formato válido (se fornecido)
+#### Notificações Não Aparecem
 
-3. **Entidades inativas**:
-   - Funcionários, vendedores e veículos inativos não podem ser editados
-   - Para editar, primeiro ative a entidade
+- **Verificar**: Configurações de notificação
+- **Solução**: Habilitar notificações no navegador
+- **Alternativa**: Verificar permissões
 
-4. **Notificação de erro**:
-   - Sistema mostra push com lista de todos os erros
-   - Corrija os erros e tente novamente
-
-**Erro na exportação:**
-
-1. Verifique se há dados para exportar
-2. Aguarde o processamento completo
-3. Verifique se o navegador permite downloads
-4. Tente novamente
-
-### Contato
-
-**Para suporte técnico:**
+### Suporte Técnico
 
 - **Email**: suporte@empresa.com
-- **Telefone**: (73) 99999-9999
+- **Telefone**: (11) 99999-9999
 - **Horário**: Segunda a Sexta, 8h às 18h
+- **Documentação**: Pasta `docs/`
 
 ---
 
-## 📱 Responsividade
-
-O sistema é totalmente responsivo e funciona em:
-
-- **Desktop**: Tela completa
-- **Tablet**: Interface adaptada
-- **Mobile**: Interface otimizada
+## 📱 Compatibilidade
 
 ### Navegadores Suportados
 
-- **Chrome**: Versão 90+
-- **Firefox**: Versão 88+
-- **Safari**: Versão 14+
-- **Edge**: Versão 90+
+- **Chrome**: 90+
+- **Firefox**: 88+
+- **Safari**: 14+
+- **Edge**: 90+
+
+### Dispositivos
+
+- **Desktop**: Windows, macOS, Linux
+- **Tablet**: iPad, Android
+- **Mobile**: iPhone, Android
+
+### Resolução
+
+- **Desktop**: 1920x1080, 1366x768
+- **Tablet**: 768x1024
+- **Mobile**: 375x667
 
 ---
 
-## 🔄 Atualizações
+## 🎉 Conclusão
 
-O sistema é atualizado automaticamente. Para verificar atualizações:
+O SGL oferece uma solução completa para gestão logística com:
 
-1. **Recarregue** a página (F5)
-2. **Limpe** o cache se necessário
-3. **Verifique** se há novas funcionalidades
+- **Interface intuitiva** e responsiva
+- **Funcionalidades avançadas** de relatórios
+- **Sistema de notificações** em tempo real
+- **Controle de segurança** robusto
+- **Exportação profissional** de dados
+- **Suporte técnico** disponível
 
----
-
-**Última atualização:** Janeiro 2025  
-**Versão do sistema:** 1.1.0  
-**Status:** ✅ Sistema operacional com novas funcionalidades de exportação
+**🚀 Sistema pronto para otimizar sua operação logística!**

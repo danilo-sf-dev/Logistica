@@ -344,7 +344,7 @@ export class DashboardService {
             id: `motorista_${motorista.id}`,
             tipo: "motorista",
             titulo: `Novo motorista cadastrado: ${motorista.nome || "Nome não informado"}`,
-            descricao: `${motorista.cnh || "CNH não informada"} - ${dataCriacao.toLocaleString("pt-BR")}`,
+            descricao: `CNH: ${motorista.cnh || "CNH não informada"} - ${dataCriacao.toLocaleString("pt-BR")}`,
             timestamp: dataCriacao,
             icon: "Car",
             color: "green",
@@ -364,7 +364,7 @@ export class DashboardService {
             id: `veiculo_${veiculo.id}`,
             tipo: "veiculo",
             titulo: `Novo veículo cadastrado: ${veiculo.placa || "Placa não informada"}`,
-            descricao: `${veiculo.modelo || "Modelo não informado"} - ${dataCriacao.toLocaleString("pt-BR")}`,
+            descricao: `Modelo: ${veiculo.modelo || "Modelo não informado"} - ${dataCriacao.toLocaleString("pt-BR")}`,
             timestamp: dataCriacao,
             icon: "Truck",
             color: "orange",
@@ -380,11 +380,35 @@ export class DashboardService {
         );
 
         if (dataCriacao > quinzeDiasAtras) {
+          // Formatar a função para exibição
+          const formatarFuncao = (funcao: string | undefined | null) => {
+            if (!funcao || funcao.trim() === "") return "Função não informada";
+
+            const funcaoLower = funcao.toLowerCase().trim();
+            switch (funcaoLower) {
+              case "motorista":
+                return "Motorista";
+              case "ajudante":
+                return "Ajudante";
+              case "outro":
+                return "Outro";
+              default:
+                // Se não for um dos valores padrão, retornar o valor original capitalizado
+                return (
+                  funcao.charAt(0).toUpperCase() + funcao.slice(1).toLowerCase()
+                );
+            }
+          };
+
+          // Buscar a função do funcionário
+          const funcaoValue = funcionario.funcao || null;
+          const funcaoFormatada = formatarFuncao(funcaoValue);
+
           atividades.push({
             id: `funcionario_${funcionario.id}`,
             tipo: "funcionario",
             titulo: `Novo funcionário cadastrado: ${funcionario.nome || "Nome não informado"}`,
-            descricao: `${funcionario.cargo || "Cargo não informado"} - ${dataCriacao.toLocaleString("pt-BR")}`,
+            descricao: `${funcaoFormatada} - ${dataCriacao.toLocaleString("pt-BR")}`,
             timestamp: dataCriacao,
             icon: "Users",
             color: "purple",
@@ -402,7 +426,7 @@ export class DashboardService {
             id: `cidade_${cidade.id}`,
             tipo: "cidade",
             titulo: `Nova cidade cadastrada: ${cidade.nome || "Nome não informado"}`,
-            descricao: `${cidade.estado || "Estado não informado"} - ${dataCriacao.toLocaleString("pt-BR")}`,
+            descricao: `Estado: ${cidade.estado || "Estado não informado"} - ${dataCriacao.toLocaleString("pt-BR")}`,
             timestamp: dataCriacao,
             icon: "Building2",
             color: "gray",
@@ -422,7 +446,7 @@ export class DashboardService {
             id: `vendedor_${vendedor.id}`,
             tipo: "vendedor",
             titulo: `Novo vendedor cadastrado: ${vendedor.nome || "Nome não informado"}`,
-            descricao: `${vendedor.regiao || "Região não informada"} - ${dataCriacao.toLocaleString("pt-BR")}`,
+            descricao: `Região: ${vendedor.regiao || "Região não informada"} - ${dataCriacao.toLocaleString("pt-BR")}`,
             timestamp: dataCriacao,
             icon: "UserCheck",
             color: "blue",

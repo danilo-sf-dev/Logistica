@@ -33,12 +33,18 @@ export const useRelatorios = () => {
   const [loading, setLoading] = useState(true);
   const [periodo, setPeriodo] = useState("mes");
   const [dadosMotoristas, setDadosMotoristas] = useState<RelatorioData[]>([]);
+  const [dadosFuncionarios, setDadosFuncionarios] = useState<RelatorioData[]>(
+    [],
+  );
   const [dadosVeiculos, setDadosVeiculos] = useState<RelatorioData[]>([]);
   const [dadosRotas, setDadosRotas] = useState<RelatorioData[]>([]);
   const [dadosFolgas, setDadosFolgas] = useState<RelatorioData[]>([]);
 
   // Dados brutos para exportação
   const [dadosBrutosMotoristas, setDadosBrutosMotoristas] = useState<
+    MotoristaData[]
+  >([]);
+  const [dadosBrutosFuncionarios, setDadosBrutosFuncionarios] = useState<
     MotoristaData[]
   >([]);
   const [dadosBrutosVeiculos, setDadosBrutosVeiculos] = useState<VeiculoData[]>(
@@ -55,18 +61,27 @@ export const useRelatorios = () => {
     setLoading(true);
     try {
       // Buscar dados de todas as entidades
-      const [motoristas, veiculos, rotas, folgas, cidades, vendedores] =
-        await Promise.all([
-          relatoriosService.buscarMotoristas(periodo),
-          relatoriosService.buscarVeiculos(periodo),
-          relatoriosService.buscarRotas(periodo),
-          relatoriosService.buscarFolgas(periodo),
-          relatoriosService.buscarCidades(periodo),
-          relatoriosService.buscarVendedores(periodo),
-        ]);
+      const [
+        motoristas,
+        funcionarios,
+        veiculos,
+        rotas,
+        folgas,
+        cidades,
+        vendedores,
+      ] = await Promise.all([
+        relatoriosService.buscarMotoristas(periodo),
+        relatoriosService.buscarFuncionarios(periodo),
+        relatoriosService.buscarVeiculos(periodo),
+        relatoriosService.buscarRotas(periodo),
+        relatoriosService.buscarFolgas(periodo),
+        relatoriosService.buscarCidades(periodo),
+        relatoriosService.buscarVendedores(periodo),
+      ]);
 
       // Salvar dados brutos para exportação
       setDadosBrutosMotoristas(motoristas);
+      setDadosBrutosFuncionarios(funcionarios);
       setDadosBrutosVeiculos(veiculos);
       setDadosBrutosRotas(rotas);
       setDadosBrutosFolgas(folgas);
@@ -76,6 +91,8 @@ export const useRelatorios = () => {
       // Processar dados para relatórios
       const dadosMotoristasProcessados =
         relatoriosService.processarDadosMotoristas(motoristas);
+      const dadosFuncionariosProcessados =
+        relatoriosService.processarDadosFuncionarios(funcionarios);
       const dadosVeiculosProcessados =
         relatoriosService.processarDadosVeiculos(veiculos);
       const dadosRotasProcessados =
@@ -84,6 +101,7 @@ export const useRelatorios = () => {
         relatoriosService.processarDadosFolgas(folgas);
 
       setDadosMotoristas(dadosMotoristasProcessados);
+      setDadosFuncionarios(dadosFuncionariosProcessados);
       setDadosVeiculos(dadosVeiculosProcessados);
       setDadosRotas(dadosRotasProcessados);
       setDadosFolgas(dadosFolgasProcessados);
@@ -93,6 +111,7 @@ export const useRelatorios = () => {
       // Mostrar notificação de sucesso
       const totalItens =
         motoristas.length +
+        funcionarios.length +
         veiculos.length +
         rotas.length +
         folgas.length +
@@ -131,13 +150,17 @@ export const useRelatorios = () => {
         switch (tipo) {
           case "motoristas":
           case "motoristas_detalhado":
+          case "status_dos_motoristas":
+            dados = dadosBrutosMotoristas;
+            dadosProcessados = dadosMotoristas;
+            nomeTipo = "Motoristas";
+            break;
           case "funcionarios":
           case "funcionarios_detalhado":
           case "status_dos_funcionários":
           case "status_dos_funcionarios":
-          case "status_dos_motoristas":
-            dados = dadosBrutosMotoristas;
-            dadosProcessados = dadosMotoristas;
+            dados = dadosBrutosFuncionarios;
+            dadosProcessados = dadosFuncionarios;
             nomeTipo = "Funcionários";
             break;
           case "veiculos":
@@ -348,6 +371,7 @@ export const useRelatorios = () => {
     loading,
     periodo,
     dadosMotoristas,
+    dadosFuncionarios,
     dadosVeiculos,
     dadosRotas,
     dadosFolgas,

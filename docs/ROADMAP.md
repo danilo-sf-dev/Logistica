@@ -6,7 +6,7 @@ Este documento apresenta o planejamento futuro e melhorias planejadas para o SGL
 
 ## 🎯 Status Atual
 
-**Versão:** 1.1.0  
+**Versão:** 1.2.0  
 **Status:** ✅ **Sistema em Produção com Novas Funcionalidades**  
 **Data:** Janeiro 2025
 
@@ -19,12 +19,33 @@ Este documento apresenta o planejamento futuro e melhorias planejadas para o SGL
 - **Gestão de Folgas** (CRUD completo)
 - **Gestão de Cidades** (CRUD completo)
 - **Gestão de Vendedores** (CRUD completo)
-- **Relatórios** e analytics
+- **Relatórios** e analytics avançados
 - **Sistema de Autenticação** (Google + Email/Senha)
 - **Interface Responsiva** (Desktop, Tablet, Mobile)
-- **Notificações Push** (configurado)
+- **Sistema de Notificações** completo
+- **Sistema de Segurança** avançado
+- **Migração para TypeScript** completa
+- **Build Tool Vite** implementado
 
-### 🆕 **Novas Funcionalidades Implementadas (v1.1.0)**
+### 🆕 **Novas Funcionalidades Implementadas (v1.2.0)**
+
+#### 🔐 **Sistema de Segurança Firebase**
+
+- ✅ **Regras de Segurança Firestore**: Implementadas e ativas
+- ✅ **Controle de Acesso por Role**: admin, gerente, dispatcher, user
+- ✅ **Proteção de Dados**: Leitura/escrita controlada por permissões
+- ✅ **Modo Teste Desabilitado**: Sistema em produção segura
+- ✅ **SessionService**: Captura real de IP e informações de dispositivo
+
+#### 🔔 **Sistema de Notificações Completo**
+
+- ✅ **NotificationService**: Serviço centralizado de notificações
+- ✅ **NotificationBell**: Sino de notificações no header
+- ✅ **Configurações de Notificação**: Interface para gerenciar preferências
+- ✅ **Notificações em Tempo Real**: Toast notifications para eventos
+- ✅ **Filtro por Preferências**: Só envia se usuário habilitou
+- ✅ **Salvamento no Firestore**: Notificações persistentes
+- ✅ **Tipos de Notificação**: funcionário, rota, folga, veículo
 
 #### 📊 **Sistema de Relatórios Avançado**
 
@@ -33,14 +54,18 @@ Este documento apresenta o planejamento futuro e melhorias planejadas para o SGL
 - ✅ **Exportação PDF**: Documentos formatados para impressão
 - ✅ **Modal de Exportação**: Interface para escolher formato (PDF/Excel)
 - ✅ **Arquitetura Modular**: Serviços especializados por entidade
+- ✅ **Formatação Brasileira**: Datas DD/MM/YYYY, CPF, telefone
 
 #### 🔧 **Melhorias Técnicas**
 
-- ✅ **Formatação Brasileira**: Datas no formato DD/MM/YYYY
+- ✅ **Migração para TypeScript**: Código tipado e mais seguro
+- ✅ **Build Tool Vite**: Desenvolvimento mais rápido e eficiente
 - ✅ **Layout Minimalista**: Interface em preto e branco
-- ✅ **Nomenclatura Padrão**: Arquivos nomeados como entity_dd-MM-YYYY.xlsx
+- ✅ **Nomenclatura Padrão**: Arquivos nomeados como `entity_dd-MM-YYYY.xlsx`
 - ✅ **Tipos Separados**: Arquivos de tipos independentes por pacote
-- ✅ **Sistema de Exportação**: BaseExportService e BaseTableExportService
+- ✅ **Padrões de Código**: Eliminação de if/else com arrays de detectores
+- ✅ **Error Boundaries**: Tratamento robusto de erros
+- ✅ **Responsive Design**: Interface adaptável a diferentes dispositivos
 
 ---
 
@@ -50,19 +75,21 @@ Este documento apresenta o planejamento futuro e melhorias planejadas para o SGL
 
 #### 🔧 **Melhorias Técnicas**
 
-- [ ] **Migração para React 19** (quando disponível)
+- [ ] **Atualização para React 19** (quando disponível)
 - [ ] **Implementação de testes automatizados**
-  - [ ] Testes unitários (Jest + React Testing Library)
+  - [ ] Testes unitários (Vitest + React Testing Library)
   - [ ] Testes de integração
-  - [ ] Testes E2E (Cypress ou Playwright)
+  - [ ] Testes E2E (Playwright)
 - [ ] **Otimização de Performance**
   - [ ] Lazy loading de componentes
   - [ ] Virtualização de listas grandes
   - [ ] Otimização de queries Firestore
+  - [ ] Code splitting avançado
 - [ ] **Melhorias de UX/UI**
   - [ ] Tema escuro/claro
   - [ ] Animações e transições
   - [ ] Feedback visual melhorado
+  - [ ] Acessibilidade (WCAG 2.1)
 
 #### 📊 **Novas Funcionalidades**
 
@@ -70,14 +97,17 @@ Este documento apresenta o planejamento futuro e melhorias planejadas para o SGL
   - [ ] Notificações por email
   - [ ] Notificações por SMS
   - [ ] Configurações personalizadas
+  - [ ] Templates de notificação
 - [ ] **Relatórios Avançados**
   - [ ] Relatórios customizáveis
   - [ ] Gráficos interativos avançados
   - [ ] Dashboards personalizáveis
+  - [ ] Agendamento de relatórios
 - [ ] **Dashboard Personalizável**
   - [ ] Widgets configuráveis
   - [ ] Layout personalizado
   - [ ] KPIs customizáveis
+  - [ ] Drag and drop de componentes
 
 ### 📅 **Q2 2025 - Expansão de Funcionalidades**
 
@@ -88,136 +118,108 @@ Este documento apresenta o planejamento futuro e melhorias planejadas para o SGL
   - [ ] Cálculo de distâncias automático
   - [ ] Otimização de rotas
   - [ ] Tracking em tempo real
+  - [ ] Geocoding de endereços
 - [ ] **Geolocalização**
   - [ ] Localização de veículos
   - [ ] Histórico de posições
   - [ ] Alertas de desvio de rota
+  - [ ] Zonas de cobertura
 
 #### 📱 **Aplicativo Mobile**
 
 - [ ] **React Native App**
   - [ ] Versão para Android
   - [ ] Versão para iOS
+  - [ ] Sincronização com web app
   - [ ] Funcionalidades offline
-  - [ ] Sincronização automática
-- [ ] **PWA (Progressive Web App)**
-  - [ ] Instalação no dispositivo
-  - [ ] Funcionalidades offline
-  - [ ] Notificações push
+  - [ ] Push notifications nativas
 
-#### 🔄 **Automação**
+### 📅 **Q3 2025 - Integrações e Automação**
 
-- [ ] **Sistema de Workflows**
-  - [ ] Aprovação automática de folgas
-  - [ ] Alertas de manutenção
-  - [ ] Notificações de eventos
-- [ ] **Integração com Sistemas Externos**
-  - [ ] ERP da empresa
-  - [ ] Sistema de RH
-  - [ ] Controle financeiro
+#### 🔗 **Integrações Externas**
 
-### 📅 **Q3 2025 - Inteligência Artificial e Analytics**
+- [ ] **Sistemas ERP**
+  - [ ] Integração com SAP
+  - [ ] Integração com TOTVS
+  - [ ] Sincronização de dados
+  - [ ] APIs padronizadas
+- [ ] **APIs Externas**
+  - [ ] API de CEP (Correios)
+  - [ ] API de CNH (DETRAN)
+  - [ ] API de veículos (DETRAN)
+  - [ ] APIs de previsão do tempo
 
-#### 🤖 **IA e Machine Learning**
+#### 🤖 **Automação e IA**
 
-- [ ] **Predição de Demandas**
-  - [ ] Análise de padrões de rotas
-  - [ ] Previsão de necessidades de veículos
-  - [ ] Otimização de recursos
-- [ ] **Análise Preditiva**
-  - [ ] Manutenção preventiva
-  - [ ] Gestão de riscos
-  - [ ] Otimização de custos
+- [ ] **Machine Learning**
+  - [ ] Otimização automática de rotas
+  - [ ] Previsão de demanda
+  - [ ] Detecção de anomalias
+  - [ ] Recomendações inteligentes
+- [ ] **Automação de Processos**
+  - [ ] Workflows automatizados
+  - [ ] Aprovações automáticas
+  - [ ] Alertas inteligentes
+  - [ ] Relatórios automáticos
+
+### 📅 **Q4 2025 - Escalabilidade e Enterprise**
+
+#### 🏢 **Funcionalidades Enterprise**
+
+- [ ] **Multi-tenancy**
+  - [ ] Múltiplas empresas
+  - [ ] Isolamento de dados
+  - [ ] Configurações por empresa
+  - [ ] Billing por empresa
+- [ ] **Auditoria e Compliance**
+  - [ ] Logs detalhados
+  - [ ] Relatórios de auditoria
+  - [ ] Compliance LGPD
+  - [ ] Backup automático
 
 #### 📈 **Analytics Avançado**
 
 - [ ] **Business Intelligence**
   - [ ] Dashboards executivos
+  - [ ] KPIs avançados
+  - [ ] Análise preditiva
   - [ ] Relatórios customizáveis
+- [ ] **Data Warehouse**
+  - [ ] Armazenamento de dados históricos
   - [ ] Análise de tendências
-- [ ] **Métricas Avançadas**
-  - [ ] KPIs personalizados
-  - [ ] Comparativos temporais
-  - [ ] Análise de performance
-
-### 📅 **Q4 2025 - Expansão e Escalabilidade**
-
-#### 🌐 **Multi-tenancy**
-
-- [ ] **Sistema Multi-empresa**
-  - [ ] Isolamento de dados
-  - [ ] Configurações por empresa
-  - [ ] Gestão de usuários por empresa
-- [ ] **White Label**
-  - [ ] Personalização de marca
-  - [ ] Temas customizáveis
-  - [ ] Configurações específicas
-
-#### 🔧 **Infraestrutura**
-
-- [ ] **Escalabilidade**
-  - [ ] Microserviços
-  - [ ] Load balancing
-  - [ ] Cache distribuído
-- [ ] **Monitoramento**
-  - [ ] APM (Application Performance Monitoring)
-  - [ ] Logs centralizados
-  - [ ] Alertas automáticos
+  - [ ] Big Data analytics
+  - [ ] Machine Learning avançado
 
 ---
 
-## 🎯 **Prioridades de Desenvolvimento**
+## 🎯 **Objetivos de Longo Prazo (2026-2027)**
 
-### 🔥 **Alta Prioridade**
+### 🌐 **Plataforma Completa**
 
-1. **Testes Automatizados**
-   - Garantir qualidade do código
-   - Reduzir bugs em produção
-   - Facilitar manutenção
+- [ ] **API Pública**
+  - [ ] Documentação completa
+  - [ ] SDKs para diferentes linguagens
+  - [ ] Marketplace de integrações
+  - [ ] Comunidade de desenvolvedores
 
-2. **Integração com Google Maps**
-   - Melhorar experiência de rotas
-   - Otimização automática
-   - Tracking em tempo real
+### 🚀 **Expansão de Mercado**
 
-3. **Sistema de Notificações**
-   - Alertas em tempo real
-   - Notificações por email
-   - Configurações personalizadas
+- [ ] **Internacionalização**
+  - [ ] Múltiplos idiomas
+  - [ ] Múltiplas moedas
+  - [ ] Adaptação a diferentes mercados
+  - [ ] Compliance internacional
 
-### 🔶 **Média Prioridade**
+### 🔮 **Tecnologias Emergentes**
 
-1. **PWA (Progressive Web App)**
-   - Funcionalidades offline
-   - Instalação no dispositivo
-   - Melhor experiência mobile
-
-2. **Relatórios Customizáveis**
-   - Dashboards personalizáveis
-   - Gráficos interativos
-   - Exportação avançada
-
-3. **Integração com Sistemas Externos**
-   - ERP da empresa
-   - Sistema de RH
-   - Controle financeiro
-
-### 🔵 **Baixa Prioridade**
-
-1. **Aplicativo Mobile Nativo**
-   - React Native
-   - Funcionalidades offline
-   - Sincronização automática
-
-2. **IA e Machine Learning**
-   - Predição de demandas
-   - Análise preditiva
-   - Otimização automática
-
-3. **Multi-tenancy**
-   - Sistema multi-empresa
-   - White label
-   - Configurações por empresa
+- [ ] **Realidade Aumentada**
+  - [ ] Visualização de rotas em AR
+  - [ ] Reconhecimento de placas
+  - [ ] Assistente virtual
+- [ ] **IoT Integration**
+  - [ ] Sensores em veículos
+  - [ ] Monitoramento de temperatura
+  - [ ] Telemetria avançada
 
 ---
 
@@ -225,143 +227,92 @@ Este documento apresenta o planejamento futuro e melhorias planejadas para o SGL
 
 ### 🎯 **Objetivos Q1 2025**
 
-- [ ] **Cobertura de Testes**: 80%+
-- [ ] **Performance**: Tempo de carregamento < 2s
-- [ ] **Disponibilidade**: 99.9% uptime
-- [ ] **Satisfação do Usuário**: 4.5/5
+- [ ] **Performance**
+  - [ ] Tempo de carregamento < 1.5s
+  - [ ] Lighthouse Score > 95
+  - [ ] Cobertura de testes > 80%
+- [ ] **Usabilidade**
+  - [ ] Taxa de adoção > 90%
+  - [ ] Tempo de onboarding < 10min
+  - [ ] NPS > 8.0
 
 ### 🎯 **Objetivos Q2 2025**
 
-- [ ] **Integração Maps**: 100% funcional
-- [ ] **PWA**: Funcionalidades offline
-- [ ] **Notificações**: Sistema completo
-- [ ] **Usuários Ativos**: 50+ usuários
+- [ ] **Funcionalidades**
+  - [ ] Google Maps integrado
+  - [ ] App mobile lançado
+  - [ ] 100% das rotas otimizadas
+- [ ] **Técnico**
+  - [ ] 99.9% uptime
+  - [ ] < 100ms latência
+  - [ ] Zero downtime deployments
 
 ### 🎯 **Objetivos Q3 2025**
 
-- [ ] **IA/ML**: Primeiros modelos implementados
-- [ ] **Analytics**: Dashboards executivos
-- [ ] **Performance**: Otimização completa
-- [ ] **Escalabilidade**: Preparado para crescimento
-
-### 🎯 **Objetivos Q4 2025**
-
-- [ ] **Multi-tenancy**: Sistema preparado
-- [ ] **Infraestrutura**: Escalável e robusta
-- [ ] **Monitoramento**: Completo
-- [ ] **Crescimento**: 200+ usuários
+- [ ] **Integrações**
+  - [ ] 3+ sistemas ERP integrados
+  - [ ] 5+ APIs externas
+  - [ ] 100% automação de processos críticos
+- [ ] **IA/ML**
+  - [ ] 50% redução no tempo de planejamento
+  - [ ] 30% redução no custo de combustível
+  - [ ] 90% precisão nas previsões
 
 ---
 
-## 🔧 **Tecnologias Futuras**
+## 🔄 **Processo de Desenvolvimento**
 
-### 🆕 **Tecnologias em Avaliação**
+### 📋 **Metodologia**
 
-- **React 19**: Quando disponível
-- **Next.js**: Para SSR e melhor SEO
-- **GraphQL**: Para APIs mais eficientes
-- **Redis**: Para cache distribuído
-- **Docker**: Para containerização
-- **Kubernetes**: Para orquestração
+- **Agile/Scrum**: Sprints de 2 semanas
+- **Continuous Integration**: Deploy automático
+- **Code Review**: Pull requests obrigatórios
+- **Testing**: TDD/BDD implementado
 
-### 🤖 **IA e Machine Learning**
+### 🛠️ **Ferramentas**
 
-- **TensorFlow.js**: Para ML no frontend
-- **Google Cloud AI**: Para ML no backend
-- **BigQuery**: Para análise de dados
-- **Data Studio**: Para visualizações
+- **Version Control**: Git + GitHub
+- **CI/CD**: GitHub Actions
+- **Testing**: Vitest + Playwright
+- **Monitoring**: Sentry + Analytics
+- **Documentation**: Storybook + Docusaurus
 
-### 📱 **Mobile e PWA**
+### 👥 **Equipe**
 
-- **React Native**: Para apps nativos
-- **Expo**: Para desenvolvimento rápido
-- **Capacitor**: Para PWA avançada
-- **Workbox**: Para service workers
-
----
-
-## 💰 **Considerações de Custos**
-
-### 💵 **Custos Atuais (Gratuito)**
-
-- **Firebase Spark Plan**: $0/mês
-- **Hosting**: $0/mês
-- **Firestore**: 1GB/mês gratuito
-- **Authentication**: Ilimitado
-
-### 💵 **Custos Futuros Estimados**
-
-#### Q1 2025
-
-- **Testes**: $50/mês (ferramentas)
-- **Monitoramento**: $100/mês
-- **Total**: $150/mês
-
-#### Q2 2025
-
-- **Google Maps**: $200/mês
-- **Notificações**: $50/mês
-- **Total**: $400/mês
-
-#### Q3 2025
-
-- **IA/ML**: $300/mês
-- **Analytics**: $200/mês
-- **Total**: $900/mês
-
-#### Q4 2025
-
-- **Infraestrutura**: $500/mês
-- **Multi-tenancy**: $300/mês
-- **Total**: $1.700/mês
+- **Product Owner**: Definição de requisitos
+- **Scrum Master**: Facilitação do processo
+- **Developers**: Desenvolvimento e testes
+- **QA**: Testes e qualidade
+- **DevOps**: Infraestrutura e deploy
 
 ---
 
-## 🚀 **Próximos Passos Imediatos**
+## 📞 **Feedback e Comunicação**
 
-### 📋 **Esta Semana**
+### 💬 **Canais de Comunicação**
 
-1. **Configurar ambiente de testes**
-2. **Implementar testes unitários básicos**
-3. **Otimizar performance do sistema atual**
-4. **Documentar APIs de exportação**
+- **Email**: roadmap@empresa.com
+- **Slack**: #sgl-roadmap
+- **GitHub**: Issues e Discussions
+- **Reuniões**: Sprint Planning e Review
 
-### 📋 **Este Mês**
+### 📝 **Como Contribuir**
 
-1. **Implementar sistema de notificações**
-2. **Integrar Google Maps básico**
-3. **Criar PWA básica**
-4. **Otimizar queries Firestore**
-
-### 📋 **Próximo Trimestre**
-
-1. **Sistema completo de testes**
-2. **Integração Maps avançada**
-3. **Relatórios customizáveis**
-4. **Dashboard personalizável**
+1. **Sugestões**: Abrir issue no GitHub
+2. **Feedback**: Usar formulário de feedback
+3. **Priorização**: Votação da comunidade
+4. **Desenvolvimento**: Pull requests
 
 ---
 
-## 📞 **Contato e Suporte**
+## 🎉 **Conclusão**
 
-### 👥 **Equipe de Desenvolvimento**
+O roadmap do SGL está focado em:
 
-- **Tech Lead**: [Nome do Tech Lead]
-- **Frontend**: [Nome do Frontend]
-- **Backend**: [Nome do Backend]
-- **QA**: [Nome do QA]
+- **Melhorias contínuas** da experiência do usuário
+- **Expansão de funcionalidades** baseada em feedback
+- **Integração com tecnologias** emergentes
+- **Escalabilidade** para suportar crescimento
+- **Inovação** para manter competitividade
 
-### 📧 **Canais de Comunicação**
-
-- **Email**: desenvolvimento@empresa.com
-- **Slack**: #sgl-desenvolvimento
-- **Jira**: Projeto SGL
-- **GitHub**: Repositório SGL
-
----
-
-**Última atualização:** Janeiro 2025  
-**Versão:** 1.1.0  
-**Status:** ✅ Sistema operacional com novas funcionalidades de exportação
-
-**Próxima revisão:** Março 2025
+**🚀 O futuro do SGL é promissor, com foco em tecnologia, inovação e valor para o usuário.**

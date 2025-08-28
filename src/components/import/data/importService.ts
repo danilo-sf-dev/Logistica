@@ -8,19 +8,19 @@ import type {
   LastImportInfo,
 } from "../types/importTypes";
 
-// Importar XLSX dinamicamente para evitar problemas de SSR
-let XLSX: any = null;
-
-const loadXLSX = async () => {
-  if (!XLSX && typeof window !== "undefined") {
+// Carregar ExcelJS dinamicamente
+const loadExcelJS = async () => {
+  let ExcelJS;
+  if (!ExcelJS && typeof window !== "undefined") {
     try {
-      const module = await import("xlsx");
-      XLSX = module;
+      const module = await import("exceljs");
+      ExcelJS = module;
     } catch (error) {
-      // Erro silencioso ao carregar XLSX
+      console.error("Erro ao carregar ExcelJS:", error);
+      throw new Error("ExcelJS não está disponível");
     }
   }
-  return XLSX;
+  return ExcelJS;
 };
 
 export abstract class BaseImportService {
@@ -72,53 +72,76 @@ export abstract class BaseImportService {
   }
 
   async generateTemplate(): Promise<Blob> {
-    const XLSX = await loadXLSX();
-    if (!XLSX) {
-      throw new Error("XLSX não está disponível");
+    const ExcelJS = await loadExcelJS();
+    if (!ExcelJS) {
+      throw new Error("ExcelJS não está disponível");
     }
 
-    const workbook = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
 
     // Planilha 1: Instruções
-    const instructionsSheet = this.createInstructionsSheet();
-    XLSX.utils.book_append_sheet(workbook, instructionsSheet, "Instruções");
+    const instructionsSheet = workbook.addWorksheet("Instruções");
+    const instructions = this.createInstructionsSheet();
+    instructions.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        const cellObj = instructionsSheet.getCell(rowIndex + 1, colIndex + 1);
+        cellObj.value = cell;
+        if (rowIndex === 0) {
+          cellObj.font = { bold: true, size: 12 };
+        }
+      });
+    });
 
     // Planilha 2: Template
-    const templateSheet = this.createTemplateSheet();
-    XLSX.utils.book_append_sheet(workbook, templateSheet, "Template");
+    const templateSheet = workbook.addWorksheet("Template");
+    const templateConfig = this.config.templateConfig;
+    templateConfig.headers.forEach((header, colIndex) => {
+      const cell = templateSheet.getCell(1, colIndex + 1);
+      cell.value = header;
+      cell.font = { bold: true, size: 11 };
+    });
 
     // Planilha 3: Exemplo
-    const exampleSheet = this.createExampleSheet();
-    XLSX.utils.book_append_sheet(workbook, exampleSheet, "Exemplo");
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
+    const exampleSheet = workbook.addWorksheet("Exemplo");
+    // Cabeçalhos
+    templateConfig.headers.forEach((header, colIndex) => {
+      const cell = exampleSheet.getCell(1, colIndex + 1);
+      cell.value = header;
+      cell.font = { bold: true, size: 11 };
     });
-    return new Blob([excelBuffer], {
+    // Dados de exemplo
+    templateConfig.exampleData.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        const cellObj = exampleSheet.getCell(rowIndex + 2, colIndex + 1);
+        cellObj.value = cell;
+      });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
   }
 
   protected async parseExcelFile(file: File): Promise<any[]> {
-    const XLSX = await loadXLSX();
-    if (!XLSX) {
-      throw new Error("XLSX não está disponível");
+    const ExcelJS = await loadExcelJS();
+    if (!ExcelJS) {
+      throw new Error("ExcelJS não está disponível");
     }
 
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
-          const workbook = XLSX.read(data, { type: "array" });
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(data);
 
           // Detectar qual planilha contém os dados
-          let sheetName = workbook.SheetNames[0];
-          let worksheet = workbook.Sheets[sheetName];
+          let worksheet = workbook.getWorksheet(1); // Primeira planilha por padrão
 
           // Detectar qual planilha contém os dados
-          if (workbook.SheetNames.length > 1) {
+          if (workbook.worksheets.length > 1) {
             // Priorizar planilhas que contenham palavras-chave relacionadas a dados
             const dataSheetKeywords = [
               "template",
@@ -133,44 +156,43 @@ export abstract class BaseImportService {
               "importacao",
             ];
 
-            const templateSheetIndex = workbook.SheetNames.findIndex((name) =>
+            const templateWorksheet = workbook.worksheets.find((ws) =>
               dataSheetKeywords.some((keyword) =>
-                name.toLowerCase().includes(keyword),
+                ws.name.toLowerCase().includes(keyword),
               ),
             );
 
-            if (templateSheetIndex !== -1) {
-              sheetName = workbook.SheetNames[templateSheetIndex];
-              worksheet = workbook.Sheets[sheetName];
+            if (templateWorksheet) {
+              worksheet = templateWorksheet;
             } else {
               // Se não encontrar planilha com palavras-chave, usar a segunda planilha
               // (assumindo que a primeira é instruções)
-              sheetName = workbook.SheetNames[1];
-              worksheet = workbook.Sheets[sheetName];
-            }
-          } else {
-            // Se há apenas uma planilha, verificar se não é apenas instruções
-            const firstSheetData = XLSX.utils.sheet_to_json(worksheet, {
-              header: 1,
-            });
-            const hasData =
-              firstSheetData.length > 1 &&
-              firstSheetData.some(
-                (row) =>
-                  Array.isArray(row) &&
-                  row.length > 0 &&
-                  row.some((cell) => cell && cell.toString().trim() !== ""),
-              );
-
-            if (!hasData) {
-              throw new Error(
-                "Nenhuma planilha com dados encontrada. Certifique-se de preencher a planilha 'Template' ou uma planilha com dados.",
-              );
+              worksheet = workbook.getWorksheet(2);
             }
           }
 
-          // Converter para JSON
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          if (!worksheet) {
+            throw new Error(
+              "Nenhuma planilha com dados encontrada. Certifique-se de preencher a planilha 'Template' ou uma planilha com dados.",
+            );
+          }
+
+          // Converter para array de arrays
+          const jsonData: any[][] = [];
+
+          worksheet.eachRow((row, rowNumber) => {
+            const rowData: any[] = [];
+            // Ler todas as colunas, mesmo as vazias
+            for (
+              let colNumber = 1;
+              colNumber <= worksheet.columnCount;
+              colNumber++
+            ) {
+              const cell = row.getCell(colNumber);
+              rowData.push(cell.value);
+            }
+            jsonData.push(rowData);
+          });
 
           // VALIDAÇÃO CRÍTICA: Verificar se o template é correto para a entidade
           if (jsonData.length > 0) {
@@ -203,75 +225,29 @@ export abstract class BaseImportService {
 
           // Remover cabeçalhos e linhas vazias
           const cleanData = jsonData
-            .slice(1) // Remove cabeçalho
-            .filter((row: any) =>
-              row.some(
-                (cell: any) =>
-                  cell !== null && cell !== undefined && cell !== "",
-              ),
+            .slice(1)
+            .filter((row) =>
+              row.some((cell) => cell && cell.toString().trim() !== ""),
             );
 
           resolve(cleanData);
         } catch (error) {
-          // Se o erro já contém nossa mensagem personalizada, não adicionar prefixo
-          if (
-            error.message.includes("Este arquivo parece ser um template de")
-          ) {
-            reject(error);
-          } else {
-            reject(
-              new Error(`Erro ao processar arquivo Excel: ${error.message}`),
-            );
-          }
+          reject(error);
         }
       };
-      reader.onerror = () => reject(new Error("Erro ao ler arquivo"));
+
+      reader.onerror = () => {
+        reject(new Error("Erro ao ler o arquivo"));
+      };
+
       reader.readAsArrayBuffer(file);
     });
   }
 
-  // Método para detectar o tipo de entidade baseado nos cabeçalhos
-  private detectEntityTypeFromHeaders(headers: any[]): string {
-    const headerText = headers.join(" ").toLowerCase();
-
-    if (
-      headerText.includes("placa") ||
-      headerText.includes("marca") ||
-      headerText.includes("carroceria")
-    ) {
-      return "Veículos";
-    }
-    if (headerText.includes("cpf") && headerText.includes("cnh")) {
-      return "Funcionários";
-    }
-    if (headerText.includes("cpf") && headerText.includes("região")) {
-      return "Vendedores";
-    }
-    if (headerText.includes("nome") && headerText.includes("estado")) {
-      return "Cidades";
-    }
-    if (
-      headerText.includes("funcionário") ||
-      headerText.includes("data início")
-    ) {
-      return "Folgas";
-    }
-    if (
-      headerText.includes("peso mínimo") ||
-      headerText.includes("dia semana")
-    ) {
-      return "Rotas";
-    }
-
-    return "Entidade Desconhecida";
-  }
-
-  protected createInstructionsSheet() {
-    const templateConfig = this.config.templateConfig;
+  protected createInstructionsSheet(): string[][] {
+    const entityName = this.getEntityDisplayName();
     const instructions = [
-      [
-        `IMPORTAÇÃO DE ${this.getEntityDisplayName().toUpperCase()} - INSTRUÇÕES`,
-      ],
+      [`IMPORTAÇÃO DE ${entityName.toUpperCase()} - INSTRUÇÕES`],
       [""],
       ["📋 COMO USAR ESTE TEMPLATE:"],
       [""],
@@ -295,12 +271,14 @@ export abstract class BaseImportService {
       ],
       [""],
       ["📊 FORMATO DOS DADOS:"],
-      ...templateConfig.instructions.map((instruction) => [
-        `   - ${instruction}`,
+      ...this.config.templateConfig.instructions.map((instruction) => [
+        instruction,
       ]),
       [""],
       ["🔍 VALIDAÇÕES:"],
-      ...templateConfig.validations.map((validation) => [`   - ${validation}`]),
+      ...this.config.templateConfig.validations.map((validation) => [
+        validation,
+      ]),
       [""],
       ["💡 DICA:"],
       ["   - Veja a planilha 'Exemplo' para referência de preenchimento"],
@@ -312,20 +290,53 @@ export abstract class BaseImportService {
       ],
     ];
 
-    return XLSX.utils.aoa_to_sheet(instructions);
+    return instructions;
   }
 
-  protected createTemplateSheet() {
-    const templateConfig = this.config.templateConfig;
-    return XLSX.utils.aoa_to_sheet([templateConfig.headers]);
-  }
+  protected abstract validateData(data: any[]): Promise<ValidationResult>;
+  protected abstract transformData(data: any[]): Promise<any[]>;
+  protected abstract saveToDatabase(data: any[]): Promise<ImportResult>;
 
-  protected createExampleSheet() {
-    const templateConfig = this.config.templateConfig;
-    return XLSX.utils.aoa_to_sheet([
-      templateConfig.headers,
-      ...templateConfig.exampleData,
-    ]);
+  // Método para salvar log de importação
+  protected async saveImportLog(
+    result: ImportResult,
+    fileName: string,
+    fileSize: number,
+  ): Promise<void> {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        console.warn("Usuário não autenticado, não foi possível salvar log");
+        return;
+      }
+
+      const importLog: Omit<ImportLog, "id"> = {
+        userId: user.uid,
+        userName: user.displayName || user.email || "Usuário",
+        entityType: this.config.entityType,
+        fileName,
+        fileSize,
+        totalRows: result.totalRows,
+        importedRows: result.importedRows,
+        failedRows: result.failedRows,
+        errors: result.errors,
+        warnings: result.warnings,
+        startTime: new Date(),
+        endTime: new Date(),
+        duration: result.duration,
+        status: result.success
+          ? "success"
+          : result.importedRows > 0
+            ? "partial"
+            : "failed",
+        ipAddress: "N/A", // Pode ser implementado se necessário
+        userAgent: navigator.userAgent,
+      };
+
+      await addDoc(collection(db, "import_logs"), importLog);
+    } catch (error) {
+      console.error("Erro ao salvar log de importação:", error);
+    }
   }
 
   protected getEntityDisplayName(): string {
@@ -340,58 +351,27 @@ export abstract class BaseImportService {
     return entityNames[this.config.entityType] || this.config.entityType;
   }
 
-  protected abstract validateData(data: any[]): Promise<ValidationResult>;
-  protected abstract transformData(data: any[]): Promise<any[]>;
-  protected abstract saveToDatabase(data: any[]): Promise<ImportResult>;
+  protected detectEntityTypeFromHeaders(headers: any[]): string {
+    const headerText = headers.join(" ").toLowerCase();
 
-  // Método para salvar log de importação
-  protected async saveImportLog(
-    result: ImportResult,
-    fileName: string,
-    fileSize: number,
-  ): Promise<void> {
-    try {
-      // Obter usuário atual
-      const currentUser = auth.currentUser;
-      const userName =
-        currentUser?.displayName || currentUser?.email || "Usuário";
-      const userId = currentUser?.uid || "unknown";
-
-      const importLog: Omit<ImportLog, "id"> = {
-        userId,
-        userName,
-        entityType: this.config.entityType,
-        fileName,
-        fileSize,
-        totalRows: result.totalRows,
-        importedRows: result.importedRows,
-        failedRows: result.failedRows,
-        errors: result.errors || [],
-        warnings: result.warnings || [],
-        startTime: new Date(),
-        endTime: new Date(),
-        duration: result.duration,
-        status:
-          result.failedRows === 0
-            ? "success"
-            : result.importedRows > 0
-              ? "partial"
-              : "failed",
-        ipAddress: "client-ip", // Implementar captura de IP
-        userAgent: navigator.userAgent,
-      };
-
-      // Verificar se todos os campos obrigatórios estão definidos
-      const sanitizedLog = Object.fromEntries(
-        Object.entries(importLog).filter(
-          ([_, value]) => value !== undefined && value !== null,
-        ),
-      );
-
-      await addDoc(collection(db, "import_logs"), sanitizedLog);
-    } catch (error) {
-      // Não falhar a importação se o log falhar
+    if (headerText.includes("nome") && headerText.includes("cpf")) {
+      return "Funcionários";
+    } else if (headerText.includes("placa") && headerText.includes("marca")) {
+      return "Veículos";
+    } else if (headerText.includes("cidade") && headerText.includes("estado")) {
+      return "Cidades";
+    } else if (
+      headerText.includes("vendedor") ||
+      headerText.includes("região")
+    ) {
+      return "Vendedores";
+    } else if (headerText.includes("rota") || headerText.includes("origem")) {
+      return "Rotas";
+    } else if (headerText.includes("folga") || headerText.includes("data")) {
+      return "Folgas";
     }
+
+    return "Desconhecido";
   }
 }
 
@@ -433,23 +413,26 @@ export async function getLastImportInfo(
     return null;
   }
 }
-
 // Função para obter o serviço de importação específico
-export function getImportService(entityType: string): BaseImportService {
+export async function getImportService(
+  entityType: string,
+): Promise<BaseImportService> {
   switch (entityType) {
     case "cidades":
-      const { CidadesImportService } = require("./cidadesImportService");
+      const { CidadesImportService } = await import("./cidadesImportService");
       return new CidadesImportService();
     case "vendedores":
-      const { VendedoresImportService } = require("./vendedoresImportService");
+      const { VendedoresImportService } = await import(
+        "./vendedoresImportService"
+      );
       return new VendedoresImportService();
     case "veiculos":
-      const { VeiculosImportService } = require("./veiculosImportService");
+      const { VeiculosImportService } = await import("./veiculosImportService");
       return new VeiculosImportService();
     case "funcionarios":
-      const {
-        FuncionariosImportService,
-      } = require("./funcionariosImportService");
+      const { FuncionariosImportService } = await import(
+        "./funcionariosImportService"
+      );
       return new FuncionariosImportService();
     // Adicionar outros serviços conforme implementados
     default:

@@ -83,6 +83,29 @@ export const relatoriosService = {
     }
   },
 
+  // Buscar dados de todos os funcionários
+  async buscarFuncionarios(periodo?: string): Promise<MotoristaData[]> {
+    try {
+      const funcionariosSnapshot = await getDocs(
+        collection(db, "funcionarios"),
+      );
+      let funcionarios = funcionariosSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as any[];
+
+      // Aplicar filtro por período se especificado
+      if (periodo) {
+        funcionarios = this.filtrarPorPeriodo(funcionarios, periodo);
+      }
+
+      return funcionarios;
+    } catch (error) {
+      console.error("Erro ao buscar funcionários:", error);
+      throw error;
+    }
+  },
+
   // Buscar dados dos veículos
   async buscarVeiculos(periodo?: string): Promise<VeiculoData[]> {
     try {
@@ -193,6 +216,44 @@ export const relatoriosService = {
     const statusCount = motoristas.reduce(
       (acc, motorista) => {
         const status = motorista.status || "disponivel";
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    const statusData = [
+      {
+        name: "Trabalhando",
+        value: statusCount.trabalhando || 0,
+        color: "#10B981",
+      },
+      {
+        name: "Disponível",
+        value: statusCount.disponivel || 0,
+        color: "#3B82F6",
+      },
+      {
+        name: "Folga",
+        value: statusCount.folga || 0,
+        color: "#F59E0B",
+      },
+      {
+        name: "Férias",
+        value: statusCount.ferias || 0,
+        color: "#EF4444",
+      },
+    ];
+
+    // Filtrar apenas valores maiores que 0
+    return statusData.filter((status) => status.value > 0);
+  },
+
+  // Processar dados de todos os funcionários para relatório
+  processarDadosFuncionarios(funcionarios: MotoristaData[]): RelatorioData[] {
+    const statusCount = funcionarios.reduce(
+      (acc, funcionario) => {
+        const status = funcionario.status || "disponivel";
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },

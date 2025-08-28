@@ -2,20 +2,24 @@
 
 ## 📋 Visão Geral
 
-O SGL é um sistema web completo desenvolvido em React com Firebase, projetado para gerenciar operações logísticas de empresas do setor de Frigorífico e Ovos. O sistema oferece uma interface moderna, responsiva e intuitiva para gestão de funcionários, veículos, rotas e folgas.
+O SGL é um sistema web completo desenvolvido em React com TypeScript e Firebase, projetado para gerenciar operações logísticas de empresas do setor de Frigorífico e Ovos. O sistema oferece uma interface moderna, responsiva e intuitiva para gestão de funcionários, veículos, rotas e folgas.
 
 ## 🏗️ Arquitetura
 
 ### Frontend
 
 - **Framework**: React 18 com Hooks
+- **Linguagem**: TypeScript
+- **Build Tool**: Vite
 - **Roteamento**: React Router v6
 - **Estilização**: Tailwind CSS
 - **Gerenciamento de Estado**: Context API + useState/useEffect
+- **UI Components**: Headless UI, Heroicons
 - **Gráficos**: Recharts
 - **Ícones**: Lucide React
 - **Notificações**: React Hot Toast
-- **Exportação**: XLSX, jsPDF, file-saver
+- **Exportação**: ExcelJS, jsPDF, file-saver
+- **Code Quality**: ESLint, Prettier
 
 ### Backend (Firebase)
 
@@ -32,509 +36,815 @@ O SGL é um sistema web completo desenvolvido em React com Firebase, projetado p
 
 #### users
 
-```javascript
-{
-  uid: "string",
-  email: "string",
-  displayName: "string",
-  role: "admin" | "gerente" | "dispatcher" | "user",
-  telefone: "string",
-  cargo: "string",
-  createdAt: Timestamp,
-  lastLogin: Timestamp
+```typescript
+interface User {
+  uid: string;
+  email: string;
+  displayName: string;
+  role: "admin" | "gerente" | "dispatcher" | "user";
+  telefone?: string;
+  cargo?: string;
+  createdAt: Timestamp;
+  lastLogin: Timestamp;
+  sessionInfo?: {
+    ip: string;
+    userAgent: string;
+    device: string;
+    browser: string;
+    os: string;
+  };
 }
 ```
 
 #### funcionarios
 
-```javascript
-{
-  nome: "string",
-  cpf: "string",
-  cnh: "string",
-  telefone: "string",
-  email: "string",
-  endereco: "string",
-  cidade: "string",
-  status: "trabalhando" | "disponivel" | "folga" | "ferias",
-  unidadeNegocio: "frigorifico" | "ovos",
-  dataAdmissao: "string",
-  salario: "number",
-  dataCriacao: Timestamp,
-  dataAtualizacao: Timestamp
+```typescript
+interface Funcionario {
+  id?: string;
+  nome: string;
+  cpf: string;
+  cnh?: string;
+  telefone: string;
+  email: string;
+  endereco: string;
+  cidade: string;
+  status: "trabalhando" | "disponivel" | "folga" | "ferias";
+  unidadeNegocio: "frigorifico" | "ovos";
+  dataAdmissao: string;
+  salario: number;
+  funcao: string;
+  dataCriacao: Timestamp;
+  dataAtualizacao: Timestamp;
 }
 ```
 
 #### veiculos
 
-```javascript
-{
-  placa: "string",
-  modelo: "string",
-  marca: "string",
-  ano: "number",
-  capacidade: "number",
-  status: "disponivel" | "em_uso" | "manutencao" | "inativo",
-  unidadeNegocio: "frigorifico" | "ovos",
-  ultimaManutencao: "string",
-  proximaManutencao: "string",
-  funcionario: "string",
-  dataCriacao: Timestamp,
-  dataAtualizacao: Timestamp
+```typescript
+interface Veiculo {
+  id?: string;
+  placa: string;
+  modelo: string;
+  marca: string;
+  ano: number;
+  capacidade: number;
+  status: "disponivel" | "em_uso" | "manutencao" | "inativo";
+  unidadeNegocio: "frigorifico" | "ovos";
+  ultimaManutencao?: string;
+  proximaManutencao?: string;
+  funcionario?: string;
+  dataCriacao: Timestamp;
+  dataAtualizacao: Timestamp;
 }
 ```
 
 #### rotas
 
-```javascript
-{
-  origem: "string",
-  destino: "string",
-  funcionario: "string",
-  veiculo: "string",
-  dataPartida: "string",
-  dataChegada: "string",
-  status: "agendada" | "em_andamento" | "concluida" | "cancelada",
-  unidadeNegocio: "frigorifico" | "ovos",
-  observacoes: "string",
-  dataCriacao: Timestamp,
-  dataAtualizacao: Timestamp
+```typescript
+interface Rota {
+  id?: string;
+  origem: string;
+  destino: string;
+  funcionario: string;
+  veiculo: string;
+  dataPartida: string;
+  dataChegada: string;
+  status: "agendada" | "em_andamento" | "concluida" | "cancelada";
+  unidadeNegocio: "frigorifico" | "ovos";
+  observacoes?: string;
+  dataCriacao: Timestamp;
+  dataAtualizacao: Timestamp;
 }
 ```
 
 #### folgas
 
-```javascript
-{
-  funcionario: "string",
-  dataInicio: "string",
-  dataFim: "string",
-  tipo: "folga" | "ferias" | "outro",
-  status: "pendente" | "aprovada" | "rejeitada",
-  motivo: "string",
-  observacoes: "string",
-  dataCriacao: Timestamp,
-  dataAtualizacao: Timestamp
+```typescript
+interface Folga {
+  id?: string;
+  funcionarioId: string;
+  funcionarioNome: string;
+  tipo: "folga" | "ferias" | "licenca";
+  dataInicio: string;
+  dataFim: string;
+  motivo: string;
+  status: "pendente" | "aprovada" | "rejeitada";
+  aprovadoPor?: string;
+  observacoes?: string;
+  dataCriacao: Timestamp;
+  dataAtualizacao: Timestamp;
 }
 ```
 
 #### cidades
 
-```javascript
-{
-  nome: "string",
-  estado: "string",
-  regiao: "string",
-  distancia: "number",
-  pesoMinimo: "number",
-  rota: "string",
-  observacao: "string",
-  dataCriacao: Timestamp,
-  dataAtualizacao: Timestamp
+```typescript
+interface Cidade {
+  id?: string;
+  nome: string;
+  estado: string;
+  regiao: string;
+  unidadeNegocio: "frigorifico" | "ovos";
+  dataCriacao: Timestamp;
+  dataAtualizacao: Timestamp;
 }
 ```
 
 #### vendedores
 
-```javascript
+```typescript
+interface Vendedor {
+  id?: string;
+  nome: string;
+  cpf: string;
+  telefone: string;
+  email: string;
+  regiao: string;
+  unidadeNegocio: "frigorifico" | "ovos";
+  dataAdmissao: string;
+  salario: number;
+  dataCriacao: Timestamp;
+  dataAtualizacao: Timestamp;
+}
+```
+
+#### notifications
+
+```typescript
+interface Notification {
+  id?: string;
+  userId: string;
+  type: "funcionario" | "rota" | "folga" | "veiculo";
+  title: string;
+  message: string;
+  read: boolean;
+  data?: any;
+  createdAt: Timestamp;
+}
+```
+
+## 🏗️ Estrutura do Projeto
+
+```
+src/
+├── components/          # Componentes React
+│   ├── auth/           # Autenticação
+│   │   ├── Login.tsx
+│   │   └── SignupModal.tsx
+│   ├── dashboard/      # Dashboard principal
+│   │   ├── Dashboard.tsx
+│   │   ├── data/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── layout/         # Layout e navegação
+│   │   ├── Layout.tsx
+│   │   ├── config/
+│   │   ├── state/
+│   │   └── ui/
+│   ├── funcionarios/   # Gestão de funcionários
+│   │   ├── data/
+│   │   ├── export/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── veiculos/       # Gestão de veículos
+│   │   ├── data/
+│   │   ├── export/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── rotas/          # Gestão de rotas
+│   │   ├── data/
+│   │   ├── export/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── folgas/         # Controle de folgas
+│   │   ├── data/
+│   │   ├── export/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── cidades/        # Cadastro de cidades
+│   │   ├── data/
+│   │   ├── export/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── vendedores/     # Gestão de vendedores
+│   │   ├── data/
+│   │   ├── export/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── relatorios/     # Sistema de relatórios
+│   │   ├── data/
+│   │   ├── export/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── configuracao/   # Configurações
+│   │   ├── config/
+│   │   ├── state/
+│   │   ├── ui/
+│   │   └── pages/
+│   ├── import/         # Sistema de importação
+│   │   ├── data/
+│   │   ├── types/
+│   │   └── ui/
+│   └── common/         # Componentes comuns
+│       ├── ErrorBoundary/
+│       ├── ErrorPages/
+│       ├── modals/
+│       └── NotificationBell.tsx
+├── contexts/           # Contextos React
+│   ├── AuthContext.tsx
+│   └── NotificationContext.tsx
+├── firebase/           # Configuração Firebase
+│   └── config.ts
+├── hooks/              # Custom hooks
+│   ├── useErrorHandler.ts
+│   └── useResizeObserver.ts
+├── services/           # Serviços
+│   ├── notificationService.ts
+│   └── sessionService.ts
+├── types/              # Tipos TypeScript
+│   └── index.ts
+├── utils/              # Utilitários
+│   ├── constants.ts
+│   ├── masks.ts
+│   └── resizeObserverFix.ts
+├── index.css           # Estilos globais
+├── index.tsx           # Ponto de entrada
+└── App.tsx             # Componente principal
+```
+
+## 🔧 Configuração do Build
+
+### Vite Configuration
+
+```typescript
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3000,
+    host: true,
+  },
+  build: {
+    outDir: "dist",
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+          ui: ["@headlessui/react", "@heroicons/react", "lucide-react"],
+        },
+      },
+    },
+  },
+});
+```
+
+### TypeScript Configuration
+
+```json
+// tsconfig.json
 {
-  nome: "string",
-  cpf: "string",
-  codigoVendSistema: "string",
-  email: "string",
-  telefone: "string",
-  estado: "string",
-  regiao: "string",
-  cidadesAtendidas: "string[]",
-  unidadeNegocio: "frigorifico" | "ovos",
-  tipoContrato: "string",
-  ativo: "boolean",
-  dataCriacao: Timestamp,
-  dataAtualizacao: Timestamp
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
 ```
 
-## 🆕 **Novas Funcionalidades Implementadas**
+## 🔐 Sistema de Segurança
 
-### 📊 **Sistema de Relatórios Avançado**
+### Regras do Firestore
 
-#### Arquitetura de Exportação
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Função para verificar se usuário está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
 
-```
-src/components/relatorios/export/
-├── BaseExportService.ts           # Classe base para exportação
-├── BaseTableExportService.ts      # Classe base para exportação de tabelas
-├── FuncionariosExportService.ts   # Serviço específico para funcionários
-├── VeiculosExportService.ts       # Serviço específico para veículos
-├── RotasExportService.ts          # Serviço específico para rotas
-├── FolgasExportService.ts         # Serviço específico para folgas
-├── CidadesExportService.ts        # Serviço específico para cidades
-├── VendedoresExportService.ts     # Serviço específico para vendedores
-└── index.ts                       # Factory e exportações
-```
+    // Função para verificar role do usuário
+    function hasRole(role) {
+      return isAuthenticated() &&
+             request.auth.token.role == role;
+    }
 
-#### Componentes de Interface
+    // Função para verificar se é admin
+    function isAdmin() {
+      return hasRole('admin');
+    }
 
-```
-src/components/relatorios/ui/
-├── ExportModal.tsx                # Modal para escolher formato
-├── RelatoriosDetalhados.tsx       # Seção de relatórios detalhados
-├── GraficoCard.tsx                # Componente de gráficos com exportação
-└── ...
-```
+    // Regras para usuários
+    match /users/{userId} {
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == userId || isAdmin());
+      allow write: if isAuthenticated() &&
+                      (request.auth.uid == userId || isAdmin());
+    }
 
-#### Serviços de Exportação
+    // Regras para funcionários
+    match /funcionarios/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasRole('gerente');
+    }
 
-**BaseExportService**: Classe abstrata que define a estrutura base para exportação
+    // Regras para veículos
+    match /veiculos/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasRole('gerente');
+    }
 
-```typescript
-abstract class BaseExportService {
-  protected abstract config: ExportConfig;
+    // Regras para rotas
+    match /rotas/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasRole('dispatcher');
+    }
 
-  async exportToPDF(
-    titulo: string,
-    dados: any[],
-    dadosProcessados: RelatorioData[],
-    periodo: string
-  ): Promise<void>;
-  async exportToCSV(
-    titulo: string,
-    dados: any[],
-    dadosProcessados: RelatorioData[],
-    periodo: string
-  ): Promise<void>;
-  protected formatValue(field: string, value: any): any;
-  protected getFilteredData(dados: any[]): any[];
-  protected getColumnHeaders(): string[];
-}
-```
+    // Regras para folgas
+    match /folgas/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+                      (request.auth.uid == resource.data.funcionarioId ||
+                       isAdmin() || hasRole('gerente'));
+    }
 
-**BaseTableExportService**: Classe base para exportação de dados tabulares
+    // Regras para cidades
+    match /cidades/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
 
-```typescript
-abstract class BaseTableExportService {
-  protected abstract config: TableExportConfig;
+    // Regras para vendedores
+    match /vendedores/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || hasRole('gerente');
+    }
 
-  async exportToExcel(
-    dados: any[],
-    filtros?: TableExportFilters
-  ): Promise<void>;
-  protected async formatValue(field: string, value: any): Promise<any>;
-  protected async getFilteredData(dados: any[]): Promise<any[]>;
-  protected getColumnHeaders(): string[];
-  protected generateFileName(): string;
-}
-```
-
-#### Factory Pattern
-
-```typescript
-export class ExportServiceFactory {
-  static createService(tipo: string): BaseExportService {
-    switch (tipo.toLowerCase()) {
-      case "funcionarios":
-      case "funcionarios_detalhado":
-        return new FuncionariosExportService();
-      case "veiculos":
-      case "veiculos_detalhado":
-        return new VeiculosExportService();
-      // ... outros casos
+    // Regras para notificações
+    match /notifications/{docId} {
+      allow read: if isAuthenticated() &&
+                     request.auth.uid == resource.data.userId;
+      allow write: if isAuthenticated() &&
+                      request.auth.uid == request.resource.data.userId;
     }
   }
 }
 ```
 
-### 🔧 **Melhorias Técnicas**
+## 🔔 Sistema de Notificações
 
-#### Formatação Brasileira
+### NotificationService
 
-- **Datas**: Formato DD/MM/YYYY
-- **CPF**: Formato 000.000.000-00
-- **Telefone**: Formato (73) 99999-9999
-- **Números**: Separador decimal vírgula
+```typescript
+// services/notificationService.ts
+export class NotificationService {
+  static async createNotification(
+    userId: string,
+    type: NotificationType,
+    title: string,
+    message: string,
+    data?: any
+  ): Promise<void> {
+    const notification: Notification = {
+      userId,
+      type,
+      title,
+      message,
+      read: false,
+      data,
+      createdAt: serverTimestamp(),
+    };
 
-#### Layout Minimalista
+    await addDoc(collection(db, "notifications"), notification);
+  }
 
-- **Cores**: Preto e branco
-- **Tipografia**: Fonte sans-serif
-- **Espaçamento**: Consistente
-- **Contraste**: Alto para melhor legibilidade
+  static async getUserNotifications(userId: string): Promise<Notification[]> {
+    const q = query(
+      collection(db, "notifications"),
+      where("userId", "==", userId),
+      orderBy("createdAt", "desc")
+    );
 
-#### Nomenclatura de Arquivos
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Notification[];
+  }
 
-- **Padrão**: `entity_dd-MM-YYYY.xlsx`
-- **Exemplos**:
-  - `funcionarios_16-01-2025.xlsx`
-  - `veiculos_16-01-2025.xlsx`
-  - `rotas_16-01-2025.xlsx`
-
-#### Tipos Separados
-
-Cada pacote possui seu próprio arquivo de tipos:
-
-```
-src/components/
-├── funcionarios/types.ts
-├── veiculos/types.ts
-├── rotas/types.ts
-├── folgas/types.ts
-├── cidades/types.ts
-├── vendedores/types.ts
-└── relatorios/types.ts
-```
-
-## 📁 **Estrutura de Componentes**
-
-### Módulo de Relatórios
-
-```
-src/components/relatorios/
-├── data/
-│   └── relatoriosService.ts        # Serviços de dados
-├── export/                         # 🆕 Sistema de exportação
-│   ├── BaseExportService.ts
-│   ├── BaseTableExportService.ts
-│   ├── FuncionariosExportService.ts
-│   ├── VeiculosExportService.ts
-│   ├── RotasExportService.ts
-│   ├── FolgasExportService.ts
-│   ├── CidadesExportService.ts
-│   ├── VendedoresExportService.ts
-│   └── index.ts
-├── state/
-│   └── useRelatorios.ts            # Hook para gerenciar estado
-├── ui/
-│   ├── RelatorioHeader.tsx         # Cabeçalho dos relatórios
-│   ├── ResumoCards.tsx             # Cards de resumo estatístico
-│   ├── GraficoCard.tsx             # Componente de gráficos
-│   ├── RelatoriosDetalhados.tsx    # 🆕 Relatórios detalhados
-│   └── ExportModal.tsx             # 🆕 Modal de exportação
-├── pages/
-│   └── RelatoriosPage.tsx          # Página principal
-├── types.ts                        # Definições de tipos
-├── Relatorios.tsx                  # Componente principal
-├── index.ts                        # Exportações do pacote
-├── index.tsx                       # Ponto de entrada
-└── README.md                       # Documentação
-```
-
-### Módulo Common
-
-```
-src/components/common/
-├── modals/
-│   ├── ConfirmationModal.tsx       # Modal de confirmação
-│   ├── TableExportModal.tsx        # 🆕 Modal de exportação de tabelas
-│   ├── ConfirmationModalConfig.ts
-│   ├── ConfirmationModalTypes.ts
-│   └── index.ts
-├── ErrorBoundary/
-├── ErrorPages/
-└── index.ts
-```
-
-## 🔧 **Configurações Técnicas**
-
-### Dependências Adicionadas
-
-```json
-{
-  "dependencies": {
-    "xlsx": "^0.18.5", // Exportação Excel
-    "jspdf": "^3.0.1", // Geração de PDF
-    "jspdf-autotable": "^5.0.2", // Tabelas em PDF
-    "file-saver": "^2.0.5" // Download de arquivos
+  static async markAsRead(notificationId: string): Promise<void> {
+    await updateDoc(doc(db, "notifications", notificationId), {
+      read: true,
+    });
   }
 }
 ```
 
-### Configurações de Exportação
+## 📊 Sistema de Relatórios
 
-#### Excel (XLSX)
-
-- **Formato**: XLSX (Excel 2007+)
-- **Encoding**: UTF-8
-- **Headers**: Personalizados por entidade
-- **Formatação**: Datas brasileiras, números formatados
-- **Estilo**: Layout minimalista (preto e branco)
-
-#### PDF
-
-- **Formato**: A4
-- **Orientação**: Portrait
-- **Margens**: 20mm
-- **Fonte**: Arial, 10pt
-- **Cores**: Preto e branco
-- **Headers**: Título, subtítulo, data de geração
-
-### Configurações de Formatação
-
-#### Datas
+### Arquitetura de Exportação
 
 ```typescript
-// Formatação brasileira
-const formatDate = (date: Date | string): string => {
-  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    const [year, month, day] = date.split("-");
-    return `${day}/${month}/${year}`;
+// Base Export Service
+export abstract class BaseExportService {
+  protected abstract getData(): Promise<any[]>;
+  protected abstract getHeaders(): string[];
+  protected abstract getFileName(): string;
+
+  async exportToExcel(): Promise<void> {
+    const data = await this.getData();
+    const headers = this.getHeaders();
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Relatório");
+
+    // Adicionar cabeçalhos
+    worksheet.addRow(headers);
+
+    // Adicionar dados
+    data.forEach((row) => {
+      worksheet.addRow(Object.values(row));
+    });
+
+    // Formatação
+    this.formatWorksheet(worksheet);
+
+    // Download
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), `${this.getFileName()}.xlsx`);
   }
-  if (date instanceof Date) {
-    return date.toLocaleDateString("pt-BR");
+
+  async exportToPDF(): Promise<void> {
+    const data = await this.getData();
+    const headers = this.getHeaders();
+
+    const doc = new jsPDF();
+
+    // Adicionar título
+    doc.setFontSize(16);
+    doc.text(this.getFileName(), 14, 20);
+
+    // Adicionar tabela
+    autoTable(doc, {
+      head: [headers],
+      body: data.map((row) => Object.values(row)),
+      startY: 30,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+      },
+    });
+
+    // Download
+    doc.save(`${this.getFileName()}.pdf`);
   }
-  return date.toString();
-};
+
+  private formatWorksheet(worksheet: ExcelJS.Worksheet): void {
+    // Formatação brasileira
+    worksheet.getColumn(1).width = 15;
+    worksheet.getColumn(2).width = 20;
+
+    // Estilo do cabeçalho
+    const headerRow = worksheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFE0E0E0" },
+    };
+  }
+}
 ```
 
-#### CPF
+### Serviços Especializados
 
 ```typescript
-const formatCPF = (cpf: string): string => {
-  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-};
+// FuncionariosExportService
+export class FuncionariosExportService extends BaseExportService {
+  protected async getData(): Promise<any[]> {
+    const snapshot = await getDocs(collection(db, "funcionarios"));
+    return snapshot.docs.map((doc) => ({
+      Nome: doc.data().nome,
+      CPF: doc.data().cpf,
+      Telefone: doc.data().telefone,
+      Email: doc.data().email,
+      Cidade: doc.data().cidade,
+      Status: doc.data().status,
+      "Data Admissão": doc.data().dataAdmissao,
+      Salário: `R$ ${doc.data().salario.toFixed(2)}`,
+      Função: doc.data().funcao,
+    }));
+  }
+
+  protected getHeaders(): string[] {
+    return [
+      "Nome",
+      "CPF",
+      "Telefone",
+      "Email",
+      "Cidade",
+      "Status",
+      "Data Admissão",
+      "Salário",
+      "Função",
+    ];
+  }
+
+  protected getFileName(): string {
+    const date = new Date().toLocaleDateString("pt-BR").replace(/\//g, "-");
+    return `funcionarios_${date}`;
+  }
+}
 ```
 
-#### Telefone
+## 🔄 Gerenciamento de Estado
+
+### Context API
 
 ```typescript
-const formatPhone = (phone: string): string => {
-  return phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+// contexts/AuthContext.tsx
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Buscar dados adicionais do usuário
+        getUserData(user.uid).then(setUser);
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 ```
 
-## 🚀 **Fluxo de Exportação**
+## 🎨 Sistema de Design
 
-### 1. Usuário Solicita Exportação
+### Tailwind CSS Configuration
 
-1. Usuário clica no botão de exportação
-2. Modal de exportação é exibido
-3. Usuário escolhe o formato (Excel ou PDF)
-4. Sistema inicia o processo de exportação
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#f8fafc',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+        },
+        gray: {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
+}
+```
 
-### 2. Processamento dos Dados
+## 🚀 Deploy e Infraestrutura
 
-1. Sistema busca os dados do Firestore
-2. Aplica filtros se necessário
-3. Formata os dados conforme configuração
-4. Gera cabeçalhos e estrutura
+### Firebase Configuration
 
-### 3. Geração do Arquivo
+```typescript
+// firebase/config.ts
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
-#### Para Excel:
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+};
 
-1. Cria workbook com XLSX
-2. Adiciona worksheet com dados
-3. Aplica formatação
-4. Gera arquivo .xlsx
+const app = initializeApp(firebaseConfig);
 
-#### Para PDF:
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
 
-1. Cria documento com jsPDF
-2. Adiciona cabeçalho com título
-3. Gera tabela com jsPDF-AutoTable
-4. Adiciona rodapé com informações
-5. Gera arquivo .pdf
+export default app;
+```
 
-### 4. Download
+### Firebase Hosting Configuration
 
-1. Sistema gera blob do arquivo
-2. Usa file-saver para download
-3. Arquivo é salvo automaticamente
-4. Notificação de sucesso é exibida
+```json
+// firebase.json
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
+```
 
-## 📊 **Tipos de Relatórios**
+## 📱 Responsividade
 
-### Relatórios de Status
+### Breakpoints
 
-- **Status dos Funcionários**: Distribuição por status
-- **Status dos Veículos**: Distribuição por status
-- **Status das Rotas**: Distribuição por status
-- **Status das Folgas**: Distribuição por status
+```css
+/* Tailwind CSS Breakpoints */
+sm: 640px   /* Small devices */
+md: 768px   /* Medium devices */
+lg: 1024px  /* Large devices */
+xl: 1280px  /* Extra large devices */
+2xl: 1536px /* 2X large devices */
+```
 
-### Relatórios Detalhados
+### Componentes Responsivos
 
-- **Funcionários Detalhado**: Lista completa com todos os dados
-- **Veículos Detalhado**: Lista completa com dados técnicos
-- **Rotas Detalhado**: Lista completa com informações de rota
-- **Folgas Detalhado**: Lista completa com solicitações
-- **Cidades Detalhado**: Lista completa com dados geográficos
-- **Vendedores Detalhado**: Lista completa com dados comerciais
+```typescript
+// Exemplo de componente responsivo
+const ResponsiveTable: React.FC = () => {
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        {/* Conteúdo da tabela */}
+      </table>
+    </div>
+  );
+};
+```
 
-## 🔒 **Segurança e Validação**
+## 🔧 Performance
 
-### Validação de Dados
+### Code Splitting
 
-- **Campos obrigatórios**: Validação antes da exportação
-- **Formato de dados**: Validação de tipos e formatos
-- **Sanitização**: Remoção de caracteres especiais
-- **Limites**: Controle de tamanho de arquivos
+```typescript
+// Lazy loading de componentes
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
+const Funcionarios = lazy(() => import('./components/funcionarios/Funcionarios'));
+const Veiculos = lazy(() => import('./components/veiculos/Veiculos'));
 
-### Validação de Formulários
+// Suspense wrapper
+<Suspense fallback={<LoadingSpinner />}>
+  <Dashboard />
+</Suspense>
+```
 
-O sistema implementa um padrão consistente de validação em todas as entidades:
+### Memoização
 
-#### **Padrão de Validação**
+```typescript
+// React.memo para componentes
+const FuncionarioCard = React.memo<FuncionarioCardProps>(({ funcionario }) => {
+  return (
+    <div className="bg-white p-4 rounded-lg shadow">
+      {/* Conteúdo do card */}
+    </div>
+  );
+});
 
-- **Hook-based**: Validação centralizada no hook de cada entidade
-- **Submit-only**: Validação apenas no momento do submit
-- **Visual feedback**: Bordas vermelhas e mensagens específicas
-- **Conditional**: Validação desabilitada para entidades inativas
+// useMemo para cálculos pesados
+const filteredFuncionarios = useMemo(() => {
+  return funcionarios.filter(f => f.status === 'disponivel');
+}, [funcionarios]);
+```
 
-#### **Entidades com Validação**
+## 🧪 Testes
 
-- **Cidades**: Unicidade nome+estado, normalização de acentos
-- **Vendedores**: CPF único, email único, formato de dados
-- **Funcionários**: CPF, CNH, celular, CEP obrigatórios
-- **Veículos**: Ano, capacidade, eixos, formato de placa
-- **Rotas**: Data futura, peso mínimo, dias da semana
-- **Folgas**: Datas válidas, funcionário, horas específicas
+### Estrutura de Testes
 
-#### **Feedback Visual**
+```
+src/
+├── __tests__/
+│   ├── components/
+│   │   ├── Dashboard.test.tsx
+│   │   ├── Funcionarios.test.tsx
+│   │   └── Veiculos.test.tsx
+│   ├── services/
+│   │   ├── notificationService.test.ts
+│   │   └── sessionService.test.ts
+│   └── utils/
+│       └── masks.test.ts
+```
 
-- **Asteriscos pretos**: Campos obrigatórios
-- **Bordas vermelhas**: Campos com erro
-- **Mensagens específicas**: Erro detalhado por campo
-- **Push de notificação**: Lista consolidada de erros
+### Exemplo de Teste
 
-### Permissões
+```typescript
+// __tests__/components/Dashboard.test.tsx
+import { render, screen } from '@testing-library/react';
+import { Dashboard } from '../Dashboard';
 
-- **Controle de acesso**: Verificação de permissões por relatório
-- **Auditoria**: Log de exportações realizadas
-- **Rate limiting**: Controle de frequência de exportações
+describe('Dashboard', () => {
+  it('should render dashboard with KPIs', () => {
+    render(<Dashboard />);
 
-## 🎯 **Performance**
-
-### Otimizações Implementadas
-
-- **Lazy loading**: Carregamento sob demanda
-- **Pagination**: Paginação de dados grandes
-- **Caching**: Cache de dados frequentemente acessados
-- **Compression**: Compressão de arquivos grandes
-
-### Métricas de Performance
-
-- **Tempo de geração**: < 5 segundos para arquivos pequenos
-- **Tamanho de arquivo**: Otimizado para download rápido
-- **Memória**: Uso eficiente de memória
-- **CPU**: Processamento otimizado
-
-## 🔄 **Manutenção e Evolução**
-
-### Estrutura Modular
-
-- **Serviços independentes**: Cada entidade tem seu serviço
-- **Configuração centralizada**: Configurações em arquivos separados
-- **Tipos TypeScript**: Tipagem forte para manutenibilidade
-- **Documentação**: Comentários e documentação inline
-
-### Extensibilidade
-
-- **Novos formatos**: Fácil adição de novos formatos
-- **Novas entidades**: Estrutura preparada para novas entidades
-- **Customização**: Configurações personalizáveis
-- **Plugins**: Arquitetura preparada para plugins
+    expect(screen.getByText('Total Funcionários')).toBeInTheDocument();
+    expect(screen.getByText('Total Veículos')).toBeInTheDocument();
+    expect(screen.getByText('Rotas Ativas')).toBeInTheDocument();
+  });
+});
+```
 
 ---
 
-**Última atualização:** Janeiro 2025  
-**Versão:** 1.1.0  
-**Status:** ✅ Sistema operacional com novas funcionalidades de exportação
+**📚 Esta documentação técnica fornece uma visão completa da arquitetura do SGL, incluindo todas as funcionalidades implementadas e as melhores práticas utilizadas no desenvolvimento.**

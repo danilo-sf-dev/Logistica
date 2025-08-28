@@ -3,7 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+import * as ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { formatCPF, formatCelular } from "../../../utils/masks";
 
@@ -344,15 +344,14 @@ export class VendedoresExportService extends BaseExportService {
   // Sobrescrever o método exportToExcel para usar as larguras específicas
   async exportToExcel(data: any, userInfo?: any): Promise<void> {
     try {
-      const wb = XLSX.utils.book_new();
+      const workbook = new ExcelJS.Workbook();
 
-      // Planilha 1: Cabeçalho minimalista
+      // Planilha 1: Cabeçalho
+      const headerSheet = workbook.addWorksheet("Cabeçalho");
       const headerData = [
         [`Relatório de ${this.config.titulo}`],
         ["Sistema de Gestão de Logística"],
-        [
-          `Período de Referência: ${this.formatPeriodo(this.config.titulo?.toLowerCase() || "")}`,
-        ],
+        [`Período de Referência: ${this.formatPeriodo(data.periodo)}`],
         [""],
         [`Gerado por: ${userInfo?.displayName || "Sistema"}`],
         [`Cargo: ${userInfo?.cargo || "N/A"}`],
@@ -360,35 +359,22 @@ export class VendedoresExportService extends BaseExportService {
         [""],
       ];
 
-      const wsHeader = XLSX.utils.aoa_to_sheet(headerData);
-      wsHeader["!cols"] = [{ width: 50 }];
+      headerData.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          const cellObj = headerSheet.getCell(rowIndex + 1, colIndex + 1);
+          cellObj.value = cell;
+          if (rowIndex === 0) {
+            cellObj.font = { bold: true, size: 12 };
+          } else if (rowIndex < 3) {
+            cellObj.font = { size: 10 };
+          } else {
+            cellObj.font = { size: 9 };
+          }
+        });
+      });
 
-      // Estilizar cabeçalho minimalista (preto e branco)
-      if (wsHeader["A1"]) {
-        wsHeader["A1"].s = {
-          font: { bold: true, size: 12, color: { rgb: "000000" } },
-        };
-        wsHeader["A2"].s = {
-          font: { size: 7, color: { rgb: "000000" } },
-        };
-        wsHeader["A3"].s = {
-          font: { size: 7, color: { rgb: "000000" } },
-        };
-        wsHeader["A5"].s = {
-          font: { size: 6, color: { rgb: "000000" } },
-        };
-        wsHeader["A6"].s = {
-          font: { size: 6, color: { rgb: "000000" } },
-        };
-        wsHeader["A7"].s = {
-          font: { size: 6, color: { rgb: "000000" } },
-        };
-      }
-
-      XLSX.utils.book_append_sheet(wb, wsHeader, "Cabeçalho");
-
-      // Planilha 2: Resumo estatístico
-      if (data.dadosProcessados && data.dadosProcessados.length > 0) {
+      // Planilha 2: Resumos por categoria
+      if (data.dadosProcessados.length > 0) {
         // Separar dados por categoria
         const dadosPorRegiao = data.dadosProcessados.filter((item: any) =>
           item.name.startsWith("Região:"),
@@ -400,129 +386,127 @@ export class VendedoresExportService extends BaseExportService {
           item.name.startsWith("Contrato:"),
         );
 
-        // Função para criar planilha de resumo por categoria
+        // Função para criar planilha de resumo
         const criarPlanilhaResumo = (titulo: string, dados: any[]) => {
+          const sheet = workbook.addWorksheet(titulo);
           const totalCategoria = dados.reduce(
             (sum: number, item: any) => sum + item.value,
             0,
           );
 
-          const resumoData = [
-            {
-              Categoria: "TOTAL",
-              Quantidade: totalCategoria,
-              Percentual: "100%",
-            },
-            ...dados.map((item: any) => {
-              const nomeLimpo = item.name.replace(
-                /^(Região|Unidade|Contrato):\s*/,
-                "",
-              );
-              return {
-                Categoria: nomeLimpo,
-                Quantidade: item.value,
-                Percentual:
-                  totalCategoria > 0
-                    ? `${((item.value / totalCategoria) * 100).toFixed(1)}%`
-                    : "0.0%",
-              };
-            }),
-          ];
+          sheet.getCell(1, 1).value = titulo;
+          sheet.getCell(1, 1).font = { bold: true, size: 12 };
 
-          const wsResumo = XLSX.utils.json_to_sheet(resumoData);
-          wsResumo["!cols"] = [{ width: 30 }, { width: 15 }, { width: 15 }];
+          sheet.getCell(3, 1).value = "Categoria";
+          sheet.getCell(3, 2).value = "Quantidade";
+          sheet.getCell(3, 3).value = "Percentual";
 
-          return { wsResumo };
+          [
+            sheet.getCell(3, 1),
+            sheet.getCell(3, 2),
+            sheet.getCell(3, 3),
+          ].forEach((cell) => {
+            cell.font = { bold: true, size: 10 };
+          });
+
+          dados.forEach((item: any, index: number) => {
+            const row = index + 4;
+            const nomeLimpo = item.name.replace(
+              /^(Região|Unidade|Contrato):\s*/,
+              "",
+            );
+            sheet.getCell(row, 1).value = nomeLimpo;
+            sheet.getCell(row, 2).value = item.value;
+            sheet.getCell(row, 3).value =
+              totalCategoria > 0
+                ? `${((item.value / totalCategoria) * 100).toFixed(1)}%`
+                : "0%";
+          });
+
+          return { sheet };
         };
 
-        // Criar planilhas separadas para cada categoria
         if (dadosPorRegiao.length > 0) {
-          const { wsResumo } = criarPlanilhaResumo(
-            "Distribuição por Região",
-            dadosPorRegiao,
-          );
-          XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo por Região");
+          criarPlanilhaResumo("Resumo por Região", dadosPorRegiao);
         }
 
         if (dadosPorUnidade.length > 0) {
-          const { wsResumo } = criarPlanilhaResumo(
-            "Distribuição por Unidade",
-            dadosPorUnidade,
-          );
-          XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo por Unidade");
+          criarPlanilhaResumo("Resumo por Unidade", dadosPorUnidade);
         }
 
         if (dadosPorContrato.length > 0) {
-          const { wsResumo } = criarPlanilhaResumo(
-            "Distribuição por Contrato",
-            dadosPorContrato,
-          );
-          XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo por Contrato");
+          criarPlanilhaResumo("Resumo por Contrato", dadosPorContrato);
         }
 
-        // Planilha de resumo geral
+        // Resumo Geral
         const total = data.dadosProcessados.reduce(
           (sum: number, item: any) => sum + item.value,
           0,
         );
 
-        const resumoGeralData = [
-          { Categoria: "TOTAL GERAL", Quantidade: total, Percentual: "100%" },
-          ...data.dadosProcessados.map((item: any) => ({
-            Categoria: item.name,
-            Quantidade: item.value,
-            Percentual:
-              total > 0
-                ? `${((item.value / total) * 100).toFixed(1)}%`
-                : "0.0%",
-          })),
-        ];
+        const resumoGeralSheet = workbook.addWorksheet("Resumo Geral");
+        resumoGeralSheet.getCell(1, 1).value = "RESUMO GERAL";
+        resumoGeralSheet.getCell(1, 1).font = { bold: true, size: 12 };
 
-        const wsResumoGeral = XLSX.utils.json_to_sheet(resumoGeralData);
-        wsResumoGeral["!cols"] = [{ width: 30 }, { width: 15 }, { width: 15 }];
+        resumoGeralSheet.getCell(3, 1).value = "Categoria";
+        resumoGeralSheet.getCell(3, 2).value = "Quantidade";
+        resumoGeralSheet.getCell(3, 3).value = "Percentual";
 
-        XLSX.utils.book_append_sheet(wb, wsResumoGeral, "Resumo Geral");
+        [
+          resumoGeralSheet.getCell(3, 1),
+          resumoGeralSheet.getCell(3, 2),
+          resumoGeralSheet.getCell(3, 3),
+        ].forEach((cell) => {
+          cell.font = { bold: true, size: 10 };
+        });
+
+        data.dadosProcessados.forEach((item: any, index: number) => {
+          const row = index + 4;
+          resumoGeralSheet.getCell(row, 1).value = item.name;
+          resumoGeralSheet.getCell(row, 2).value = item.value;
+          resumoGeralSheet.getCell(row, 3).value =
+            total > 0 ? `${((item.value / total) * 100).toFixed(1)}%` : "0%";
+        });
       }
 
       // Planilha 3: Dados detalhados
-      if (data.dados && data.dados.length > 0) {
+      if (data.dados.length > 0) {
+        const detalhadoSheet = workbook.addWorksheet("Dados Detalhados");
         const dadosFiltrados = await this.processDataWithCidades(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosParaExcel = dadosFiltrados.map((item) => {
-          const row: any = {};
-          this.config.campos.forEach((campo, index) => {
-            row[colunas[index]] = item[campo];
+        detalhadoSheet.getCell(1, 1).value = "DADOS DETALHADOS";
+        detalhadoSheet.getCell(1, 1).font = { bold: true, size: 12 };
+
+        // Cabeçalhos
+        colunas.forEach((coluna, index) => {
+          const cell = detalhadoSheet.getCell(3, index + 1);
+          cell.value = coluna;
+          cell.font = { bold: true, size: 10 };
+        });
+
+        // Dados
+        dadosFiltrados.forEach((item, rowIndex) => {
+          this.config.campos.forEach((campo, colIndex) => {
+            detalhadoSheet.getCell(rowIndex + 4, colIndex + 1).value =
+              item[campo] || "";
           });
-          return row;
         });
-
-        const wsDetalhado = XLSX.utils.json_to_sheet(dadosParaExcel);
-
-        // Definir larguras das colunas
-        wsDetalhado["!cols"] = this.config.campos.map((_, index) => {
-          const width = this.getColumnWidths()[index]?.cellWidth || 15;
-          return { width: width / 7 }; // Converter para unidades do Excel
-        });
-
-        XLSX.utils.book_append_sheet(wb, wsDetalhado, "Dados Detalhados");
       }
 
-      // Salvar Excel
-      const excelBuffer = XLSX.write(wb, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      const blob = new Blob([excelBuffer], {
+      // Gerar arquivo
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
+
       saveAs(
         blob,
         `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`,
       );
     } catch (error) {
-      console.error("Erro ao gerar Excel:", error);
-      throw error;
+      console.error("Erro ao exportar Excel:", error);
+      throw new Error("Erro ao exportar dados para Excel");
     }
   }
 }

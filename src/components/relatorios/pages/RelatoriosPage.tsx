@@ -14,6 +14,7 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
     loading,
     periodo,
     dadosMotoristas,
+    dadosFuncionarios,
     dadosVeiculos,
     dadosRotas,
     dadosFolgas,
@@ -41,13 +42,14 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
       {/* Cards de Resumo */}
       <ResumoCards
         dadosMotoristas={dadosMotoristas}
+        dadosFuncionarios={dadosFuncionarios}
         dadosVeiculos={dadosVeiculos}
         dadosRotas={dadosRotas}
         dadosFolgas={dadosFolgas}
       />
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-2">
         {/* Status dos Motoristas */}
         <GraficoCard
           config={{
@@ -56,7 +58,6 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
             dados: dadosMotoristas,
             altura: 256,
           }}
-          onDownload={handleDownload}
         />
 
         {/* Status dos Veículos */}
@@ -67,7 +68,6 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
             dados: dadosVeiculos,
             altura: 256,
           }}
-          onDownload={handleDownload}
         />
 
         {/* Status das Rotas - Gráfico de Barras Horizontais */}
@@ -79,7 +79,6 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
             altura: 256,
             cor: "#3B82F6",
           }}
-          onDownload={handleDownload}
         />
 
         {/* Status das Folgas - Gráfico de Barras Horizontais */}
@@ -91,7 +90,6 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
             altura: 256,
             cor: "#F59E0B",
           }}
-          onDownload={handleDownload}
         />
       </div>
 

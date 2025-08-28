@@ -1,8 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+
 import { saveAs } from "file-saver";
 import type { RelatorioData } from "../types";
+import ExcelJS from "exceljs";
 
 export interface ExportConfig {
   campos: string[];
@@ -345,9 +346,10 @@ export abstract class BaseExportService {
 
   async exportToExcel(data: ExportData, userInfo?: UserInfo): Promise<void> {
     try {
-      const wb = XLSX.utils.book_new();
+      const workbook = new ExcelJS.Workbook();
 
-      // Planilha 1: Cabeçalho minimalista
+      // Planilha 1: Cabeçalho
+      const headerSheet = workbook.addWorksheet("Cabeçalho");
       const headerData = [
         [`Relatório de ${this.config.titulo}`],
         ["Sistema de Gestão de Logística"],
@@ -359,132 +361,90 @@ export abstract class BaseExportService {
         [""],
       ];
 
-      const wsHeader = XLSX.utils.aoa_to_sheet(headerData);
-      wsHeader["!cols"] = [{ width: 50 }];
+      headerData.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          const cellObj = headerSheet.getCell(rowIndex + 1, colIndex + 1);
+          cellObj.value = cell;
+          if (rowIndex === 0) {
+            cellObj.font = { bold: true, size: 12 };
+          } else if (rowIndex < 3) {
+            cellObj.font = { size: 10 };
+          } else {
+            cellObj.font = { size: 9 };
+          }
+        });
+      });
 
-      // Estilizar cabeçalho minimalista (preto e branco)
-      if (wsHeader["A1"]) {
-        wsHeader["A1"].s = {
-          font: { bold: true, size: 12, color: { rgb: "000000" } },
-        };
-        wsHeader["A2"].s = {
-          font: { size: 7, color: { rgb: "000000" } },
-        };
-        wsHeader["A3"].s = {
-          font: { size: 7, color: { rgb: "000000" } },
-        };
-        wsHeader["A5"].s = {
-          font: { size: 6, color: { rgb: "000000" } },
-        };
-        wsHeader["A6"].s = {
-          font: { size: 6, color: { rgb: "000000" } },
-        };
-        wsHeader["A7"].s = {
-          font: { size: 6, color: { rgb: "000000" } },
-        };
-      }
-
-      XLSX.utils.book_append_sheet(wb, wsHeader, "Cabeçalho");
-
-      // Planilha 2: Resumo estatístico
+      // Planilha 2: Resumo
       if (data.dadosProcessados.length > 0) {
+        const resumoSheet = workbook.addWorksheet("Resumo");
         const total = data.dadosProcessados.reduce(
           (sum, d) => sum + d.value,
           0,
         );
-        const resumoData = [
-          ["RESUMO ESTATÍSTICO"],
-          [""],
-          ["Status", "Quantidade", "Percentual"],
-          ...data.dadosProcessados.map((item) => [
-            item.name,
-            item.value,
-            total > 0 ? `${((item.value / total) * 100).toFixed(1)}%` : "0%",
-          ]),
-        ];
 
-        const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
-        wsResumo["!cols"] = [{ width: 30 }, { width: 15 }, { width: 15 }];
+        resumoSheet.getCell(1, 1).value = "RESUMO ESTATÍSTICO";
+        resumoSheet.getCell(1, 1).font = { bold: true, size: 12 };
 
-        // Aplicar estilo minimalista ao cabeçalho
-        if (wsResumo["A1"]) {
-          wsResumo["A1"].s = {
-            font: { bold: true, size: 9, color: { rgb: "000000" } },
-          };
-          wsResumo["A3"].s = {
-            font: { bold: true, size: 6, color: { rgb: "000000" } },
-          };
-          wsResumo["B3"].s = {
-            font: { bold: true, size: 6, color: { rgb: "000000" } },
-          };
-          wsResumo["C3"].s = {
-            font: { bold: true, size: 6, color: { rgb: "000000" } },
-          };
-        }
+        resumoSheet.getCell(3, 1).value = "Status";
+        resumoSheet.getCell(3, 2).value = "Quantidade";
+        resumoSheet.getCell(3, 3).value = "Percentual";
 
-        XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo");
+        [
+          resumoSheet.getCell(3, 1),
+          resumoSheet.getCell(3, 2),
+          resumoSheet.getCell(3, 3),
+        ].forEach((cell) => {
+          cell.font = { bold: true, size: 10 };
+        });
+
+        data.dadosProcessados.forEach((item, index) => {
+          const row = index + 4;
+          resumoSheet.getCell(row, 1).value = item.name;
+          resumoSheet.getCell(row, 2).value = item.value;
+          resumoSheet.getCell(row, 3).value =
+            total > 0 ? `${((item.value / total) * 100).toFixed(1)}%` : "0%";
+        });
       }
 
       // Planilha 3: Dados detalhados
       if (data.dados.length > 0) {
+        const detalhadoSheet = workbook.addWorksheet("Dados Detalhados");
         const dadosFiltrados = this.getFilteredData(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosDetalhados = [
-          ["DADOS DETALHADOS"],
-          [""],
-          colunas,
-          ...dadosFiltrados.map((item) =>
-            this.config.campos.map((campo) => item[campo] || ""),
-          ),
-        ];
+        detalhadoSheet.getCell(1, 1).value = "DADOS DETALHADOS";
+        detalhadoSheet.getCell(1, 1).font = { bold: true, size: 12 };
 
-        const wsDetalhado = XLSX.utils.aoa_to_sheet(dadosDetalhados);
-        wsDetalhado["!cols"] = this.config.campos.map((campo) => {
-          // Largura específica para o nome do funcionário
-          if (campo === "funcionarioNome") {
-            return { width: 45 };
-          }
-          // Largura padrão para outros campos
-          return { width: 15 };
+        // Cabeçalhos
+        colunas.forEach((coluna, index) => {
+          const cell = detalhadoSheet.getCell(3, index + 1);
+          cell.value = coluna;
+          cell.font = { bold: true, size: 10 };
         });
 
-        // Aplicar estilo minimalista ao cabeçalho da planilha detalhada
-        if (wsDetalhado["A1"]) {
-          wsDetalhado["A1"].s = {
-            font: { bold: true, size: 9, color: { rgb: "000000" } },
-          };
-        }
-
-        // Estilizar cabeçalhos das colunas
-        this.config.campos.forEach((_, index) => {
-          const cellRef = XLSX.utils.encode_cell({ r: 2, c: index });
-          if (wsDetalhado[cellRef]) {
-            wsDetalhado[cellRef].s = {
-              font: { bold: true, size: 6, color: { rgb: "000000" } },
-            };
-          }
+        // Dados
+        dadosFiltrados.forEach((item, rowIndex) => {
+          this.config.campos.forEach((campo, colIndex) => {
+            detalhadoSheet.getCell(rowIndex + 4, colIndex + 1).value =
+              item[campo] || "";
+          });
         });
-
-        XLSX.utils.book_append_sheet(wb, wsDetalhado, "Dados Detalhados");
       }
 
-      // Salvar arquivo
-      const excelBuffer = XLSX.write(wb, {
-        bookType: "xlsx",
-        type: "array",
-        bookSST: false,
-        compression: true,
-      });
-      const blob = new Blob([excelBuffer], {
+      // Gerar arquivo
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
 
-      const fileName = `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`;
-      saveAs(blob, fileName);
+      saveAs(
+        blob,
+        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
     } catch (error) {
-      console.error("Erro ao gerar Excel:", error);
-      throw error;
+      console.error("Erro ao exportar Excel:", error);
+      throw new Error("Erro ao exportar dados para Excel");
     }
   }
 
