@@ -6,6 +6,7 @@ import autoTable from "jspdf-autotable";
 import * as ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { formatCPF, formatCelular } from "../../../utils/masks";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 export class VendedoresExportService extends BaseExportService {
   protected config: ExportConfig = {
@@ -23,24 +24,33 @@ export class VendedoresExportService extends BaseExportService {
       "ativo",
     ],
     formatacao: {
-      nome: (valor) => (valor ? valor.toUpperCase() : "N/A"),
-      cpf: (valor) => (valor ? formatCPF(valor) : "N/A"),
-      celular: (valor) => (valor ? formatCelular(valor) : "N/A"),
-      email: (valor) => (valor ? valor.toLowerCase() : "N/A"),
+      nome: (valor) => {
+        if (!valor || valor === "") return "N/A";
+        return valor.toUpperCase().trim();
+      },
+      cpf: (valor) => {
+        if (!valor || valor === "") return "N/A";
+        return formatCPF(valor);
+      },
+      celular: (valor) => {
+        if (!valor || valor === "") return "N/A";
+        return formatCelular(valor);
+      },
+      email: (valor) => {
+        if (!valor || valor === "") return "N/A";
+        return valor.toLowerCase().trim();
+      },
       regiao: (valor) => {
         if (!valor) return "N/A";
-        const regiaoMap: Record<string, string> = {
-          norte: "Norte",
-          nordeste: "Nordeste",
-          "centro-oeste": "Centro-Oeste",
-          sudeste: "Sudeste",
-          sul: "Sul",
-        };
-        return regiaoMap[valor] || valor;
+        const regiaoNome = REGIOES_BRASIL.find((r) => r.valor === valor)?.nome;
+        return regiaoNome || valor.toUpperCase();
       },
-      codigoVendSistema: (valor) => (valor ? valor : "N/A"),
+      codigoVendSistema: (valor) => {
+        if (!valor || valor === "") return "N/A";
+        return valor.toString();
+      },
       unidadeNegocio: (valor) => {
-        if (!valor) return "N/A";
+        if (!valor || valor === "") return "N/A";
         const unidadeMap: Record<string, string> = {
           frigorifico: "Frigorífico",
           ovos: "Ovos",
@@ -49,7 +59,7 @@ export class VendedoresExportService extends BaseExportService {
         return unidadeMap[valor] || valor;
       },
       tipoContrato: (valor) => {
-        if (!valor) return "N/A";
+        if (!valor || valor === "") return "N/A";
         const contratoMap: Record<string, string> = {
           clt: "CLT",
           pj: "PJ",
@@ -59,14 +69,15 @@ export class VendedoresExportService extends BaseExportService {
         return contratoMap[valor] || valor;
       },
       cidadesAtendidas: (valor) => {
-        if (!valor) return "N/A";
-        if (Array.isArray(valor)) {
-          return valor.join(", ");
+        if (!valor || !Array.isArray(valor) || valor.length === 0) {
+          return "Nenhuma cidade";
         }
-        return valor;
+        return valor.join(", ");
       },
       ativo: (valor) => {
-        return valor ? "Ativo" : "Inativo";
+        if (valor === true) return "Ativo";
+        if (valor === false) return "Inativo";
+        return "N/A";
       },
     },
     ordenacao: ["nome", "regiao", "unidadeNegocio"],
@@ -127,6 +138,8 @@ export class VendedoresExportService extends BaseExportService {
     const cidades = cidadesSnapshot.docs.map((doc) => ({
       id: doc.id,
       nome: doc.data().nome,
+      estado: doc.data().estado,
+      regiao: doc.data().regiao,
     }));
 
     return dados.map((item) => {
@@ -139,7 +152,15 @@ export class VendedoresExportService extends BaseExportService {
             const nomesCidades = item.cidadesAtendidas.map(
               (cidadeId: string) => {
                 const cidade = cidades.find((c) => c.id === cidadeId);
-                return cidade ? cidade.nome : "Cidade não encontrada";
+                if (!cidade) return "Cidade não encontrada";
+
+                const regiaoNome = cidade.regiao
+                  ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)?.nome
+                  : null;
+
+                return regiaoNome
+                  ? `${cidade.nome} - ${cidade.estado} (${regiaoNome})`
+                  : `${cidade.nome} - ${cidade.estado}`;
               },
             );
             processedItem[campo] = nomesCidades.join(", ");
@@ -415,7 +436,35 @@ export class VendedoresExportService extends BaseExportService {
               /^(Região|Unidade|Contrato):\s*/,
               "",
             );
-            sheet.getCell(row, 1).value = nomeLimpo;
+
+            // Formatar o nome da categoria adequadamente
+            let nomeFormatado = nomeLimpo;
+            if (item.name.startsWith("Região:")) {
+              // Usar a constante REGIOES_BRASIL para formatar regiões
+              const regiaoNome = REGIOES_BRASIL.find(
+                (r) => r.valor === nomeLimpo,
+              )?.nome;
+              nomeFormatado = regiaoNome || nomeLimpo.toUpperCase();
+            } else if (item.name.startsWith("Unidade:")) {
+              // Formatar unidades de negócio
+              const unidadeMap: Record<string, string> = {
+                frigorifico: "Frigorífico",
+                ovos: "Ovos",
+                ambos: "Ambos",
+              };
+              nomeFormatado = unidadeMap[nomeLimpo] || nomeLimpo;
+            } else if (item.name.startsWith("Contrato:")) {
+              // Formatar tipos de contrato
+              const contratoMap: Record<string, string> = {
+                clt: "CLT",
+                pj: "PJ",
+                autonomo: "Autônomo",
+                outro: "Outro",
+              };
+              nomeFormatado = contratoMap[nomeLimpo] || nomeLimpo;
+            }
+
+            sheet.getCell(row, 1).value = nomeFormatado;
             sheet.getCell(row, 2).value = item.value;
             sheet.getCell(row, 3).value =
               totalCategoria > 0
@@ -462,7 +511,35 @@ export class VendedoresExportService extends BaseExportService {
 
         data.dadosProcessados.forEach((item: any, index: number) => {
           const row = index + 4;
-          resumoGeralSheet.getCell(row, 1).value = item.name;
+
+          // Formatar o nome da categoria adequadamente
+          let nomeFormatado = item.name;
+          if (item.name.startsWith("Região:")) {
+            const nomeLimpo = item.name.replace(/^Região:\s*/, "");
+            const regiaoNome = REGIOES_BRASIL.find(
+              (r) => r.valor === nomeLimpo,
+            )?.nome;
+            nomeFormatado = `Região: ${regiaoNome || nomeLimpo.toUpperCase()}`;
+          } else if (item.name.startsWith("Unidade:")) {
+            const nomeLimpo = item.name.replace(/^Unidade:\s*/, "");
+            const unidadeMap: Record<string, string> = {
+              frigorifico: "Frigorífico",
+              ovos: "Ovos",
+              ambos: "Ambos",
+            };
+            nomeFormatado = `Unidade: ${unidadeMap[nomeLimpo] || nomeLimpo}`;
+          } else if (item.name.startsWith("Contrato:")) {
+            const nomeLimpo = item.name.replace(/^Contrato:\s*/, "");
+            const contratoMap: Record<string, string> = {
+              clt: "CLT",
+              pj: "PJ",
+              autonomo: "Autônomo",
+              outro: "Outro",
+            };
+            nomeFormatado = `Contrato: ${contratoMap[nomeLimpo] || nomeLimpo}`;
+          }
+
+          resumoGeralSheet.getCell(row, 1).value = nomeFormatado;
           resumoGeralSheet.getCell(row, 2).value = item.value;
           resumoGeralSheet.getCell(row, 3).value =
             total > 0 ? `${((item.value / total) * 100).toFixed(1)}%` : "0%";

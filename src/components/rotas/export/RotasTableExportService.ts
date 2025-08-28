@@ -3,6 +3,7 @@ import {
   type TableExportConfig,
 } from "../../relatorios/export/BaseTableExportService";
 import { cidadesService } from "../../cidades/data/cidadesService";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 export class RotasTableExportService extends BaseTableExportService {
   protected config: TableExportConfig = {
@@ -58,7 +59,15 @@ export class RotasTableExportService extends BaseTableExportService {
           const todasCidades = await cidadesService.listar();
           const nomesCidades = valor.map((id) => {
             const cidade = todasCidades.find((c) => c.id === id);
-            return cidade ? cidade.nome : id; // Se não encontrar, retorna o ID
+            if (!cidade) return id; // Se não encontrar, retorna o ID
+
+            const regiaoNome = cidade.regiao
+              ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)?.nome
+              : null;
+
+            return regiaoNome
+              ? `${cidade.nome} - ${cidade.estado} (${regiaoNome})`
+              : `${cidade.nome} - ${cidade.estado}`;
           });
 
           return nomesCidades.join(", ");

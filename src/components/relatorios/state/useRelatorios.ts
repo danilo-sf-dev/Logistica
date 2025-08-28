@@ -259,11 +259,11 @@ export const useRelatorios = () => {
 
             // Definir todas as regiões do Brasil
             const todasRegioesVendedores = [
-              "norte",
-              "nordeste",
-              "centro-oeste",
-              "sudeste",
-              "sul",
+              "NORTE",
+              "NORDESTE",
+              "CENTRO-OESTE",
+              "SUDESTE",
+              "SUL",
             ];
 
             // Adicionar todas as regiões, mesmo as que não têm vendedores

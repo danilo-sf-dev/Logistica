@@ -1,6 +1,7 @@
 import React from "react";
 import ConfirmationModal from "components/common/modals/ConfirmationModal";
 import type { Cidade } from "../types";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 interface Props {
   aberto: boolean;
@@ -25,7 +26,13 @@ const ModalConfirmacaoExclusaoGenerico: React.FC<Props> = ({
       details={[
         { label: "Cidade", value: cidade.nome },
         { label: "Estado", value: cidade.estado },
-        { label: "Região", value: cidade.regiao },
+        {
+          label: "Região",
+          value: cidade.regiao
+            ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)?.nome ||
+              cidade.regiao
+            : "Não definida",
+        },
       ]}
       warning="Esta ação não pode ser revertida. Todos os vínculos serão perdidos e será necessário criar uma cidade novamente para ter vínculos novamente."
       primaryAction={{

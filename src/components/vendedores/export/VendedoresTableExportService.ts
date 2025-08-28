@@ -4,6 +4,7 @@ import {
 } from "../../relatorios/export/BaseTableExportService";
 import { formatCPF, formatCelular } from "../../../utils/masks";
 import { cidadesService } from "../../cidades/data/cidadesService";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 export class VendedoresTableExportService extends BaseTableExportService {
   protected config: TableExportConfig = {
@@ -29,7 +30,7 @@ export class VendedoresTableExportService extends BaseTableExportService {
       regiao: (valor) => (valor ? valor.toUpperCase() : "N/A"),
       codigoVendSistema: (valor) => (valor ? valor : "N/A"),
       unidadeNegocio: (valor) => {
-        if (!valor) return "N/A";
+        if (!valor || valor === "") return "N/A";
         const unidadeMap: Record<string, string> = {
           frigorifico: "Frigorífico",
           ovos: "Ovos",
@@ -38,7 +39,7 @@ export class VendedoresTableExportService extends BaseTableExportService {
         return unidadeMap[valor] || valor;
       },
       tipoContrato: (valor) => {
-        if (!valor) return "N/A";
+        if (!valor || valor === "") return "N/A";
         const contratoMap: Record<string, string> = {
           clt: "CLT",
           pj: "PJ",
@@ -62,7 +63,15 @@ export class VendedoresTableExportService extends BaseTableExportService {
           const todasCidades = await cidadesService.listar();
           const nomesCidades = valor.map((id) => {
             const cidade = todasCidades.find((c) => c.id === id);
-            return cidade ? cidade.nome : id; // Se não encontrar, retorna o ID
+            if (!cidade) return id; // Se não encontrar, retorna o ID
+
+            const regiaoNome = cidade.regiao
+              ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)?.nome
+              : null;
+
+            return regiaoNome
+              ? `${cidade.nome} - ${cidade.estado} (${regiaoNome})`
+              : `${cidade.nome} - ${cidade.estado}`;
           });
 
           return nomesCidades.join(", ");

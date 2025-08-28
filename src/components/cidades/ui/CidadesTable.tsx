@@ -3,6 +3,7 @@ import { MapPin, Edit, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import type { Cidade } from "components/cidades/types";
 import type { OrdenacaoCampo, DirecaoOrdenacao } from "../state/useCidades";
 import { useRotasForCidades } from "../state/useRotasForCidades";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 type Props = {
   cidades: Cidade[];
@@ -109,7 +110,12 @@ export const CidadesTable: React.FC<Props> = ({
                 <div className="text-sm text-gray-900">{cidade.estado}</div>
               </td>
               <td className="table-cell">
-                <div className="text-sm text-gray-900">{cidade.regiao}</div>
+                <div className="text-sm text-gray-900">
+                  {cidade.regiao
+                    ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)
+                        ?.nome || cidade.regiao
+                    : "-"}
+                </div>
               </td>
               <td className="table-cell">
                 <div className="text-sm text-gray-900">

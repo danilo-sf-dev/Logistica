@@ -3,6 +3,7 @@ import { X, Eye } from "lucide-react";
 import { Rota, RotaFormData } from "../types";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type { Cidade } from "../../cidades/types";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 interface RotaFormModalProps {
   isOpen: boolean;
@@ -241,14 +242,23 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-2">
-                      {cidadesVinculadas.map((cidade) => (
-                        <span
-                          key={cidade.id}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                        >
-                          {cidade.nome}
-                        </span>
-                      ))}
+                      {cidadesVinculadas.map((cidade) => {
+                        const regiaoNome = cidade.regiao
+                          ? REGIOES_BRASIL.find(
+                              (r) => r.valor === cidade.regiao,
+                            )?.nome
+                          : null;
+
+                        return (
+                          <span
+                            key={cidade.id}
+                            className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                          >
+                            {cidade.nome} - {cidade.estado}
+                            {regiaoNome && ` (${regiaoNome})`}
+                          </span>
+                        );
+                      })}
                     </div>
                   )}
                   <p className="text-xs text-gray-500 mt-2">

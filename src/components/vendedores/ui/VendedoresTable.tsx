@@ -69,15 +69,22 @@ const CidadesAtendidas: React.FC<{ cidadesIds: string[] }> = ({
 
   return (
     <div className="space-y-1">
-      {cidades.slice(0, 2).map((cidade) => (
-        <div
-          key={cidade.id}
-          className="flex items-center text-sm text-gray-600"
-        >
-          <MapPin className="h-3 w-3 mr-1" />
-          {cidade.nome} - {cidade.estado}
-        </div>
-      ))}
+      {cidades.slice(0, 2).map((cidade) => {
+        const regiaoNome = cidade.regiao
+          ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)?.nome
+          : null;
+
+        return (
+          <div
+            key={cidade.id}
+            className="flex items-center text-sm text-gray-600"
+          >
+            <MapPin className="h-3 w-3 mr-1" />
+            {cidade.nome} - {cidade.estado}
+            {regiaoNome && ` (${regiaoNome})`}
+          </div>
+        );
+      })}
       {cidades.length > 2 && (
         <div className="text-xs text-gray-500">
           +{cidades.length - 2} mais cidade{cidades.length - 2 !== 1 ? "s" : ""}
