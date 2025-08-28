@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Check, ChevronDown, X } from "lucide-react";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type { Cidade } from "../../cidades/types";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 interface CidadesSelectProps {
   value: string[];
@@ -61,7 +62,9 @@ const CidadesSelect: React.FC<CidadesSelectProps> = ({
   const cidadesFiltradas = cidades.filter(
     (cidade) =>
       cidade.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cidade.estado.toLowerCase().includes(searchTerm.toLowerCase()),
+      cidade.estado.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (cidade.regiao &&
+        cidade.regiao.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   const cidadesSelecionadas = cidades.filter((cidade) =>
@@ -105,26 +108,33 @@ const CidadesSelect: React.FC<CidadesSelectProps> = ({
         >
           <div className="flex flex-wrap gap-1">
             {cidadesSelecionadas.length > 0 ? (
-              cidadesSelecionadas.map((cidade) => (
-                <span
-                  key={cidade.id}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-md"
-                >
-                  {cidade.nome} - {cidade.estado}
-                  {!disabled && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeCidade(cidade.id);
-                      }}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </span>
-              ))
+              cidadesSelecionadas.map((cidade) => {
+                const regiaoNome = cidade.regiao
+                  ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)?.nome
+                  : null;
+
+                return (
+                  <span
+                    key={cidade.id}
+                    className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-md"
+                  >
+                    {cidade.nome} - {cidade.estado}
+                    {regiaoNome && ` (${regiaoNome})`}
+                    {!disabled && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeCidade(cidade.id);
+                        }}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </span>
+                );
+              })
             ) : (
               <span className="text-gray-500">{placeholder}</span>
             )}
@@ -182,6 +192,10 @@ const CidadesSelect: React.FC<CidadesSelectProps> = ({
             ) : (
               cidadesFiltradas.map((cidade) => {
                 const isSelected = value.includes(cidade.id);
+                const regiaoNome = cidade.regiao
+                  ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)?.nome
+                  : null;
+
                 return (
                   <div
                     key={cidade.id}
@@ -194,6 +208,7 @@ const CidadesSelect: React.FC<CidadesSelectProps> = ({
                       <div className="font-medium">{cidade.nome}</div>
                       <div className="text-sm text-gray-500">
                         {cidade.estado}
+                        {regiaoNome && ` - ${regiaoNome}`}
                       </div>
                     </div>
                     {isSelected && <Check className="h-4 w-4 text-blue-600" />}

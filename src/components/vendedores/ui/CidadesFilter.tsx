@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type { Cidade } from "../../cidades/types";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 interface CidadesFilterProps {
   value: string;
@@ -59,7 +60,9 @@ const CidadesFilter: React.FC<CidadesFilterProps> = ({
   const cidadesFiltradas = cidades.filter(
     (cidade) =>
       cidade.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cidade.estado.toLowerCase().includes(searchTerm.toLowerCase()),
+      cidade.estado.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (cidade.regiao &&
+        cidade.regiao.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   const cidadeSelecionada = cidades.find((cidade) => cidade.id === value);
@@ -88,7 +91,14 @@ const CidadesFilter: React.FC<CidadesFilterProps> = ({
             className={cidadeSelecionada ? "text-gray-900" : "text-gray-500"}
           >
             {cidadeSelecionada
-              ? `${cidadeSelecionada.nome} - ${cidadeSelecionada.estado}`
+              ? (() => {
+                  const regiaoNome = cidadeSelecionada.regiao
+                    ? REGIOES_BRASIL.find(
+                        (r) => r.valor === cidadeSelecionada.regiao,
+                      )?.nome
+                    : null;
+                  return `${cidadeSelecionada.nome} - ${cidadeSelecionada.estado}${regiaoNome ? ` (${regiaoNome})` : ""}`;
+                })()
               : placeholder}
           </span>
           <div className="flex items-center gap-1">
@@ -146,16 +156,26 @@ const CidadesFilter: React.FC<CidadesFilterProps> = ({
                 >
                   Todas as cidades
                 </div>
-                {cidadesFiltradas.map((cidade) => (
-                  <div
-                    key={cidade.id}
-                    className="px-3 py-2 cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleSelectCidade(cidade.id)}
-                  >
-                    <div className="font-medium">{cidade.nome}</div>
-                    <div className="text-sm text-gray-500">{cidade.estado}</div>
-                  </div>
-                ))}
+                {cidadesFiltradas.map((cidade) => {
+                  const regiaoNome = cidade.regiao
+                    ? REGIOES_BRASIL.find((r) => r.valor === cidade.regiao)
+                        ?.nome
+                    : null;
+
+                  return (
+                    <div
+                      key={cidade.id}
+                      className="px-3 py-2 cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleSelectCidade(cidade.id)}
+                    >
+                      <div className="font-medium">{cidade.nome}</div>
+                      <div className="text-sm text-gray-500">
+                        {cidade.estado}
+                        {regiaoNome && ` - ${regiaoNome}`}
+                      </div>
+                    </div>
+                  );
+                })}
               </>
             )}
           </div>

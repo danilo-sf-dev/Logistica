@@ -2,6 +2,7 @@ import {
   BaseTableExportService,
   type TableExportConfig,
 } from "../../relatorios/export/BaseTableExportService";
+import { REGIOES_BRASIL } from "../../../utils/constants";
 
 export class CidadesTableExportService extends BaseTableExportService {
   protected config: TableExportConfig = {
@@ -18,7 +19,11 @@ export class CidadesTableExportService extends BaseTableExportService {
     formatacao: {
       nome: (valor) => (valor ? valor.toUpperCase() : "N/A"),
       estado: (valor) => (valor ? valor.toUpperCase() : "N/A"),
-      regiao: (valor) => (valor ? valor.toUpperCase() : "N/A"),
+      regiao: (valor) => {
+        if (!valor) return "N/A";
+        const regiaoNome = REGIOES_BRASIL.find((r) => r.valor === valor)?.nome;
+        return regiaoNome || valor.toUpperCase();
+      },
       distancia: (valor) => {
         if (!valor) return "N/A";
         return `${valor} km`;
