@@ -38,7 +38,7 @@ export const FuncionariosFilters: React.FC<FuncionariosFiltersProps> = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Buscar por nome, CPF ou cidade..."
+            placeholder="Buscar"
             value={termoBusca}
             onChange={(e) => setTermoBusca(e.target.value)}
             className="input-field pl-10"

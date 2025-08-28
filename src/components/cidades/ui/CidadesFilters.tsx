@@ -25,7 +25,7 @@ export const CidadesFilters: React.FC<Props> = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Buscar por nome, estado ou região..."
+            placeholder="Buscar"
             value={termo}
             onChange={(e) => onChangeTermo(e.target.value)}
             className="input-field pl-10"
