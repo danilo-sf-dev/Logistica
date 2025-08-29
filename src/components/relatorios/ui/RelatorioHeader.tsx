@@ -9,19 +9,19 @@ export const RelatorioHeader: React.FC<RelatorioHeaderProps> = ({
   className = "",
 }) => {
   return (
-    <div className={`flex justify-between items-center ${className}`}>
+    <div className={`space-y-4 ${className}`}>
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">Relatórios</h1>
         <p className="mt-1 text-sm text-gray-500">
           Análise detalhada das operações de logística
         </p>
       </div>
-      <div className="flex items-center space-x-4">
+      <div className="w-full sm:w-auto">
         <div className="relative">
           <select
             value={periodo}
             onChange={(e) => onPeriodoChange(e.target.value)}
-            className="input-field w-40 pr-10"
+            className="input-field w-full sm:w-40 pr-10"
             disabled={loading}
           >
             <option value="semana">Semana</option>

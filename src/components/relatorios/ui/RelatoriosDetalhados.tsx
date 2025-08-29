@@ -39,7 +39,7 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">
         <button
           onClick={() => handleDownloadClick("funcionarios_detalhado")}
-          className="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex flex-col items-center justify-center p-4 sm:p-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <Users className="h-8 w-8 text-primary-600 mb-2" />
           <span className="font-medium text-gray-900">Funcionários</span>
@@ -48,7 +48,7 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
 
         <button
           onClick={() => handleDownloadClick("veiculos_detalhado")}
-          className="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex flex-col items-center justify-center p-4 sm:p-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <Truck className="h-8 w-8 text-primary-600 mb-2" />
           <span className="font-medium text-gray-900">Veículos</span>
@@ -57,7 +57,7 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
 
         <button
           onClick={() => handleDownloadClick("rotas_detalhado")}
-          className="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex flex-col items-center justify-center p-4 sm:p-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <Map className="h-8 w-8 text-primary-600 mb-2" />
           <span className="font-medium text-gray-900">Rotas</span>
@@ -66,7 +66,7 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
 
         <button
           onClick={() => handleDownloadClick("folgas_detalhado")}
-          className="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex flex-col items-center justify-center p-4 sm:p-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <Calendar className="h-8 w-8 text-primary-600 mb-2" />
           <span className="font-medium text-gray-900">Folgas</span>
@@ -78,7 +78,7 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <button
           onClick={() => handleDownloadClick("cidades_detalhado")}
-          className="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex flex-col items-center justify-center p-4 sm:p-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <MapPin className="h-8 w-8 text-primary-600 mb-2" />
           <span className="font-medium text-gray-900">Cidades</span>
@@ -87,7 +87,7 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
 
         <button
           onClick={() => handleDownloadClick("vendedores_detalhado")}
-          className="flex flex-col items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex flex-col items-center justify-center p-4 sm:p-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           <UserCheck className="h-8 w-8 text-primary-600 mb-2" />
           <span className="font-medium text-gray-900">Vendedores</span>
