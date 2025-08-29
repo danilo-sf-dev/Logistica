@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { CidadesTable } from "components/cidades/ui/CidadesTable";
 import { CidadesFilters } from "components/cidades/ui/CidadesFilters";
 import { useCidades } from "../state/useCidades";
@@ -158,6 +159,7 @@ const CidadesListPage: React.FC = () => {
             onClick={abrirCriacao}
             className="w-full sm:w-auto btn-primary flex items-center justify-center"
           >
+            <Plus className="h-4 w-4 mr-2" />
             Nova Cidade
           </button>
         </div>

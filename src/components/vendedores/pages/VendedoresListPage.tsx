@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { Plus } from "lucide-react";
 import ConfirmationModal from "../../common/modals/ConfirmationModal";
 import { TableExportModal } from "../../common/modals";
 import { VendedoresTable } from "../ui/VendedoresTable";
@@ -142,6 +143,7 @@ const VendedoresListPage: React.FC = () => {
             onClick={abrirCriacao}
             className="w-full sm:w-auto btn-primary flex items-center justify-center"
           >
+            <Plus className="h-4 w-4 mr-2" />
             Novo Vendedor
           </button>
         </div>
