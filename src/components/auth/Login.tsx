@@ -24,7 +24,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
+    e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault();
     setLoading(true);
@@ -52,6 +52,12 @@ const Login: React.FC = () => {
       showNotification("Login com Google realizado com sucesso!", "success");
       navigate("/dashboard");
     } catch (error: any) {
+      // Verificar se é um erro de redirect iniciado
+      if (error.message === "REDIRECT_INITIATED") {
+        showNotification("Redirecionando para login com Google...", "info");
+        return; // Não mostrar erro, pois o redirect foi iniciado
+      }
+
       // Usando o novo hook de erro
       handleError(error, {
         showNotification: true,

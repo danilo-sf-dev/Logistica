@@ -23,6 +23,15 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       open: true,
+      headers: {
+        // Configurações para resolver problemas de COOP com Google Sign-In
+        "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+        "Cross-Origin-Embedder-Policy": "unsafe-none",
+        // Headers de segurança adicionais
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "no-referrer-when-downgrade",
+      },
     },
     build: {
       outDir: "dist",
