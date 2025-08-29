@@ -49,7 +49,6 @@ export const requestNotificationPermission = async (): Promise<
     }
     return null;
   } catch (error) {
-    console.error("Erro ao solicitar permissão de notificação:", error);
     return null;
   }
 };

@@ -12,6 +12,8 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   User,
   UserCredential,
@@ -58,11 +60,11 @@ interface AuthContextType {
     email: string,
     password: string,
     displayName: string,
-    role?: string,
+    role?: string
   ) => Promise<UserCredential>;
   updateUserProfile: (
     uid: string,
-    updates: Partial<UserProfile>,
+    updates: Partial<UserProfile>
   ) => Promise<void>;
   loading: boolean;
 }
@@ -89,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Login com email/senha
   const login = async (
     email: string,
-    password: string,
+    password: string
   ): Promise<UserCredential> => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
@@ -108,10 +110,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               timestamp: new Date(),
             },
           },
-          { merge: true },
+          { merge: true }
         );
       } catch (sessionError) {
-        console.error("Erro ao capturar informações de sessão:", sessionError);
         // Continuar mesmo se falhar a captura de sessão
       }
 
@@ -126,42 +127,62 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const provider = new GoogleAuthProvider();
 
-      // Configurar o popup para melhor compatibilidade
+      // Configurar o provider para melhor compatibilidade
       provider.setCustomParameters({
         prompt: "select_account",
       });
 
-      const result = await signInWithPopup(auth, provider);
+      // Tentar popup primeiro (melhor UX), com fallback para redirect
+      try {
+        const result = await signInWithPopup(auth, provider);
+        await processGoogleSignInResult(result);
+        return result;
+      } catch (popupError: any) {
+        // Se o popup falhar por qualquer motivo relacionado a COOP, usar redirect
+        if (
+          popupError.code === "auth/popup-closed-by-user" ||
+          popupError.message?.includes("Cross-Origin-Opener-Policy") ||
+          popupError.message?.includes("window.closed") ||
+          popupError.message?.includes("blocked") ||
+          popupError.code === "auth/popup-blocked"
+        ) {
+          await signInWithRedirect(auth, provider);
+          throw new Error("REDIRECT_INITIATED");
+        }
 
-      // Verificar se o usuário já existe no Firestore
-      const userDoc = await getDoc(doc(db, "users", result.user.uid));
-
-      if (!userDoc.exists()) {
-        // Criar novo usuário no Firestore
-        await setDoc(doc(db, "users", result.user.uid), {
-          uid: result.user.uid,
-          email: result.user.email,
-          displayName: result.user.displayName,
-          photoURL: result.user.photoURL,
-          role: "user", // Role padrão
-          createdAt: new Date(),
-          lastLogin: new Date(),
-          provider: "google",
-        });
-      } else {
-        // Atualizar último login
-        await setDoc(
-          doc(db, "users", result.user.uid),
-          {
-            lastLogin: new Date(),
-          },
-          { merge: true },
-        );
+        throw popupError;
       }
-
-      return result;
     } catch (error) {
       throw error;
+    }
+  };
+
+  // Função auxiliar para processar resultado do login Google
+  const processGoogleSignInResult = async (result: UserCredential) => {
+    // Verificar se o usuário já existe no Firestore
+    const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+    if (!userDoc.exists()) {
+      // Criar novo usuário no Firestore
+      await setDoc(doc(db, "users", result.user.uid), {
+        uid: result.user.uid,
+        email: result.user.email,
+        displayName: result.user.displayName,
+        photoURL: result.user.photoURL,
+        role: "user", // Role padrão
+        createdAt: new Date(),
+        lastLogin: new Date(),
+        provider: "google",
+      });
+    } else {
+      // Atualizar último login
+      await setDoc(
+        doc(db, "users", result.user.uid),
+        {
+          lastLogin: new Date(),
+        },
+        { merge: true }
+      );
     }
   };
 
@@ -179,13 +200,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     email: string,
     password: string,
     displayName: string,
-    role: string = "user",
+    role: string = "user"
   ): Promise<UserCredential> => {
     try {
       const result = await createUserWithEmailAndPassword(
         auth,
         email,
-        password,
+        password
       );
 
       // Atualizar perfil
@@ -242,7 +263,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             return new Date();
           } catch (error) {
-            console.error("Erro ao converter timestamp:", error);
             return new Date();
           }
         };
@@ -269,7 +289,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       return null;
     } catch (error) {
-      console.error("Erro ao buscar perfil do usuário:", error);
       return null;
     }
   };
@@ -277,7 +296,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Atualizar perfil do usuário
   const updateUserProfile = async (
     uid: string,
-    updates: Partial<UserProfile>,
+    updates: Partial<UserProfile>
   ): Promise<void> => {
     try {
       await setDoc(doc(db, "users", uid), updates, { merge: true });
@@ -289,6 +308,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    // Verificar se há resultado de redirect pendente
+    const checkRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          // Processar resultado do redirect
+          await processGoogleSignInResult(result);
+        }
+      } catch (error) {}
+    };
+
+    // Verificar redirect result primeiro
+    checkRedirectResult();
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
 

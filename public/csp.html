@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSP Configuration - Google Sign-In</title>
+  <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' https://accounts.google.com/gsi/;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com/gsi/client;
+        style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style;
+        frame-src 'self' https://accounts.google.com/gsi/;
+        connect-src 'self' https://accounts.google.com/gsi/;
+        img-src 'self' data: https:;
+        font-src 'self' data:;
+    ">
+</head>
+
+<body>
+  <h1>Content Security Policy Configuration</h1>
+  <p>Este arquivo demonstra as configurações de CSP necessárias para o Google Sign-In.</p>
+  <p>Para implementar no seu servidor, adicione os seguintes headers:</p>
+  <pre>
+Content-Security-Policy: 
+    default-src 'self' https://accounts.google.com/gsi/;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com/gsi/client;
+    style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style;
+    frame-src 'self' https://accounts.google.com/gsi/;
+    connect-src 'self' https://accounts.google.com/gsi/;
+    img-src 'self' data: https:;
+    font-src 'self' data:;
+
+Cross-Origin-Opener-Policy: same-origin-allow-popups
+Cross-Origin-Embedder-Policy: unsafe-none
+Referrer-Policy: no-referrer-when-downgrade
+    </pre>
+</body>
+
+</html>
