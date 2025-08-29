@@ -33,7 +33,7 @@ export const DashboardPage: React.FC = () => {
             <p className="text-gray-500 mb-4">{error}</p>
             <button
               onClick={refreshData}
-              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+              className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
             >
               Tentar novamente
             </button>
