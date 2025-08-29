@@ -20,8 +20,8 @@ export const CidadesFilters: React.FC<Props> = ({
 
   return (
     <div className="card space-y-4">
-      <div className="flex gap-4">
-        <div className="relative flex-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
@@ -32,7 +32,7 @@ export const CidadesFilters: React.FC<Props> = ({
           />
         </div>
 
-        <div className="w-48">
+        <div>
           <select
             value={filtroRegiao}
             onChange={(e) => onChangeFiltroRegiao(e.target.value)}
