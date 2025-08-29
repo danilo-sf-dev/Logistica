@@ -90,17 +90,19 @@ const VendedoresListPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="space-y-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Vendedores</h1>
           <p className="mt-1 text-sm text-gray-500">
             Gerencie os vendedores da empresa
           </p>
         </div>
-        <div className="flex space-x-3">
+
+        {/* Botões de ação - Layout responsivo */}
+        <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
           <button
             onClick={handleExportClick}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+            className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
           >
             <svg
               className="h-4 w-4 mr-2"
@@ -119,7 +121,7 @@ const VendedoresListPage: React.FC = () => {
           </button>
           <button
             onClick={() => setShowImportModal(true)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+            className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
           >
             <svg
               className="h-4 w-4 mr-2"
@@ -136,7 +138,10 @@ const VendedoresListPage: React.FC = () => {
             </svg>
             Importar Excel
           </button>
-          <button onClick={abrirCriacao} className="btn-primary">
+          <button
+            onClick={abrirCriacao}
+            className="w-full sm:w-auto btn-primary flex items-center justify-center"
+          >
             Novo Vendedor
           </button>
         </div>
@@ -174,34 +179,14 @@ const VendedoresListPage: React.FC = () => {
 
         {totalPaginado.totalPaginas > 1 && (
           <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
-            <div className="text-sm text-gray-700">
-              Mostrando {totalPaginado.inicio + 1} a {totalPaginado.fim} de{" "}
-              {totalPaginado.total} resultados
-            </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex justify-between flex-1 sm:hidden">
               <button
                 onClick={() => setPaginaAtual(Math.max(1, paginaAtual - 1))}
                 disabled={paginaAtual === 1}
-                className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Anterior
               </button>
-              {Array.from(
-                { length: totalPaginado.totalPaginas },
-                (_, i) => i + 1,
-              ).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setPaginaAtual(page)}
-                  className={`px-3 py-1 text-sm border rounded-md ${
-                    paginaAtual === page
-                      ? "bg-primary-600 text-white border-primary-600"
-                      : "border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
               <button
                 onClick={() =>
                   setPaginaAtual(
@@ -209,10 +194,90 @@ const VendedoresListPage: React.FC = () => {
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}
-                className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Próximo
               </button>
+            </div>
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700">
+                  Mostrando{" "}
+                  <span className="font-medium">
+                    {totalPaginado.inicio + 1}
+                  </span>{" "}
+                  a <span className="font-medium">{totalPaginado.fim}</span> de{" "}
+                  <span className="font-medium">{totalPaginado.total}</span>{" "}
+                  resultados
+                </p>
+              </div>
+              <div>
+                <nav
+                  className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                  aria-label="Pagination"
+                >
+                  <button
+                    onClick={() => setPaginaAtual(Math.max(1, paginaAtual - 1))}
+                    disabled={paginaAtual === 1}
+                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="sr-only">Anterior</span>
+                    <svg
+                      className="h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                  {Array.from(
+                    { length: totalPaginado.totalPaginas },
+                    (_, i) => i + 1,
+                  ).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setPaginaAtual(page)}
+                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                        paginaAtual === page
+                          ? "z-10 bg-primary-50 border-primary-500 text-primary-600"
+                          : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() =>
+                      setPaginaAtual(
+                        Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
+                      )
+                    }
+                    disabled={paginaAtual === totalPaginado.totalPaginas}
+                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="sr-only">Próximo</span>
+                    <svg
+                      className="h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </nav>
+              </div>
             </div>
           </div>
         )}
