@@ -29,25 +29,25 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
   if (!aberto) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-        <div className="mt-3">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="w-full max-w-3xl max-h-[90vh] bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-2rem)]">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg sm:text-xl font-medium text-gray-900">
               {editando ? "Editar Vendedor" : "Novo Vendedor"}
             </h3>
             <button
               onClick={onCancelar}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           </div>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Nome *
                 </label>
                 <input
@@ -65,7 +65,7 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   CPF *
                 </label>
                 <input
@@ -86,9 +86,9 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Código Vend.Sistema
                 </label>
                 <input
@@ -108,7 +108,7 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tipo de Contrato *
                 </label>
                 <select
@@ -136,9 +136,9 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
                 </label>
                 <input
@@ -156,7 +156,7 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Celular *
                 </label>
                 <input
@@ -179,9 +179,9 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Região *
                 </label>
                 <select
@@ -205,7 +205,7 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Unidade de Negócio *
                 </label>
                 <select
@@ -243,11 +243,11 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
               />
             </div>
 
-            <div className="flex justify-end space-x-3 pt-4">
+            <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-6 pb-2 border-t">
               <button
                 type="button"
                 onClick={onCancelar}
-                className="btn-secondary"
+                className="w-full sm:w-auto btn-secondary py-3 sm:py-2"
               >
                 Cancelar
               </button>
@@ -255,7 +255,7 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 <button
                   type="button"
                   onClick={onConfirmar}
-                  className="btn-primary"
+                  className="w-full sm:w-auto btn-primary py-3 sm:py-2"
                 >
                   {editando ? "Atualizar" : "Cadastrar"}
                 </button>

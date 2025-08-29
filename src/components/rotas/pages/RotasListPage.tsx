@@ -101,17 +101,19 @@ export const RotasListPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="space-y-4">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Rotas</h1>
           <p className="mt-1 text-sm text-gray-500">
             Gerencie as rotas de transporte da empresa
           </p>
         </div>
-        <div className="flex space-x-3">
+
+        {/* Botões de ação - Layout responsivo */}
+        <div className="flex flex-col sm:flex-row sm:space-x-3 space-y-3 sm:space-y-0">
           <button
             onClick={handleExportClick}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center"
+            className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
           >
             <svg
               className="h-4 w-4 mr-2"
@@ -130,7 +132,7 @@ export const RotasListPage: React.FC = () => {
           </button>
           <button
             onClick={() => setShowModal(true)}
-            className="btn-primary flex items-center"
+            className="w-full sm:w-auto btn-primary flex items-center justify-center"
           >
             <Plus className="h-4 w-4 mr-2" />
             Nova Rota
@@ -139,7 +141,7 @@ export const RotasListPage: React.FC = () => {
       </div>
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="card">
           <div className="flex items-center">
             <div className="flex-shrink-0 h-8 w-8">

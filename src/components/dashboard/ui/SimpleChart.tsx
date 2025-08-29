@@ -19,28 +19,30 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
     <div className="card">
       <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
       <div className="flex flex-col items-center">
-        <PieChart width={width} height={height}>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip
-            formatter={(value: any, name: any) => [
-              `${value} (${((value / data.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(0)}%)`,
-              name,
-            ]}
-          />
-        </PieChart>
+        <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg">
+          <PieChart width={width} height={height}>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+              outerRadius={80}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value: any, name: any) => [
+                `${value} (${((value / data.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(0)}%)`,
+                name,
+              ]}
+            />
+          </PieChart>
+        </div>
 
         {/* Legenda separada */}
         <div className="mt-6 w-full">

@@ -94,7 +94,7 @@ export const PerfilForm: React.FC<PerfilFormProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary flex items-center"
+            className="w-full sm:w-auto btn-primary flex items-center justify-center py-3 sm:py-2"
           >
             <Save className="h-4 w-4 mr-2" />
             {loading ? "Salvando..." : "Salvar Alterações"}

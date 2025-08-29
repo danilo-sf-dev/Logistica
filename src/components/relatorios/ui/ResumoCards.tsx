@@ -20,7 +20,7 @@ export const ResumoCards: React.FC<ResumoCardsProps> = ({
 
   return (
     <div
-      className={`grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 ${className}`}
+      className={`grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 ${className}`}
     >
       <div className="card">
         <div className="flex items-center">

@@ -29,12 +29,12 @@ export const RotasFilters: React.FC<RotasFiltersProps> = ({
         <span className="font-medium">Filtros</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Buscar por nome da rota ou cidades..."
+            placeholder="Buscar"
             value={filters.searchTerm}
             onChange={(e) => onFiltersChange({ searchTerm: e.target.value })}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
