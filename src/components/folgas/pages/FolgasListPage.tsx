@@ -12,6 +12,11 @@ export function FolgasListPage() {
 
   const {
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingExclusao,
+    loadingAprovacao,
+    loadingRejeicao,
     folgasPaginadas,
     totalPaginado,
     paginaAtual,
@@ -71,8 +76,15 @@ export function FolgasListPage() {
     setShowExportModal(true);
   };
 
-  const handleExportConfirm = () => {
-    handleExportExcel();
+  const handleExportConfirm = async () => {
+    try {
+      await handleExportExcel();
+      // Modal só fecha quando a exportação for bem-sucedida
+      setShowExportModal(false);
+    } catch (error) {
+      // Em caso de erro, o modal permanece aberto
+      console.error("Erro na exportação:", error);
+    }
   };
 
   const renderPaginacao = () => {
@@ -244,6 +256,8 @@ export function FolgasListPage() {
         excluirFolga={excluirFolga}
         aprovarFolga={aprovarFolga}
         rejeitarFolga={rejeitarFolga}
+        loadingAprovacao={loadingAprovacao}
+        loadingRejeicao={loadingRejeicao}
       />
 
       {/* Paginação */}
@@ -258,6 +272,7 @@ export function FolgasListPage() {
         onConfirmar={confirmar}
         onCancelar={() => setMostrarModal(false)}
         erros={erros}
+        loading={loadingSubmit}
       />
 
       {/* Modal de Confirmação de Exclusão */}
@@ -271,6 +286,7 @@ export function FolgasListPage() {
           label: "Excluir",
           onClick: confirmarExclusao,
           variant: "danger",
+          loading: loadingExclusao,
         }}
         secondaryAction={{
           label: "Cancelar",
@@ -285,6 +301,7 @@ export function FolgasListPage() {
         onExport={handleExportConfirm}
         titulo="Folgas"
         nomeArquivo={generateFileName()}
+        loading={loadingExport}
       />
     </div>
   );

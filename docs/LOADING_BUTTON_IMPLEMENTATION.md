@@ -475,12 +475,19 @@ const handleSubmit = async () => {
 - **ConfirmationModal**: Botão "Confirmar Exclusão" (modal fecha apenas após sucesso)
 - **ImportModal**: Botões "Baixar Template Excel" e "Importar Dados"
 
+### ✅ Folgas
+
+- **FolgaFormModal**: Botão "Atualizar" / "Solicitar" (modal fecha apenas após sucesso)
+- **FolgasListPage**: Botão "Exportar Excel" (abre modal)
+- **TableExportModal**: Botão "Exportar Excel" (modal fecha apenas após sucesso)
+- **ConfirmationModal**: Botão "Excluir" (modal fecha apenas após sucesso)
+- **FolgasTable**: Botões "Aprovar" e "Rejeitar" (com loading inline)
+
 ### 🔄 Próximas Seções
 
 - [ ] Funcionários
 - [ ] Veículos
 - [ ] Rotas
-- [ ] Folgas
 - [ ] Autenticação
 
 ## 🎯 Boas Práticas
@@ -505,5 +512,5 @@ Para dúvidas sobre implementação:
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.2  
-**Status:** Cidades implementado com comportamento correto dos modais
+**Versão:** 1.3  
+**Status:** Folgas implementado com comportamento correto dos modais
