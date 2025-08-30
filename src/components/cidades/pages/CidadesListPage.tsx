@@ -18,6 +18,9 @@ const CidadesListPage: React.FC = () => {
 
   const {
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingExclusao,
     cidadesPaginadas,
     totalPaginado,
     paginaAtual,
@@ -65,8 +68,15 @@ const CidadesListPage: React.FC = () => {
     setShowExportModal(true);
   };
 
-  const handleExportConfirm = () => {
-    handleExportExcel();
+  const handleExportConfirm = async () => {
+    try {
+      await handleExportExcel();
+      // Modal só fecha quando a exportação for bem-sucedida
+      setShowExportModal(false);
+    } catch (error) {
+      // Em caso de erro, o modal permanece aberto
+      console.error("Erro na exportação:", error);
+    }
   };
 
   const handleImportSuccess = (result: ImportResult) => {
@@ -296,6 +306,7 @@ const CidadesListPage: React.FC = () => {
         onChange={setValores}
         onCancelar={() => setMostrarModal(false)}
         onConfirmar={confirmar}
+        loading={loadingSubmit}
       />
 
       <ConfirmationModal
@@ -316,6 +327,7 @@ const CidadesListPage: React.FC = () => {
           label: "Confirmar Exclusão",
           onClick: confirmarExclusao,
           variant: "danger",
+          loading: loadingExclusao,
         }}
         secondaryAction={{
           label: "Cancelar",
@@ -331,6 +343,7 @@ const CidadesListPage: React.FC = () => {
         onExport={handleExportConfirm}
         titulo="Cidades"
         nomeArquivo={generateFileName()}
+        loading={loadingExport}
       />
 
       <ImportModal

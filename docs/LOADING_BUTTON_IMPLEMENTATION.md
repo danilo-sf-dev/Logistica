@@ -267,6 +267,12 @@ const handleSubmit = async () => {
 </button>
 ```
 
+**Comportamento do Modal:**
+
+- Modal permanece aberto durante loading
+- Só fecha após sucesso da operação
+- Em caso de erro, modal permanece aberto para nova tentativa
+
 ### Ações em Tabela (Editar/Excluir)
 
 ```tsx
@@ -319,6 +325,12 @@ const handleSubmit = async () => {
 </button>
 ```
 
+**Comportamento do Modal:**
+
+- Modal permanece aberto durante exportação
+- Só fecha após sucesso da operação
+- Em caso de erro, modal permanece aberto para nova tentativa
+
 ### Aprovação/Rejeição
 
 ```tsx
@@ -334,6 +346,12 @@ const handleSubmit = async () => {
   Aprovar
 </button>
 ```
+
+**Comportamento do Modal:**
+
+- Modal permanece aberto durante confirmação
+- Só fecha após sucesso da operação
+- Em caso de erro, modal permanece aberto para nova tentativa
 
 ### Importação
 
@@ -449,9 +467,16 @@ const handleSubmit = async () => {
 - **ConfirmationModal**: Botões "Confirmar Inativação" e "Confirmar Ativação"
 - **ImportModal**: Botões "Baixar Template Excel" e "Importar Dados"
 
+### ✅ Cidades
+
+- **CidadeFormModal**: Botão "Atualizar" / "Cadastrar" (modal fecha apenas após sucesso)
+- **CidadesListPage**: Botão "Exportar Excel" (abre modal)
+- **TableExportModal**: Botão "Exportar Excel" (modal fecha apenas após sucesso)
+- **ConfirmationModal**: Botão "Confirmar Exclusão" (modal fecha apenas após sucesso)
+- **ImportModal**: Botões "Baixar Template Excel" e "Importar Dados"
+
 ### 🔄 Próximas Seções
 
-- [ ] Cidades
 - [ ] Funcionários
 - [ ] Veículos
 - [ ] Rotas
@@ -464,8 +489,9 @@ const handleSubmit = async () => {
 2. **Mantenha o layout original** - Não altere o visual dos botões
 3. **Loading apenas no botão da ação** - Não desabilite botões de cancelar/fechar
 4. **Modal permanece aberto** durante loading - Só fecha após sucesso
-5. **Teste sempre** o comportamento de loading
-6. **Documente mudanças** quando necessário
+5. **Em caso de erro** - Modal permanece aberto para nova tentativa
+6. **Teste sempre** o comportamento de loading
+7. **Documente mudanças** quando necessário
 
 ## 📞 Suporte
 
@@ -479,5 +505,5 @@ Para dúvidas sobre implementação:
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.1  
-**Status:** Vendedores implementado
+**Versão:** 1.2  
+**Status:** Cidades implementado com comportamento correto dos modais
