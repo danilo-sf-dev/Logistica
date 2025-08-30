@@ -490,10 +490,17 @@ const handleSubmit = async () => {
 - **TableExportModal**: Botão "Exportar Excel" (modal fecha apenas após sucesso)
 - **ModalConfirmacaoExclusaoGenerico**: Botão "Confirmar Exclusão" (modal fecha apenas após sucesso)
 
+### ✅ Veículos
+
+- **VeiculoFormModal**: Botão "Atualizar" / "Cadastrar" (modal fecha apenas após sucesso)
+- **VeiculosListPage**: Botão "Exportar Excel" (abre modal)
+- **TableExportModal**: Botão "Exportar Excel" (modal fecha apenas após sucesso)
+- **ConfirmationModal**: Botões "Sim, Ativar" e "Sim, Inativar" (modal fecha apenas após sucesso)
+- **ImportModal**: Botões de importação (já implementado)
+
 ### 🔄 Próximas Seções
 
 - [ ] Funcionários
-- [ ] Veículos
 - [ ] Autenticação
 
 ## 🎯 Boas Práticas
@@ -518,5 +525,5 @@ Para dúvidas sobre implementação:
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.4  
-**Status:** Rotas implementado com comportamento correto dos modais
+**Versão:** 1.5  
+**Status:** Veículos implementado com comportamento correto dos modais

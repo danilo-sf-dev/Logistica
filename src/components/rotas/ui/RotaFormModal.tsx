@@ -41,7 +41,6 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
     cidades: [],
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [cidadesVinculadas, setCidadesVinculadas] = useState<Cidade[]>([]);
   const [loadingCidades, setLoadingCidades] = useState(false);
 
@@ -73,10 +72,10 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
     setLoadingCidades(true);
     try {
       const cidades = await Promise.all(
-        cidadeIds.map((id) => cidadesService.getById(id))
+        cidadeIds.map((id) => cidadesService.getById(id)),
       );
       const cidadesValidas = cidades.filter(
-        (cidade): cidade is Cidade => cidade !== null
+        (cidade): cidade is Cidade => cidade !== null,
       );
       setCidadesVinculadas(cidadesValidas);
     } catch (error) {
@@ -98,15 +97,12 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
     const success = await onSubmit(formData);
 
     if (success) {
       onClose();
       resetForm();
     }
-
-    setIsSubmitting(false);
   };
 
   const handleClose = () => {
@@ -253,7 +249,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                         {cidadesVinculadas.map((cidade) => {
                           const regiaoNome = cidade.regiao
                             ? REGIOES_BRASIL.find(
-                                (r) => r.valor === cidade.regiao
+                                (r) => r.valor === cidade.regiao,
                               )?.nome
                             : null;
 
