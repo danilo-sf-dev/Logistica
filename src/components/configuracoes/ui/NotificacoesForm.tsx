@@ -1,9 +1,13 @@
 import React from "react";
+import { Save } from "lucide-react";
+import LoadingButton from "../../common/LoadingButton";
 import type { NotificacoesFormProps } from "../types";
 
 export const NotificacoesForm: React.FC<NotificacoesFormProps> = ({
   config,
   onChange,
+  onSubmit,
+  loading = false,
   className = "",
 }) => {
   return (
@@ -121,6 +125,21 @@ export const NotificacoesForm: React.FC<NotificacoesFormProps> = ({
             />
           </button>
         </div>
+
+        {/* Botão de Salvar */}
+        {onSubmit && (
+          <div className="flex justify-end pt-6 border-t border-gray-200">
+            <LoadingButton
+              onClick={onSubmit}
+              loading={loading}
+              variant="primary"
+              size="md"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Salvar Configurações
+            </LoadingButton>
+          </div>
+        )}
       </div>
     </div>
   );

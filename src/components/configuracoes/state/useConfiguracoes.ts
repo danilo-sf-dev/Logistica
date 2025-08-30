@@ -155,6 +155,62 @@ export const useConfiguracoes = () => {
     [],
   );
 
+  const handleNotificacoesSubmit = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const perfilDataToSave = {
+        ...perfilData,
+        notificacoes,
+      };
+
+      await updateUserProfile(userProfile?.uid, perfilDataToSave);
+      showNotification(
+        "Configurações de notificações atualizadas com sucesso!",
+        "success",
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar notificações:", error);
+      showNotification("Erro ao atualizar notificações", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    perfilData,
+    notificacoes,
+    updateUserProfile,
+    userProfile?.uid,
+    showNotification,
+  ]);
+
+  const handleSistemaSubmit = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const perfilDataToSave = {
+        ...perfilData,
+        sistema,
+      };
+
+      await updateUserProfile(userProfile?.uid, perfilDataToSave);
+      showNotification(
+        "Configurações do sistema atualizadas com sucesso!",
+        "success",
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar configurações do sistema:", error);
+      showNotification("Erro ao atualizar configurações do sistema", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    perfilData,
+    sistema,
+    updateUserProfile,
+    userProfile?.uid,
+    showNotification,
+  ]);
+
   return {
     activeTab,
     setActiveTab,
@@ -167,6 +223,8 @@ export const useConfiguracoes = () => {
     handlePerfilChange,
     handleNotificacoesChange,
     handleSistemaChange,
+    handleNotificacoesSubmit,
+    handleSistemaSubmit,
   };
 };
 

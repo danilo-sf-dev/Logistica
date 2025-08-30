@@ -1,9 +1,13 @@
 import React from "react";
+import { Save } from "lucide-react";
+import LoadingButton from "../../common/LoadingButton";
 import type { SistemaFormProps } from "../types";
 
 export const SistemaForm: React.FC<SistemaFormProps> = ({
   config,
   onChange,
+  onSubmit,
+  loading = false,
   className = "",
 }) => {
   return (
@@ -63,6 +67,21 @@ export const SistemaForm: React.FC<SistemaFormProps> = ({
             <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-1" />
           </button>
         </div>
+
+        {/* Botão de Salvar */}
+        {onSubmit && (
+          <div className="flex justify-end pt-6 border-t border-gray-200">
+            <LoadingButton
+              onClick={onSubmit}
+              loading={loading}
+              variant="primary"
+              size="md"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Salvar Configurações
+            </LoadingButton>
+          </div>
+        )}
       </div>
     </div>
   );
