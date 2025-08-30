@@ -16,6 +16,10 @@ const VendedoresListPage: React.FC = () => {
 
   const {
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingInativacao,
+    loadingAtivacao,
     vendedoresPaginados,
     totalPaginado,
     paginaAtual,
@@ -72,8 +76,15 @@ const VendedoresListPage: React.FC = () => {
     setShowExportModal(true);
   };
 
-  const handleExportConfirm = () => {
-    handleExportExcel();
+  const handleExportConfirm = async () => {
+    try {
+      await handleExportExcel();
+      // Modal só fecha quando a exportação for bem-sucedida
+      setShowExportModal(false);
+    } catch (error) {
+      // Em caso de erro, o modal permanece aberto
+      console.error("Erro na exportação:", error);
+    }
   };
 
   const handleImportSuccess = (result: any) => {
@@ -294,6 +305,7 @@ const VendedoresListPage: React.FC = () => {
         onCancelar={() => setMostrarModal(false)}
         onConfirmar={confirmar}
         somenteLeitura={editando ? !editando.ativo : false}
+        loading={loadingSubmit}
       />
 
       {/* Modal de Confirmação de Inativação */}
@@ -330,6 +342,7 @@ const VendedoresListPage: React.FC = () => {
           label: "Confirmar Inativação",
           onClick: confirmarInativacao,
           variant: "warning",
+          loading: loadingInativacao,
         }}
         secondaryAction={{
           label: "Cancelar",
@@ -372,6 +385,7 @@ const VendedoresListPage: React.FC = () => {
           label: "Confirmar Ativação",
           onClick: confirmarAtivacao,
           variant: "success",
+          loading: loadingAtivacao,
         }}
         secondaryAction={{
           label: "Cancelar",
@@ -386,6 +400,7 @@ const VendedoresListPage: React.FC = () => {
         onExport={handleExportConfirm}
         titulo="Vendedores"
         nomeArquivo={generateFileName()}
+        loading={loadingExport}
       />
 
       {/* Modal de Importação */}

@@ -249,48 +249,120 @@ const handleSubmit = async () => {
 ### Formulários (Salvar/Atualizar)
 
 ```tsx
+// Usando LoadingButton (quando já existe)
 <LoadingButton type="submit" loading={loading} variant="primary" size="md">
   Salvar
 </LoadingButton>
+
+// Ou mantendo layout original
+<button
+  type="submit"
+  disabled={loading}
+  className="btn-primary flex items-center justify-center"
+>
+  {loading ? (
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+  ) : null}
+  Salvar
+</button>
 ```
 
 ### Ações em Tabela (Editar/Excluir)
 
 ```tsx
+// Usando LoadingButton (quando já existe)
 <LoadingButton
   onClick={handleAction}
   loading={loading}
-  variant="danger" // ou "primary"
+  variant="danger"
   size="sm"
 >
   Excluir
 </LoadingButton>
+
+// Ou mantendo layout original
+<button
+  onClick={handleAction}
+  disabled={loading}
+  className="btn-danger flex items-center justify-center"
+>
+  {loading ? (
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+  ) : null}
+  Excluir
+</button>
 ```
 
 ### Exportação/Importação
 
 ```tsx
-<LoadingButton
-  onClick={handleExport}
-  loading={loading}
-  variant="secondary"
-  size="md"
+// Botão principal (abre modal)
+<button
+  onClick={handleExportClick}
+  className="btn-secondary"
 >
   Exportar Excel
-</LoadingButton>
+</button>
+
+// Botão no modal (com loading)
+<button
+  onClick={handleExport}
+  disabled={loading}
+  className="btn-primary flex items-center justify-center"
+>
+  {loading ? (
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+  ) : (
+    <Download className="h-4 w-4 mr-2" />
+  )}
+  Exportar Excel
+</button>
 ```
 
 ### Aprovação/Rejeição
 
 ```tsx
-<LoadingButton
+// Botão no modal de confirmação
+<button
   onClick={handleApprove}
-  loading={loading}
-  variant="success"
-  size="sm"
+  disabled={loading}
+  className="btn-success flex items-center justify-center"
 >
+  {loading ? (
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+  ) : null}
   Aprovar
-</LoadingButton>
+</button>
+```
+
+### Importação
+
+```tsx
+// Botão de download template
+<button
+  onClick={handleDownloadTemplate}
+  disabled={loading}
+  className="btn-primary flex items-center"
+>
+  {loading ? (
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+  ) : (
+    <Download className="h-4 w-4 mr-2" />
+  )}
+  Baixar Template Excel
+</button>
+
+// Botão de importar dados
+<button
+  onClick={handleImport}
+  disabled={loadingImport}
+  className="btn-primary flex items-center justify-center"
+>
+  {loadingImport ? (
+    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+  ) : null}
+  Importar Dados
+</button>
 ```
 
 ## 🔧 Troubleshooting
@@ -369,11 +441,18 @@ const handleSubmit = async () => {
 - **NotificacoesForm**: Botão "Salvar Configurações"
 - **SistemaForm**: Botão "Salvar Configurações"
 
+### ✅ Vendedores
+
+- **VendedorFormModal**: Botão "Atualizar" / "Cadastrar"
+- **VendedoresListPage**: Botão "Exportar Excel" (abre modal)
+- **TableExportModal**: Botão "Exportar Excel" (com loading no modal)
+- **ConfirmationModal**: Botões "Confirmar Inativação" e "Confirmar Ativação"
+- **ImportModal**: Botões "Baixar Template Excel" e "Importar Dados"
+
 ### 🔄 Próximas Seções
 
 - [ ] Cidades
 - [ ] Funcionários
-- [ ] Vendedores
 - [ ] Veículos
 - [ ] Rotas
 - [ ] Folgas
@@ -382,10 +461,11 @@ const handleSubmit = async () => {
 ## 🎯 Boas Práticas
 
 1. **Sempre use try/catch/finally** para garantir que loading seja resetado
-2. **Use variantes apropriadas** para cada contexto
-3. **Mantenha consistência** de tamanhos em cada seção
-4. **Teste sempre** o comportamento de loading
-5. **Documente mudanças** quando necessário
+2. **Mantenha o layout original** - Não altere o visual dos botões
+3. **Loading apenas no botão da ação** - Não desabilite botões de cancelar/fechar
+4. **Modal permanece aberto** durante loading - Só fecha após sucesso
+5. **Teste sempre** o comportamento de loading
+6. **Documente mudanças** quando necessário
 
 ## 📞 Suporte
 
@@ -399,5 +479,5 @@ Para dúvidas sobre implementação:
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.0  
-**Status:** Em implementação
+**Versão:** 1.1  
+**Status:** Vendedores implementado
