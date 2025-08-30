@@ -483,11 +483,17 @@ const handleSubmit = async () => {
 - **ConfirmationModal**: Botão "Excluir" (modal fecha apenas após sucesso)
 - **FolgasTable**: Botões "Aprovar" e "Rejeitar" (com loading inline)
 
+### ✅ Rotas
+
+- **RotaFormModal**: Botão "Atualizar" / "Criar" (modal fecha apenas após sucesso)
+- **RotasListPage**: Botão "Exportar Excel" (abre modal)
+- **TableExportModal**: Botão "Exportar Excel" (modal fecha apenas após sucesso)
+- **ModalConfirmacaoExclusaoGenerico**: Botão "Confirmar Exclusão" (modal fecha apenas após sucesso)
+
 ### 🔄 Próximas Seções
 
 - [ ] Funcionários
 - [ ] Veículos
-- [ ] Rotas
 - [ ] Autenticação
 
 ## 🎯 Boas Práticas
@@ -512,5 +518,5 @@ Para dúvidas sobre implementação:
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.3  
-**Status:** Folgas implementado com comportamento correto dos modais
+**Versão:** 1.4  
+**Status:** Rotas implementado com comportamento correto dos modais

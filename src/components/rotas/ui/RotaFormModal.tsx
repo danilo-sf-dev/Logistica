@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Eye } from "lucide-react";
+import LoadingButton from "../../common/LoadingButton";
 import { Rota, RotaFormData } from "../types";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type { Cidade } from "../../cidades/types";
@@ -11,6 +12,7 @@ interface RotaFormModalProps {
   onSubmit: (data: RotaFormData) => Promise<boolean>;
   editingRota?: Rota | null;
   erros?: Partial<Record<keyof RotaFormData, string>>;
+  loading?: boolean;
 }
 
 const DIAS_SEMANA = [
@@ -29,6 +31,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
   onSubmit,
   editingRota,
   erros = {},
+  loading = false,
 }) => {
   const [formData, setFormData] = useState<RotaFormData>({
     nome: "",
@@ -70,10 +73,10 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
     setLoadingCidades(true);
     try {
       const cidades = await Promise.all(
-        cidadeIds.map((id) => cidadesService.getById(id)),
+        cidadeIds.map((id) => cidadesService.getById(id))
       );
       const cidadesValidas = cidades.filter(
-        (cidade): cidade is Cidade => cidade !== null,
+        (cidade): cidade is Cidade => cidade !== null
       );
       setCidadesVinculadas(cidadesValidas);
     } catch (error) {
@@ -250,7 +253,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                         {cidadesVinculadas.map((cidade) => {
                           const regiaoNome = cidade.regiao
                             ? REGIOES_BRASIL.find(
-                                (r) => r.valor === cidade.regiao,
+                                (r) => r.valor === cidade.regiao
                               )?.nome
                             : null;
 
@@ -294,18 +297,15 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
               >
                 Cancelar
               </button>
-              <button
-                type="button"
+              <LoadingButton
                 onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                loading={loading}
+                variant="primary"
+                size="md"
+                className="w-full sm:w-auto"
               >
-                {isSubmitting
-                  ? "Salvando..."
-                  : editingRota
-                    ? "Atualizar"
-                    : "Criar"}
-              </button>
+                {editingRota ? "Atualizar" : "Criar"}
+              </LoadingButton>
             </div>
           </div>
         </div>
