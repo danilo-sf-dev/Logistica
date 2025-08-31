@@ -12,6 +12,7 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
 }) => {
   const {
     loading,
+    loadingDownload,
     periodo,
     dadosMotoristas,
     dadosFuncionarios,
@@ -94,7 +95,10 @@ export const RelatoriosPage: React.FC<RelatoriosProps> = ({
       </div>
 
       {/* Relatórios Detalhados */}
-      <RelatoriosDetalhados onDownload={handleDownload} />
+      <RelatoriosDetalhados
+        onDownload={handleDownload}
+        loading={loadingDownload}
+      />
     </div>
   );
 };

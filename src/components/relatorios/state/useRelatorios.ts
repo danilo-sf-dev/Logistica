@@ -31,6 +31,7 @@ export const useRelatorios = () => {
   const { showNotification } = useNotification();
   const { userProfile } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [loadingDownload, setLoadingDownload] = useState(false);
   const [periodo, setPeriodo] = useState("mes");
   const [dadosMotoristas, setDadosMotoristas] = useState<RelatorioData[]>([]);
   const [dadosFuncionarios, setDadosFuncionarios] = useState<RelatorioData[]>(
@@ -134,6 +135,7 @@ export const useRelatorios = () => {
 
   const handleDownload = useCallback(
     async (tipo: string, formato: "pdf" | "csv" = "pdf") => {
+      setLoadingDownload(true);
       try {
         // Verificar se é um relatório detalhado
         const isDetalhado = tipo.includes("_detalhado");
@@ -336,6 +338,8 @@ export const useRelatorios = () => {
       } catch (error) {
         console.error("Erro ao exportar relatório:", error);
         showNotification("Erro ao exportar relatório", "error");
+      } finally {
+        setLoadingDownload(false);
       }
     },
     [
@@ -369,6 +373,7 @@ export const useRelatorios = () => {
 
   return {
     loading,
+    loadingDownload,
     periodo,
     dadosMotoristas,
     dadosFuncionarios,

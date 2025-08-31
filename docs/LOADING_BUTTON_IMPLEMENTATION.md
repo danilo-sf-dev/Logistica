@@ -506,9 +506,14 @@ const handleSubmit = async () => {
 - **ConfirmationModal**: Botões "Confirmar Inativação" e "Confirmar Ativação" (modal fecha apenas após sucesso)
 - **ImportModal**: Botões de importação (já implementado)
 
+### ✅ Relatórios Detalhados
+
+- **RelatoriosDetalhados**: Botões de download de relatórios (abrem modal)
+- **ExportModal**: Botão "Exportar" (modal fecha apenas após sucesso)
+
 ### 🔄 Próximas Seções
 
-- [ ] Autenticação
+- [ ] Autenticação (não será implementado)
 
 ## 🎯 Boas Práticas
 
@@ -532,5 +537,5 @@ Para dúvidas sobre implementação:
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.6  
-**Status:** Funcionários implementado com comportamento correto dos modais
+**Versão:** 1.7  
+**Status:** Relatórios Detalhados implementado com comportamento correto dos modais

@@ -127,6 +127,7 @@ export interface GraficoCardProps {
 export interface RelatoriosDetalhadosProps {
   onDownload: (tipo: string, formato?: "pdf" | "csv") => void;
   className?: string;
+  loading?: boolean;
 }
 
 // Tipos para estado dos relatórios
