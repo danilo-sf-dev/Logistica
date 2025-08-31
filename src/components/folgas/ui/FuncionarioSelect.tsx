@@ -72,7 +72,7 @@ export function FuncionarioSelect({
   const funcionariosFiltrados = funcionarios.filter(
     (funcionario) =>
       funcionario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      funcionario.cpf.includes(searchTerm)
+      funcionario.cpf.includes(searchTerm),
   );
 
   const handleSelect = (funcionario: Funcionario) => {
