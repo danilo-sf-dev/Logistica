@@ -8,6 +8,7 @@ interface FuncionarioSelectProps {
   onChange: (funcionarioId: string, funcionarioNome: string) => void;
   placeholder?: string;
   error?: string;
+  disabled?: boolean;
 }
 
 export function FuncionarioSelect({
@@ -15,6 +16,7 @@ export function FuncionarioSelect({
   onChange,
   placeholder = "Selecione um funcionário",
   error,
+  disabled = false,
 }: FuncionarioSelectProps) {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -70,7 +72,7 @@ export function FuncionarioSelect({
   const funcionariosFiltrados = funcionarios.filter(
     (funcionario) =>
       funcionario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      funcionario.cpf.includes(searchTerm),
+      funcionario.cpf.includes(searchTerm)
   );
 
   const handleSelect = (funcionario: Funcionario) => {
@@ -92,8 +94,8 @@ export function FuncionarioSelect({
       <div
         className={`input-field cursor-pointer flex items-center justify-between ${
           error ? "border-red-500" : ""
-        }`}
-        onClick={() => setIsOpen(!isOpen)}
+        } ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
       >
         <span
           className={selectedFuncionario ? "text-gray-900" : "text-gray-500"}
@@ -101,7 +103,7 @@ export function FuncionarioSelect({
           {selectedFuncionario ? selectedFuncionario.nome : placeholder}
         </span>
         <div className="flex items-center space-x-2">
-          {selectedFuncionario && (
+          {selectedFuncionario && !disabled && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -120,7 +122,7 @@ export function FuncionarioSelect({
 
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
           {/* Campo de pesquisa */}
           <div className="p-2 border-b border-gray-200">
