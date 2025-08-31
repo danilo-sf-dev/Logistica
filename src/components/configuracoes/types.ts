@@ -50,6 +50,7 @@ export interface PerfilFormProps {
   data: PerfilData;
   errors: FormErrors;
   loading: boolean;
+  profileLoading?: boolean;
   onSubmit: (data: PerfilData) => Promise<void>;
   onChange: (field: keyof PerfilData, value: string) => void;
   className?: string;

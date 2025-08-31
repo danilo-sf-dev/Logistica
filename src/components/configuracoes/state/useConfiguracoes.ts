@@ -17,6 +17,7 @@ export const useConfiguracoes = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [configLoaded, setConfigLoaded] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const [perfilData, setPerfilData] = useState<PerfilData>({
     displayName: userProfile?.displayName || "",
@@ -65,6 +66,22 @@ export const useConfiguracoes = () => {
     }
   }, [userProfile, configLoaded]);
 
+  // Sincronizar dados do perfil sempre que userProfile mudar
+  useEffect(() => {
+    if (userProfile) {
+      setProfileLoading(true);
+      setPerfilData({
+        displayName: userProfile.displayName || "",
+        email: userProfile.email || "",
+        telefone: userProfile.telefone || "",
+        cargo: userProfile.cargo || "",
+      });
+      setProfileLoading(false);
+    } else {
+      setProfileLoading(false);
+    }
+  }, [userProfile]);
+
   const validatePerfilForm = useCallback((): boolean => {
     const newErrors: FormErrors = {};
 
@@ -98,7 +115,7 @@ export const useConfiguracoes = () => {
         await updateUserProfile(userProfile?.uid, perfilDataToSave);
         showNotification(
           "Perfil e configurações atualizados com sucesso!",
-          "success",
+          "success"
         );
       } catch (error) {
         console.error("Erro ao atualizar perfil:", error);
@@ -113,7 +130,7 @@ export const useConfiguracoes = () => {
       updateUserProfile,
       userProfile?.uid,
       notificacoes,
-    ],
+    ]
   );
 
   const handlePerfilChange = useCallback(
@@ -123,7 +140,7 @@ export const useConfiguracoes = () => {
         [field]: value,
       }));
     },
-    [],
+    []
   );
 
   const handleNotificacoesChange = useCallback(
@@ -140,7 +157,7 @@ export const useConfiguracoes = () => {
         [key]: !prev[key],
       }));
     },
-    [showNotification],
+    [showNotification]
   );
 
   const handleSistemaChange = useCallback(
@@ -150,7 +167,7 @@ export const useConfiguracoes = () => {
         [key]: value,
       }));
     },
-    [],
+    []
   );
 
   const handleNotificacoesSubmit = useCallback(async () => {
@@ -165,7 +182,7 @@ export const useConfiguracoes = () => {
       await updateUserProfile(userProfile?.uid, perfilDataToSave);
       showNotification(
         "Configurações de notificações atualizadas com sucesso!",
-        "success",
+        "success"
       );
     } catch (error) {
       console.error("Erro ao atualizar notificações:", error);
@@ -193,7 +210,7 @@ export const useConfiguracoes = () => {
       await updateUserProfile(userProfile?.uid, perfilDataToSave);
       showNotification(
         "Configurações do sistema atualizadas com sucesso!",
-        "success",
+        "success"
       );
     } catch (error) {
       console.error("Erro ao atualizar configurações do sistema:", error);
@@ -213,6 +230,7 @@ export const useConfiguracoes = () => {
     activeTab,
     setActiveTab,
     loading,
+    profileLoading,
     errors,
     perfilData,
     notificacoes,

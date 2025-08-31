@@ -35,28 +35,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
   // Aplicar o hook de ResizeObserver globalmente para suprimir erros
   useResizeObserver();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
 
   return (
     <ErrorBoundary>
@@ -79,20 +59,14 @@ const App: React.FC = () => {
                 />
 
                 <Routes>
-                  <Route
-                    path="/login"
-                    element={user ? <Navigate to="/dashboard" /> : <Login />}
-                  />
+                  <Route path="/login" element={<Login />} />
 
                   {/* Rotas de erro */}
                   <Route path="/error/500" element={<ServerErrorPage />} />
                   <Route path="/error/404" element={<NotFoundPage />} />
                   <Route path="/error-test" element={<ErrorTestPage />} />
 
-                  <Route
-                    path="/"
-                    element={user ? <Layout /> : <Navigate to="/login" />}
-                  >
+                  <Route path="/" element={<Layout />}>
                     <Route index element={<Navigate to="/dashboard" />} />
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="funcionarios" element={<Funcionarios />} />
