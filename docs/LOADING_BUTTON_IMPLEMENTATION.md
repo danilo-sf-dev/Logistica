@@ -498,9 +498,16 @@ const handleSubmit = async () => {
 - **ConfirmationModal**: Botões "Sim, Ativar" e "Sim, Inativar" (modal fecha apenas após sucesso)
 - **ImportModal**: Botões de importação (já implementado)
 
+### ✅ Funcionários
+
+- **FuncionarioFormModal**: Botão "Atualizar" / "Cadastrar" (modal fecha apenas após sucesso)
+- **FuncionariosListPage**: Botão "Exportar Excel" (abre modal)
+- **TableExportModal**: Botão "Exportar Excel" (modal fecha apenas após sucesso)
+- **ConfirmationModal**: Botões "Confirmar Inativação" e "Confirmar Ativação" (modal fecha apenas após sucesso)
+- **ImportModal**: Botões de importação (já implementado)
+
 ### 🔄 Próximas Seções
 
-- [ ] Funcionários
 - [ ] Autenticação
 
 ## 🎯 Boas Práticas
@@ -525,5 +532,5 @@ Para dúvidas sobre implementação:
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.5  
-**Status:** Veículos implementado com comportamento correto dos modais
+**Versão:** 1.6  
+**Status:** Funcionários implementado com comportamento correto dos modais
