@@ -56,6 +56,7 @@ export function FolgaFormModal({
                 }
                 placeholder="Selecione um funcionário"
                 error={erros.funcionarioId}
+                disabled={editando}
               />
             </div>
 

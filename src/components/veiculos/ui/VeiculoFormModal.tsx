@@ -149,11 +149,13 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                     })
                   }
                   className={`input-field ${erros.placa ? "border-red-500" : ""} ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                    somenteLeitura || !!editingVeiculo
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : ""
                   }`}
                   placeholder="ABC1234"
                   maxLength={7}
-                  disabled={somenteLeitura}
+                  disabled={somenteLeitura || !!editingVeiculo}
                 />
                 {erros.placa && (
                   <p className="text-red-500 text-xs mt-1">{erros.placa}</p>

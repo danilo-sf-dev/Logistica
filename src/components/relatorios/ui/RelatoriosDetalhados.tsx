@@ -31,8 +31,19 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
             Relatórios Detalhados
           </h3>
           <p className="text-sm text-gray-500 mt-1">
-            Exporte listas completas com todos os dados de cada entidade
+            Exporte relatórios completos com os dados relacionados de cada
+            sessão.
           </p>
+          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-xs text-blue-800">
+              <strong>ℹ️ Observação:</strong> Relatórios de{" "}
+              <strong>Rotas</strong> e <strong>Folgas</strong> são temporais
+              (filtrados por período selecionado). Relatórios de{" "}
+              <strong>Veículos</strong>, <strong>Cidades</strong>,
+              <strong>Vendedores</strong> e <strong>Funcionários</strong>{" "}
+              mostram todos os dados cadastrados.
+            </p>
+          </div>
         </div>
       </div>
 

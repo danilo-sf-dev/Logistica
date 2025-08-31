@@ -79,8 +79,12 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                     const valorLimpo = e.target.value.replace(/\D/g, "");
                     onChange({ ...valores, cpf: valorLimpo });
                   }}
-                  disabled={somenteLeitura}
-                  className={`input-field ${erros.cpf ? "border-red-500" : ""}`}
+                  disabled={somenteLeitura || !!editando}
+                  className={`input-field ${erros.cpf ? "border-red-500" : ""} ${
+                    somenteLeitura || !!editando
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : ""
+                  }`}
                   placeholder="000.000.000-00"
                 />
                 {erros.cpf && (

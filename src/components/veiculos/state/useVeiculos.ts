@@ -111,6 +111,18 @@ export const useVeiculos = () => {
     [showNotification],
   );
 
+  const checkPlacaExists = useCallback(
+    async (placa: string, excludeId?: string) => {
+      try {
+        return await VeiculosService.checkPlacaExists(placa, excludeId);
+      } catch (error) {
+        console.error("Erro ao verificar placa:", error);
+        return false;
+      }
+    },
+    [],
+  );
+
   const createVeiculo = useCallback(
     async (veiculoData: VeiculoFormData) => {
       // Validar formulário
@@ -126,7 +138,18 @@ export const useVeiculos = () => {
         await fetchVeiculos();
         return true;
       } catch (error) {
-        showNotification("Erro ao cadastrar veículo", "error");
+        if (
+          error instanceof Error &&
+          error.message.includes("já está cadastrado")
+        ) {
+          setErros((prev) => ({
+            ...prev,
+            placa: "Esta placa já está cadastrada no sistema",
+          }));
+          showNotification(error.message, "error");
+        } else {
+          showNotification("Erro ao cadastrar veículo", "error");
+        }
         return false;
       } finally {
         setLoadingSubmit(false);
@@ -191,18 +214,6 @@ export const useVeiculos = () => {
       }
     },
     [fetchVeiculos, showNotification],
-  );
-
-  const checkPlacaExists = useCallback(
-    async (placa: string, excludeId?: string) => {
-      try {
-        return await VeiculosService.checkPlacaExists(placa, excludeId);
-      } catch (error) {
-        console.error("Erro ao verificar placa:", error);
-        return false;
-      }
-    },
-    [],
   );
 
   const updateFilters = useCallback(

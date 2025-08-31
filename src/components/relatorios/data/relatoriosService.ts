@@ -76,6 +76,17 @@ export const relatoriosService = {
         motoristas = this.filtrarPorPeriodo(motoristas, periodo);
       }
 
+      // Ordenar por data de criação (mais recente primeiro)
+      motoristas.sort((a, b) => {
+        const dataA = a.dataCriacao?.toDate
+          ? a.dataCriacao.toDate()
+          : new Date(a.dataCriacao || 0);
+        const dataB = b.dataCriacao?.toDate
+          ? b.dataCriacao.toDate()
+          : new Date(b.dataCriacao || 0);
+        return dataB.getTime() - dataA.getTime(); // Decrescente (mais recente primeiro)
+      });
+
       return motoristas;
     } catch (error) {
       console.error("Erro ao buscar motoristas:", error);
@@ -99,6 +110,17 @@ export const relatoriosService = {
         funcionarios = this.filtrarPorPeriodo(funcionarios, periodo);
       }
 
+      // Ordenar por data de criação (mais recente primeiro)
+      funcionarios.sort((a, b) => {
+        const dataA = a.dataCriacao?.toDate
+          ? a.dataCriacao.toDate()
+          : new Date(a.dataCriacao || 0);
+        const dataB = b.dataCriacao?.toDate
+          ? b.dataCriacao.toDate()
+          : new Date(b.dataCriacao || 0);
+        return dataB.getTime() - dataA.getTime(); // Decrescente (mais recente primeiro)
+      });
+
       return funcionarios;
     } catch (error) {
       console.error("Erro ao buscar funcionários:", error);
@@ -115,10 +137,18 @@ export const relatoriosService = {
         ...doc.data(),
       })) as VeiculoData[];
 
-      // Aplicar filtro por período se especificado
-      if (periodo) {
-        veiculos = this.filtrarPorPeriodo(veiculos, periodo);
-      }
+      // Veículos não são entidades temporais, então não aplicamos filtro de período
+      // Apenas retornamos todos os veículos cadastrados
+      // Ordenar por data de criação (mais recente primeiro)
+      veiculos.sort((a, b) => {
+        const dataA = a.dataCriacao?.toDate
+          ? a.dataCriacao.toDate()
+          : new Date(a.dataCriacao || 0);
+        const dataB = b.dataCriacao?.toDate
+          ? b.dataCriacao.toDate()
+          : new Date(b.dataCriacao || 0);
+        return dataB.getTime() - dataA.getTime(); // Decrescente (mais recente primeiro)
+      });
 
       return veiculos;
     } catch (error) {
@@ -141,6 +171,17 @@ export const relatoriosService = {
         rotas = this.filtrarPorPeriodo(rotas, periodo);
       }
 
+      // Ordenar por data de criação (mais recente primeiro)
+      rotas.sort((a, b) => {
+        const dataA = a.dataCriacao?.toDate
+          ? a.dataCriacao.toDate()
+          : new Date(a.dataCriacao || 0);
+        const dataB = b.dataCriacao?.toDate
+          ? b.dataCriacao.toDate()
+          : new Date(b.dataCriacao || 0);
+        return dataB.getTime() - dataA.getTime(); // Decrescente (mais recente primeiro)
+      });
+
       return rotas;
     } catch (error) {
       console.error("Erro ao buscar rotas:", error);
@@ -162,6 +203,17 @@ export const relatoriosService = {
         folgas = this.filtrarPorPeriodo(folgas, periodo);
       }
 
+      // Ordenar por data de início (mais recente primeiro)
+      folgas.sort((a, b) => {
+        const dataA = a.dataInicio?.toDate
+          ? a.dataInicio.toDate()
+          : new Date(a.dataInicio || 0);
+        const dataB = b.dataInicio?.toDate
+          ? b.dataInicio.toDate()
+          : new Date(b.dataInicio || 0);
+        return dataB.getTime() - dataA.getTime(); // Decrescente (mais recente primeiro)
+      });
+
       return folgas;
     } catch (error) {
       console.error("Erro ao buscar folgas:", error);
@@ -178,10 +230,18 @@ export const relatoriosService = {
         ...doc.data(),
       })) as Cidade[];
 
-      // Aplicar filtro por período se especificado
-      if (periodo) {
-        cidades = this.filtrarPorPeriodo(cidades, periodo);
-      }
+      // Cidades não são entidades temporais, então não aplicamos filtro de período
+      // Apenas retornamos todas as cidades cadastradas
+      // Ordenar por data de criação (mais recente primeiro)
+      cidades.sort((a, b) => {
+        const dataA = a.dataCriacao?.toDate
+          ? a.dataCriacao.toDate()
+          : new Date(a.dataCriacao || 0);
+        const dataB = b.dataCriacao?.toDate
+          ? b.dataCriacao.toDate()
+          : new Date(b.dataCriacao || 0);
+        return dataB.getTime() - dataA.getTime(); // Decrescente (mais recente primeiro)
+      });
 
       return cidades;
     } catch (error) {
@@ -199,10 +259,18 @@ export const relatoriosService = {
         ...doc.data(),
       })) as Vendedor[];
 
-      // Aplicar filtro por período se especificado
-      if (periodo) {
-        vendedores = this.filtrarPorPeriodo(vendedores, periodo);
-      }
+      // Vendedores não são entidades temporais, então não aplicamos filtro de período
+      // Apenas retornamos todos os vendedores cadastrados
+      // Ordenar por data de criação (mais recente primeiro)
+      vendedores.sort((a, b) => {
+        const dataA = a.dataCriacao?.toDate
+          ? a.dataCriacao.toDate()
+          : new Date(a.dataCriacao || 0);
+        const dataB = b.dataCriacao?.toDate
+          ? b.dataCriacao.toDate()
+          : new Date(b.dataCriacao || 0);
+        return dataB.getTime() - dataA.getTime(); // Decrescente (mais recente primeiro)
+      });
 
       return vendedores;
     } catch (error) {

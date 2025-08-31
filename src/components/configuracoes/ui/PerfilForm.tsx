@@ -47,9 +47,13 @@ export const PerfilForm: React.FC<PerfilFormProps> = ({
               type="email"
               value={data.email}
               onChange={(e) => onChange("email", e.target.value)}
-              className={`input-field ${errors.email ? "border-red-500" : ""}`}
+              className={`input-field bg-gray-100 cursor-not-allowed ${errors.email ? "border-red-500" : ""}`}
               placeholder="exemplo@email.com"
+              disabled={true}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              O email não pode ser alterado pois está vinculado ao seu login
+            </p>
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email}</p>
             )}

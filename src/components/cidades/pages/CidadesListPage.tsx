@@ -98,7 +98,7 @@ const CidadesListPage: React.FC = () => {
       setValores({
         nome: editando.nome || "",
         estado: editando.estado || "",
-        regiao: editando.regiao ? editando.regiao.toLowerCase() : "",
+        regiao: editando.regiao || "",
         distancia: editando.distancia ? String(editando.distancia) : "",
         pesoMinimo: editando.pesoMinimo ? String(editando.pesoMinimo) : "",
         rotaId: editando.rotaId || "",

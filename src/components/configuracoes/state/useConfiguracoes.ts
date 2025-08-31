@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useNotification } from "../../../contexts/NotificationContext";
-import { validateEmail, validateCelular } from "../../../utils/masks";
+import { validateCelular } from "../../../utils/masks";
 import type {
   PerfilData,
   NotificacoesConfig,
@@ -68,9 +68,7 @@ export const useConfiguracoes = () => {
   const validatePerfilForm = useCallback((): boolean => {
     const newErrors: FormErrors = {};
 
-    if (perfilData.email && !validateEmail(perfilData.email)) {
-      newErrors.email = "Email inválido";
-    }
+    // Email não é validado pois não pode ser alterado
     if (perfilData.telefone && !validateCelular(perfilData.telefone)) {
       newErrors.telefone = "Telefone inválido (formato: (73) 99999-9999)";
     }
