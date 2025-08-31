@@ -13,13 +13,12 @@ export class VeiculosTableExportService extends BaseTableExportService {
       "ano",
       "capacidade",
       "tipoCarroceria",
-      "quantidadeEixos",
       "tipoBau",
+      "quantidadeEixos",
       "status",
       "unidadeNegocio",
       "ultimaManutencao",
       "proximaManutencao",
-      "motorista",
       "observacao",
       "dataCriacao",
     ],
@@ -104,7 +103,6 @@ export class VeiculosTableExportService extends BaseTableExportService {
         if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
         return valor;
       },
-      motorista: (valor) => (valor ? valor.toUpperCase() : "N/A"),
       observacao: (valor) => (valor ? valor : "N/A"),
       dataCriacao: (valor) => {
         if (!valor) return "N/A";

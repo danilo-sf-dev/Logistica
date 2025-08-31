@@ -26,7 +26,6 @@ export class VeiculosImportService extends BaseImportService {
       "ano",
       "ultimaManutencao",
       "proximaManutencao",
-      "motorista",
       "observacao",
     ],
     validationRules: [
@@ -74,7 +73,6 @@ export class VeiculosImportService extends BaseImportService {
       { field: "placa", transform: "uppercase" },
       { field: "modelo", transform: "uppercase" },
       { field: "marca", transform: "uppercase" },
-      { field: "motorista", transform: "uppercase" },
       { field: "observacao", transform: "uppercase" },
       { field: "capacidade", transform: "cleanNumeric" },
       { field: "quantidadeEixos", transform: "cleanNumeric" },
@@ -87,13 +85,12 @@ export class VeiculosImportService extends BaseImportService {
         "Ano",
         "Capacidade*",
         "Tipo Carroceria*",
-        "Quantidade Eixos*",
         "Tipo Baú*",
+        "Quantidade Eixos*",
         "Status*",
         "Unidade Negócio*",
         "Última Manutenção",
         "Próxima Manutenção",
-        "Motorista",
         "Observação",
       ],
       exampleData: [
@@ -104,13 +101,12 @@ export class VeiculosImportService extends BaseImportService {
           "2020",
           "25000",
           "Truck",
-          "3",
           "Frigorífico",
+          "3",
           "Disponível",
           "Frigorífico",
           "15/01/2024",
           "15/04/2024",
-          "JOÃO SILVA",
           "Veículo em excelente estado",
         ],
         [
@@ -120,13 +116,12 @@ export class VeiculosImportService extends BaseImportService {
           "2021",
           "30000",
           "Carreta",
-          "6",
           "Frigorífico",
+          "6",
           "Disponível",
           "Ovos",
           "20/02/2024",
           "20/05/2024",
-          "MARIA SANTOS",
           "Veículo para transporte de ovos",
         ],
       ],
@@ -137,13 +132,12 @@ export class VeiculosImportService extends BaseImportService {
         "Ano: Ano de fabricação (opcional)",
         "Capacidade: Capacidade em kg (deve ser número)",
         "Tipo Carroceria: Truck, Toco, Bitruck, Carreta, Carreta LS, Carreta 3 Eixos, Truck 3 Eixos, Truck 4 Eixos",
-        "Quantidade Eixos: 2, 3, 4, 5, 6, 7, 8, 9 (apenas o número)",
         "Tipo Baú: Frigorífico, Carga Seca, Baucher, Graneleiro, Tanque, Caçamba, Plataforma",
+        "Quantidade Eixos: 2, 3, 4, 5, 6, 7, 8, 9 (apenas o número)",
         "Status: Disponível, Em Uso, Manutenção, Inativo",
         "Unidade Negócio: Frigorífico, Ovos, Ambos",
         "Última Manutenção: Data no formato DD/MM/AAAA (opcional)",
         "Próxima Manutenção: Data no formato DD/MM/AAAA (opcional)",
-        "Motorista: Nome do motorista (opcional, será convertido para maiúsculas)",
         "Observação: Observações sobre o veículo (opcional, será convertida para maiúsculas)",
       ],
       validations: [
@@ -259,16 +253,16 @@ export class VeiculosImportService extends BaseImportService {
         if (!row[6]?.toString().trim()) {
           errors.push({
             row: rowNumber,
-            field: "Quantidade Eixos",
-            message: "Quantidade de eixos é obrigatória",
+            field: "Tipo Baú",
+            message: "Tipo de baú é obrigatório",
           });
         }
 
         if (!row[7]?.toString().trim()) {
           errors.push({
             row: rowNumber,
-            field: "Tipo Baú",
-            message: "Tipo de baú é obrigatório",
+            field: "Quantidade Eixos",
+            message: "Quantidade de eixos é obrigatória",
           });
         }
 
@@ -310,7 +304,7 @@ export class VeiculosImportService extends BaseImportService {
           });
         }
 
-        if (row[6] && (isNaN(Number(row[6])) || Number(row[6]) <= 0)) {
+        if (row[7] && (isNaN(Number(row[7])) || Number(row[7]) <= 0)) {
           errors.push({
             row: rowNumber,
             field: "Quantidade Eixos",
@@ -330,6 +324,20 @@ export class VeiculosImportService extends BaseImportService {
             row: rowNumber,
             field: "Tipo Carroceria",
             message: `Tipo de carroceria "${row[5]}" inválido. Opções válidas: ${VeiculosImportService.VALID_TIPOS_CARROCERIA_VISIVEIS.join(", ")}`,
+          });
+        }
+
+        // Validação de tipo de baú
+        if (
+          row[6] &&
+          !VeiculosImportService.VALID_TIPOS_BAU_VISIVEIS.includes(
+            row[6].toString(),
+          )
+        ) {
+          errors.push({
+            row: rowNumber,
+            field: "Tipo Baú",
+            message: `Tipo de baú "${row[6]}" inválido. Opções válidas: ${VeiculosImportService.VALID_TIPOS_BAU_VISIVEIS.join(", ")}`,
           });
         }
 
@@ -358,20 +366,6 @@ export class VeiculosImportService extends BaseImportService {
             row: rowNumber,
             field: "Unidade Negócio",
             message: `Unidade de negócio "${row[9]}" inválida. Opções válidas: ${VeiculosImportService.VALID_UNIDADES_NEGOCIO_VISIVEIS.join(", ")}`,
-          });
-        }
-
-        // Validação de tipo de baú
-        if (
-          row[7] &&
-          !VeiculosImportService.VALID_TIPOS_BAU_VISIVEIS.includes(
-            row[7].toString(),
-          )
-        ) {
-          errors.push({
-            row: rowNumber,
-            field: "Tipo Baú",
-            message: `Tipo de baú "${row[7]}" inválido. Opções válidas: ${VeiculosImportService.VALID_TIPOS_BAU_VISIVEIS.join(", ")}`,
           });
         }
 
@@ -420,9 +414,9 @@ export class VeiculosImportService extends BaseImportService {
       tipoCarroceria:
         VeiculosImportService.TIPO_CARROCERIA_MAP[row[5]?.toString()] ||
         "truck",
-      quantidadeEixos: row[6]?.toString().trim() || "",
       tipoBau:
-        VeiculosImportService.TIPO_BAU_MAP[row[7]?.toString()] || "frigorifico",
+        VeiculosImportService.TIPO_BAU_MAP[row[6]?.toString()] || "frigorifico",
+      quantidadeEixos: row[7]?.toString().trim() || "",
       status:
         VeiculosImportService.STATUS_MAP[row[8]?.toString()] || "disponivel",
       unidadeNegocio:
@@ -432,8 +426,8 @@ export class VeiculosImportService extends BaseImportService {
       proximaManutencao: this.convertDateToISO(
         row[11]?.toString().trim() || "",
       ),
-      motorista: row[12]?.toString().toUpperCase().trim() || "",
-      observacao: row[13]?.toString().toUpperCase().trim() || "",
+      motorista: "",
+      observacao: row[12]?.toString().toUpperCase().trim() || "",
     }));
   }
 

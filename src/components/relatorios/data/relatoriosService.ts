@@ -115,11 +115,8 @@ export const relatoriosService = {
         ...doc.data(),
       })) as VeiculoData[];
 
-      // Aplicar filtro por período se especificado
-      if (periodo) {
-        veiculos = this.filtrarPorPeriodo(veiculos, periodo);
-      }
-
+      // Veículos não são entidades temporais, então não aplicamos filtro de período
+      // Apenas retornamos todos os veículos cadastrados
       return veiculos;
     } catch (error) {
       console.error("Erro ao buscar veículos:", error);
@@ -178,11 +175,8 @@ export const relatoriosService = {
         ...doc.data(),
       })) as Cidade[];
 
-      // Aplicar filtro por período se especificado
-      if (periodo) {
-        cidades = this.filtrarPorPeriodo(cidades, periodo);
-      }
-
+      // Cidades não são entidades temporais, então não aplicamos filtro de período
+      // Apenas retornamos todas as cidades cadastradas
       return cidades;
     } catch (error) {
       console.error("Erro ao buscar cidades:", error);
@@ -199,11 +193,8 @@ export const relatoriosService = {
         ...doc.data(),
       })) as Vendedor[];
 
-      // Aplicar filtro por período se especificado
-      if (periodo) {
-        vendedores = this.filtrarPorPeriodo(vendedores, periodo);
-      }
-
+      // Vendedores não são entidades temporais, então não aplicamos filtro de período
+      // Apenas retornamos todos os vendedores cadastrados
       return vendedores;
     } catch (error) {
       console.error("Erro ao buscar vendedores:", error);
