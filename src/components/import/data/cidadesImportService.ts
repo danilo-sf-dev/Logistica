@@ -1,5 +1,6 @@
 import { BaseImportService } from "./importService";
 import { cidadesService } from "../../cidades/data/cidadesService";
+import { obterRegiaoPorEstado } from "utils/constants";
 import type {
   ImportConfig,
   ValidationResult,
@@ -58,14 +59,14 @@ export class CidadesImportService extends BaseImportService {
         "Observação",
       ],
       exampleData: [
-        ["SÃO PAULO", "SP", "sudeste", "0", "1000", "Capital do estado"],
-        ["RIO DE JANEIRO", "RJ", "sudeste", "430", "500", "Cidade maravilhosa"],
-        ["BELO HORIZONTE", "MG", "sudeste", "586", "800", "Capital de Minas"],
+        ["SÃO PAULO", "SP", "", "0", "1000", "Capital do estado"],
+        ["RIO DE JANEIRO", "RJ", "", "430", "500", "Cidade maravilhosa"],
+        ["BELO HORIZONTE", "MG", "", "586", "800", "Capital de Minas"],
       ],
       instructions: [
         "Nome: Nome da cidade (será convertido para maiúsculas)",
         "Estado: Sigla do estado (será convertido para maiúsculas)",
-        "Região: Região geográfica (opcional, será convertido para minúsculas)",
+        "Região: Região geográfica (opcional, será preenchida automaticamente baseada no estado)",
         "Distância: Distância em km da sede (opcional, apenas números)",
         "Peso Mínimo: Peso mínimo em kg para entrega (opcional, apenas números)",
         "Observação: Observações adicionais (opcional)",
@@ -73,6 +74,7 @@ export class CidadesImportService extends BaseImportService {
       validations: [
         "Nome e Estado são obrigatórios",
         "Nome da cidade deve ser único no sistema",
+        "Região será preenchida automaticamente baseada no estado",
         "Distância e Peso Mínimo devem ser números válidos",
         "Estado deve ser uma sigla válida (SP, RJ, MG, etc.)",
       ],
@@ -89,8 +91,8 @@ export class CidadesImportService extends BaseImportService {
       const nomesExistentes = new Set(
         cidadesExistentes.map(
           (cidade) =>
-            `${this.normalizeCityName(cidade.nome)}-${cidade.estado.toUpperCase()}`,
-        ),
+            `${this.normalizeCityName(cidade.nome)}-${cidade.estado.toUpperCase()}`
+        )
       );
 
       // Validar cada linha
@@ -194,9 +196,15 @@ export class CidadesImportService extends BaseImportService {
           estado: row[1]?.toString().trim().toUpperCase() || "",
         };
 
-        // Adicionar campos opcionais apenas se tiverem valor
+        // Definir região automaticamente baseada no estado se não for fornecida
         if (row[2]?.toString().trim()) {
           cidade.regiao = row[2].toString().trim().toUpperCase();
+        } else {
+          // Se região não foi fornecida, obter automaticamente do estado
+          const regiaoAutomatica = obterRegiaoPorEstado(cidade.estado);
+          if (regiaoAutomatica) {
+            cidade.regiao = regiaoAutomatica;
+          }
         }
 
         if (row[3] !== undefined && row[3] !== null && row[3] !== "") {
@@ -214,7 +222,7 @@ export class CidadesImportService extends BaseImportService {
         return cidade;
       } catch (error) {
         throw new Error(
-          `Erro ao processar linha ${index + 1}: ${error.message}`,
+          `Erro ao processar linha ${index + 1}: ${error.message}`
         );
       }
     });

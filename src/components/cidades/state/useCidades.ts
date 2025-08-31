@@ -3,6 +3,7 @@ import { useNotification } from "../../../contexts/NotificationContext";
 import { cidadesService } from "../data/cidadesService";
 import { CidadesTableExportService } from "../export/CidadesTableExportService";
 import { useRotasForCidades } from "./useRotasForCidades";
+import { obterRegiaoPorEstado } from "utils/constants";
 import type { Cidade, CidadeInput, CidadeFormData } from "../types";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
@@ -30,7 +31,7 @@ export function useCidades() {
   const [editando, setEditando] = useState<Cidade | null>(null);
   const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
   const [cidadeParaExcluir, setCidadeParaExcluir] = useState<Cidade | null>(
-    null,
+    null
   );
   const [termoBusca, setTermoBusca] = useState("");
   const [filtroRegiao, setFiltroRegiao] = useState("");
@@ -94,7 +95,7 @@ export function useCidades() {
       const payload: CidadeInput = {
         ...valores,
         nome: valores.nome.toUpperCase(),
-        regiao: valores.regiao?.toUpperCase() ?? "",
+        regiao: valores.regiao?.toUpperCase() || undefined, // Deixar undefined para o serviço definir automaticamente
         distancia: valores.distancia ? parseFloat(valores.distancia) : null,
         pesoMinimo: valores.pesoMinimo ? parseFloat(valores.pesoMinimo) : null,
         rotaId: valores.rotaId || null,
@@ -147,15 +148,22 @@ export function useCidades() {
 
   const editarCidade = useCallback((cidade: Cidade) => {
     setEditando(cidade);
-    setValores({
+
+    // Garantir que a região seja sempre preenchida baseada no estado
+    const regiaoAutomatica = obterRegiaoPorEstado(cidade.estado);
+    const regiao = cidade.regiao || regiaoAutomatica || "";
+
+    const valoresIniciais = {
       nome: cidade.nome || "",
       estado: cidade.estado || "",
-      regiao: cidade.regiao || "",
+      regiao: regiao,
       distancia: cidade.distancia ? String(cidade.distancia) : "",
       pesoMinimo: cidade.pesoMinimo ? String(cidade.pesoMinimo) : "",
       rotaId: cidade.rotaId || "",
       observacao: cidade.observacao || "",
-    });
+    };
+
+    setValores(valoresIniciais);
     setMostrarModal(true);
   }, []);
 
@@ -199,7 +207,7 @@ export function useCidades() {
         setDirecaoOrdenacao("asc");
       }
     },
-    [direcaoOrdenacao, ordenarPor],
+    [direcaoOrdenacao, ordenarPor]
   );
 
   const listaFiltrada = useMemo(() => {

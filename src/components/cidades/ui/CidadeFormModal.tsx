@@ -37,12 +37,12 @@ export const CidadeFormModal: React.FC<Props> = ({
   useEffect(() => {
     if (valores.estado) {
       const regiaoAutomatica = obterRegiaoPorEstado(valores.estado);
-      if (regiaoAutomatica) {
-        // Sempre atualizar a região quando o estado mudar
+      if (regiaoAutomatica && valores.regiao !== regiaoAutomatica) {
+        // Atualizar a região apenas se for diferente da atual
         onChange({ ...valores, regiao: regiaoAutomatica });
       }
     }
-  }, [valores.estado, onChange]);
+  }, [valores.estado]);
 
   if (!aberto) return null;
 

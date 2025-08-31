@@ -98,7 +98,7 @@ const CidadesListPage: React.FC = () => {
       setValores({
         nome: editando.nome || "",
         estado: editando.estado || "",
-        regiao: editando.regiao ? editando.regiao.toLowerCase() : "",
+        regiao: editando.regiao || "",
         distancia: editando.distancia ? String(editando.distancia) : "",
         pesoMinimo: editando.pesoMinimo ? String(editando.pesoMinimo) : "",
         rotaId: editando.rotaId || "",
@@ -205,7 +205,7 @@ const CidadesListPage: React.FC = () => {
               <button
                 onClick={() =>
                   setPaginaAtual(
-                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
+                    Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
                   )
                 }
                 disabled={paginaAtual === totalPaginado.totalPaginas}
@@ -253,7 +253,7 @@ const CidadesListPage: React.FC = () => {
                   </button>
                   {Array.from(
                     { length: totalPaginado.totalPaginas },
-                    (_, i) => i + 1,
+                    (_, i) => i + 1
                   ).map((page) => (
                     <button
                       key={page}
@@ -270,7 +270,7 @@ const CidadesListPage: React.FC = () => {
                   <button
                     onClick={() =>
                       setPaginaAtual(
-                        Math.min(totalPaginado.totalPaginas, paginaAtual + 1),
+                        Math.min(totalPaginado.totalPaginas, paginaAtual + 1)
                       )
                     }
                     disabled={paginaAtual === totalPaginado.totalPaginas}
