@@ -100,10 +100,12 @@ const FuncionarioFormModal: React.FC<Props> = ({
                     onChange({ ...valores, cpf: valorLimpo });
                   }}
                   className={`input-field h-11 ${erros.cpf ? "border-red-500" : ""} ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                    somenteLeitura || !!editando
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : ""
                   }`}
                   placeholder="000.000.000-00"
-                  disabled={somenteLeitura}
+                  disabled={somenteLeitura || !!editando}
                 />
                 {erros.cpf && (
                   <p className="text-red-500 text-xs mt-1">{erros.cpf}</p>
