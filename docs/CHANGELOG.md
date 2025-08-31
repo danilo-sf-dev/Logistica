@@ -1,5 +1,91 @@
 # 📝 Changelog - Sistema de Gestão de Logística
 
+## [1.2.2] - 2025-01-XX
+
+### 🚛 **Reestruturação da Tabela de Veículos**
+
+#### **Nova Estrutura de Colunas**
+
+- **✅ Coluna "Ano" Separada**: Removida da coluna "Marca", agora é coluna independente
+- **✅ Colunas "Carroceria" e "Baú" Separadas**: Antes combinadas em "Carroceria/Baú"
+- **❌ Campo "Motorista" Removido**: Não mais exibido na visualização (mantido no banco)
+- **🎯 Ordenação**: Todas as colunas agora são ordenáveis individualmente
+
+#### **Estrutura Final da Tabela**
+
+```
+Marca → Modelo → Ano → Placa → Capacidade → Carroceria → Baú → Status → Unidade → Ações
+```
+
+#### **Arquivos Modificados**
+
+- ✅ `src/components/veiculos/ui/VeiculosTable.tsx` - Nova estrutura de colunas
+- ✅ `src/components/veiculos/types.ts` - Campo motorista tornado opcional
+- ✅ `src/components/veiculos/export/VeiculosTableExportService.ts` - Exportação atualizada
+- ✅ `src/components/import/data/veiculosImportService.ts` - Importação atualizada
+
+### 📊 **Sistema de Relatórios Otimizado**
+
+#### **Correção de Filtros de Período**
+
+- **✅ Entidades Não-Temporais**: Veículos, Cidades, Vendedores não aplicam filtro de período
+- **✅ Entidades Temporais**: Rotas, Folgas, Funcionários mantêm filtro de período
+- **🎯 Resultado**: Relatórios mostram dados corretos (ex: 11 veículos em vez de 7)
+
+#### **Ordenação Padrão dos Relatórios**
+
+- **🕒 Ordenação por Data**: Todos os relatórios agora mostram dados do mais recente para o mais antigo
+- **📅 Campo de Referência**:
+  - Veículos, Cidades, Vendedores, Funcionários: `dataCriacao`
+  - Folgas: `dataInicio`
+  - Rotas: `dataCriacao`
+
+#### **Interface de Relatórios Melhorada**
+
+- **ℹ️ Caixa Informativa**: Explicação clara sobre quais relatórios são temporais
+- **📝 Texto Atualizado**: "Exporte relatórios completos com os dados relacionados de cada sessão"
+- **🎨 Design**: Caixa azul informativa com ícone de observação
+
+#### **Arquivos Modificados**
+
+- ✅ `src/components/relatorios/data/relatoriosService.ts` - Ordenação implementada
+- ✅ `src/components/relatorios/ui/RelatoriosDetalhados.tsx` - Interface melhorada
+- ✅ `src/components/relatorios/export/VeiculosExportService.ts` - Exportação atualizada
+
+### 🔧 **Melhorias Técnicas**
+
+#### **Validação de Unicidade**
+
+- **✅ Placa de Veículos**: Validação de unicidade implementada no backend
+- **✅ CPF de Funcionários**: Validação de unicidade mantida
+- **✅ CNH de Funcionários**: Validação de unicidade mantida
+
+#### **Campos Desabilitados na Edição**
+
+- **🔒 CPF**: Desabilitado na edição de funcionários e vendedores
+- **🔒 Placa**: Desabilitada na edição de veículos
+- **🔒 Funcionário**: Desabilitado na edição de folgas
+- **�� Email**: Desabilitado na configuração de perfil
+
+#### **Arquivos Modificados**
+
+- ✅ `src/components/funcionarios/ui/FuncionarioFormModal.tsx` - CPF desabilitado na edição
+- ✅ `src/components/vendedores/ui/VendedorFormModal.tsx` - CPF desabilitado na edição
+- ✅ `src/components/veiculos/ui/VeiculoFormModal.tsx` - Placa desabilitada na edição
+- ✅ `src/components/folgas/ui/FolgaFormModal.tsx` - Funcionário desabilitado na edição
+- ✅ `src/components/configuracoes/ui/PerfilForm.tsx` - Email desabilitado
+
+### 🐛 **Correções de Bugs**
+
+#### **Campo Região das Cidades**
+
+- **✅ Auto-preenchimento**: Região agora é preenchida automaticamente baseada no estado
+- **✅ Importação Excel**: Região é populada automaticamente se não fornecida
+- **✅ Edição**: Região é mantida corretamente durante edições
+- **🔧 Arquivos**: `src/components/cidades/` atualizados para resolver inconsistências
+
+---
+
 ## [1.2.1] - 2025-01-XX
 
 ### 🔄 **Migração de Variáveis de Ambiente**
