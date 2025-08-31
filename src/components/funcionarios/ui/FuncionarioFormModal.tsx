@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { X } from "lucide-react";
+import LoadingButton from "../../common/LoadingButton";
 import type { Funcionario, FuncionarioInput } from "../types";
 import { maskCPF, maskCelular, maskMoeda, maskCEP } from "utils/masks";
 
@@ -12,6 +13,7 @@ type Props = {
   onCancelar: () => void;
   onConfirmar: () => void;
   somenteLeitura?: boolean;
+  loading?: boolean;
 };
 
 const FuncionarioFormModal: React.FC<Props> = ({
@@ -23,6 +25,7 @@ const FuncionarioFormModal: React.FC<Props> = ({
   onCancelar,
   onConfirmar,
   somenteLeitura = false,
+  loading = false,
 }) => {
   // ViaCEP auto-fill
   useEffect(() => {
@@ -369,13 +372,15 @@ const FuncionarioFormModal: React.FC<Props> = ({
                 {somenteLeitura ? "Fechar" : "Cancelar"}
               </button>
               {!somenteLeitura && (
-                <button
-                  type="button"
+                <LoadingButton
                   onClick={onConfirmar}
-                  className="w-full sm:w-auto btn-primary py-3 sm:py-2"
+                  loading={loading}
+                  variant="primary"
+                  size="md"
+                  className="w-full sm:w-auto py-3 sm:py-2"
                 >
                   {editando ? "Atualizar" : "Cadastrar"}
-                </button>
+                </LoadingButton>
               )}
             </div>
           </div>

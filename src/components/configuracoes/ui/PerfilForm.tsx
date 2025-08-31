@@ -1,6 +1,7 @@
 import React from "react";
 import { Save } from "lucide-react";
 import { maskCelular } from "../../../utils/masks";
+import LoadingButton from "../../common/LoadingButton";
 import type { PerfilFormProps } from "../types";
 
 export const PerfilForm: React.FC<PerfilFormProps> = ({
@@ -91,14 +92,16 @@ export const PerfilForm: React.FC<PerfilFormProps> = ({
         </div>
 
         <div className="flex justify-end">
-          <button
+          <LoadingButton
             type="submit"
-            disabled={loading}
-            className="w-full sm:w-auto btn-primary flex items-center justify-center py-3 sm:py-2"
+            loading={loading}
+            variant="primary"
+            size="md"
+            className="w-full sm:w-auto"
           >
             <Save className="h-4 w-4 mr-2" />
-            {loading ? "Salvando..." : "Salvar Alterações"}
-          </button>
+            Salvar Alterações
+          </LoadingButton>
         </div>
       </form>
     </div>

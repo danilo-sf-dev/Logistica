@@ -28,6 +28,10 @@ export function useVendedores() {
 
   const [lista, setLista] = useState<Vendedor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingExport, setLoadingExport] = useState(false);
+  const [loadingInativacao, setLoadingInativacao] = useState(false);
+  const [loadingAtivacao, setLoadingAtivacao] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Vendedor | null>(null);
   const [mostrarModalInativacao, setMostrarModalInativacao] = useState(false);
@@ -147,6 +151,7 @@ export function useVendedores() {
       return;
     }
 
+    setLoadingSubmit(true);
     try {
       const payload: VendedorInput = {
         ...valores,
@@ -189,6 +194,8 @@ export function useVendedores() {
       } else {
         showNotification("Erro ao salvar vendedor", "error");
       }
+    } finally {
+      setLoadingSubmit(false);
     }
   }, [carregar, editando, showNotification, validar, valores]);
 
@@ -234,6 +241,7 @@ export function useVendedores() {
   const confirmarInativacao = useCallback(async () => {
     if (!vendedorParaInativar) return;
 
+    setLoadingInativacao(true);
     try {
       await vendedoresService.inativar(vendedorParaInativar.id);
       showNotification("Vendedor inativado com sucesso!", "success");
@@ -243,6 +251,8 @@ export function useVendedores() {
     } catch (error) {
       console.error("Erro ao inativar vendedor:", error);
       showNotification("Erro ao inativar vendedor", "error");
+    } finally {
+      setLoadingInativacao(false);
     }
   }, [vendedorParaInativar, showNotification, carregar]);
 
@@ -259,6 +269,7 @@ export function useVendedores() {
   const confirmarAtivacao = useCallback(async () => {
     if (!vendedorParaAtivar) return;
 
+    setLoadingAtivacao(true);
     try {
       await vendedoresService.ativar(vendedorParaAtivar.id);
       showNotification("Vendedor ativado com sucesso!", "success");
@@ -268,6 +279,8 @@ export function useVendedores() {
     } catch (error) {
       console.error("Erro ao ativar vendedor:", error);
       showNotification("Erro ao ativar vendedor", "error");
+    } finally {
+      setLoadingAtivacao(false);
     }
   }, [vendedorParaAtivar, showNotification, carregar]);
 
@@ -342,6 +355,7 @@ export function useVendedores() {
 
   // Funcionalidade de exportação
   const handleExportExcel = useCallback(async () => {
+    setLoadingExport(true);
     try {
       const exportService = new VendedoresTableExportService();
 
@@ -360,6 +374,8 @@ export function useVendedores() {
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
       showNotification("Erro ao exportar dados", "error");
+    } finally {
+      setLoadingExport(false);
     }
   }, [
     listaOrdenada,
@@ -388,6 +404,10 @@ export function useVendedores() {
 
   return {
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingInativacao,
+    loadingAtivacao,
     vendedoresPaginados,
     totalPaginado,
     paginaAtual,

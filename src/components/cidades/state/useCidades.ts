@@ -23,6 +23,9 @@ export function useCidades() {
 
   const [lista, setLista] = useState<Cidade[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingExport, setLoadingExport] = useState(false);
+  const [loadingExclusao, setLoadingExclusao] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Cidade | null>(null);
   const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
@@ -86,6 +89,7 @@ export function useCidades() {
       return;
     }
 
+    setLoadingSubmit(true);
     try {
       const payload: CidadeInput = {
         ...valores,
@@ -122,6 +126,8 @@ export function useCidades() {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao salvar cidade";
       showNotification(errorMessage, "error");
+    } finally {
+      setLoadingSubmit(false);
     }
   }, [carregar, editando, showNotification, validar, valores]);
 
@@ -161,6 +167,7 @@ export function useCidades() {
   const confirmarExclusao = useCallback(async () => {
     if (!cidadeParaExcluir) return;
 
+    setLoadingExclusao(true);
     try {
       await cidadesService.excluir(cidadeParaExcluir.id);
       showNotification("Cidade excluída com sucesso!", "success");
@@ -173,6 +180,8 @@ export function useCidades() {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao excluir cidade";
       showNotification(errorMessage, "error");
+    } finally {
+      setLoadingExclusao(false);
     }
   }, [cidadeParaExcluir, carregar, showNotification]);
 
@@ -236,6 +245,7 @@ export function useCidades() {
 
   // Funcionalidade de exportação
   const handleExportExcel = useCallback(async () => {
+    setLoadingExport(true);
     try {
       const exportService = new CidadesTableExportService();
 
@@ -251,6 +261,8 @@ export function useCidades() {
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
       showNotification("Erro ao exportar dados", "error");
+    } finally {
+      setLoadingExport(false);
     }
   }, [
     listaOrdenada,
@@ -277,6 +289,9 @@ export function useCidades() {
 
   return {
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingExclusao,
     cidadesPaginadas,
     totalPaginado,
     paginaAtual,

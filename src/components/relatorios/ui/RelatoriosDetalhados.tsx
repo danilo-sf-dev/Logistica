@@ -6,6 +6,7 @@ import type { RelatoriosDetalhadosProps } from "../types";
 export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
   onDownload,
   className = "",
+  loading = false,
 }) => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [selectedTipo, setSelectedTipo] = useState("");
@@ -108,6 +109,7 @@ export const RelatoriosDetalhados: React.FC<RelatoriosDetalhadosProps> = ({
           .replace(/([A-Z])/g, " $1")
           .trim()}
         disablePDF={shouldDisablePDF}
+        loading={loading}
       />
     </div>
   );

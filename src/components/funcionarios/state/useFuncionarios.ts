@@ -25,6 +25,10 @@ export function useFuncionarios() {
 
   const [lista, setLista] = useState<Funcionario[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSalvar, setLoadingSalvar] = useState(false);
+  const [loadingInativacao, setLoadingInativacao] = useState(false);
+  const [loadingAtivacao, setLoadingAtivacao] = useState(false);
+  const [loadingExport, setLoadingExport] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Funcionario | null>(null);
   const [mostrarModalInativacao, setMostrarModalInativacao] = useState(false);
@@ -147,6 +151,8 @@ export function useFuncionarios() {
       showNotification("Por favor, corrija os erros no formulário", "error");
       return;
     }
+
+    setLoadingSalvar(true);
     try {
       const payload: FuncionarioInput = {
         ...valores,
@@ -204,6 +210,8 @@ export function useFuncionarios() {
       } else {
         showNotification("Erro ao salvar funcionário", "error");
       }
+    } finally {
+      setLoadingSalvar(false);
     }
   }, [carregar, editando, showNotification, validar, valores]);
 
@@ -273,6 +281,7 @@ export function useFuncionarios() {
   const confirmarInativacao = useCallback(async () => {
     if (!funcionarioParaInativar) return;
 
+    setLoadingInativacao(true);
     try {
       await funcionariosService.inativar(funcionarioParaInativar.id);
       showNotification("Funcionário inativado com sucesso!", "success");
@@ -282,6 +291,8 @@ export function useFuncionarios() {
     } catch (error) {
       console.error("Erro ao inativar funcionário:", error);
       showNotification("Erro ao inativar funcionário", "error");
+    } finally {
+      setLoadingInativacao(false);
     }
   }, [funcionarioParaInativar, showNotification, carregar]);
 
@@ -298,6 +309,7 @@ export function useFuncionarios() {
   const confirmarAtivacao = useCallback(async () => {
     if (!funcionarioParaAtivar) return;
 
+    setLoadingAtivacao(true);
     try {
       await funcionariosService.ativar(funcionarioParaAtivar.id);
       showNotification("Funcionário ativado com sucesso!", "success");
@@ -307,6 +319,8 @@ export function useFuncionarios() {
     } catch (error) {
       console.error("Erro ao ativar funcionário:", error);
       showNotification("Erro ao ativar funcionário", "error");
+    } finally {
+      setLoadingAtivacao(false);
     }
   }, [funcionarioParaAtivar, showNotification, carregar]);
 
@@ -408,6 +422,7 @@ export function useFuncionarios() {
 
   // Funcionalidade de exportação
   const handleExportExcel = useCallback(async () => {
+    setLoadingExport(true);
     try {
       const exportService = new FuncionariosTableExportService();
       const dadosFiltrados = listaOrdenada;
@@ -428,6 +443,8 @@ export function useFuncionarios() {
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
       showNotification("Erro ao exportar dados", "error");
+    } finally {
+      setLoadingExport(false);
     }
   }, [
     listaOrdenada,
@@ -443,6 +460,10 @@ export function useFuncionarios() {
 
   return {
     loading,
+    loadingSalvar,
+    loadingInativacao,
+    loadingAtivacao,
+    loadingExport,
     funcionariosPaginados,
     totalPaginado,
     paginaAtual,

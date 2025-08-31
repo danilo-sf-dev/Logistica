@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import { X } from "lucide-react";
+import LoadingButton from "../../common/LoadingButton";
 import type { CidadeFormData, Cidade } from "../types";
 import {
   REGIOES_BRASIL,
@@ -17,6 +18,7 @@ type Props = {
   onChange: (valores: CidadeFormData) => void;
   onCancelar: () => void;
   onConfirmar: () => void;
+  loading?: boolean;
 };
 
 export const CidadeFormModal: React.FC<Props> = ({
@@ -27,6 +29,7 @@ export const CidadeFormModal: React.FC<Props> = ({
   onChange,
   onCancelar,
   onConfirmar,
+  loading = false,
 }) => {
   const { rotas, loading: loadingRotas } = useRotasForCidades();
 
@@ -218,13 +221,15 @@ export const CidadeFormModal: React.FC<Props> = ({
               >
                 Cancelar
               </button>
-              <button
-                type="button"
+              <LoadingButton
                 onClick={onConfirmar}
-                className="w-full sm:w-auto btn-primary py-3 sm:py-2"
+                loading={loading}
+                variant="primary"
+                size="md"
+                className="w-full sm:w-auto"
               >
                 {editando ? "Atualizar" : "Cadastrar"}
-              </button>
+              </LoadingButton>
             </div>
           </div>
         </div>

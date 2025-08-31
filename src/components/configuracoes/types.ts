@@ -58,12 +58,16 @@ export interface PerfilFormProps {
 export interface NotificacoesFormProps {
   config: NotificacoesConfig;
   onChange: (key: keyof NotificacoesConfig) => void;
+  onSubmit?: () => Promise<void>;
+  loading?: boolean;
   className?: string;
 }
 
 export interface SistemaFormProps {
   config: SistemaConfig;
   onChange: (key: keyof SistemaConfig, value: any) => void;
+  onSubmit?: () => Promise<void>;
+  loading?: boolean;
   className?: string;
 }
 

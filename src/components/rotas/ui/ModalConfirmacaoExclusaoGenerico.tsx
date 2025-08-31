@@ -7,6 +7,7 @@ interface Props {
   rota: Rota | null;
   onConfirmar: () => void;
   onCancelar: () => void;
+  loading?: boolean;
 }
 
 const ModalConfirmacaoExclusaoGenerico: React.FC<Props> = ({
@@ -14,6 +15,7 @@ const ModalConfirmacaoExclusaoGenerico: React.FC<Props> = ({
   rota,
   onConfirmar,
   onCancelar,
+  loading = false,
 }) => {
   if (!rota) return null;
 
@@ -51,6 +53,7 @@ const ModalConfirmacaoExclusaoGenerico: React.FC<Props> = ({
         label: "Confirmar Exclusão",
         onClick: onConfirmar,
         variant: "danger",
+        loading: loading,
       }}
       secondaryAction={{
         label: "Cancelar",

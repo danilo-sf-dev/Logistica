@@ -35,6 +35,8 @@ interface FolgasTableProps {
   excluirFolga: (folga: Folga) => void;
   aprovarFolga: (id: string) => void;
   rejeitarFolga: (id: string) => void;
+  loadingAprovacao?: boolean;
+  loadingRejeicao?: boolean;
 }
 
 export function FolgasTable({
@@ -47,6 +49,8 @@ export function FolgasTable({
   excluirFolga,
   aprovarFolga,
   rejeitarFolga,
+  loadingAprovacao = false,
+  loadingRejeicao = false,
 }: FolgasTableProps) {
   const getStatusColor = (status: Folga["status"]) => {
     switch (status) {
@@ -254,17 +258,35 @@ export function FolgasTable({
                       <>
                         <button
                           onClick={() => aprovarFolga(folga.id)}
-                          className="text-green-600 hover:text-green-900"
+                          disabled={loadingAprovacao}
+                          className={`text-green-600 hover:text-green-900 flex items-center justify-center ${
+                            loadingAprovacao
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
                           title="Aprovar"
                         >
-                          <Check className="h-4 w-4" />
+                          {loadingAprovacao ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600" />
+                          ) : (
+                            <Check className="h-4 w-4" />
+                          )}
                         </button>
                         <button
                           onClick={() => rejeitarFolga(folga.id)}
-                          className="text-red-600 hover:text-red-900"
+                          disabled={loadingRejeicao}
+                          className={`text-red-600 hover:text-red-900 flex items-center justify-center ${
+                            loadingRejeicao
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
                           title="Rejeitar"
                         >
-                          <X className="h-4 w-4" />
+                          {loadingRejeicao ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600" />
+                          ) : (
+                            <X className="h-4 w-4" />
+                          )}
                         </button>
                       </>
                     )}
