@@ -31,7 +31,7 @@ export function useCidades() {
   const [editando, setEditando] = useState<Cidade | null>(null);
   const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
   const [cidadeParaExcluir, setCidadeParaExcluir] = useState<Cidade | null>(
-    null
+    null,
   );
   const [termoBusca, setTermoBusca] = useState("");
   const [filtroRegiao, setFiltroRegiao] = useState("");
@@ -207,7 +207,7 @@ export function useCidades() {
         setDirecaoOrdenacao("asc");
       }
     },
-    [direcaoOrdenacao, ordenarPor]
+    [direcaoOrdenacao, ordenarPor],
   );
 
   const listaFiltrada = useMemo(() => {

@@ -62,18 +62,18 @@ async function criar(input: CidadeInput): Promise<string> {
   const cidadeExistente = cidadesExistentes.find(
     (cidade) =>
       normalizeCityName(cidade.nome) === nomeNormalizado &&
-      cidade.estado === estado
+      cidade.estado === estado,
   );
 
   if (cidadeExistente) {
     throw new Error(
-      `Cidade "${input.nome}" já está cadastrada no estado ${estado}`
+      `Cidade "${input.nome}" já está cadastrada no estado ${estado}`,
     );
   }
 
   // Sanitizar dados para remover campos undefined
   const sanitizedInput = Object.fromEntries(
-    Object.entries(input).filter(([_, value]) => value !== undefined)
+    Object.entries(input).filter(([_, value]) => value !== undefined),
   );
 
   // Definir região automaticamente se não for fornecida
@@ -103,8 +103,8 @@ async function criar(input: CidadeInput): Promise<string> {
   // Remover campos null/undefined do payload final
   const finalPayload = Object.fromEntries(
     Object.entries(payload).filter(
-      ([_, value]) => value !== undefined && value !== null
-    )
+      ([_, value]) => value !== undefined && value !== null,
+    ),
   );
 
   const ref = await addDoc(collection(db, COLLECTION), finalPayload);
@@ -143,12 +143,12 @@ async function atualizar(id: string, input: CidadeInput): Promise<void> {
     (cidade) =>
       cidade.id !== id && // Excluir a própria cidade sendo editada
       normalizeCityName(cidade.nome) === nomeNormalizado &&
-      cidade.estado === estado
+      cidade.estado === estado,
   );
 
   if (cidadeExistente) {
     throw new Error(
-      `Cidade "${input.nome}" já está cadastrada no estado ${estado}`
+      `Cidade "${input.nome}" já está cadastrada no estado ${estado}`,
     );
   }
 

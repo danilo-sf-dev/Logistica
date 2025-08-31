@@ -91,8 +91,8 @@ export class CidadesImportService extends BaseImportService {
       const nomesExistentes = new Set(
         cidadesExistentes.map(
           (cidade) =>
-            `${this.normalizeCityName(cidade.nome)}-${cidade.estado.toUpperCase()}`
-        )
+            `${this.normalizeCityName(cidade.nome)}-${cidade.estado.toUpperCase()}`,
+        ),
       );
 
       // Validar cada linha
@@ -222,7 +222,7 @@ export class CidadesImportService extends BaseImportService {
         return cidade;
       } catch (error) {
         throw new Error(
-          `Erro ao processar linha ${index + 1}: ${error.message}`
+          `Erro ao processar linha ${index + 1}: ${error.message}`,
         );
       }
     });
