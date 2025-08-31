@@ -50,7 +50,7 @@ const Login: React.FC = () => {
   }
 
   const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
     setLoading(true);

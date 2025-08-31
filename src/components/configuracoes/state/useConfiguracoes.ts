@@ -115,7 +115,7 @@ export const useConfiguracoes = () => {
         await updateUserProfile(userProfile?.uid, perfilDataToSave);
         showNotification(
           "Perfil e configurações atualizados com sucesso!",
-          "success"
+          "success",
         );
       } catch (error) {
         console.error("Erro ao atualizar perfil:", error);
@@ -130,7 +130,7 @@ export const useConfiguracoes = () => {
       updateUserProfile,
       userProfile?.uid,
       notificacoes,
-    ]
+    ],
   );
 
   const handlePerfilChange = useCallback(
@@ -140,7 +140,7 @@ export const useConfiguracoes = () => {
         [field]: value,
       }));
     },
-    []
+    [],
   );
 
   const handleNotificacoesChange = useCallback(
@@ -157,7 +157,7 @@ export const useConfiguracoes = () => {
         [key]: !prev[key],
       }));
     },
-    [showNotification]
+    [showNotification],
   );
 
   const handleSistemaChange = useCallback(
@@ -167,7 +167,7 @@ export const useConfiguracoes = () => {
         [key]: value,
       }));
     },
-    []
+    [],
   );
 
   const handleNotificacoesSubmit = useCallback(async () => {
@@ -182,7 +182,7 @@ export const useConfiguracoes = () => {
       await updateUserProfile(userProfile?.uid, perfilDataToSave);
       showNotification(
         "Configurações de notificações atualizadas com sucesso!",
-        "success"
+        "success",
       );
     } catch (error) {
       console.error("Erro ao atualizar notificações:", error);
@@ -210,7 +210,7 @@ export const useConfiguracoes = () => {
       await updateUserProfile(userProfile?.uid, perfilDataToSave);
       showNotification(
         "Configurações do sistema atualizadas com sucesso!",
-        "success"
+        "success",
       );
     } catch (error) {
       console.error("Erro ao atualizar configurações do sistema:", error);

@@ -60,11 +60,11 @@ interface AuthContextType {
     email: string,
     password: string,
     displayName: string,
-    role?: string
+    role?: string,
   ) => Promise<UserCredential>;
   updateUserProfile: (
     uid: string,
-    updates: Partial<UserProfile>
+    updates: Partial<UserProfile>,
   ) => Promise<void>;
   loading: boolean;
 }
@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Login com email/senha
   const login = async (
     email: string,
-    password: string
+    password: string,
   ): Promise<UserCredential> => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               timestamp: new Date(),
             },
           },
-          { merge: true }
+          { merge: true },
         );
       } catch (sessionError) {
         // Continuar mesmo se falhar a captura de sessão
@@ -181,7 +181,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         {
           lastLogin: new Date(),
         },
-        { merge: true }
+        { merge: true },
       );
     }
 
@@ -204,13 +204,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     email: string,
     password: string,
     displayName: string,
-    role: string = "user"
+    role: string = "user",
   ): Promise<UserCredential> => {
     try {
       const result = await createUserWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
 
       // Atualizar perfil
@@ -300,7 +300,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Atualizar perfil do usuário
   const updateUserProfile = async (
     uid: string,
-    updates: Partial<UserProfile>
+    updates: Partial<UserProfile>,
   ): Promise<void> => {
     try {
       await setDoc(doc(db, "users", uid), updates, { merge: true });
