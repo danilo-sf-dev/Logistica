@@ -192,4 +192,4 @@ service cloud.firestore {
       allow write: if isAuthenticated() && canAccessSecurityConfig();
     }
   }
-} 
+}
