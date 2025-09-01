@@ -6,7 +6,7 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { db, auth } from "../firebase/config";
+import { db } from "../firebase/config";
 import { toast } from "react-hot-toast";
 
 export interface NotificationConfig {
@@ -32,7 +32,7 @@ export interface NotificationData {
 export class NotificationService {
   // Criar notificação no Firestore
   static async createNotification(
-    data: Omit<NotificationData, "id" | "createdAt" | "read">
+    data: Omit<NotificationData, "id" | "createdAt" | "read">,
   ): Promise<void> {
     try {
       // Buscar usuários que devem receber a notificação
@@ -63,13 +63,13 @@ export class NotificationService {
 
   // Buscar usuários que devem receber a notificação
   static async getUsersToNotify(
-    notificationData: Omit<NotificationData, "id" | "createdAt" | "read">
+    notificationData: Omit<NotificationData, "id" | "createdAt" | "read">,
   ): Promise<any[]> {
     try {
       const usersRef = collection(db, "users");
       const usersQuery = query(
         usersRef,
-        where("role", "in", ["admin", "gerente"])
+        where("role", "in", ["admin", "gerente"]),
       );
       const usersSnapshot = await getDocs(usersQuery);
 
@@ -93,7 +93,7 @@ export class NotificationService {
   // Verificar se usuário deve receber a notificação
   static shouldNotifyUser(
     userData: any,
-    notificationData: Omit<NotificationData, "id" | "createdAt" | "read">
+    notificationData: Omit<NotificationData, "id" | "createdAt" | "read">,
   ): boolean {
     const notificacoes = userData.notificacoes || {};
 
@@ -114,7 +114,7 @@ export class NotificationService {
   // Enviar notificação para um usuário específico
   static async sendNotificationToUser(
     user: any,
-    notification: NotificationData
+    notification: NotificationData,
   ): Promise<void> {
     try {
       const notificacoes = user.notificacoes || {};
@@ -136,7 +136,7 @@ export class NotificationService {
   // Enviar notificação push (FCM)
   static async sendPushNotification(
     fcmToken: string,
-    notification: NotificationData
+    notification: NotificationData,
   ): Promise<void> {
     try {
       // Aqui você pode integrar com Firebase Functions para enviar FCM
@@ -153,7 +153,7 @@ export class NotificationService {
   // Enviar notificação por email
   static async sendEmailNotification(
     email: string,
-    notification: NotificationData
+    notification: NotificationData,
   ): Promise<void> {
     try {
       // Aqui você pode integrar com Firebase Functions para enviar email
@@ -206,69 +206,16 @@ export class NotificationService {
 
   // Buscar notificações do usuário
   static async getUserNotifications(
-    userId: string
+    userId: string,
   ): Promise<NotificationData[]> {
     try {
-      // ========================================
-      // DEBUG: Informações de Autenticação
-      // ========================================
-      console.log("🔍 DEBUG: Iniciando busca de notificações");
-      console.log("👤 User ID recebido:", userId);
-      console.log("🔐 Auth State:", auth.currentUser);
-      console.log("🆔 Current User UID:", auth.currentUser?.uid);
-      console.log("✅ Usuário autenticado:", !!auth.currentUser);
-
-      // Verificar se o userId recebido é válido
-      if (!userId || userId.trim() === "") {
-        console.error("❌ ERROR: User ID inválido ou vazio");
-        return [];
-      }
-
-      // Verificar se o usuário está autenticado
-      if (!auth.currentUser) {
-        console.error("❌ ERROR: Usuário não está autenticado");
-        return [];
-      }
-
-      // Verificar se o userId recebido é igual ao UID autenticado
-      if (userId !== auth.currentUser.uid) {
-        console.warn("⚠️ WARNING: User ID diferente do UID autenticado");
-        console.log("📝 User ID recebido:", userId);
-        console.log("🔑 UID autenticado:", auth.currentUser.uid);
-      }
-
-      // ========================================
-      // DEBUG: Configuração da Query
-      // ========================================
-      console.log("📚 DEBUG: Configurando query do Firestore");
-      console.log("🏷️ Coleção:", "notificacoes");
-      console.log("🔍 Campo de busca:", "targetUsers");
-      console.log("🎯 Valor buscado:", userId);
-
       const notificationsRef = collection(db, "notificacoes");
       const notificationsQuery = query(
         notificationsRef,
-        where("targetUsers", "array-contains", userId)
+        where("targetUsers", "array-contains", userId),
       );
-
-      console.log("📋 Query configurada:", notificationsQuery);
-
-      // ========================================
-      // DEBUG: Executando Query
-      // ========================================
-      console.log("🚀 DEBUG: Executando query no Firestore...");
 
       const snapshot = await getDocs(notificationsQuery);
-
-      console.log("📊 DEBUG: Query executada com sucesso!");
-      console.log("📈 Número de documentos encontrados:", snapshot.size);
-      console.log(
-        "📄 Documentos:",
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          data: doc.data(),
-        }))
-      );
 
       const notifications: NotificationData[] = [];
       snapshot.forEach((doc) => {
@@ -285,31 +232,11 @@ export class NotificationService {
         } as NotificationData);
       });
 
-      console.log("✅ DEBUG: Notificações processadas com sucesso");
-      console.log("🎉 Total de notificações retornadas:", notifications.length);
-
       return notifications.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
       );
     } catch (error) {
-      // ========================================
-      // DEBUG: Tratamento de Erro Detalhado
-      // ========================================
-      console.error("❌ ERROR: Erro ao buscar notificações");
-      console.error("📝 Tipo do erro:", error.constructor.name);
-      console.error("🔍 Mensagem do erro:", error.message);
-      console.error("📊 Código do erro:", error.code);
-      console.error("🏷️ Coleção tentada:", "notificacoes");
-      console.error("👤 User ID usado:", userId);
-      console.error("🔐 Auth State no erro:", auth.currentUser);
-      console.error("🆔 UID autenticado no erro:", auth.currentUser?.uid);
-
-      // Log adicional para erros do Firebase
-      if (error.code) {
-        console.error("🔥 Firebase Error Code:", error.code);
-        console.error("🔥 Firebase Error Details:", error);
-      }
-
+      console.error("Erro ao buscar notificações:", error);
       return [];
     }
   }

@@ -114,3 +114,21 @@ export interface TimezoneOption {
   label: string;
   offset: string;
 }
+
+// Tipos para gestão de usuários
+export interface UserManagementData {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  role: string;
+  createdAt: Date;
+  lastLogin: Date;
+  provider: string;
+  telefone?: string;
+  cargo?: string;
+}
+
+export interface UserManagementFormProps {
+  className?: string;
+}
