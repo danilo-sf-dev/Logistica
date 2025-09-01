@@ -8,6 +8,7 @@ export const PerfilForm: React.FC<PerfilFormProps> = ({
   data,
   errors,
   loading,
+  profileLoading = false,
   onSubmit,
   onChange,
   className = "",
@@ -16,6 +17,23 @@ export const PerfilForm: React.FC<PerfilFormProps> = ({
     e.preventDefault();
     onSubmit(data);
   };
+
+  // Mostrar loading quando os dados do perfil estiverem sendo carregados
+  if (profileLoading) {
+    return (
+      <div className={`card ${className}`}>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Perfil do Usuário
+        </h3>
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <span className="ml-3 text-gray-600">
+            Carregando dados do perfil...
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`card ${className}`}>

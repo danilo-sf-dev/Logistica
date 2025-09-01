@@ -17,6 +17,7 @@ export const useConfiguracoes = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [configLoaded, setConfigLoaded] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const [perfilData, setPerfilData] = useState<PerfilData>({
     displayName: userProfile?.displayName || "",
@@ -64,6 +65,22 @@ export const useConfiguracoes = () => {
       setConfigLoaded(true);
     }
   }, [userProfile, configLoaded]);
+
+  // Sincronizar dados do perfil sempre que userProfile mudar
+  useEffect(() => {
+    if (userProfile) {
+      setProfileLoading(true);
+      setPerfilData({
+        displayName: userProfile.displayName || "",
+        email: userProfile.email || "",
+        telefone: userProfile.telefone || "",
+        cargo: userProfile.cargo || "",
+      });
+      setProfileLoading(false);
+    } else {
+      setProfileLoading(false);
+    }
+  }, [userProfile]);
 
   const validatePerfilForm = useCallback((): boolean => {
     const newErrors: FormErrors = {};
@@ -213,6 +230,7 @@ export const useConfiguracoes = () => {
     activeTab,
     setActiveTab,
     loading,
+    profileLoading,
     errors,
     perfilData,
     notificacoes,

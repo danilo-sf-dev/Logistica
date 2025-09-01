@@ -17,6 +17,7 @@ export const ConfiguracoesPage: React.FC<ConfiguracoesProps> = ({
     activeTab,
     setActiveTab,
     loading,
+    profileLoading,
     errors,
     perfilData,
     notificacoes,
@@ -53,6 +54,7 @@ export const ConfiguracoesPage: React.FC<ConfiguracoesProps> = ({
             data={perfilData}
             errors={errors}
             loading={loading}
+            profileLoading={profileLoading}
             onSubmit={handlePerfilSubmit}
             onChange={handlePerfilChange}
           />
