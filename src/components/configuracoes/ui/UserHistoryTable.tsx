@@ -1,5 +1,5 @@
 import React from "react";
-import { History } from "lucide-react";
+import { History, ChevronUp, ChevronDown } from "lucide-react";
 import { PermissionService } from "../../../services/permissionService";
 
 import type { RoleChange } from "../../../types/permissions";
@@ -7,11 +7,17 @@ import type { RoleChange } from "../../../types/permissions";
 interface UserHistoryTableProps {
   roleChanges: RoleChange[];
   userMap: Record<string, { displayName: string; email: string }>;
+  ordenarPor: "changedAt" | "userId" | "changeType";
+  direcaoOrdenacao: "asc" | "desc";
+  onOrdenar: (campo: "changedAt" | "userId" | "changeType") => void;
 }
 
 export const UserHistoryTable: React.FC<UserHistoryTableProps> = ({
   roleChanges,
   userMap,
+  ordenarPor,
+  direcaoOrdenacao,
+  onOrdenar,
 }) => {
   const getRoleDisplayName = (role: string) => {
     return PermissionService.getRoleDisplayName(role as any);
@@ -30,17 +36,50 @@ export const UserHistoryTable: React.FC<UserHistoryTableProps> = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Data
+              <th
+                className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => onOrdenar("changedAt")}
+              >
+                <div className="flex items-center">
+                  Data
+                  {ordenarPor === "changedAt" &&
+                    (direcaoOrdenacao === "asc" ? (
+                      <ChevronUp className="ml-1 h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    ))}
+                </div>
               </th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Usuário
+              <th
+                className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => onOrdenar("userId")}
+              >
+                <div className="flex items-center">
+                  Usuário
+                  {ordenarPor === "userId" &&
+                    (direcaoOrdenacao === "asc" ? (
+                      <ChevronUp className="ml-1 h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    ))}
+                </div>
               </th>
               <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 De → Para
               </th>
-              <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Tipo
+              <th
+                className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => onOrdenar("changeType")}
+              >
+                <div className="flex items-center">
+                  Tipo
+                  {ordenarPor === "changeType" &&
+                    (direcaoOrdenacao === "asc" ? (
+                      <ChevronUp className="ml-1 h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    ))}
+                </div>
               </th>
               <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Motivo

@@ -50,6 +50,22 @@ export const useUserManagement = () => {
     total: 0,
   });
 
+  // Estados de ordenação
+  const [ordenarPor, setOrdenarPor] = useState<
+    "displayName" | "email" | "role" | "lastLogin" | "cargo" | "status"
+  >("displayName");
+  const [direcaoOrdenacao, setDirecaoOrdenacao] = useState<"asc" | "desc">(
+    "asc",
+  );
+
+  // Estados de ordenação do histórico
+  const [ordenarHistoricoPor, setOrdenarHistoricoPor] = useState<
+    "changedAt" | "userId" | "changeType"
+  >("changedAt");
+  const [direcaoOrdenacaoHistorico, setDirecaoOrdenacaoHistorico] = useState<
+    "asc" | "desc"
+  >("desc");
+
   // Verificar se o usuário atual pode gerenciar usuários
   const canManageUsers = PermissionService.canManageUsers(
     userProfile?.role || "user",
@@ -106,12 +122,41 @@ export const useUserManagement = () => {
 
     try {
       const history = await UserManagementService.getRoleChangeHistory();
-      setRoleChanges(history);
+
+      // Aplicar ordenação ao histórico
+      const historyOrdenado = [...history].sort((a, b) => {
+        let aValue: any = a[ordenarHistoricoPor];
+        let bValue: any = b[ordenarHistoricoPor];
+
+        if (ordenarHistoricoPor === "changedAt") {
+          aValue = aValue ? new Date(aValue).getTime() : 0;
+          bValue = bValue ? new Date(bValue).getTime() : 0;
+        } else if (ordenarHistoricoPor === "userId") {
+          aValue = aValue?.toLowerCase() || "";
+          bValue = bValue?.toLowerCase() || "";
+        } else if (ordenarHistoricoPor === "changeType") {
+          aValue = aValue?.toLowerCase() || "";
+          bValue = bValue?.toLowerCase() || "";
+        }
+
+        if (aValue < bValue)
+          return direcaoOrdenacaoHistorico === "asc" ? -1 : 1;
+        if (aValue > bValue)
+          return direcaoOrdenacaoHistorico === "asc" ? 1 : -1;
+        return 0;
+      });
+
+      setRoleChanges(historyOrdenado);
     } catch (error) {
       console.error("Erro ao carregar histórico:", error);
       showNotification("Erro ao carregar histórico", "error");
     }
-  }, [canManageUsers, showNotification]);
+  }, [
+    canManageUsers,
+    showNotification,
+    ordenarHistoricoPor,
+    direcaoOrdenacaoHistorico,
+  ]);
 
   /**
    * Alterar perfil de um usuário
@@ -274,6 +319,46 @@ export const useUserManagement = () => {
   }, []);
 
   /**
+   * Alternar ordenação
+   */
+  const alternarOrdenacao = useCallback(
+    (
+      campo:
+        | "displayName"
+        | "email"
+        | "role"
+        | "lastLogin"
+        | "cargo"
+        | "status",
+    ) => {
+      if (ordenarPor === campo) {
+        setDirecaoOrdenacao(direcaoOrdenacao === "asc" ? "desc" : "asc");
+      } else {
+        setOrdenarPor(campo);
+        setDirecaoOrdenacao("asc");
+      }
+    },
+    [direcaoOrdenacao, ordenarPor],
+  );
+
+  /**
+   * Alternar ordenação do histórico
+   */
+  const alternarOrdenacaoHistorico = useCallback(
+    (campo: "changedAt" | "userId" | "changeType") => {
+      if (ordenarHistoricoPor === campo) {
+        setDirecaoOrdenacaoHistorico(
+          direcaoOrdenacaoHistorico === "asc" ? "desc" : "asc",
+        );
+      } else {
+        setOrdenarHistoricoPor(campo);
+        setDirecaoOrdenacaoHistorico("asc");
+      }
+    },
+    [direcaoOrdenacaoHistorico, ordenarHistoricoPor],
+  );
+
+  /**
    * Aplicar filtros
    */
   const applyFilters = useCallback((newFilters: Partial<typeof filters>) => {
@@ -294,7 +379,7 @@ export const useUserManagement = () => {
   }, []);
 
   /**
-   * Filtrar usuários baseado nos filtros ativos
+   * Filtrar e ordenar usuários baseado nos filtros ativos
    */
   const filteredUsers = useCallback(() => {
     let filtered = [...users];
@@ -326,8 +411,50 @@ export const useUserManagement = () => {
       });
     }
 
+    // Aplicar ordenação
+    filtered.sort((a, b) => {
+      let aValue: any = a[ordenarPor];
+      let bValue: any = b[ordenarPor];
+
+      // Tratamento especial para diferentes tipos de campos
+      if (
+        ordenarPor === "displayName" ||
+        ordenarPor === "email" ||
+        ordenarPor === "cargo"
+      ) {
+        aValue = aValue?.toLowerCase() || "";
+        bValue = bValue?.toLowerCase() || "";
+      } else if (ordenarPor === "lastLogin") {
+        // Converter para Date para ordenação correta
+        aValue = aValue ? new Date(aValue).getTime() : 0;
+        bValue = bValue ? new Date(bValue).getTime() : 0;
+      } else if (ordenarPor === "role") {
+        // Ordenar por hierarquia de roles
+        const roleHierarchy = {
+          user: 1,
+          dispatcher: 2,
+          gerente: 3,
+          admin: 4,
+          admin_senior: 5,
+        };
+        aValue = roleHierarchy[aValue as keyof typeof roleHierarchy] || 0;
+        bValue = roleHierarchy[bValue as keyof typeof roleHierarchy] || 0;
+      } else if (ordenarPor === "status") {
+        // Ordenar por status (ativos primeiro, depois temporários)
+        const statusHierarchy = { active: 1, temporary: 2, inactive: 3 };
+        const aStatus = a.temporaryRole?.isActive ? "temporary" : "active";
+        const bStatus = b.temporaryRole?.isActive ? "temporary" : "active";
+        aValue = statusHierarchy[aStatus as keyof typeof statusHierarchy] || 0;
+        bValue = statusHierarchy[bStatus as keyof typeof statusHierarchy] || 0;
+      }
+
+      if (aValue < bValue) return direcaoOrdenacao === "asc" ? -1 : 1;
+      if (aValue > bValue) return direcaoOrdenacao === "asc" ? 1 : -1;
+      return 0;
+    });
+
     return filtered;
-  }, [users, filters]);
+  }, [users, filters, ordenarPor, direcaoOrdenacao]);
 
   /**
    * Obter usuários paginados
@@ -375,6 +502,10 @@ export const useUserManagement = () => {
     filters,
     pagination,
     userMap,
+    ordenarPor,
+    direcaoOrdenacao,
+    ordenarHistoricoPor,
+    direcaoOrdenacaoHistorico,
 
     // Permissões e roles
     canManageUsers,
@@ -389,6 +520,8 @@ export const useUserManagement = () => {
     applyFilters,
     clearFilters,
     changePage,
+    alternarOrdenacao,
+    alternarOrdenacaoHistorico,
 
     // Dados processados
     filteredUsers: filteredUsers(),

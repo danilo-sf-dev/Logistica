@@ -99,6 +99,16 @@ export class UserManagementService {
       // Atualizar usuário
       await setDoc(doc(db, "users", userId), updateData, { merge: true });
 
+      // Se o usuário alterado for o usuário atual, disparar evento para atualizar o contexto
+      if (userId === changedBy) {
+        // Disparar evento customizado para atualizar o contexto de autenticação
+        window.dispatchEvent(
+          new CustomEvent("userProfileUpdated", {
+            detail: { userId },
+          }),
+        );
+      }
+
       // Registrar mudança no histórico
       const roleChange: Omit<RoleChange, "id"> = {
         userId,

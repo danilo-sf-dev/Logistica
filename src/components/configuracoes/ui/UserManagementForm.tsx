@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Users, Shield, Edit, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Users,
+  Shield,
+  Edit,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import { useUserManagement } from "../state/useUserManagement";
 import { PermissionService } from "../../../services/permissionService";
 import { UserFilters } from "./UserFilters";
@@ -18,6 +26,10 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
     filters,
     pagination,
     userMap,
+    ordenarPor,
+    direcaoOrdenacao,
+    ordenarHistoricoPor,
+    direcaoOrdenacaoHistorico,
 
     // Permissões e roles
     canManageUsers,
@@ -31,6 +43,8 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
     applyFilters,
     clearFilters,
     changePage,
+    alternarOrdenacao,
+    alternarOrdenacaoHistorico,
 
     // Dados processados
     filteredUsers,
@@ -103,8 +117,7 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
           Gestão de Usuários
         </h3>
         <p className="text-sm text-gray-600 mt-1 break-words">
-          Gerencie perfis, permissões e acesso dos usuários existentes (usuários
-          são criados via Google Auth)
+          Gerencie perfis, permissões e acesso dos usuários existentes
         </p>
       </div>
 
@@ -125,17 +138,61 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Usuário
+                <th
+                  className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => alternarOrdenacao("displayName")}
+                >
+                  <div className="flex items-center">
+                    Usuário
+                    {ordenarPor === "displayName" &&
+                      (direcaoOrdenacao === "asc" ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      ))}
+                  </div>
                 </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Perfil
+                <th
+                  className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => alternarOrdenacao("role")}
+                >
+                  <div className="flex items-center">
+                    Perfil
+                    {ordenarPor === "role" &&
+                      (direcaoOrdenacao === "asc" ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      ))}
+                  </div>
                 </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                <th
+                  className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => alternarOrdenacao("status")}
+                >
+                  <div className="flex items-center">
+                    Status
+                    {ordenarPor === "status" &&
+                      (direcaoOrdenacao === "asc" ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      ))}
+                  </div>
                 </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Último Login
+                <th
+                  className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  onClick={() => alternarOrdenacao("lastLogin")}
+                >
+                  <div className="flex items-center">
+                    Último Login
+                    {ordenarPor === "lastLogin" &&
+                      (direcaoOrdenacao === "asc" ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      ))}
+                  </div>
                 </th>
                 <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Ações
@@ -316,7 +373,13 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
       />
 
       {/* Histórico de Alterações */}
-      <UserHistoryTable roleChanges={roleChanges} userMap={userMap} />
+      <UserHistoryTable
+        roleChanges={roleChanges}
+        userMap={userMap}
+        ordenarPor={ordenarHistoricoPor}
+        direcaoOrdenacao={direcaoOrdenacaoHistorico}
+        onOrdenar={alternarOrdenacaoHistorico}
+      />
     </div>
   );
 };

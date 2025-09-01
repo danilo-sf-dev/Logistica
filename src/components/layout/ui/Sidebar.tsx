@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { X, LogOut, Truck } from "lucide-react";
+import { PermissionService } from "../../../services/permissionService";
 import type { SidebarProps } from "../types";
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -75,9 +76,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {userProfile.displayName || "Usuário"}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {userProfile.role === "admin"
-                        ? "Administrador"
-                        : "Usuário"}
+                      {PermissionService.getRoleDisplayName(
+                        userProfile.role as any,
+                      )}
                     </div>
                   </div>
                   <button
@@ -134,9 +135,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {userProfile.displayName || "Usuário"}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {userProfile.role === "admin"
-                        ? "Administrador"
-                        : "Usuário"}
+                      {PermissionService.getRoleDisplayName(
+                        userProfile.role as any,
+                      )}
                     </div>
                   </div>
                 </div>

@@ -332,8 +332,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(false);
     });
 
-    return unsubscribe;
-  }, [processGoogleSignInResult, fetchUserProfile]);
+    // Listener para atualizações de perfil
+    const handleUserProfileUpdate = async (event: CustomEvent) => {
+      if (event.detail.userId === currentUser?.uid) {
+        try {
+          const updatedProfile = await fetchUserProfile(event.detail.userId);
+          setUserProfile(updatedProfile);
+        } catch (error) {
+          console.error("Erro ao atualizar perfil:", error);
+        }
+      }
+    };
+
+    window.addEventListener(
+      "userProfileUpdated",
+      handleUserProfileUpdate as EventListener,
+    );
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener(
+        "userProfileUpdated",
+        handleUserProfileUpdate as EventListener,
+      );
+    };
+  }, [processGoogleSignInResult, fetchUserProfile, currentUser?.uid]);
 
   const value: AuthContextType = {
     currentUser,
