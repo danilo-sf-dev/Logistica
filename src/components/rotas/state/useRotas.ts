@@ -14,6 +14,9 @@ import type { TableExportFilters } from "../../relatorios/export/BaseTableExport
 export const useRotas = () => {
   const [rotas, setRotas] = useState<Rota[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingExport, setLoadingExport] = useState(false);
+  const [loadingExclusao, setLoadingExclusao] = useState(false);
   const [filters, setFilters] = useState<RotaFilters>({
     searchTerm: "",
     diaSemana: "",
@@ -93,6 +96,7 @@ export const useRotas = () => {
         return false;
       }
 
+      setLoadingSubmit(true);
       try {
         await rotasService.create(rotaData);
         showNotification("Rota criada com sucesso!", "success");
@@ -102,6 +106,8 @@ export const useRotas = () => {
         showNotification("Erro ao criar rota", "error");
         console.error("Erro ao criar rota:", error);
         return false;
+      } finally {
+        setLoadingSubmit(false);
       }
     },
     [fetchRotas, showNotification, validar],
@@ -115,6 +121,7 @@ export const useRotas = () => {
         return false;
       }
 
+      setLoadingSubmit(true);
       try {
         await rotasService.update(id, rotaData);
         showNotification("Rota atualizada com sucesso!", "success");
@@ -124,6 +131,8 @@ export const useRotas = () => {
         showNotification("Erro ao atualizar rota", "error");
         console.error("Erro ao atualizar rota:", error);
         return false;
+      } finally {
+        setLoadingSubmit(false);
       }
     },
     [fetchRotas, showNotification, validar],
@@ -131,6 +140,7 @@ export const useRotas = () => {
 
   const deleteRota = useCallback(
     async (id: string) => {
+      setLoadingExclusao(true);
       try {
         await rotasService.delete(id);
         showNotification("Rota excluída com sucesso!", "success");
@@ -140,6 +150,8 @@ export const useRotas = () => {
         showNotification("Erro ao excluir rota", "error");
         console.error("Erro ao excluir rota:", error);
         return false;
+      } finally {
+        setLoadingExclusao(false);
       }
     },
     [fetchRotas, showNotification],
@@ -223,6 +235,7 @@ export const useRotas = () => {
 
   // Funcionalidade de exportação
   const handleExportExcel = useCallback(async () => {
+    setLoadingExport(true);
     try {
       const exportService = new RotasTableExportService();
       const dadosFiltrados = filteredRotas();
@@ -254,12 +267,17 @@ export const useRotas = () => {
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
       showNotification("Erro ao exportar dados", "error");
+    } finally {
+      setLoadingExport(false);
     }
   }, [filteredRotas, filters, showNotification]);
 
   const result = {
     rotas: rotas || [],
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingExclusao,
     filters,
     sortConfig,
     filteredRotas: filteredRotas(),

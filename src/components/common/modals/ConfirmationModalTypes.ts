@@ -10,6 +10,7 @@ export interface ConfirmationModalAction {
   onClick: () => void;
   variant?: "primary" | "secondary" | "danger" | "warning" | "success";
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export interface ConfirmationModalProps {

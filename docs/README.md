@@ -59,7 +59,7 @@ Esta pasta contém toda a documentação do projeto SGL, organizada por público
 2. Configure notificações com **[SISTEMA_NOTIFICACOES.md](./SISTEMA_NOTIFICACOES.md)**
 3. Importe dados com **[IMPORTACAO_DADOS.md](./IMPORTACAO_DADOS.md)**
 
-## 🆕 **Novas Funcionalidades Implementadas (v1.2.0)**
+## 🆕 **Novas Funcionalidades Implementadas (v1.2.0+)**
 
 ### 📊 **Sistema de Relatórios Avançado**
 
@@ -69,6 +69,9 @@ Esta pasta contém toda a documentação do projeto SGL, organizada por público
 - **Gráficos Interativos**: Visualizações dinâmicas com Recharts
 - **Filtros Avançados**: Busca e filtragem por múltiplos critérios
 - **Arquitetura Modular**: Serviços especializados por entidade
+- **Ordenação Inteligente**: Dados sempre do mais recente para o mais antigo
+- **Filtros de Período**: Aplicados apenas em entidades temporais (Rotas, Folgas)
+- **Interface Informativa**: Explicação clara sobre comportamento dos relatórios
 
 ### 🔔 **Sistema de Notificações Completo**
 
@@ -97,6 +100,21 @@ Esta pasta contém toda a documentação do projeto SGL, organizada por público
 - **Nomenclatura de Arquivos**: Padrão entity_dd-MM-YYYY.xlsx
 - **Tipos Separados**: Arquivos de tipos independentes por pacote
 - **Padrões de Código**: Eliminação de if/else com arrays de detectores
+
+### 🚛 **Reestruturação da Tabela de Veículos (v1.2.2)**
+
+- **Colunas Separadas**: Ano, Carroceria e Baú agora são colunas independentes
+- **Campo Motorista Removido**: Não mais exibido na visualização (mantido no banco)
+- **Ordenação Individual**: Todas as colunas são ordenáveis
+- **Estrutura Otimizada**: Layout mais limpo e organizado
+
+### 🔒 **Campos de Edição Inteligentes (v1.2.2)**
+
+- **CPF**: Desabilitado na edição de funcionários e vendedores
+- **Placa**: Desabilitada na edição de veículos
+- **Funcionário**: Desabilitado na edição de folgas
+- **Email**: Desabilitado na configuração de perfil
+- **Validação de Unicidade**: Implementada para todos os campos únicos
 
 ### 📈 **Funcionalidades de Exportação**
 

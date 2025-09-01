@@ -1488,8 +1488,9 @@ IMPORTAÇÃO DE VEÍCULOS - INSTRUÇÕES
    - Unidade Negócio: Frigorífico, Ovos, Ambos
    - Última Manutenção: Data no formato DD/MM/AAAA (opcional)
    - Próxima Manutenção: Data no formato DD/MM/AAAA (opcional)
-   - Motorista: Nome do motorista (opcional, será convertido para maiúsculas)
    - Observação: Observações sobre o veículo (opcional, será convertida para maiúsculas)
+
+⚠️ **IMPORTANTE:** O campo "Motorista" foi removido da visualização e não é mais exibido na tabela de veículos, mas continua sendo armazenado no banco de dados.
 
 🔍 VALIDAÇÕES:
    - Placa deve ser única no sistema
@@ -1509,15 +1510,15 @@ IMPORTAÇÃO DE VEÍCULOS - INSTRUÇÕES
 #### Planilha 2: Template
 
 ```
-Placa* | Modelo | Marca* | Ano | Capacidade* | Tipo Carroceria* | Quantidade Eixos* | Tipo Baú* | Status* | Unidade Negócio* | Última Manutenção | Próxima Manutenção | Motorista | Observação
+Placa* | Modelo | Marca* | Ano | Capacidade* | Tipo Carroceria* | Quantidade Eixos* | Tipo Baú* | Status* | Unidade Negócio* | Última Manutenção | Próxima Manutenção | Observação
 ```
 
 #### Planilha 3: Exemplo
 
 ```
-Placa* | Modelo | Marca* | Ano | Capacidade* | Tipo Carroceria* | Quantidade Eixos* | Tipo Baú* | Status* | Unidade Negócio* | Última Manutenção | Próxima Manutenção | Motorista | Observação
-ABC1234 | FH 460 | VOLVO | 2020 | 25000 | Truck | 3 | Frigorífico | Disponível | Frigorífico | 15/01/2024 | 15/04/2024 | JOÃO SILVA | Veículo em excelente estado
-XYZ5678 | Actros 2651 | MERCEDES-BENZ | 2021 | 30000 | Carreta | 6 | Frigorífico | Disponível | Ovos | 20/02/2024 | 20/05/2024 | MARIA SANTOS | Veículo para transporte de ovos
+Placa* | Modelo | Marca* | Ano | Capacidade* | Tipo Carroceria* | Quantidade Eixos* | Tipo Baú* | Status* | Unidade Negócio* | Última Manutenção | Próxima Manutenção | Observação
+ABC1234 | FH 460 | VOLVO | 2020 | 25000 | Truck | 3 | Frigorífico | Disponível | Frigorífico | 15/01/2024 | 15/04/2024 | Veículo em excelente estado
+XYZ5678 | Actros 2651 | MERCEDES-BENZ | 2021 | 30000 | Carreta | 6 | Frigorífico | Disponível | Ovos | 20/02/2024 | 20/05/2024 | Veículo para transporte de ovos
 ```
 
 ## 🔒 Segurança e Validação

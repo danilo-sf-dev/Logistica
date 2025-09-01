@@ -68,6 +68,14 @@ export class VeiculosService {
 
   static async createVeiculo(veiculoData: VeiculoFormData): Promise<string> {
     try {
+      // Verificar se a placa já existe
+      const placaExists = await this.checkPlacaExists(veiculoData.placa);
+      if (placaExists) {
+        throw new Error(
+          `Veículo com placa ${veiculoData.placa.toUpperCase()} já está cadastrado no sistema`,
+        );
+      }
+
       const docRef = await addDoc(collection(db, this.collectionName), {
         ...veiculoData,
         placa: veiculoData.placa.toUpperCase(),
@@ -79,7 +87,7 @@ export class VeiculosService {
       return docRef.id;
     } catch (error) {
       console.error("Erro ao criar veículo:", error);
-      throw new Error("Erro ao criar veículo");
+      throw error; // Re-throw para manter a mensagem original
     }
   }
 

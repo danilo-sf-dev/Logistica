@@ -17,6 +17,10 @@ const FuncionariosListPage: React.FC = () => {
 
   const {
     loading,
+    loadingSalvar,
+    loadingInativacao,
+    loadingAtivacao,
+    loadingExport,
     funcionariosPaginados,
     totalPaginado,
     paginaAtual,
@@ -307,6 +311,7 @@ const FuncionariosListPage: React.FC = () => {
         onConfirmar={confirmar}
         somenteLeitura={editando ? !editando.ativo : false}
         erros={erros}
+        loading={loadingSalvar}
       />
 
       {/* Modal de Confirmação de Inativação */}
@@ -335,6 +340,7 @@ const FuncionariosListPage: React.FC = () => {
           label: "Confirmar Inativação",
           onClick: confirmarInativacao,
           variant: "warning",
+          loading: loadingInativacao,
         }}
         secondaryAction={{
           label: "Cancelar",
@@ -369,6 +375,7 @@ const FuncionariosListPage: React.FC = () => {
           label: "Confirmar Ativação",
           onClick: confirmarAtivacao,
           variant: "success",
+          loading: loadingAtivacao,
         }}
         secondaryAction={{
           label: "Cancelar",
@@ -383,6 +390,7 @@ const FuncionariosListPage: React.FC = () => {
         onExport={handleExportConfirm}
         titulo="Funcionários"
         nomeArquivo={generateFileName()}
+        loading={loadingExport}
       />
 
       {/* Modal de Importação */}

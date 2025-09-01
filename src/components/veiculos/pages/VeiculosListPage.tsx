@@ -21,6 +21,9 @@ export const VeiculosListPage: React.FC = () => {
 
   const {
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingToggleStatus,
     filters,
     sortConfig,
     createVeiculo,
@@ -106,8 +109,15 @@ export const VeiculosListPage: React.FC = () => {
     setShowExportModal(true);
   };
 
-  const handleExportConfirm = () => {
-    handleExportExcel();
+  const handleExportConfirm = async () => {
+    try {
+      await handleExportExcel();
+      // Modal só fecha quando a exportação for bem-sucedida
+      setShowExportModal(false);
+    } catch (error) {
+      // Em caso de erro, o modal permanece aberto
+      console.error("Erro na exportação:", error);
+    }
   };
 
   const handleImportSuccess = () => {
@@ -316,6 +326,7 @@ export const VeiculosListPage: React.FC = () => {
           editingVeiculo ? editingVeiculo.status === "inativo" : false
         }
         erros={erros}
+        loading={loadingSubmit}
       />
 
       {/* Modal de Confirmação de Ativação */}
@@ -330,7 +341,7 @@ export const VeiculosListPage: React.FC = () => {
           label: "Sim, Ativar",
           onClick: confirmToggleStatus,
           variant: "success",
-          disabled: loading,
+          loading: loadingToggleStatus,
         }}
         secondaryAction={{
           label: "Cancelar",
@@ -351,7 +362,7 @@ export const VeiculosListPage: React.FC = () => {
           label: "Sim, Inativar",
           onClick: confirmToggleStatus,
           variant: "warning",
-          disabled: loading,
+          loading: loadingToggleStatus,
         }}
         secondaryAction={{
           label: "Cancelar",
@@ -366,6 +377,7 @@ export const VeiculosListPage: React.FC = () => {
         onExport={handleExportConfirm}
         titulo="Veículos"
         nomeArquivo={generateFileName()}
+        loading={loadingExport}
       />
 
       <ImportModal

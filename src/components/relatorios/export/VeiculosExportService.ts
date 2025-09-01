@@ -20,7 +20,6 @@ export class VeiculosExportService extends BaseExportService {
       "unidadeNegocio",
       "ultimaManutencao",
       "proximaManutencao",
-      "motorista",
       "observacao",
     ],
     formatacao: {
@@ -102,10 +101,6 @@ export class VeiculosExportService extends BaseExportService {
         if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
         return valor;
       },
-      motorista: (valor) => {
-        if (!valor) return "Não atribuído";
-        return valor;
-      },
       observacao: (valor) => {
         if (!valor) return "N/A";
         return valor;
@@ -158,7 +153,7 @@ export class VeiculosExportService extends BaseExportService {
   protected getColumnWidths(): Record<number, { cellWidth: number }> {
     return {
       0: { cellWidth: 20 }, // Placa
-      1: { cellWidth: 10 }, // Marca
+      1: { cellWidth: 20 }, // Marca
       2: { cellWidth: 15 }, // Modelo
       3: { cellWidth: 15 }, // Ano
       4: { cellWidth: 18 }, // Capacidade
@@ -169,8 +164,7 @@ export class VeiculosExportService extends BaseExportService {
       9: { cellWidth: 25 }, // Unidade de Negócio
       10: { cellWidth: 25 }, // Última Manutenção
       11: { cellWidth: 25 }, // Próxima Manutenção
-      12: { cellWidth: 20 }, // Motorista
-      13: { cellWidth: 20 }, // Observação
+      12: { cellWidth: 20 }, // Observação
     };
   }
 

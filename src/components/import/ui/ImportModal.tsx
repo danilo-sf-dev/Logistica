@@ -56,6 +56,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const [result, setResult] = useState<ImportResult | null>(null);
   const [lastImport, setLastImport] = useState<LastImportInfoType | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingImport, setLoadingImport] = useState(false);
   const [showAllErrors, setShowAllErrors] = useState(false);
 
   // Carregar informações da última importação
@@ -96,6 +97,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const handleValidation = async () => {
     if (!file) return;
 
+    setLoadingImport(true);
     setStep("progress");
     const service = await getImportService(entityType);
 
@@ -116,6 +118,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         status: "error",
         message: error.message,
       });
+    } finally {
+      setLoadingImport(false);
     }
   };
 
@@ -268,7 +272,16 @@ export const ImportModal: React.FC<ImportModalProps> = ({
               >
                 ← Selecionar outro arquivo
               </button>
-              <button onClick={handleValidation} className="btn-primary">
+              <button
+                onClick={handleValidation}
+                disabled={loadingImport}
+                className={`btn-primary flex items-center justify-center ${
+                  loadingImport ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {loadingImport ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                ) : null}
                 Importar Dados
               </button>
             </div>

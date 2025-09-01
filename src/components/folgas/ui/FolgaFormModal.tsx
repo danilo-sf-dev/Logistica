@@ -1,5 +1,6 @@
 import React from "react";
 import { X } from "lucide-react";
+import LoadingButton from "../../common/LoadingButton";
 import type { FolgaInput } from "../types";
 import type { TipoFolga, StatusFolga } from "../../../types";
 import { FuncionarioSelect } from "./FuncionarioSelect";
@@ -12,6 +13,7 @@ interface FolgaFormModalProps {
   onConfirmar: () => void;
   onCancelar: () => void;
   erros?: Partial<Record<keyof FolgaInput, string>>;
+  loading?: boolean;
 }
 
 export function FolgaFormModal({
@@ -22,6 +24,7 @@ export function FolgaFormModal({
   onConfirmar,
   onCancelar,
   erros = {},
+  loading = false,
 }: FolgaFormModalProps) {
   if (!mostrar) return null;
 
@@ -53,6 +56,7 @@ export function FolgaFormModal({
                 }
                 placeholder="Selecione um funcionário"
                 error={erros.funcionarioId}
+                disabled={editando}
               />
             </div>
 
@@ -237,13 +241,15 @@ export function FolgaFormModal({
               >
                 Cancelar
               </button>
-              <button
-                type="button"
+              <LoadingButton
                 onClick={onConfirmar}
-                className="w-full sm:w-auto btn-primary py-3 sm:py-2"
+                loading={loading}
+                variant="primary"
+                size="md"
+                className="w-full sm:w-auto"
               >
                 {editando ? "Atualizar" : "Solicitar"}
-              </button>
+              </LoadingButton>
             </div>
           </div>
         </div>

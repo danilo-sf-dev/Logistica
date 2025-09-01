@@ -1,53 +1,184 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Usuários podem ler/escrever seus próprios dados
+
+    // ========================================
+    // FUNÇÕES AUXILIARES DE PERMISSÃO
+    // ========================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && getUserRole() == role;
+    }
+
+    function isAdminSenior() {
+      return hasRole('admin_senior');
+    }
+
+    function isAdmin() {
+      return hasRole('admin') || isAdminSenior();
+    }
+
+    function isGerente() {
+      return hasRole('gerente') || isAdmin();
+    }
+
+    function isDispatcher() {
+      return hasRole('dispatcher') || isGerente();
+    }
+
+    function canDeleteRecords() {
+      return isAdmin() || isGerente();
+    }
+
+    function canExportReports() {
+      return isDispatcher() || isGerente() || isAdmin();
+    }
+
+    function canManageUsers() {
+      return isGerente() || isAdmin();
+    }
+
+    function canAccessSystemConfig() {
+      return isGerente() || isAdmin();
+    }
+
+    function canAccessSecurityConfig() {
+      return isAdmin();
+    }
+
+    // ========================================
+    // REGRAS PARA USUÁRIOS
+    // ========================================
+    
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == userId || canManageUsers());
+      allow write: if isAuthenticated() &&
+                      (request.auth.uid == userId || canManageUsers());
     }
+
+    // ========================================
+    // REGRAS PARA FUNCIONÁRIOS
+    // ========================================
     
-    // Administradores podem acessar todos os dados
-    match /{document=**} {
-      allow read, write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    match /funcionarios/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isGerente();
+      allow delete: if isAuthenticated() && canDeleteRecords();
     }
+
+    // ========================================
+    // REGRAS PARA VEÍCULOS
+    // ========================================
     
-    // Usuários autenticados podem ler dados do sistema
-  
-    match /funcionarios/{document=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'gerente'];
+    match /veiculos/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isGerente();
+      allow delete: if isAuthenticated() && canDeleteRecords();
     }
+
+    // ========================================
+    // REGRAS PARA ROTAS
+    // ========================================
     
-    match /veiculos/{document=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'gerente'];
+    match /rotas/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isDispatcher();
+      allow delete: if isAuthenticated() && canDeleteRecords();
     }
+
+    // ========================================
+    // REGRAS PARA FOLGAS
+    // ========================================
     
-    match /rotas/{document=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'gerente', 'dispatcher'];
+    match /folgas/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isDispatcher();
+      allow delete: if isAuthenticated() && canDeleteRecords();
     }
+
+    // ========================================
+    // REGRAS PARA CIDADES
+    // ========================================
     
-    match /folgas/{document=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'gerente'];
+    match /cidades/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isGerente();
+      allow delete: if isAuthenticated() && canDeleteRecords();
     }
+
+    // ========================================
+    // REGRAS PARA VENDEDORES
+    // ========================================
     
-    match /cidades/{document=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'gerente'];
+    match /vendedores/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isGerente();
+      allow delete: if isAuthenticated() && isGerente();
     }
+
+    // ========================================
+    // REGRAS PARA HISTÓRICO DE MUDANÇAS DE ROLE
+    // ========================================
     
-    match /vendedores/{document=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'gerente'];
+    match /role_changes/{docId} {
+      allow read: if isAuthenticated() && canManageUsers();
+      allow write: if isAuthenticated() && canManageUsers();
+    }
+
+    // ========================================
+    // REGRAS PARA NOTIFICAÇÕES
+    // ========================================
+    
+    match /notifications/{docId} {
+      allow read: if isAuthenticated() &&
+                     request.auth.uid == resource.data.userId;
+      allow write: if isAuthenticated() &&
+                      request.auth.uid == request.resource.data.userId;
+    }
+
+    // ========================================
+    // REGRAS PARA RELATÓRIOS E EXPORTAÇÕES
+    // ========================================
+    
+    match /reports/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && canExportReports();
+    }
+
+    // ========================================
+    // REGRAS PARA CONFIGURAÇÕES DO SISTEMA
+    // ========================================
+    
+    match /system_config/{docId} {
+      allow read: if isAuthenticated() && canAccessSystemConfig();
+      allow write: if isAuthenticated() && canAccessSystemConfig();
+    }
+
+    // ========================================
+    // REGRAS PARA CONFIGURAÇÕES DE SEGURANÇA
+    // ========================================
+    
+    match /security_config/{docId} {
+      allow read: if isAuthenticated() && canAccessSecurityConfig();
+      allow write: if isAuthenticated() && canAccessSecurityConfig();
+    }
+
+    // ========================================
+    // REGRAS PARA LOGS DE AUDITORIA
+    // ========================================
+    
+    match /audit_logs/{docId} {
+      allow read: if isAuthenticated() && canAccessSecurityConfig();
+      allow write: if isAuthenticated() && canAccessSecurityConfig();
     }
   }
 } 

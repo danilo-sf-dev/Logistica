@@ -17,6 +17,7 @@ export const ConfiguracoesPage: React.FC<ConfiguracoesProps> = ({
     activeTab,
     setActiveTab,
     loading,
+    profileLoading,
     errors,
     perfilData,
     notificacoes,
@@ -25,6 +26,8 @@ export const ConfiguracoesPage: React.FC<ConfiguracoesProps> = ({
     handlePerfilChange,
     handleNotificacoesChange,
     handleSistemaChange,
+    handleNotificacoesSubmit,
+    handleSistemaSubmit,
   } = useConfiguracoes();
 
   return (
@@ -51,6 +54,7 @@ export const ConfiguracoesPage: React.FC<ConfiguracoesProps> = ({
             data={perfilData}
             errors={errors}
             loading={loading}
+            profileLoading={profileLoading}
             onSubmit={handlePerfilSubmit}
             onChange={handlePerfilChange}
           />
@@ -60,11 +64,18 @@ export const ConfiguracoesPage: React.FC<ConfiguracoesProps> = ({
           <NotificacoesForm
             config={notificacoes}
             onChange={handleNotificacoesChange}
+            onSubmit={handleNotificacoesSubmit}
+            loading={loading}
           />
         )}
 
         {activeTab === "sistema" && (
-          <SistemaForm config={sistema} onChange={handleSistemaChange} />
+          <SistemaForm
+            config={sistema}
+            onChange={handleSistemaChange}
+            onSubmit={handleSistemaSubmit}
+            loading={loading}
+          />
         )}
 
         {activeTab === "seguranca" && (

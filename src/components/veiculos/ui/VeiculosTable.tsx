@@ -153,6 +153,15 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
               </th>
               <th
                 className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("ano")}
+              >
+                <div className="flex items-center">
+                  Ano
+                  {getSortIcon("ano")}
+                </div>
+              </th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
                 onClick={() => onSort("placa")}
               >
                 <div className="flex items-center">
@@ -174,8 +183,17 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
                 onClick={() => onSort("tipoCarroceria")}
               >
                 <div className="flex items-center">
-                  Carroceria/Baú
+                  Carroceria
                   {getSortIcon("tipoCarroceria")}
+                </div>
+              </th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("tipoBau")}
+              >
+                <div className="flex items-center">
+                  Baú
+                  {getSortIcon("tipoBau")}
                 </div>
               </th>
               <th
@@ -213,15 +231,17 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
                       <div className="text-sm font-medium text-gray-900">
                         {veiculo.marca}
                       </div>
-                      <div className="text-sm text-gray-500">
-                        Ano: {veiculo.ano}
-                      </div>
                     </div>
                   </div>
                 </td>
                 <td className="table-cell">
                   <div className="text-sm font-medium text-gray-900">
                     {veiculo.modelo || "N/A"}
+                  </div>
+                </td>
+                <td className="table-cell">
+                  <div className="text-sm font-medium text-gray-900">
+                    {veiculo.ano}
                   </div>
                 </td>
                 <td className="table-cell">
@@ -238,7 +258,9 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
                   <div className="text-sm text-gray-900">
                     {getTipoCarroceriaText(veiculo.tipoCarroceria || "truck")}
                   </div>
-                  <div className="text-sm text-gray-500">
+                </td>
+                <td className="table-cell">
+                  <div className="text-sm text-gray-900">
                     {getTipoBauText(veiculo.tipoBau || "frigorifico")}
                   </div>
                 </td>

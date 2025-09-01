@@ -1,5 +1,6 @@
 import React from "react";
 import { X } from "lucide-react";
+import LoadingButton from "../../common/LoadingButton";
 import type { Vendedor, VendedorInput } from "../types";
 import { maskCelular, maskCPF } from "../../../utils/masks";
 import { REGIOES_BRASIL } from "../../../utils/constants";
@@ -14,6 +15,7 @@ interface VendedorFormModalProps {
   onCancelar: () => void;
   onConfirmar: () => void;
   somenteLeitura?: boolean;
+  loading?: boolean;
 }
 
 const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
@@ -25,6 +27,7 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
   onCancelar,
   onConfirmar,
   somenteLeitura = false,
+  loading = false,
 }) => {
   if (!aberto) return null;
 
@@ -76,8 +79,12 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                     const valorLimpo = e.target.value.replace(/\D/g, "");
                     onChange({ ...valores, cpf: valorLimpo });
                   }}
-                  disabled={somenteLeitura}
-                  className={`input-field ${erros.cpf ? "border-red-500" : ""}`}
+                  disabled={somenteLeitura || !!editando}
+                  className={`input-field ${erros.cpf ? "border-red-500" : ""} ${
+                    somenteLeitura || !!editando
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : ""
+                  }`}
                   placeholder="000.000.000-00"
                 />
                 {erros.cpf && (
@@ -252,13 +259,15 @@ const VendedorFormModal: React.FC<VendedorFormModalProps> = ({
                 Cancelar
               </button>
               {!somenteLeitura && (
-                <button
-                  type="button"
+                <LoadingButton
                   onClick={onConfirmar}
-                  className="w-full sm:w-auto btn-primary py-3 sm:py-2"
+                  loading={loading}
+                  variant="primary"
+                  size="md"
+                  className="w-full sm:w-auto"
                 >
                   {editando ? "Atualizar" : "Cadastrar"}
-                </button>
+                </LoadingButton>
               )}
             </div>
           </div>

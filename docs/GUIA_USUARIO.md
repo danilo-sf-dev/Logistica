@@ -312,37 +312,51 @@ O módulo de relatórios oferece:
 
 ### Relatórios Detalhados
 
+**ℹ️ Observação Importante:**
+
+- **Relatórios Temporais**: Rotas e Folgas são filtrados pelo período selecionado (última semana, mês, etc.)
+- **Relatórios Não-Temporais**: Veículos, Cidades, Vendedores e Funcionários mostram todos os dados cadastrados
+
 **Tipos disponíveis:**
 
 1. **Funcionários Detalhado**
    - Dados pessoais e profissionais
    - Status atual
    - Informações de contato
+   - **Ordenação**: Do mais recente para o mais antigo
 
 2. **Veículos Detalhado**
-   - Informações técnicas
+   - Informações técnicas (Marca, Modelo, Ano, Placa, Capacidade)
+   - Carroceria e Tipo de Baú separados
    - Status da frota
    - Dados de manutenção
+   - **Ordenação**: Do mais recente para o mais antigo
 
 3. **Rotas Detalhado**
    - Detalhes de rotas
    - Associações funcionário/veículo
    - Status de execução
+   - **Filtro**: Por período selecionado
+   - **Ordenação**: Do mais recente para o mais antigo
 
 4. **Folgas Detalhado**
    - Histórico de solicitações
    - Status de aprovação
    - Observações
+   - **Filtro**: Por período selecionado
+   - **Ordenação**: Do mais recente para o mais antigo
 
 5. **Cidades Detalhado**
    - Dados geográficos
    - Organização regional
    - Vínculos com rotas
+   - **Ordenação**: Do mais recente para o mais antigo
 
 6. **Vendedores Detalhado**
    - Informações comerciais
    - Territórios de atuação
    - Dados de contato
+   - **Ordenação**: Do mais recente para o mais antigo
 
 ### Exportação Avançada
 

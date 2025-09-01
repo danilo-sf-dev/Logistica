@@ -7,6 +7,7 @@ interface ExportModalProps {
   onExport: (formato: "pdf" | "csv") => void;
   titulo: string;
   disablePDF?: boolean; // Nova prop para desabilitar PDF
+  loading?: boolean;
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({
@@ -15,6 +16,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   onExport,
   titulo,
   disablePDF = false,
+  loading = false,
 }) => {
   const [formato, setFormato] = useState<"pdf" | "csv">("pdf");
 
@@ -31,7 +33,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   const handleExport = () => {
     onExport(formato);
-    onClose();
+    // Modal só fecha quando a chamada finalizar (não aqui)
   };
 
   return (
@@ -111,15 +113,25 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
           <button
             onClick={onClose}
-            className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+            disabled={loading}
+            className={`w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             Cancelar
           </button>
           <button
             onClick={handleExport}
-            className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 flex items-center justify-center"
+            disabled={loading}
+            className={`w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 flex items-center justify-center ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            <Download className="h-4 w-4 mr-2" />
+            {loading ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
             Exportar
           </button>
         </div>

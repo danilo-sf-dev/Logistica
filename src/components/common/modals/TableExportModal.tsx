@@ -7,6 +7,7 @@ interface TableExportModalProps {
   onExport: () => void;
   titulo: string;
   nomeArquivo: string;
+  loading?: boolean;
 }
 
 export const TableExportModal: React.FC<TableExportModalProps> = ({
@@ -15,12 +16,13 @@ export const TableExportModal: React.FC<TableExportModalProps> = ({
   onExport,
   titulo,
   nomeArquivo,
+  loading = false,
 }) => {
   if (!isOpen) return null;
 
   const handleExport = () => {
     onExport();
-    onClose();
+    // Modal só fecha quando a chamada finalizar (não aqui)
   };
 
   return (
@@ -61,9 +63,16 @@ export const TableExportModal: React.FC<TableExportModalProps> = ({
           </button>
           <button
             onClick={handleExport}
-            className="w-full sm:w-auto px-4 py-3 sm:py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center"
+            disabled={loading}
+            className={`w-full sm:w-auto px-4 py-3 sm:py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex items-center justify-center ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            <Download className="h-4 w-4 mr-2" />
+            {loading ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
             Exportar Excel
           </button>
         </div>

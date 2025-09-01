@@ -14,6 +14,9 @@ export const RotasListPage: React.FC = () => {
   const {
     rotas,
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingExclusao,
     filters,
     sortConfig,
     filteredRotas,
@@ -94,8 +97,15 @@ export const RotasListPage: React.FC = () => {
     setShowExportModal(true);
   };
 
-  const handleExportConfirm = () => {
-    handleExportExcel();
+  const handleExportConfirm = async () => {
+    try {
+      await handleExportExcel();
+      // Modal só fecha quando a exportação for bem-sucedida
+      setShowExportModal(false);
+    } catch (error) {
+      // Em caso de erro, o modal permanece aberto
+      console.error("Erro na exportação:", error);
+    }
   };
 
   return (
@@ -215,6 +225,7 @@ export const RotasListPage: React.FC = () => {
         onSubmit={editingRota ? handleUpdateRota : handleCreateRota}
         editingRota={editingRota}
         erros={erros}
+        loading={loadingSubmit}
       />
 
       {/* Modal de Confirmação de Exclusão */}
@@ -223,6 +234,7 @@ export const RotasListPage: React.FC = () => {
         rota={rotaToDelete}
         onConfirmar={confirmDelete}
         onCancelar={handleCloseDeleteModal}
+        loading={loadingExclusao}
       />
 
       <TableExportModal
@@ -231,6 +243,7 @@ export const RotasListPage: React.FC = () => {
         onExport={handleExportConfirm}
         titulo="Rotas"
         nomeArquivo={generateFileName()}
+        loading={loadingExport}
       />
     </div>
   );

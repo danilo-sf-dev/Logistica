@@ -20,7 +20,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const IconComponent = config.icon;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget && onClose) {
+    if (e.target === e.currentTarget && onClose && !primaryAction.loading) {
       onClose();
     }
   };
@@ -44,7 +44,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           {onClose && (
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              disabled={primaryAction.loading}
+              className={`text-gray-400 hover:text-gray-600 transition-colors ${
+                primaryAction.loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               <X className="h-5 w-5" />
             </button>
@@ -83,20 +86,23 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <div className="flex justify-end space-x-3 p-6 border-t border-gray-200">
           <button
             onClick={secondaryAction.onClick}
-            disabled={secondaryAction.disabled}
+            disabled={secondaryAction.disabled || primaryAction.loading}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               BUTTON_VARIANTS[secondaryAction.variant || "secondary"]
-            } ${secondaryAction.disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            } ${secondaryAction.disabled || primaryAction.loading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             {secondaryAction.label}
           </button>
           <button
             onClick={primaryAction.onClick}
-            disabled={primaryAction.disabled}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            disabled={primaryAction.disabled || primaryAction.loading}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center ${
               BUTTON_VARIANTS[primaryAction.variant || "primary"]
-            } ${primaryAction.disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            } ${primaryAction.disabled || primaryAction.loading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
+            {primaryAction.loading ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            ) : null}
             {primaryAction.label}
           </button>
         </div>

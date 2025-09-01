@@ -12,6 +12,7 @@ import {
 import { db } from "../../../firebase/config";
 import type { Cidade, CidadeInput } from "../types";
 import { rotasService } from "../../rotas/data/rotasService";
+import { obterRegiaoPorEstado } from "utils/constants";
 
 const COLLECTION = "cidades";
 
@@ -75,13 +76,19 @@ async function criar(input: CidadeInput): Promise<string> {
     Object.entries(input).filter(([_, value]) => value !== undefined),
   );
 
+  // Definir região automaticamente se não for fornecida
+  let regiao = input.regiao;
+  if (!regiao && input.estado) {
+    regiao = obterRegiaoPorEstado(input.estado);
+  }
+
   const payload = {
     ...sanitizedInput,
     // Garantir que nome e estado estejam em maiúsculas
     nome: input.nome?.toString().toUpperCase() || "",
     estado: input.estado?.toString().toUpperCase() || "",
     // Garantir que região esteja em maiúsculas se existir
-    ...(input.regiao && { regiao: input.regiao.toString().toUpperCase() }),
+    ...(regiao && { regiao: regiao.toString().toUpperCase() }),
     // Garantir que observação esteja em maiúsculas se existir
     ...(input.observacao && {
       observacao: input.observacao.toString().toUpperCase(),
@@ -151,13 +158,19 @@ async function atualizar(id: string, input: CidadeInput): Promise<void> {
   const cidadeAtual = cidadeSnap.docs.find((d) => d.id === id);
   const rotaIdAnterior = cidadeAtual?.data()?.rotaId;
 
+  // Definir região automaticamente se não for fornecida
+  let regiao = input.regiao;
+  if (!regiao && input.estado) {
+    regiao = obterRegiaoPorEstado(input.estado);
+  }
+
   const payload = {
     ...input,
     // Garantir que nome e estado estejam em maiúsculas
     nome: input.nome?.toString().toUpperCase() || "",
     estado: input.estado?.toString().toUpperCase() || "",
     // Garantir que região esteja em maiúsculas se existir
-    ...(input.regiao && { regiao: input.regiao.toString().toUpperCase() }),
+    ...(regiao && { regiao: regiao.toString().toUpperCase() }),
     // Garantir que observação esteja em maiúsculas se existir
     ...(input.observacao && {
       observacao: input.observacao.toString().toUpperCase(),

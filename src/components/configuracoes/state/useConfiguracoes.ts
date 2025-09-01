@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useNotification } from "../../../contexts/NotificationContext";
-import { validateEmail, validateCelular } from "../../../utils/masks";
+import { validateCelular } from "../../../utils/masks";
 import type {
   PerfilData,
   NotificacoesConfig,
@@ -17,6 +17,7 @@ export const useConfiguracoes = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [configLoaded, setConfigLoaded] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const [perfilData, setPerfilData] = useState<PerfilData>({
     displayName: userProfile?.displayName || "",
@@ -65,12 +66,26 @@ export const useConfiguracoes = () => {
     }
   }, [userProfile, configLoaded]);
 
+  // Sincronizar dados do perfil sempre que userProfile mudar
+  useEffect(() => {
+    if (userProfile) {
+      setProfileLoading(true);
+      setPerfilData({
+        displayName: userProfile.displayName || "",
+        email: userProfile.email || "",
+        telefone: userProfile.telefone || "",
+        cargo: userProfile.cargo || "",
+      });
+      setProfileLoading(false);
+    } else {
+      setProfileLoading(false);
+    }
+  }, [userProfile]);
+
   const validatePerfilForm = useCallback((): boolean => {
     const newErrors: FormErrors = {};
 
-    if (perfilData.email && !validateEmail(perfilData.email)) {
-      newErrors.email = "Email inválido";
-    }
+    // Email não é validado pois não pode ser alterado
     if (perfilData.telefone && !validateCelular(perfilData.telefone)) {
       newErrors.telefone = "Telefone inválido (formato: (73) 99999-9999)";
     }
@@ -155,10 +170,67 @@ export const useConfiguracoes = () => {
     [],
   );
 
+  const handleNotificacoesSubmit = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const perfilDataToSave = {
+        ...perfilData,
+        notificacoes,
+      };
+
+      await updateUserProfile(userProfile?.uid, perfilDataToSave);
+      showNotification(
+        "Configurações de notificações atualizadas com sucesso!",
+        "success",
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar notificações:", error);
+      showNotification("Erro ao atualizar notificações", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    perfilData,
+    notificacoes,
+    updateUserProfile,
+    userProfile?.uid,
+    showNotification,
+  ]);
+
+  const handleSistemaSubmit = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const perfilDataToSave = {
+        ...perfilData,
+        sistema,
+      };
+
+      await updateUserProfile(userProfile?.uid, perfilDataToSave);
+      showNotification(
+        "Configurações do sistema atualizadas com sucesso!",
+        "success",
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar configurações do sistema:", error);
+      showNotification("Erro ao atualizar configurações do sistema", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    perfilData,
+    sistema,
+    updateUserProfile,
+    userProfile?.uid,
+    showNotification,
+  ]);
+
   return {
     activeTab,
     setActiveTab,
     loading,
+    profileLoading,
     errors,
     perfilData,
     notificacoes,
@@ -167,6 +239,8 @@ export const useConfiguracoes = () => {
     handlePerfilChange,
     handleNotificacoesChange,
     handleSistemaChange,
+    handleNotificacoesSubmit,
+    handleSistemaSubmit,
   };
 };
 

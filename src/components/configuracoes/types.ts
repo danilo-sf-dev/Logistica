@@ -50,6 +50,7 @@ export interface PerfilFormProps {
   data: PerfilData;
   errors: FormErrors;
   loading: boolean;
+  profileLoading?: boolean;
   onSubmit: (data: PerfilData) => Promise<void>;
   onChange: (field: keyof PerfilData, value: string) => void;
   className?: string;
@@ -58,12 +59,16 @@ export interface PerfilFormProps {
 export interface NotificacoesFormProps {
   config: NotificacoesConfig;
   onChange: (key: keyof NotificacoesConfig) => void;
+  onSubmit?: () => Promise<void>;
+  loading?: boolean;
   className?: string;
 }
 
 export interface SistemaFormProps {
   config: SistemaConfig;
   onChange: (key: keyof SistemaConfig, value: any) => void;
+  onSubmit?: () => Promise<void>;
+  loading?: boolean;
   className?: string;
 }
 

@@ -42,7 +42,7 @@ export type VeiculoFormData = {
   unidadeNegocio: UnidadeNegocio;
   ultimaManutencao: string;
   proximaManutencao: string;
-  motorista: string;
+  motorista?: string;
   observacao: string;
 };
 

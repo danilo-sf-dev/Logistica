@@ -20,6 +20,11 @@ export function useFolgas() {
 
   const [lista, setLista] = useState<Folga[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingExport, setLoadingExport] = useState(false);
+  const [loadingExclusao, setLoadingExclusao] = useState(false);
+  const [loadingAprovacao, setLoadingAprovacao] = useState(false);
+  const [loadingRejeicao, setLoadingRejeicao] = useState(false);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [editando, setEditando] = useState<Folga | null>(null);
   const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
@@ -115,6 +120,7 @@ export function useFolgas() {
       return;
     }
     setErros({});
+    setLoadingSubmit(true);
     try {
       const payload: FolgaInput = {
         ...valores,
@@ -152,6 +158,8 @@ export function useFolgas() {
     } catch (error) {
       console.error("Erro ao salvar folga:", error);
       showNotification("Erro ao salvar folga", "error");
+    } finally {
+      setLoadingSubmit(false);
     }
   }, [carregar, editando, showNotification, validar, valores]);
 
@@ -199,6 +207,7 @@ export function useFolgas() {
   const confirmarExclusao = useCallback(async () => {
     if (!folgaParaExcluir) return;
 
+    setLoadingExclusao(true);
     try {
       await folgasService.excluir(folgaParaExcluir.id);
       showNotification("Folga excluída com sucesso!", "success");
@@ -208,6 +217,8 @@ export function useFolgas() {
     } catch (error) {
       console.error("Erro ao excluir folga:", error);
       showNotification("Erro ao excluir folga", "error");
+    } finally {
+      setLoadingExclusao(false);
     }
   }, [folgaParaExcluir, showNotification, carregar]);
 
@@ -218,6 +229,7 @@ export function useFolgas() {
 
   const aprovarFolga = useCallback(
     async (id: string) => {
+      setLoadingAprovacao(true);
       try {
         await folgasService.aprovar(id);
         showNotification("Folga aprovada com sucesso!", "success");
@@ -225,6 +237,8 @@ export function useFolgas() {
       } catch (error) {
         console.error("Erro ao aprovar folga:", error);
         showNotification("Erro ao aprovar folga", "error");
+      } finally {
+        setLoadingAprovacao(false);
       }
     },
     [carregar, showNotification],
@@ -232,6 +246,7 @@ export function useFolgas() {
 
   const rejeitarFolga = useCallback(
     async (id: string) => {
+      setLoadingRejeicao(true);
       try {
         await folgasService.rejeitar(id);
         showNotification("Folga rejeitada com sucesso!", "success");
@@ -239,6 +254,8 @@ export function useFolgas() {
       } catch (error) {
         console.error("Erro ao rejeitar folga:", error);
         showNotification("Erro ao rejeitar folga", "error");
+      } finally {
+        setLoadingRejeicao(false);
       }
     },
     [carregar, showNotification],
@@ -309,6 +326,7 @@ export function useFolgas() {
 
   // Funcionalidade de exportação
   const handleExportExcel = useCallback(async () => {
+    setLoadingExport(true);
     try {
       const exportService = new FolgasTableExportService();
 
@@ -325,6 +343,8 @@ export function useFolgas() {
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
       showNotification("Erro ao exportar dados", "error");
+    } finally {
+      setLoadingExport(false);
     }
   }, [
     listaOrdenada,
@@ -352,6 +372,11 @@ export function useFolgas() {
 
   return {
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingExclusao,
+    loadingAprovacao,
+    loadingRejeicao,
     folgasPaginadas,
     totalPaginado,
     paginaAtual,

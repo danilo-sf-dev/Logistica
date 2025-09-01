@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import LoadingButton from "../../common/LoadingButton";
 import { Veiculo, VeiculoFormData } from "../types";
 import type {
   StatusVeiculo,
@@ -16,6 +17,7 @@ interface VeiculoFormModalProps {
   checkPlacaExists: (placa: string, excludeId?: string) => Promise<boolean>;
   somenteLeitura?: boolean;
   erros?: Partial<Record<keyof VeiculoFormData, string>>;
+  loading?: boolean;
 }
 
 export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
@@ -26,6 +28,7 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
   checkPlacaExists,
   somenteLeitura = false,
   erros = {},
+  loading = false,
 }) => {
   const [formData, setFormData] = useState<VeiculoFormData>({
     placa: "",
@@ -146,11 +149,13 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                     })
                   }
                   className={`input-field ${erros.placa ? "border-red-500" : ""} ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
+                    somenteLeitura || !!editingVeiculo
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : ""
                   }`}
                   placeholder="ABC1234"
                   maxLength={7}
-                  disabled={somenteLeitura}
+                  disabled={somenteLeitura || !!editingVeiculo}
                 />
                 {erros.placa && (
                   <p className="text-red-500 text-xs mt-1">{erros.placa}</p>
@@ -451,18 +456,15 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
                 {somenteLeitura ? "Fechar" : "Cancelar"}
               </button>
               {!somenteLeitura && (
-                <button
-                  type="button"
+                <LoadingButton
                   onClick={handleSubmit}
-                  className="w-full sm:w-auto btn-primary py-3 sm:py-2"
-                  disabled={isSubmitting}
+                  loading={loading}
+                  variant="primary"
+                  size="md"
+                  className="w-full sm:w-auto"
                 >
-                  {isSubmitting
-                    ? "Salvando..."
-                    : editingVeiculo
-                      ? "Atualizar"
-                      : "Cadastrar"}
-                </button>
+                  {editingVeiculo ? "Atualizar" : "Cadastrar"}
+                </LoadingButton>
               )}
             </div>
           </div>

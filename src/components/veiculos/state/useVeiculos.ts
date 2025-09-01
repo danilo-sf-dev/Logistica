@@ -13,6 +13,9 @@ import type { TableExportFilters } from "../../relatorios/export/BaseTableExport
 export const useVeiculos = () => {
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingExport, setLoadingExport] = useState(false);
+  const [loadingToggleStatus, setLoadingToggleStatus] = useState(false);
   const [filters, setFilters] = useState<VeiculosFiltersType>({
     searchTerm: "",
   });
@@ -108,6 +111,18 @@ export const useVeiculos = () => {
     [showNotification],
   );
 
+  const checkPlacaExists = useCallback(
+    async (placa: string, excludeId?: string) => {
+      try {
+        return await VeiculosService.checkPlacaExists(placa, excludeId);
+      } catch (error) {
+        console.error("Erro ao verificar placa:", error);
+        return false;
+      }
+    },
+    [],
+  );
+
   const createVeiculo = useCallback(
     async (veiculoData: VeiculoFormData) => {
       // Validar formulário
@@ -116,14 +131,28 @@ export const useVeiculos = () => {
         return false;
       }
 
+      setLoadingSubmit(true);
       try {
         await VeiculosService.createVeiculo(veiculoData);
         showNotification("Veículo cadastrado com sucesso!", "success");
         await fetchVeiculos();
         return true;
       } catch (error) {
-        showNotification("Erro ao cadastrar veículo", "error");
+        if (
+          error instanceof Error &&
+          error.message.includes("já está cadastrado")
+        ) {
+          setErros((prev) => ({
+            ...prev,
+            placa: "Esta placa já está cadastrada no sistema",
+          }));
+          showNotification(error.message, "error");
+        } else {
+          showNotification("Erro ao cadastrar veículo", "error");
+        }
         return false;
+      } finally {
+        setLoadingSubmit(false);
       }
     },
     [fetchVeiculos, showNotification, validar],
@@ -137,6 +166,7 @@ export const useVeiculos = () => {
         return false;
       }
 
+      setLoadingSubmit(true);
       try {
         await VeiculosService.updateVeiculo(id, veiculoData);
         showNotification("Veículo atualizado com sucesso!", "success");
@@ -145,6 +175,8 @@ export const useVeiculos = () => {
       } catch (error) {
         showNotification("Erro ao atualizar veículo", "error");
         return false;
+      } finally {
+        setLoadingSubmit(false);
       }
     },
     [fetchVeiculos, showNotification, validar],
@@ -167,6 +199,7 @@ export const useVeiculos = () => {
 
   const toggleVeiculoStatus = useCallback(
     async (id: string, novoStatus: string) => {
+      setLoadingToggleStatus(true);
       try {
         await VeiculosService.toggleVeiculoStatus(id, novoStatus);
         const statusText = novoStatus === "inativo" ? "inativado" : "ativado";
@@ -176,21 +209,11 @@ export const useVeiculos = () => {
       } catch (error) {
         showNotification("Erro ao alterar status do veículo", "error");
         return false;
+      } finally {
+        setLoadingToggleStatus(false);
       }
     },
     [fetchVeiculos, showNotification],
-  );
-
-  const checkPlacaExists = useCallback(
-    async (placa: string, excludeId?: string) => {
-      try {
-        return await VeiculosService.checkPlacaExists(placa, excludeId);
-      } catch (error) {
-        console.error("Erro ao verificar placa:", error);
-        return false;
-      }
-    },
-    [],
   );
 
   const updateFilters = useCallback(
@@ -266,6 +289,7 @@ export const useVeiculos = () => {
 
   // Funcionalidade de exportação
   const handleExportExcel = useCallback(async () => {
+    setLoadingExport(true);
     try {
       const exportService = new VeiculosTableExportService();
       const dadosFiltrados = getFilteredAndSortedVeiculos();
@@ -285,12 +309,17 @@ export const useVeiculos = () => {
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
       showNotification("Erro ao exportar dados", "error");
+    } finally {
+      setLoadingExport(false);
     }
   }, [getFilteredAndSortedVeiculos, filters, sortConfig, showNotification]);
 
   return {
     veiculos,
     loading,
+    loadingSubmit,
+    loadingExport,
+    loadingToggleStatus,
     filters,
     sortConfig,
     fetchVeiculos,

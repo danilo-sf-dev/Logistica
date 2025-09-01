@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
@@ -18,13 +18,39 @@ const Login: React.FC = () => {
   // Aplicar o hook de ResizeObserver para suprimir erros
   useResizeObserver();
 
-  const { login, loginWithGoogle } = useAuth();
+  const {
+    login,
+    loginWithGoogle,
+    userProfile,
+    loading: authLoading,
+  } = useAuth();
   const { showNotification } = useNotification();
   const { handleError } = useErrorHandler();
   const navigate = useNavigate();
 
+  // Redirecionar se já estiver logado
+  useEffect(() => {
+    if (userProfile && !authLoading) {
+      navigate("/dashboard");
+    }
+  }, [userProfile, authLoading, navigate]);
+
+  // Se ainda estiver carregando, mostrar loading
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  // Se já estiver logado, não renderizar nada (será redirecionado)
+  if (userProfile) {
+    return null;
+  }
+
   const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
     setLoading(true);
