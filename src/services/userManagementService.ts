@@ -26,7 +26,6 @@ import type {
   RoleChangeType,
   UserRole,
   AuditLog,
-  SecurityNotification,
 } from "../types";
 
 /**
@@ -82,7 +81,7 @@ export class UserManagementService {
           role: newRole,
           startDate: temporaryPeriod.startDate,
           endDate: temporaryPeriod.endDate,
-          reason,
+          reason: reason.toUpperCase(),
           grantedBy: changedBy,
           grantedAt: new Date(),
           isActive: true,
@@ -102,7 +101,7 @@ export class UserManagementService {
         oldRole,
         newRole,
         changeType,
-        reason,
+        reason: reason.toUpperCase(),
         changedBy,
         changedAt: new Date(),
         temporaryPeriod,
@@ -242,6 +241,15 @@ export class UserManagementService {
       const users = querySnapshot.docs.map((doc) => ({
         uid: doc.id,
         ...doc.data(),
+        // Garantir que campos obrigatórios existam
+        displayName: doc.data().displayName || null,
+        email: doc.data().email || null,
+        photoURL: doc.data().photoURL || null,
+        role: doc.data().role || "user",
+        baseRole: doc.data().baseRole || doc.data().role || "user",
+        provider: doc.data().provider || "google.com",
+        status: doc.data().status || "ativo",
+        cargo: doc.data().cargo || undefined,
         createdAt: doc.data().createdAt?.toDate() || new Date(),
         lastLogin: doc.data().lastLogin?.toDate() || new Date(),
         lastActivity: doc.data().lastActivity?.toDate(),
@@ -283,6 +291,15 @@ export class UserManagementService {
         .map((doc) => ({
           uid: doc.id,
           ...doc.data(),
+          // Garantir que campos obrigatórios existam
+          displayName: doc.data().displayName || null,
+          email: doc.data().email || null,
+          photoURL: doc.data().photoURL || null,
+          role: doc.data().role || "user",
+          baseRole: doc.data().baseRole || doc.data().role || "user",
+          provider: doc.data().provider || "google.com",
+          status: doc.data().status || "ativo",
+          cargo: doc.data().cargo || undefined,
           createdAt: doc.data().createdAt?.toDate() || new Date(),
           lastLogin: doc.data().lastLogin?.toDate() || new Date(),
           lastActivity: doc.data().lastActivity?.toDate(),
@@ -380,10 +397,11 @@ export class UserManagementService {
         action: "data_modification",
         level: "warning",
         description: `Usuário ${userId} desativado`,
-        details: { reason },
+        details: { reason: reason.toUpperCase() },
         ipAddress: "captured-from-session",
         userAgent: "captured-from-session",
         success: true,
+        timestamp: new Date(),
       });
     } catch (error) {
       console.error("Erro ao desativar usuário:", error);
@@ -392,7 +410,7 @@ export class UserManagementService {
   }
 
   /**
-   * Envia notificação para o usuário sobre mudança de perfil
+   * Envia notificação avançada para mudança de role
    */
   private static async notifyUserRoleChange(
     userId: string,
@@ -401,23 +419,223 @@ export class UserManagementService {
     reason: string,
   ): Promise<void> {
     try {
-      const notification: Omit<SecurityNotification, "id"> = {
+      const notification = {
+        userId,
         type: "role_change",
         title: "Seu perfil foi alterado",
         message: `Seu perfil foi alterado para ${PermissionService.getRoleDisplayName(newRole)}. ${changeType === "temporary" ? "Esta é uma alteração temporária." : ""}`,
-        severity: "medium",
-        userId,
-        userRole: newRole,
-        timestamp: new Date(),
+        data: { newRole, changeType, reason },
         read: false,
-        actionRequired: false,
-        metadata: { newRole, changeType, reason },
+        createdAt: Timestamp.now(),
+        priority: changeType === "temporary" ? "medium" : "high",
+        category: "security",
       };
 
-      await addDoc(collection(db, "security_notifications"), notification);
+      await addDoc(collection(db, "notifications"), notification);
+
+      // Se for uma mudança temporária, criar notificação de lembrete
+      if (changeType === "temporary") {
+        await this.scheduleExpirationReminder(userId, newRole);
+      }
     } catch (error) {
       console.error("Erro ao enviar notificação:", error);
-      // Não falha a operação principal se a notificação falhar
+    }
+  }
+
+  /**
+   * Agenda lembrete de expiração para roles temporários
+   */
+  private static async scheduleExpirationReminder(
+    userId: string,
+    temporaryRole: UserRole,
+  ): Promise<void> {
+    try {
+      // Buscar usuário para obter data de expiração
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (!userDoc.exists()) return;
+
+      const userData = userDoc.data() as UserProfile;
+      const tempRole = userData.temporaryRole;
+
+      if (!tempRole?.endDate) return;
+
+      // Calcular quando enviar o lembrete (1 dia antes da expiração)
+      const reminderDate = new Date(tempRole.endDate);
+      reminderDate.setDate(reminderDate.getDate() - 1);
+
+      // Criar notificação agendada
+      const reminderNotification = {
+        userId,
+        type: "role_expiration_reminder",
+        title: "Seu perfil temporário expira em breve",
+        message: `Seu perfil temporário de ${PermissionService.getRoleDisplayName(temporaryRole)} expira em 24 horas.`,
+        data: {
+          temporaryRole,
+          expiresAt: tempRole.endDate,
+          willRevertTo: userData.baseRole || "user",
+        },
+        read: false,
+        createdAt: Timestamp.now(),
+        scheduledFor: reminderDate,
+        priority: "high",
+        category: "security",
+      };
+
+      await addDoc(
+        collection(db, "scheduled_notifications"),
+        reminderNotification,
+      );
+    } catch (error) {
+      console.error("Erro ao agendar lembrete:", error);
+    }
+  }
+
+  /**
+   * Obtém usuários com roles temporários próximos da expiração
+   */
+  static async getUsersWithExpiringTemporaryRoles(
+    daysThreshold: number = 3,
+  ): Promise<
+    {
+      userId: string;
+      displayName: string;
+      email: string;
+      temporaryRole: string;
+      expiresAt: Date;
+      daysUntilExpiration: number;
+    }[]
+  > {
+    try {
+      const now = new Date();
+      const thresholdDate = new Date();
+      thresholdDate.setDate(thresholdDate.getDate() + daysThreshold);
+
+      const q = query(
+        collection(db, "users"),
+        where("temporaryRole.isActive", "==", true),
+        where("temporaryRole.endDate", "<=", thresholdDate),
+        where("temporaryRole.endDate", ">", now),
+      );
+
+      const querySnapshot = await getDocs(q);
+      const expiringUsers = [];
+
+      for (const docSnapshot of querySnapshot.docs) {
+        const userData = docSnapshot.data() as UserProfile;
+        const tempRole = userData.temporaryRole!;
+
+        const daysUntilExpiration = Math.ceil(
+          (tempRole.endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+        );
+
+        expiringUsers.push({
+          userId: docSnapshot.id,
+          displayName: userData.displayName || "Usuário",
+          email: userData.email || "",
+          temporaryRole: tempRole.role,
+          expiresAt: tempRole.endDate,
+          daysUntilExpiration,
+        });
+      }
+
+      // Ordenar por proximidade da expiração
+      return expiringUsers.sort(
+        (a, b) => a.daysUntilExpiration - b.daysUntilExpiration,
+      );
+    } catch (error) {
+      console.error("Erro ao buscar usuários com roles expirando:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Estende um role temporário
+   */
+  static async extendTemporaryRole(
+    userId: string,
+    newEndDate: Date,
+    reason: string,
+    extendedBy: string,
+  ): Promise<void> {
+    try {
+      // Verificar se o usuário que está fazendo a extensão tem permissão
+      const adminUser = await getDoc(doc(db, "users", extendedBy));
+      if (!adminUser.exists()) {
+        throw new Error("Usuário administrador não encontrado");
+      }
+
+      const adminRole = adminUser.data().role as UserRole;
+      if (!PermissionService.canManageUsers(adminRole)) {
+        throw new Error(
+          "Você não tem permissão para estender roles temporários",
+        );
+      }
+
+      // Buscar usuário atual
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (!userDoc.exists()) {
+        throw new Error("Usuário não encontrado");
+      }
+
+      const currentUser = userDoc.data() as UserProfile;
+      if (!currentUser.temporaryRole?.isActive) {
+        throw new Error("Usuário não possui role temporário ativo");
+      }
+
+      // Atualizar data de expiração
+      await setDoc(
+        doc(db, "users", userId),
+        {
+          temporaryRole: {
+            ...currentUser.temporaryRole,
+            endDate: newEndDate,
+            extendedAt: new Date(),
+            extendedBy,
+            extensionReason: reason.toUpperCase(),
+          },
+          lastLogin: new Date(),
+        },
+        { merge: true },
+      );
+
+      // Registrar extensão no histórico
+      const roleChange: Omit<RoleChange, "id"> = {
+        userId,
+        oldRole: currentUser.temporaryRole.role,
+        newRole: currentUser.temporaryRole.role, // Mesmo role, apenas estendido
+        changeType: "temporary_extension",
+        reason: `Role temporário estendido: ${reason.toUpperCase()}`,
+        changedBy: extendedBy,
+        changedAt: new Date(),
+        temporaryPeriod: {
+          startDate: currentUser.temporaryRole.startDate,
+          endDate: newEndDate,
+        },
+        metadata: {
+          ip: "captured-from-session",
+          userAgent: "captured-from-session",
+          device: "captured-from-session",
+        },
+      };
+
+      await addDoc(collection(db, "role_changes"), roleChange);
+
+      // Enviar notificação para o usuário
+      await this.notifyUserRoleChange(
+        userId,
+        currentUser.temporaryRole.role,
+        "temporary_extension",
+        `Seu perfil temporário foi estendido até ${newEndDate.toLocaleDateString("pt-BR")}`,
+      );
+
+      // Reagendar lembrete de expiração
+      await this.scheduleExpirationReminder(
+        userId,
+        currentUser.temporaryRole.role,
+      );
+    } catch (error) {
+      console.error("Erro ao estender role temporário:", error);
+      throw error;
     }
   }
 
@@ -529,5 +747,366 @@ export class UserManagementService {
       console.error("Erro ao reverter perfil temporário:", error);
       throw error;
     }
+  }
+
+  /**
+   * Verifica e processa períodos temporários expirados
+   * Esta função deve ser executada periodicamente (ex: diariamente)
+   */
+  static async processExpiredTemporaryRoles(): Promise<{
+    processed: number;
+    errors: string[];
+  }> {
+    const errors: string[] = [];
+    let processed = 0;
+
+    try {
+      const now = new Date();
+
+      // Buscar usuários com roles temporários expirados
+      const q = query(
+        collection(db, "users"),
+        where("temporaryRole.isActive", "==", true),
+        where("temporaryRole.endDate", "<=", now),
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      for (const docSnapshot of querySnapshot.docs) {
+        try {
+          const userData = docSnapshot.data() as UserProfile;
+          const temporaryRole = userData.temporaryRole!;
+
+          // Reverter para o role base
+          await setDoc(
+            docSnapshot.ref,
+            {
+              role: userData.baseRole || "user",
+              temporaryRole: {
+                ...temporaryRole,
+                isActive: false,
+                expiredAt: now,
+              },
+              lastLogin: new Date(),
+            },
+            { merge: true },
+          );
+
+          // Registrar mudança automática
+          const roleChange: Omit<RoleChange, "id"> = {
+            userId: docSnapshot.id,
+            oldRole: temporaryRole.role,
+            newRole: userData.baseRole || "user",
+            changeType: "automatic_revert",
+            reason: "Período temporário expirado automaticamente",
+            changedBy: "system",
+            changedAt: now,
+            metadata: {
+              ip: "system",
+              userAgent: "system",
+              device: "system",
+            },
+          };
+
+          await addDoc(collection(db, "role_changes"), roleChange);
+
+          // Enviar notificação para o usuário
+          await this.notifyUserRoleChange(
+            docSnapshot.id,
+            userData.baseRole || "user",
+            "automatic_revert",
+            "Seu perfil temporário expirou e foi revertido automaticamente",
+          );
+
+          processed++;
+        } catch (error) {
+          console.error(`Erro ao processar usuário ${docSnapshot.id}:`, error);
+          errors.push(`Usuário ${docSnapshot.id}: ${error}`);
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao processar roles temporários expirados:", error);
+      errors.push(`Erro geral: ${error}`);
+    }
+
+    return { processed, errors };
+  }
+
+  /**
+   * Obtém estatísticas de usuários por role
+   */
+  static async getUserRoleStatistics(): Promise<{
+    total: number;
+    byRole: Record<string, number>;
+    temporary: number;
+    active: number;
+  }> {
+    try {
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const users = usersSnapshot.docs.map((doc) => doc.data() as UserProfile);
+
+      const byRole: Record<string, number> = {};
+      let temporary = 0;
+      let active = 0;
+
+      users.forEach((user) => {
+        // Contar por role
+        byRole[user.role] = (byRole[user.role] || 0) + 1;
+
+        // Contar temporários
+        if (user.temporaryRole?.isActive) {
+          temporary++;
+        }
+
+        // Contar ativos (não temporários)
+        if (!user.temporaryRole?.isActive) {
+          active++;
+        }
+      });
+
+      return {
+        total: users.length,
+        byRole,
+        temporary,
+        active,
+      };
+    } catch (error) {
+      console.error("Erro ao obter estatísticas:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtém histórico de mudanças com filtros avançados
+   */
+  static async getAdvancedRoleChangeHistory(filters: {
+    userId?: string;
+    changeType?: RoleChangeType;
+    startDate?: Date;
+    endDate?: Date;
+    changedBy?: string;
+    limit?: number;
+  }): Promise<RoleChange[]> {
+    try {
+      let q = collection(db, "role_changes");
+
+      // Aplicar filtros
+      if (filters.userId) {
+        q = query(q, where("userId", "==", filters.userId));
+      }
+
+      if (filters.changeType) {
+        q = query(q, where("changeType", "==", filters.changeType));
+      }
+
+      if (filters.changedBy) {
+        q = query(q, where("changedBy", "==", filters.changedBy));
+      }
+
+      if (filters.startDate) {
+        q = query(q, where("changedAt", ">=", filters.startDate));
+      }
+
+      if (filters.endDate) {
+        q = query(q, where("changedAt", "<=", filters.endDate));
+      }
+
+      // Ordenar por data de mudança (mais recente primeiro)
+      q = query(q, orderBy("changedAt", "desc"));
+
+      // Aplicar limite
+      if (filters.limit) {
+        q = query(q, limit(filters.limit));
+      }
+
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map((docSnapshot) => ({
+        id: docSnapshot.id,
+        ...docSnapshot.data(),
+      })) as RoleChange[];
+    } catch (error) {
+      console.error("Erro ao buscar histórico avançado:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cria um relatório de auditoria para um período específico
+   */
+  static async generateAuditReport(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<{
+    period: { start: Date; end: Date };
+    totalChanges: number;
+    changesByType: Record<string, number>;
+    changesByRole: Record<string, number>;
+    topUsers: Array<{ userId: string; changes: number }>;
+    securityAlerts: string[];
+  }> {
+    try {
+      const changes = await this.getAdvancedRoleChangeHistory({
+        startDate,
+        endDate,
+        limit: 1000, // Buscar todas as mudanças do período
+      });
+
+      const changesByType: Record<string, number> = {};
+      const changesByRole: Record<string, number> = {};
+      const userChanges: Record<string, number> = {};
+      const securityAlerts: string[] = [];
+
+      changes.forEach((change) => {
+        // Contar por tipo
+        changesByType[change.changeType] =
+          (changesByType[change.changeType] || 0) + 1;
+
+        // Contar por role
+        changesByRole[change.newRole] =
+          (changesByRole[change.newRole] || 0) + 1;
+
+        // Contar por usuário
+        userChanges[change.changedBy] =
+          (userChanges[change.changedBy] || 0) + 1;
+
+        // Verificar alertas de segurança
+        if (
+          change.changeType === "permanent" &&
+          change.newRole === "admin_senior"
+        ) {
+          securityAlerts.push(
+            `Promoção para Admin Senior: ${change.userId} por ${change.changedBy}`,
+          );
+        }
+
+        if (
+          change.changeType === "permanent" &&
+          change.oldRole === "admin_senior"
+        ) {
+          securityAlerts.push(
+            `Remoção de Admin Senior: ${change.userId} por ${change.changedBy}`,
+          );
+        }
+      });
+
+      // Top usuários por mudanças
+      const topUsers = Object.entries(userChanges)
+        .map(([userId, changes]) => ({ userId, changes }))
+        .sort((a, b) => b.changes - a.changes)
+        .slice(0, 10);
+
+      return {
+        period: { start: startDate, end: endDate },
+        totalChanges: changes.length,
+        changesByType,
+        changesByRole,
+        topUsers,
+        securityAlerts,
+      };
+    } catch (error) {
+      console.error("Erro ao gerar relatório de auditoria:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Valida se uma mudança de role é segura
+   */
+  static async validateRoleChange(
+    userId: string,
+    newRole: UserRole,
+    changeType: RoleChangeType,
+    changedBy: string,
+  ): Promise<{
+    isValid: boolean;
+    warnings: string[];
+    errors: string[];
+  }> {
+    const warnings: string[] = [];
+    const errors: string[] = [];
+
+    try {
+      // Verificar se o usuário que está fazendo a mudança tem permissão
+      const adminUser = await getDoc(doc(db, "users", changedBy));
+      if (!adminUser.exists()) {
+        errors.push("Usuário administrador não encontrado");
+        return { isValid: false, warnings, errors };
+      }
+
+      const adminRole = adminUser.data().role as UserRole;
+      if (!PermissionService.canChangeRole(adminRole, newRole)) {
+        errors.push("Você não tem permissão para alterar este perfil");
+        return { isValid: false, warnings, errors };
+      }
+
+      // Verificar se o usuário alvo existe
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (!userDoc.exists()) {
+        errors.push("Usuário alvo não encontrado");
+        return { isValid: false, warnings, errors };
+      }
+
+      const currentUser = userDoc.data() as UserProfile;
+      const oldRole = currentUser.role;
+
+      // Verificar se é uma mudança para o mesmo role
+      if (oldRole === newRole) {
+        warnings.push("Usuário já possui este perfil");
+      }
+
+      // Verificar se é uma promoção significativa
+      if (this.isSignificantPromotion(oldRole, newRole)) {
+        warnings.push(
+          "Esta é uma promoção significativa - considere aprovação adicional",
+        );
+      }
+
+      // Verificar se o usuário tem mudanças recentes
+      const recentChanges = await this.getAdvancedRoleChangeHistory({
+        userId,
+        limit: 5,
+      });
+
+      if (recentChanges.length > 0) {
+        const lastChange = recentChanges[0];
+        const daysSinceLastChange = Math.floor(
+          (Date.now() - lastChange.changedAt.getTime()) / (1000 * 60 * 60 * 24),
+        );
+
+        if (daysSinceLastChange < 7) {
+          warnings.push("Usuário teve mudança de perfil há menos de 7 dias");
+        }
+      }
+
+      return {
+        isValid: errors.length === 0,
+        warnings,
+        errors,
+      };
+    } catch (error) {
+      errors.push(`Erro de validação: ${error}`);
+      return { isValid: false, warnings, errors };
+    }
+  }
+
+  /**
+   * Verifica se uma mudança é uma promoção significativa
+   */
+  private static isSignificantPromotion(
+    oldRole: UserRole,
+    newRole: UserRole,
+  ): boolean {
+    const roleHierarchy = [
+      "user",
+      "dispatcher",
+      "gerente",
+      "admin",
+      "admin_senior",
+    ];
+    const oldIndex = roleHierarchy.indexOf(oldRole);
+    const newIndex = roleHierarchy.indexOf(newRole);
+
+    // Promoção de mais de 2 níveis é considerada significativa
+    return newIndex - oldIndex > 2;
   }
 }

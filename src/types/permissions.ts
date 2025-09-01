@@ -148,7 +148,12 @@ export interface UserProfile {
 /**
  * Tipo de mudança de perfil
  */
-export type RoleChangeType = "permanent" | "temporary" | "revert";
+export type RoleChangeType =
+  | "permanent"
+  | "temporary"
+  | "revert"
+  | "automatic_revert"
+  | "temporary_extension";
 
 /**
  * Mudança de perfil registrada
