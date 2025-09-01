@@ -41,7 +41,7 @@ export class PermissionService {
    */
   static canExportReports(userRole: UserRole): boolean {
     return ["admin_senior", "admin", "gerente", "dispatcher"].includes(
-      userRole
+      userRole,
     );
   }
 
@@ -120,7 +120,7 @@ export class PermissionService {
   static canPerformOperation(
     userRole: UserRole,
     feature: SystemFeature,
-    operation: CrudOperation
+    operation: CrudOperation,
   ): boolean {
     // Usuários básicos só podem ler
     if (userRole === "user") {
@@ -151,7 +151,7 @@ export class PermissionService {
    * Retorna resultado detalhado da validação
    */
   static validatePermissions(
-    context: PermissionContext
+    context: PermissionContext,
   ): PermissionValidationResult {
     const { userRole, targetUserRole, feature, operation } = context;
 

@@ -12,7 +12,6 @@ import {
   where,
   getDocs,
   updateDoc,
-  deleteDoc,
   Timestamp,
   orderBy,
   limit,
@@ -45,7 +44,7 @@ export class UserManagementService {
     changeType: RoleChangeType,
     reason: string,
     changedBy: string,
-    temporaryPeriod?: { startDate: Date; endDate: Date }
+    temporaryPeriod?: { startDate: Date; endDate: Date },
   ): Promise<void> {
     try {
       // Verificar se o usuário que está fazendo a mudança tem permissão
@@ -130,6 +129,7 @@ export class UserManagementService {
         ipAddress: "captured-from-session",
         userAgent: "captured-from-session",
         success: true,
+        timestamp: new Date(),
       });
     } catch (error) {
       console.error("Erro ao alterar role do usuário:", error);
@@ -148,6 +148,7 @@ export class UserManagementService {
         userAgent: "captured-from-session",
         success: false,
         errorMessage: error instanceof Error ? error.message : String(error),
+        timestamp: new Date(),
       });
 
       throw error;
@@ -224,13 +225,13 @@ export class UserManagementService {
    */
   static async getAllUsers(
     pageSize: number = 50,
-    lastDoc?: QueryDocumentSnapshot
+    lastDoc?: QueryDocumentSnapshot,
   ): Promise<{ users: UserProfile[]; lastDoc?: QueryDocumentSnapshot }> {
     try {
       let q = query(
         collection(db, "users"),
         orderBy("createdAt", "desc"),
-        limit(pageSize)
+        limit(pageSize),
       );
 
       if (lastDoc) {
@@ -317,7 +318,7 @@ export class UserManagementService {
   static async updateUserInfo(
     userId: string,
     updates: Partial<UserProfile>,
-    updatedBy: string
+    updatedBy: string,
   ): Promise<void> {
     try {
       // Verificar se o usuário existe
@@ -343,6 +344,7 @@ export class UserManagementService {
         ipAddress: "captured-from-session",
         userAgent: "captured-from-session",
         success: true,
+        timestamp: new Date(),
       });
     } catch (error) {
       console.error("Erro ao atualizar usuário:", error);
@@ -356,7 +358,7 @@ export class UserManagementService {
   static async deactivateUser(
     userId: string,
     deactivatedBy: string,
-    reason: string
+    reason: string,
   ): Promise<void> {
     try {
       // Verificar se o usuário existe
@@ -396,7 +398,7 @@ export class UserManagementService {
     userId: string,
     newRole: UserRole,
     changeType: RoleChangeType,
-    reason: string
+    reason: string,
   ): Promise<void> {
     try {
       const notification: Omit<SecurityNotification, "id"> = {
@@ -423,7 +425,7 @@ export class UserManagementService {
    * Cria log de auditoria
    */
   private static async createAuditLog(
-    logData: Omit<AuditLog, "id">
+    logData: Omit<AuditLog, "id">,
   ): Promise<void> {
     try {
       await addDoc(collection(db, "audit_logs"), {
@@ -446,7 +448,7 @@ export class UserManagementService {
       const q = query(
         collection(db, "users"),
         where("temporaryRole.isActive", "==", true),
-        where("temporaryRole.endDate", "<=", now)
+        where("temporaryRole.endDate", "<=", now),
       );
 
       const querySnapshot = await getDocs(q);
@@ -521,7 +523,7 @@ export class UserManagementService {
         userId,
         userData.baseRole,
         "revert",
-        "Seu perfil temporário expirou e foi revertido automaticamente"
+        "Seu perfil temporário expirou e foi revertido automaticamente",
       );
     } catch (error) {
       console.error("Erro ao reverter perfil temporário:", error);
