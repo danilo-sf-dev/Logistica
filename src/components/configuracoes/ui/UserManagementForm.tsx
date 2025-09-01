@@ -17,6 +17,7 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
     formData,
     filters,
     pagination,
+    userMap,
 
     // Permissões e roles
     canManageUsers,
@@ -315,7 +316,7 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
       />
 
       {/* Histórico de Alterações */}
-      <UserHistoryTable roleChanges={roleChanges} />
+      <UserHistoryTable roleChanges={roleChanges} userMap={userMap} />
     </div>
   );
 };

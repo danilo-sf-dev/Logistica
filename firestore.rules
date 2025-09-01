@@ -140,9 +140,18 @@ service cloud.firestore {
     
     match /notifications/{docId} {
       allow read: if isAuthenticated() &&
-                     request.auth.uid == resource.data.userId;
-      allow write: if isAuthenticated() &&
-                      request.auth.uid == request.resource.data.userId;
+                     (request.auth.uid == resource.data.userId || canManageUsers());
+      allow write: if isAuthenticated() && canManageUsers();
+    }
+
+    // ========================================
+    // REGRAS PARA NOTIFICAÇÕES AGENDADAS
+    // ========================================
+    
+    match /scheduled_notifications/{docId} {
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid == resource.data.userId || canManageUsers());
+      allow write: if isAuthenticated() && canManageUsers();
     }
 
     // ========================================

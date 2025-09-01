@@ -6,14 +6,12 @@ import type { RoleChange } from "../../../types/permissions";
 
 interface UserHistoryTableProps {
   roleChanges: RoleChange[];
-}
-
-interface UserHistoryTableProps {
-  roleChanges: RoleChange[];
+  userMap: Record<string, { displayName: string; email: string }>;
 }
 
 export const UserHistoryTable: React.FC<UserHistoryTableProps> = ({
   roleChanges,
+  userMap,
 }) => {
   const getRoleDisplayName = (role: string) => {
     return PermissionService.getRoleDisplayName(role as any);
@@ -66,7 +64,15 @@ export const UserHistoryTable: React.FC<UserHistoryTableProps> = ({
                     {new Date(change.changedAt).toLocaleDateString("pt-BR")}
                   </td>
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {change.userId}
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {userMap[change.userId]?.displayName ||
+                          "Usuário não encontrado"}
+                      </div>
+                      <div className="text-xs text-gray-500 truncate">
+                        {userMap[change.userId]?.email || change.userId}
+                      </div>
+                    </div>
                   </td>
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {getRoleDisplayName(change.oldRole)} →{" "}

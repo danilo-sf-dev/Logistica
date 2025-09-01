@@ -24,6 +24,9 @@ export const useUserManagement = () => {
   const [roleChanges, setRoleChanges] = useState<RoleChange[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
+  const [userMap, setUserMap] = useState<
+    Record<string, { displayName: string; email: string }>
+  >({});
 
   // Estado do formulário
   const [formData, setFormData] = useState({
@@ -80,6 +83,20 @@ export const useUserManagement = () => {
       setLoading(false);
     }
   }, [canManageUsers, pagination.pageSize, showNotification]);
+
+  /**
+   * Criar mapeamento de usuários por ID
+   */
+  const createUserMap = useCallback(() => {
+    const map: Record<string, { displayName: string; email: string }> = {};
+    users.forEach((user) => {
+      map[user.uid] = {
+        displayName: user.displayName || "Usuário sem nome",
+        email: user.email || "Sem email",
+      };
+    });
+    setUserMap(map);
+  }, [users]);
 
   /**
    * Carregar histórico de mudanças de perfil
@@ -339,6 +356,15 @@ export const useUserManagement = () => {
     }
   }, [canManageUsers, loadUsers, loadRoleChangeHistory]);
 
+  /**
+   * Criar mapeamento de usuários quando a lista for carregada
+   */
+  useEffect(() => {
+    if (users.length > 0) {
+      createUserMap();
+    }
+  }, [users, createUserMap]);
+
   return {
     // Estados
     users,
@@ -348,6 +374,7 @@ export const useUserManagement = () => {
     formData,
     filters,
     pagination,
+    userMap,
 
     // Permissões e roles
     canManageUsers,

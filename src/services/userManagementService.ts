@@ -89,7 +89,11 @@ export class UserManagementService {
       } else {
         // Mudança permanente - atualizar role base
         updateData.baseRole = newRole;
-        updateData.temporaryRole = undefined;
+        // Remover campo temporaryRole se existir (não definir como undefined)
+        if (currentUser.temporaryRole) {
+          // Usar delete para remover o campo do documento
+          delete updateData.temporaryRole;
+        }
       }
 
       // Atualizar usuário
@@ -104,7 +108,8 @@ export class UserManagementService {
         reason: reason.toUpperCase(),
         changedBy,
         changedAt: new Date(),
-        temporaryPeriod,
+        // Só incluir temporaryPeriod se existir
+        ...(temporaryPeriod && { temporaryPeriod }),
         metadata: {
           ip: "captured-from-session",
           userAgent: "captured-from-session",
@@ -114,8 +119,16 @@ export class UserManagementService {
 
       await addDoc(collection(db, "role_changes"), roleChange);
 
-      // Enviar notificação para o usuário
-      await this.notifyUserRoleChange(userId, newRole, changeType, reason);
+      // Enviar notificação para o usuário (opcional - não falha a operação)
+      try {
+        await this.notifyUserRoleChange(userId, newRole, changeType, reason);
+      } catch (notificationError) {
+        console.warn(
+          "Aviso: Não foi possível enviar notificação:",
+          notificationError,
+        );
+        // Não falha a operação principal se a notificação falhar
+      }
 
       // Registrar log de auditoria
       await this.createAuditLog({
@@ -160,29 +173,31 @@ export class UserManagementService {
    */
   static async getRoleChangeHistory(userId?: string): Promise<RoleChange[]> {
     try {
-      let q = collection(db, "role_changes");
+      let finalQuery: any = collection(db, "role_changes");
 
       if (userId) {
-        q = query(q, where("userId", "==", userId));
+        finalQuery = query(finalQuery, where("userId", "==", userId));
       }
 
-      q = query(q, orderBy("changedAt", "desc"), limit(100));
+      finalQuery = query(finalQuery, orderBy("changedAt", "desc"), limit(100));
 
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        changedAt: doc.data().changedAt?.toDate() || new Date(),
-        temporaryPeriod: doc.data().temporaryPeriod
-          ? {
-              ...doc.data().temporaryPeriod,
-              startDate:
-                doc.data().temporaryPeriod.startDate?.toDate() || new Date(),
-              endDate:
-                doc.data().temporaryPeriod.endDate?.toDate() || new Date(),
-            }
-          : undefined,
-      })) as RoleChange[];
+      const querySnapshot = await getDocs(finalQuery);
+      return querySnapshot.docs.map((doc) => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          changedAt: data.changedAt?.toDate() || new Date(),
+          temporaryPeriod: data.temporaryPeriod
+            ? {
+                ...data.temporaryPeriod,
+                startDate:
+                  data.temporaryPeriod.startDate?.toDate() || new Date(),
+                endDate: data.temporaryPeriod.endDate?.toDate() || new Date(),
+              }
+            : undefined,
+        } as RoleChange;
+      });
     } catch (error) {
       console.error("Erro ao buscar histórico de mudanças:", error);
       throw error;
@@ -433,9 +448,17 @@ export class UserManagementService {
 
       await addDoc(collection(db, "notifications"), notification);
 
-      // Se for uma mudança temporária, criar notificação de lembrete
+      // Se for uma mudança temporária, criar notificação de lembrete (opcional)
       if (changeType === "temporary") {
-        await this.scheduleExpirationReminder(userId, newRole);
+        try {
+          await this.scheduleExpirationReminder(userId, newRole);
+        } catch (reminderError) {
+          console.warn(
+            "Aviso: Não foi possível agendar lembrete:",
+            reminderError,
+          );
+          // Não falha a operação principal se o agendamento falhar
+        }
       }
     } catch (error) {
       console.error("Erro ao enviar notificação:", error);
@@ -620,19 +643,33 @@ export class UserManagementService {
 
       await addDoc(collection(db, "role_changes"), roleChange);
 
-      // Enviar notificação para o usuário
-      await this.notifyUserRoleChange(
-        userId,
-        currentUser.temporaryRole.role,
-        "temporary_extension",
-        `Seu perfil temporário foi estendido até ${newEndDate.toLocaleDateString("pt-BR")}`,
-      );
+      // Enviar notificação para o usuário (opcional)
+      try {
+        await this.notifyUserRoleChange(
+          userId,
+          currentUser.temporaryRole.role,
+          "temporary_extension",
+          `Seu perfil temporário foi estendido até ${newEndDate.toLocaleDateString("pt-BR")}`,
+        );
+      } catch (notificationError) {
+        console.warn(
+          "Aviso: Não foi possível enviar notificação de extensão:",
+          notificationError,
+        );
+      }
 
-      // Reagendar lembrete de expiração
-      await this.scheduleExpirationReminder(
-        userId,
-        currentUser.temporaryRole.role,
-      );
+      // Reagendar lembrete de expiração (opcional)
+      try {
+        await this.scheduleExpirationReminder(
+          userId,
+          currentUser.temporaryRole.role,
+        );
+      } catch (reminderError) {
+        console.warn(
+          "Aviso: Não foi possível reagendar lembrete:",
+          reminderError,
+        );
+      }
     } catch (error) {
       console.error("Erro ao estender role temporário:", error);
       throw error;
@@ -736,13 +773,20 @@ export class UserManagementService {
 
       await addDoc(collection(db, "role_changes"), roleChange);
 
-      // Enviar notificação
-      await this.notifyUserRoleChange(
-        userId,
-        userData.baseRole,
-        "revert",
-        "Seu perfil temporário expirou e foi revertido automaticamente",
-      );
+      // Enviar notificação (opcional)
+      try {
+        await this.notifyUserRoleChange(
+          userId,
+          userData.baseRole,
+          "revert",
+          "Seu perfil temporário expirou e foi revertido automaticamente",
+        );
+      } catch (notificationError) {
+        console.warn(
+          "Aviso: Não foi possível enviar notificação de reversão:",
+          notificationError,
+        );
+      }
     } catch (error) {
       console.error("Erro ao reverter perfil temporário:", error);
       throw error;
@@ -810,13 +854,20 @@ export class UserManagementService {
 
           await addDoc(collection(db, "role_changes"), roleChange);
 
-          // Enviar notificação para o usuário
-          await this.notifyUserRoleChange(
-            docSnapshot.id,
-            userData.baseRole || "user",
-            "automatic_revert",
-            "Seu perfil temporário expirou e foi revertido automaticamente",
-          );
+          // Enviar notificação para o usuário (opcional)
+          try {
+            await this.notifyUserRoleChange(
+              docSnapshot.id,
+              userData.baseRole || "user",
+              "automatic_revert",
+              "Seu perfil temporário expirou e foi revertido automaticamente",
+            );
+          } catch (notificationError) {
+            console.warn(
+              `Aviso: Não foi possível enviar notificação para usuário ${docSnapshot.id}:`,
+              notificationError,
+            );
+          }
 
           processed++;
         } catch (error) {
@@ -888,42 +939,54 @@ export class UserManagementService {
     limit?: number;
   }): Promise<RoleChange[]> {
     try {
-      let q = collection(db, "role_changes");
+      let baseQuery: any = collection(db, "role_changes");
 
       // Aplicar filtros
       if (filters.userId) {
-        q = query(q, where("userId", "==", filters.userId));
+        baseQuery = query(baseQuery, where("userId", "==", filters.userId));
       }
 
       if (filters.changeType) {
-        q = query(q, where("changeType", "==", filters.changeType));
+        baseQuery = query(
+          baseQuery,
+          where("changeType", "==", filters.changeType),
+        );
       }
 
       if (filters.changedBy) {
-        q = query(q, where("changedBy", "==", filters.changedBy));
+        baseQuery = query(
+          baseQuery,
+          where("changedBy", "==", filters.changedBy),
+        );
       }
 
       if (filters.startDate) {
-        q = query(q, where("changedAt", ">=", filters.startDate));
+        baseQuery = query(
+          baseQuery,
+          where("changedAt", ">=", filters.startDate),
+        );
       }
 
       if (filters.endDate) {
-        q = query(q, where("changedAt", "<=", filters.endDate));
+        baseQuery = query(baseQuery, where("changedAt", "<=", filters.endDate));
       }
 
       // Ordenar por data de mudança (mais recente primeiro)
-      q = query(q, orderBy("changedAt", "desc"));
+      baseQuery = query(baseQuery, orderBy("changedAt", "desc"));
 
       // Aplicar limite
       if (filters.limit) {
-        q = query(q, limit(filters.limit));
+        baseQuery = query(baseQuery, limit(filters.limit));
       }
 
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map((docSnapshot) => ({
-        id: docSnapshot.id,
-        ...docSnapshot.data(),
-      })) as RoleChange[];
+      const querySnapshot = await getDocs(baseQuery);
+      return querySnapshot.docs.map((docSnapshot) => {
+        const data = docSnapshot.data() as any;
+        return {
+          id: docSnapshot.id,
+          ...data,
+        } as RoleChange;
+      });
     } catch (error) {
       console.error("Erro ao buscar histórico avançado:", error);
       throw error;
