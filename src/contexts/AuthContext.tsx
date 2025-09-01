@@ -23,33 +23,7 @@ import { doc, setDoc, getDoc, DocumentData } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 import SessionService from "../services/sessionService";
 
-interface UserProfile {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
-  role: string;
-  createdAt: Date;
-  lastLogin: Date;
-  provider: string;
-  telefone?: string;
-  cargo?: string;
-  notificacoes?: {
-    email: boolean;
-    push: boolean;
-    rotas: boolean;
-    folgas: boolean;
-    manutencao: boolean;
-  };
-  sessionInfo?: {
-    ip: string;
-    device: string;
-    browser: string;
-    os: string;
-    userAgent: string;
-    timestamp: Date;
-  };
-}
+import { UserProfile } from "../types";
 
 interface AuthContextType {
   currentUser: User | null;
@@ -202,7 +176,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             email: data.email,
             displayName: data.displayName,
             photoURL: data.photoURL,
-            role: data.role,
+            role: data.role || "user",
+            baseRole: data.baseRole || data.role || "user",
+            status: data.status || "ativo",
             createdAt: convertTimestampToDate(data.createdAt),
             lastLogin: convertTimestampToDate(data.lastLogin),
             provider: data.provider,
@@ -239,6 +215,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           displayName: result.user.displayName,
           photoURL: result.user.photoURL,
           role: "user", // Role padrão
+          baseRole: "user", // Role base padrão
+          status: "ativo", // Status padrão
           createdAt: new Date(),
           lastLogin: new Date(),
           provider: "google",

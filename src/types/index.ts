@@ -168,3 +168,10 @@ export interface ConfiguracaoModal {
   fecharAoConfirmar: boolean;
   mostrarOverlay: boolean;
 }
+
+// ========================================
+// EXPORTAÇÃO DOS TIPOS DE PERMISSÕES
+// ========================================
+
+// Re-exportar todos os tipos de permissões
+export * from "./permissions";
