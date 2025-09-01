@@ -4,6 +4,7 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import {
   signInWithEmailAndPassword,
@@ -157,38 +158,108 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Buscar perfil do usuário
+  const fetchUserProfile = useCallback(
+    async (uid: string): Promise<UserProfile | null> => {
+      try {
+        const userDoc = await getDoc(doc(db, "users", uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data() as DocumentData;
+
+          // Função auxiliar para converter Timestamp para Date
+          const convertTimestampToDate = (timestamp: any): Date => {
+            if (!timestamp) return new Date();
+
+            try {
+              // Se é um Timestamp do Firestore
+              if (timestamp && typeof timestamp.toDate === "function") {
+                return timestamp.toDate();
+              }
+
+              // Se já é um Date
+              if (timestamp instanceof Date) {
+                return timestamp;
+              }
+
+              // Se é um timestamp numérico
+              if (typeof timestamp === "number") {
+                return new Date(timestamp);
+              }
+
+              // Se é uma string de data
+              if (typeof timestamp === "string") {
+                return new Date(timestamp);
+              }
+
+              return new Date();
+            } catch (error) {
+              return new Date();
+            }
+          };
+
+          return {
+            uid: data.uid,
+            email: data.email,
+            displayName: data.displayName,
+            photoURL: data.photoURL,
+            role: data.role,
+            createdAt: convertTimestampToDate(data.createdAt),
+            lastLogin: convertTimestampToDate(data.lastLogin),
+            provider: data.provider,
+            telefone: data.telefone,
+            cargo: data.cargo,
+            notificacoes: data.notificacoes,
+            sessionInfo: data.sessionInfo
+              ? {
+                  ...data.sessionInfo,
+                  timestamp: convertTimestampToDate(data.sessionInfo.timestamp),
+                }
+              : undefined,
+          };
+        }
+        return null;
+      } catch (error) {
+        return null;
+      }
+    },
+    [],
+  );
+
   // Função auxiliar para processar resultado do login Google
-  const processGoogleSignInResult = async (result: UserCredential) => {
-    // Verificar se o usuário já existe no Firestore
-    const userDoc = await getDoc(doc(db, "users", result.user.uid));
+  const processGoogleSignInResult = useCallback(
+    async (result: UserCredential) => {
+      // Verificar se o usuário já existe no Firestore
+      const userDoc = await getDoc(doc(db, "users", result.user.uid));
 
-    if (!userDoc.exists()) {
-      // Criar novo usuário no Firestore
-      await setDoc(doc(db, "users", result.user.uid), {
-        uid: result.user.uid,
-        email: result.user.email,
-        displayName: result.user.displayName,
-        photoURL: result.user.photoURL,
-        role: "user", // Role padrão
-        createdAt: new Date(),
-        lastLogin: new Date(),
-        provider: "google",
-      });
-    } else {
-      // Atualizar último login
-      await setDoc(
-        doc(db, "users", result.user.uid),
-        {
+      if (!userDoc.exists()) {
+        // Criar novo usuário no Firestore
+        await setDoc(doc(db, "users", result.user.uid), {
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName,
+          photoURL: result.user.photoURL,
+          role: "user", // Role padrão
+          createdAt: new Date(),
           lastLogin: new Date(),
-        },
-        { merge: true },
-      );
-    }
+          provider: "google",
+        });
+      } else {
+        // Atualizar último login
+        await setDoc(
+          doc(db, "users", result.user.uid),
+          {
+            lastLogin: new Date(),
+          },
+          { merge: true },
+        );
+      }
 
-    // Atualizar imediatamente o userProfile para evitar delay na interface
-    const updatedProfile = await fetchUserProfile(result.user.uid);
-    setUserProfile(updatedProfile);
-  };
+      // Atualizar imediatamente o userProfile para evitar delay na interface
+      const updatedProfile = await fetchUserProfile(result.user.uid);
+      setUserProfile(updatedProfile);
+    },
+    [fetchUserProfile],
+  );
 
   // Logout
   const logout = async (): Promise<void> => {
@@ -230,70 +301,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return result;
     } catch (error) {
       throw error;
-    }
-  };
-
-  // Buscar perfil do usuário
-  const fetchUserProfile = async (uid: string): Promise<UserProfile | null> => {
-    try {
-      const userDoc = await getDoc(doc(db, "users", uid));
-      if (userDoc.exists()) {
-        const data = userDoc.data() as DocumentData;
-
-        // Função auxiliar para converter Timestamp para Date
-        const convertTimestampToDate = (timestamp: any): Date => {
-          if (!timestamp) return new Date();
-
-          try {
-            // Se é um Timestamp do Firestore
-            if (timestamp && typeof timestamp.toDate === "function") {
-              return timestamp.toDate();
-            }
-
-            // Se já é um Date
-            if (timestamp instanceof Date) {
-              return timestamp;
-            }
-
-            // Se é um timestamp numérico
-            if (typeof timestamp === "number") {
-              return new Date(timestamp);
-            }
-
-            // Se é uma string de data
-            if (typeof timestamp === "string") {
-              return new Date(timestamp);
-            }
-
-            return new Date();
-          } catch (error) {
-            return new Date();
-          }
-        };
-
-        return {
-          uid: data.uid,
-          email: data.email,
-          displayName: data.displayName,
-          photoURL: data.photoURL,
-          role: data.role,
-          createdAt: convertTimestampToDate(data.createdAt),
-          lastLogin: convertTimestampToDate(data.lastLogin),
-          provider: data.provider,
-          telefone: data.telefone,
-          cargo: data.cargo,
-          notificacoes: data.notificacoes,
-          sessionInfo: data.sessionInfo
-            ? {
-                ...data.sessionInfo,
-                timestamp: convertTimestampToDate(data.sessionInfo.timestamp),
-              }
-            : undefined,
-        };
-      }
-      return null;
-    } catch (error) {
-      return null;
     }
   };
 
@@ -348,7 +355,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
 
     return unsubscribe;
-  }, []);
+  }, [processGoogleSignInResult, fetchUserProfile]);
 
   const value: AuthContextType = {
     currentUser,

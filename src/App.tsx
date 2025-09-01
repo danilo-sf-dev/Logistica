@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -6,8 +6,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { auth } from "./firebase/config";
-import { onAuthStateChanged, User } from "firebase/auth";
 import { useResizeObserver } from "./hooks/useResizeObserver";
 
 // Componentes
