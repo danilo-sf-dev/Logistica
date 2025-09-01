@@ -146,6 +146,17 @@ service cloud.firestore {
     }
 
     // ========================================
+    // REGRAS PARA NOTIFICAÇÕES (coleção atual)
+    // ========================================
+    
+    match /notificacoes/{docId} {
+      allow read: if isAuthenticated() &&
+                     (resource.data.targetUsers && 
+                      request.auth.uid in resource.data.targetUsers);
+      allow write: if isAuthenticated() && isGerente();
+    }
+
+    // ========================================
     // REGRAS PARA RELATÓRIOS E EXPORTAÇÕES
     // ========================================
     
