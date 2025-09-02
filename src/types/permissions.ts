@@ -153,7 +153,8 @@ export type RoleChangeType =
   | "temporary"
   | "revert"
   | "automatic_revert"
-  | "temporary_extension";
+  | "temporary_extension"
+  | "removal";
 
 /**
  * Mudança de perfil registrada
@@ -170,8 +171,8 @@ export interface RoleChange {
 
   // Período temporário (se aplicável)
   temporaryPeriod?: {
-    startDate: Date;
-    endDate: Date;
+    startDate: Date; // Use Date type to match the code
+    endDate: Date; // Use Date type to match the code
   };
 
   // Metadados da mudança
@@ -290,7 +291,8 @@ export type AuditableAction =
   | "data_access"
   | "data_modification"
   | "export_request"
-  | "system_config_change";
+  | "system_config_change"
+  | "temporary_role_removal";
 
 /**
  * Log de auditoria

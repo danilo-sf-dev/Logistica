@@ -88,6 +88,13 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
   };
 
   const handleEditUser = (user: any) => {
+    // Limpar formulário antes de selecionar novo usuário
+    handleFormChange("newRole", "");
+    handleFormChange("changeType", "permanent");
+    handleFormChange("startDate", "");
+    handleFormChange("endDate", "");
+    handleFormChange("reason", "");
+
     setSelectedUser(user);
     setShowRoleChangeModal(true);
   };

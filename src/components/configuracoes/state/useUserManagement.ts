@@ -163,16 +163,19 @@ export const useUserManagement = () => {
    */
   const handleRoleChange = useCallback(async () => {
     // Validações obrigatórias
+    // Validar usuário selecionado
     if (!selectedUser) {
       showNotification("Nenhum usuário selecionado", "error");
       return;
     }
 
+    // Validar novo perfil
     if (!formData.newRole) {
       showNotification("Selecione um novo perfil", "error");
       return;
     }
 
+    // Validar motivo da alteração
     if (!formData.reason || formData.reason.trim().length < 10) {
       showNotification(
         "O motivo da alteração é obrigatório (mínimo 10 caracteres)",
@@ -183,6 +186,7 @@ export const useUserManagement = () => {
 
     // Validações para período temporário
     if (formData.changeType === "temporary") {
+      // Validar que as datas sejam fornecidas
       if (!formData.startDate) {
         showNotification(
           "Data de início é obrigatória para alterações temporárias",
@@ -199,16 +203,19 @@ export const useUserManagement = () => {
         return;
       }
 
-      const startDate = new Date(formData.startDate);
-      const endDate = new Date(formData.endDate);
-      const now = new Date();
+      // Obter a data de hoje no fuso horário local (formato YYYY-MM-DD)
+      const hoje = new Date();
+      // Ajustar para o fuso horário local para evitar problemas de UTC
+      const hojeLocal = hoje.toLocaleDateString("en-CA"); // Formato YYYY-MM-DD
 
-      if (startDate < now) {
+      // Validar que a data de início não seja no passado
+      if (formData.startDate < hojeLocal) {
         showNotification("A data de início não pode ser no passado", "error");
         return;
       }
 
-      if (endDate <= startDate) {
+      // Validar que a data de fim seja posterior à data de início
+      if (formData.endDate <= formData.startDate) {
         showNotification(
           "A data de fim deve ser posterior à data de início",
           "error",
@@ -216,8 +223,11 @@ export const useUserManagement = () => {
         return;
       }
 
+      // Validar que o período não exceda 1 ano
       const diffDays = Math.ceil(
-        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+        (new Date(formData.endDate).getTime() -
+          new Date(formData.startDate).getTime()) /
+          (1000 * 60 * 60 * 24),
       );
       if (diffDays > 365) {
         showNotification(
@@ -228,7 +238,7 @@ export const useUserManagement = () => {
       }
     }
 
-    // Verificar se o novo role é diferente do atual
+    // Verificar se o novo perfil é diferente do atual
     if (formData.newRole === selectedUser.role) {
       showNotification("O novo perfil deve ser diferente do atual", "warning");
       return;
@@ -237,6 +247,7 @@ export const useUserManagement = () => {
     try {
       setLoading(true);
 
+      // Criar período temporário se necessário
       const temporaryPeriod =
         formData.changeType === "temporary"
           ? {
@@ -245,6 +256,7 @@ export const useUserManagement = () => {
             }
           : undefined;
 
+      // Executar alteração de perfil
       await UserManagementService.changeUserRole(
         selectedUser.uid,
         formData.newRole as UserRole,
@@ -254,13 +266,14 @@ export const useUserManagement = () => {
         temporaryPeriod,
       );
 
+      // Notificar sucesso
       showNotification("Perfil alterado com sucesso!", "success");
 
-      // Recarregar dados
+      // Recarregar dados atualizados
       await loadUsers();
       await loadRoleChangeHistory();
 
-      // Limpar formulário
+      // Limpar formulário e seleção
       setFormData({
         newRole: "",
         changeType: "permanent",
@@ -270,9 +283,11 @@ export const useUserManagement = () => {
       });
       setSelectedUser(null);
     } catch (error: any) {
+      // Tratar erro
       console.error("Erro ao alterar perfil:", error);
       showNotification(error.message || "Erro ao alterar perfil", "error");
     } finally {
+      // Sempre desativar loading
       setLoading(false);
     }
   }, [

@@ -16,6 +16,7 @@ import {
   orderBy,
   limit,
   startAfter,
+  deleteField,
   QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
@@ -45,6 +46,29 @@ export class UserManagementService {
     changedBy: string,
     temporaryPeriod?: { startDate: Date; endDate: Date },
   ): Promise<void> {
+    // Função auxiliar para normalizar datas e garantir consistência
+    const normalizeDate = (date: Date): Date => {
+      // Retornar a data original, garantindo que seja um objeto Date válido
+      return new Date(date);
+    };
+
+    // Função para validar período temporário
+    const validateTemporaryPeriod = (startDate: Date, endDate: Date) => {
+      if (startDate >= endDate) {
+        throw new Error("Data de início deve ser anterior à data de fim");
+      }
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Meia-noite de hoje
+
+      // Permitir datas de hoje em diante
+      if (endDate < today) {
+        throw new Error("Data de fim deve ser hoje ou futura");
+      }
+
+      return true;
+    };
+
     try {
       // Verificar se o usuário que está fazendo a mudança tem permissão
       const adminUser = await getDoc(doc(db, "users", changedBy));
@@ -77,27 +101,35 @@ export class UserManagementService {
           throw new Error("Período temporário é obrigatório");
         }
 
+        // Validar período temporário
+        validateTemporaryPeriod(
+          temporaryPeriod.startDate,
+          temporaryPeriod.endDate,
+        );
+
         updateData.temporaryRole = {
           role: newRole,
-          startDate: temporaryPeriod.startDate,
-          endDate: temporaryPeriod.endDate,
+          startDate: normalizeDate(temporaryPeriod.startDate),
+          endDate: normalizeDate(temporaryPeriod.endDate),
           reason: reason.toUpperCase(),
           grantedBy: changedBy,
-          grantedAt: new Date(),
+          grantedAt: normalizeDate(temporaryPeriod.startDate), // Usar a data de início
           isActive: true,
         };
       } else {
         // Mudança permanente - atualizar role base
         updateData.baseRole = newRole;
-        // Remover campo temporaryRole se existir (não definir como undefined)
-        if (currentUser.temporaryRole) {
-          // Usar delete para remover o campo do documento
-          delete updateData.temporaryRole;
-        }
       }
 
       // Atualizar usuário
       await setDoc(doc(db, "users", userId), updateData, { merge: true });
+
+      // Se for mudança permanente e existir temporaryRole, removê-lo separadamente
+      if (changeType === "permanent" && currentUser.temporaryRole) {
+        await updateDoc(doc(db, "users", userId), {
+          temporaryRole: deleteField(),
+        });
+      }
 
       // Se o usuário alterado for o usuário atual, disparar evento para atualizar o contexto
       if (userId === changedBy) {
@@ -118,8 +150,13 @@ export class UserManagementService {
         reason: reason.toUpperCase(),
         changedBy,
         changedAt: new Date(),
-        // Só incluir temporaryPeriod se existir
-        ...(temporaryPeriod && { temporaryPeriod }),
+        // Só incluir temporaryPeriod se existir (com datas normalizadas)
+        ...(temporaryPeriod && {
+          temporaryPeriod: {
+            startDate: normalizeDate(temporaryPeriod.startDate),
+            endDate: normalizeDate(temporaryPeriod.endDate),
+          },
+        }),
         metadata: {
           ip: "captured-from-session",
           userAgent: "captured-from-session",
@@ -1181,5 +1218,64 @@ export class UserManagementService {
 
     // Promoção de mais de 2 níveis é considerada significativa
     return newIndex - oldIndex > 2;
+  }
+
+  /**
+   * Resolve inconsistência específica: remove temporaryRole de usuário já convertido para permanente
+   * Útil para resolver o problema onde o usuário tem role permanente mas temporaryRole ainda está ativo
+   */
+  static async fixPermanentUserWithTemporaryRole(
+    userId: string,
+  ): Promise<void> {
+    try {
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (!userDoc.exists()) {
+        throw new Error("Usuário não encontrado");
+      }
+
+      const userData = userDoc.data() as UserProfile;
+
+      // Verificar se é o caso que queremos resolver
+      if (
+        userData.role === userData.baseRole &&
+        userData.temporaryRole?.isActive
+      ) {
+        console.log(
+          `Corrigindo inconsistência para usuário ${userId}: role=${userData.role}, baseRole=${userData.baseRole}`,
+        );
+
+        // Remover temporaryRole
+        await updateDoc(doc(db, "users", userId), {
+          temporaryRole: deleteField(),
+        });
+
+        // Registrar correção automática
+        await addDoc(collection(db, "role_changes"), {
+          userId,
+          oldRole: userData.temporaryRole.role,
+          newRole: userData.baseRole,
+          changeType: "automatic_revert",
+          reason: "Correção automática: usuário já convertido para permanente",
+          changedBy: "system",
+          changedAt: new Date(),
+          metadata: {
+            ip: "system",
+            userAgent: "system",
+            device: "system",
+          },
+        });
+
+        console.log(
+          `Campo temporaryRole removido com sucesso para usuário ${userId}`,
+        );
+      } else {
+        console.log(
+          `Usuário ${userId} não precisa de correção: role=${userData.role}, baseRole=${userData.baseRole}, hasTemporary=${!!userData.temporaryRole?.isActive}`,
+        );
+      }
+    } catch (error) {
+      console.error(`Erro ao corrigir usuário ${userId}:`, error);
+      throw error;
+    }
   }
 }
