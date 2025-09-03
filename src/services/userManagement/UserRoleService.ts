@@ -48,6 +48,7 @@ export class UserRoleService {
       const updateData = this.prepareRoleUpdateData(
         newRole,
         changeType,
+        reason, // ✅ PASSAR O MOTIVO PARA O MÉTODO
         temporaryPeriod,
       );
 
@@ -117,11 +118,12 @@ export class UserRoleService {
   private static prepareRoleUpdateData(
     newRole: UserRole,
     changeType: RoleChangeType,
+    reason: string,
     temporaryPeriod?: { startDate: Date; endDate: Date },
   ): Partial<UserProfile> {
     const updateData: Partial<UserProfile> = {
       role: newRole,
-      lastLogin: getServerTimestamp(), // Usar serverTimestamp para auditoria
+      lastLogin: getServerTimestamp(),
     };
 
     if (changeType === "temporary" && temporaryPeriod) {
@@ -129,9 +131,9 @@ export class UserRoleService {
         role: newRole,
         startDate: toFirebaseTimestamp(temporaryPeriod.startDate),
         endDate: toFirebaseTimestamp(temporaryPeriod.endDate),
-        reason: "TEMPORARY_ROLE",
+        reason: reason.toUpperCase(),
         grantedBy: "system",
-        grantedAt: getServerTimestamp(), // Usar serverTimestamp para auditoria
+        grantedAt: getServerTimestamp(),
         isActive: true,
       };
     } else {
