@@ -6,9 +6,9 @@ import {
   doc,
   orderBy,
   query,
-  serverTimestamp,
   where,
 } from "firebase/firestore";
+import { DateService } from "../../../services/DateService";
 import { db } from "../../../firebase/config";
 import type { Vendedor, VendedorInput } from "../types";
 
@@ -57,8 +57,8 @@ async function criar(input: VendedorInput): Promise<string> {
     celular: limpar(input.celular),
     ativo: input.ativo !== undefined ? input.ativo : true,
     cidadesAtendidas: input.cidadesAtendidas || [],
-    dataCriacao: serverTimestamp(),
-    dataAtualizacao: serverTimestamp(),
+    dataCriacao: DateService.getServerTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   };
   const ref = await addDoc(collection(db, COLLECTION), payload);
   return ref.id;
@@ -80,7 +80,7 @@ async function atualizar(id: string, input: VendedorInput): Promise<void> {
     celular: limpar(input.celular),
     ativo: input.ativo !== undefined ? input.ativo : true,
     cidadesAtendidas: input.cidadesAtendidas || [],
-    dataAtualizacao: serverTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   };
   await updateDoc(doc(db, COLLECTION, id), payload);
 }
@@ -88,14 +88,14 @@ async function atualizar(id: string, input: VendedorInput): Promise<void> {
 async function inativar(id: string): Promise<void> {
   await updateDoc(doc(db, COLLECTION, id), {
     ativo: false,
-    dataAtualizacao: serverTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   });
 }
 
 async function ativar(id: string): Promise<void> {
   await updateDoc(doc(db, COLLECTION, id), {
     ativo: true,
-    dataAtualizacao: serverTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   });
 }
 

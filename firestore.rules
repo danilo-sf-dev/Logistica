@@ -200,5 +200,14 @@ service cloud.firestore {
       allow read: if isAuthenticated() && canAccessSecurityConfig();
       allow write: if isAuthenticated() && canAccessSecurityConfig();
     }
+
+    // ========================================
+    // REGRAS PARA LOGS DE IMPORTAÇÃO
+    // ========================================
+    
+    match /import_logs/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
   }
 }

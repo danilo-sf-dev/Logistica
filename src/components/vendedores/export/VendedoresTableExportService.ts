@@ -5,6 +5,7 @@ import {
 import { formatCPF, formatCelular } from "../../../utils/masks";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import { REGIOES_BRASIL } from "../../../utils/constants";
+import { DateService } from "../../../services/DateService";
 
 export class VendedoresTableExportService extends BaseTableExportService {
   protected config: TableExportConfig = {
@@ -82,12 +83,7 @@ export class VendedoresTableExportService extends BaseTableExportService {
       },
       dataCriacao: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
     },
   };
