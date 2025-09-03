@@ -35,34 +35,33 @@ export const DateRangeInput: React.FC<DateRangeInputProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className={`space-y-4 ${className}`}>
-      {/* Data de Início */}
-      <DateInput
-        label={startDateLabel}
-        value={startDate}
-        onChange={onStartDateChange}
-        minDate={minStartDate}
-        maxDate={endDate}
-        required={required}
-        error={errors.startDate}
-        disabled={disabled}
-        name="startDate"
-        id="startDate"
-      />
+    <div className={`${className}`}>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Data de Início */}
+        <DateInput
+          label={startDateLabel}
+          value={startDate}
+          onChange={onStartDateChange}
+          minDate={minStartDate}
+          required={required}
+          error={errors.startDate}
+          disabled={disabled}
+          name="startDate"
+          id="startDate"
+        />
 
-      {/* Data de Fim */}
-      <DateInput
-        label={endDateLabel}
-        value={endDate}
-        onChange={onEndDateChange}
-        minDate={startDate}
-        maxDate={maxEndDate}
-        required={required}
-        error={errors.endDate}
-        disabled={disabled}
-        name="endDate"
-        id="endDate"
-      />
+        {/* Data de Fim */}
+        <DateInput
+          label={endDateLabel}
+          value={endDate}
+          onChange={onEndDateChange}
+          required={required}
+          error={errors.endDate}
+          disabled={disabled}
+          name="endDate"
+          id="endDate"
+        />
+      </div>
 
       {/* Erro de período (se houver) */}
       {errors.period && (

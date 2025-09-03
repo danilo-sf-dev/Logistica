@@ -2,6 +2,7 @@ import {
   BaseTableExportService,
   type TableExportConfig,
 } from "../../relatorios/export/BaseTableExportService";
+import { DateService } from "../../../services/DateService";
 
 export class FolgasTableExportService extends BaseTableExportService {
   protected config: TableExportConfig = {
@@ -22,21 +23,11 @@ export class FolgasTableExportService extends BaseTableExportService {
       funcionarioNome: (valor) => (valor ? valor.toUpperCase() : "N/A"),
       dataInicio: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
       dataFim: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
       tipo: (valor) => {
         if (!valor) return "N/A";
@@ -79,12 +70,7 @@ export class FolgasTableExportService extends BaseTableExportService {
       },
       dataCriacao: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
     },
   };

@@ -10,7 +10,8 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../../firebase/config";
-import type { Folga, FolgaInput } from "../types";
+import type { Folga, FolgaFormData } from "../types";
+import { DateService } from "../../../services/DateService";
 
 const COLLECTION = "folgas";
 
@@ -80,7 +81,7 @@ async function atualizarStatusFuncionario(
     // Atualizar status do funcionário
     await updateDoc(doc(db, "funcionarios", funcionarioId), {
       status: novoStatus,
-      dataAtualizacao: serverTimestamp(),
+      dataAtualizacao: DateService.getServerTimestamp(),
     });
   } catch (error) {
     console.error("Erro ao atualizar status do funcionário:", error);
@@ -196,22 +197,38 @@ async function listar(): Promise<Folga[]> {
   return folgas;
 }
 
-async function criar(input: FolgaInput): Promise<string> {
-  const payload = {
+async function criar(input: FolgaFormData): Promise<string> {
+  const normalizedData = {
     ...input,
-    dataCriacao: serverTimestamp(),
-    dataAtualizacao: serverTimestamp(),
+    dataInicio: input.dataInicio
+      ? DateService.normalizeForFirebase(input.dataInicio)
+      : undefined,
+    dataFim: input.dataFim
+      ? DateService.normalizeForFirebase(input.dataFim)
+      : undefined,
+    dataCriacao: DateService.getServerTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   };
-  const ref = await addDoc(collection(db, COLLECTION), payload);
+  const ref = await addDoc(collection(db, COLLECTION), normalizedData);
   return ref.id;
 }
 
-async function atualizar(id: string, input: FolgaInput): Promise<void> {
-  const payload = {
+async function atualizar(id: string, input: FolgaFormData): Promise<void> {
+  const normalizedData: any = {
     ...input,
-    dataAtualizacao: serverTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   };
-  await updateDoc(doc(db, COLLECTION, id), payload);
+
+  if (input.dataInicio) {
+    normalizedData.dataInicio = DateService.normalizeForFirebase(
+      input.dataInicio,
+    );
+  }
+  if (input.dataFim) {
+    normalizedData.dataFim = DateService.normalizeForFirebase(input.dataFim);
+  }
+
+  await updateDoc(doc(db, COLLECTION, id), normalizedData);
 }
 
 async function excluir(id: string): Promise<void> {
@@ -232,7 +249,7 @@ async function aprovar(id: string): Promise<void> {
   // Aprovar a folga
   await updateDoc(doc(db, COLLECTION, id), {
     status: "aprovada",
-    dataAtualizacao: serverTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   });
 
   // Atualizar status do funcionário
@@ -253,7 +270,7 @@ async function rejeitar(id: string): Promise<void> {
   // Rejeitar a folga
   await updateDoc(doc(db, COLLECTION, id), {
     status: "rejeitada",
-    dataAtualizacao: serverTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   });
 
   // Atualizar status do funcionário (pode voltar para disponível se não houver outras folgas aprovadas)
@@ -274,7 +291,7 @@ async function cancelar(id: string): Promise<void> {
   // Cancelar a folga
   await updateDoc(doc(db, COLLECTION, id), {
     status: "cancelada",
-    dataAtualizacao: serverTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   });
 
   // Atualizar status do funcionário
