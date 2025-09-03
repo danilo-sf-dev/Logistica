@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { X, Eye } from "lucide-react";
 import LoadingButton from "../../common/LoadingButton";
+import { DateInput } from "../../common/DateInput";
 import { Rota, RotaFormData } from "../types";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type { Cidade } from "../../cidades/types";
 import { REGIOES_BRASIL } from "../../../utils/constants";
+import { useDateConversion } from "../../../hooks";
 
 interface RotaFormModalProps {
   isOpen: boolean;
@@ -33,11 +35,13 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
   erros = {},
   loading = false,
 }) => {
+  const { fromFirebaseDate, getCurrentDateString } = useDateConversion();
+
   const [formData, setFormData] = useState<RotaFormData>({
     nome: "",
     dataRota: "",
     pesoMinimo: 0,
-    diaSemana: [], // Mudado para array
+    diaSemana: [],
     cidades: [],
   });
 
@@ -46,17 +50,26 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
 
   useEffect(() => {
     if (editingRota) {
+      let dataRotaString = "";
+      if (editingRota.dataRota) {
+        try {
+          const dataObj = fromFirebaseDate(editingRota.dataRota as any);
+          dataRotaString = dataObj.toISOString().split("T")[0];
+        } catch (error) {
+          console.error("Erro ao converter data da rota:", error);
+        }
+      }
+
       setFormData({
         nome: editingRota.nome,
-        dataRota: editingRota.dataRota,
+        dataRota: dataRotaString,
         pesoMinimo: editingRota.pesoMinimo,
         diaSemana: Array.isArray(editingRota.diaSemana)
           ? [...editingRota.diaSemana]
-          : [], // Garantir que seja array
+          : [],
         cidades: [...editingRota.cidades],
       });
 
-      // Buscar dados das cidades vinculadas
       if (editingRota.cidades && editingRota.cidades.length > 0) {
         buscarCidadesVinculadas(editingRota.cidades);
       } else {
@@ -66,7 +79,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
       resetForm();
       setCidadesVinculadas([]);
     }
-  }, [editingRota]);
+  }, [editingRota, fromFirebaseDate]);
 
   const buscarCidadesVinculadas = async (cidadeIds: string[]) => {
     setLoadingCidades(true);
@@ -91,7 +104,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
       nome: "",
       dataRota: "",
       pesoMinimo: 0,
-      diaSemana: [], // Mudado para array
+      diaSemana: [],
       cidades: [],
     });
   };
@@ -159,21 +172,18 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Data da Rota *
-                </label>
-                <input
-                  type="date"
-                  required
+                <DateInput
+                  label="Data da Rota"
                   value={formData.dataRota}
-                  onChange={(e) =>
-                    setFormData({ ...formData, dataRota: e.target.value })
+                  onChange={(date) =>
+                    setFormData({ ...formData, dataRota: date })
                   }
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${erros.dataRota ? "border-red-500" : ""}`}
+                  minDate={getCurrentDateString()}
+                  required
+                  error={erros.dataRota}
+                  name="dataRota"
+                  id="dataRota"
                 />
-                {erros.dataRota && (
-                  <p className="text-red-500 text-xs mt-1">{erros.dataRota}</p>
-                )}
               </div>
             </div>
 
