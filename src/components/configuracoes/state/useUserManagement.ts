@@ -8,6 +8,11 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { UserManagementService } from "../../../services/userManagementService";
 import { PermissionService } from "../../../services/permissionService";
+import {
+  validateDatePeriod,
+  validateFutureDate,
+  normalizeDateForFirebase,
+} from "../../../utils/dateUtils";
 import type {
   UserProfile,
   RoleChange,
@@ -203,37 +208,21 @@ export const useUserManagement = () => {
         return;
       }
 
-      // Obter a data de hoje no fuso horário local (formato YYYY-MM-DD)
-      const hoje = new Date();
-      // Ajustar para o fuso horário local para evitar problemas de UTC
-      const hojeLocal = hoje.toLocaleDateString("en-CA"); // Formato YYYY-MM-DD
-
-      // Validar que a data de início não seja no passado
-      if (formData.startDate < hojeLocal) {
-        showNotification("A data de início não pode ser no passado", "error");
+      // Validar data de início usando utilitário centralizado
+      const startDateValidation = validateFutureDate(formData.startDate);
+      if (!startDateValidation.isValid) {
+        showNotification(startDateValidation.error!, "error");
         return;
       }
 
-      // Validar que a data de fim seja posterior à data de início
-      if (formData.endDate <= formData.startDate) {
-        showNotification(
-          "A data de fim deve ser posterior à data de início",
-          "error",
-        );
-        return;
-      }
-
-      // Validar que o período não exceda 1 ano
-      const diffDays = Math.ceil(
-        (new Date(formData.endDate).getTime() -
-          new Date(formData.startDate).getTime()) /
-          (1000 * 60 * 60 * 24),
+      // Validar período usando utilitário centralizado
+      const periodValidation = validateDatePeriod(
+        formData.startDate,
+        formData.endDate,
+        365,
       );
-      if (diffDays > 365) {
-        showNotification(
-          "O período temporário não pode exceder 1 ano",
-          "error",
-        );
+      if (!periodValidation.isValid) {
+        showNotification(periodValidation.error!, "error");
         return;
       }
     }
@@ -248,11 +237,12 @@ export const useUserManagement = () => {
       setLoading(true);
 
       // Criar período temporário se necessário
+      // SOLUÇÃO: Usar normalizeDateForFirebase para evitar problemas de fuso horário
       const temporaryPeriod =
         formData.changeType === "temporary"
           ? {
-              startDate: new Date(formData.startDate),
-              endDate: new Date(formData.endDate),
+              startDate: normalizeDateForFirebase(formData.startDate),
+              endDate: normalizeDateForFirebase(formData.endDate),
             }
           : undefined;
 

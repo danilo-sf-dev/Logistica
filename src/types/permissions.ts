@@ -9,6 +9,12 @@
 /**
  * Perfis de usuário hierárquicos (do maior para o menor)
  */
+// ========================================
+// PERFIL DE USUÁRIO EXPANDIDO
+// ========================================
+
+import type { Timestamp, FieldValue } from "firebase/firestore";
+
 export type UserRole =
   | "admin_senior" // Administrador Senior - Acesso total
   | "admin" // Administrador - Acesso total com restrições
@@ -77,20 +83,22 @@ export interface FeaturePermissions {
   canManage: boolean;
 }
 
-// ========================================
-// PERFIL DE USUÁRIO EXPANDIDO
-// ========================================
+// Tipo união para datas (aceita tanto Date quanto Timestamp)
+export type FirebaseDate = Date | Timestamp;
+
+// Tipo união para campos de auditoria (aceita Date, Timestamp ou FieldValue)
+export type FirebaseAuditDate = Date | Timestamp | FieldValue;
 
 /**
  * Perfil temporário de usuário
  */
 export interface TemporaryRole {
   role: UserRole;
-  startDate: Date;
-  endDate: Date;
+  startDate: FirebaseDate;
+  endDate: FirebaseDate;
   reason: string;
   grantedBy: string;
-  grantedAt: Date;
+  grantedAt: FirebaseAuditDate; // Pode ser serverTimestamp()
   isActive: boolean;
 }
 
@@ -109,8 +117,8 @@ export interface UserProfile {
   temporaryRole?: TemporaryRole; // Perfil temporário se aplicável
 
   // Metadados
-  createdAt: Date;
-  lastLogin: Date;
+  createdAt: FirebaseDate;
+  lastLogin: FirebaseAuditDate; // Pode ser serverTimestamp()
   provider: string;
 
   // Informações pessoais
@@ -133,12 +141,12 @@ export interface UserProfile {
     browser: string;
     os: string;
     userAgent: string;
-    timestamp: Date;
+    timestamp: FirebaseDate;
   };
 
   // Status do usuário
   status: "ativo" | "inativo" | "suspenso";
-  lastActivity?: Date;
+  lastActivity?: FirebaseDate;
 }
 
 // ========================================
@@ -167,12 +175,12 @@ export interface RoleChange {
   changeType: RoleChangeType;
   reason: string;
   changedBy: string;
-  changedAt: Date;
+  changedAt: FirebaseAuditDate; // Pode ser serverTimestamp()
 
   // Período temporário (se aplicável)
   temporaryPeriod?: {
-    startDate: Date; // Use Date type to match the code
-    endDate: Date; // Use Date type to match the code
+    startDate: FirebaseDate; // Aceita Date ou Timestamp
+    endDate: FirebaseDate; // Aceita Date ou Timestamp
   };
 
   // Metadados da mudança

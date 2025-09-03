@@ -16,6 +16,11 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { PermissionService } from "../permissionService";
+import {
+  toFirebaseTimestamp,
+  fromFirebaseDate,
+  getServerTimestamp,
+} from "../../utils/dateUtils";
 import type { UserProfile, RoleChange, UserRole } from "../../types";
 
 /**
@@ -47,12 +52,12 @@ export class TemporaryRoleService {
         {
           temporaryRole: {
             ...currentUser.temporaryRole,
-            endDate: newEndDate,
-            extendedAt: new Date(),
+            endDate: toFirebaseTimestamp(newEndDate),
+            extendedAt: getServerTimestamp(), // Usar serverTimestamp para auditoria
             extendedBy,
             extensionReason: reason.toUpperCase(),
           },
-          lastLogin: new Date(),
+          lastLogin: getServerTimestamp(), // Usar serverTimestamp para auditoria
         },
         { merge: true },
       );
@@ -105,8 +110,11 @@ export class TemporaryRoleService {
         const userData = docSnapshot.data() as UserProfile;
         const tempRole = userData.temporaryRole!;
 
+        // Converter FirebaseDate para Date antes de usar getTime()
+        const endDate = fromFirebaseDate(tempRole.endDate);
+
         const daysUntilExpiration = Math.ceil(
-          (tempRole.endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+          (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
         );
 
         expiringUsers.push({
@@ -114,7 +122,7 @@ export class TemporaryRoleService {
           displayName: userData.displayName || "Usuário",
           email: userData.email || "",
           temporaryRole: tempRole.role,
-          expiresAt: tempRole.endDate,
+          expiresAt: endDate,
           daysUntilExpiration,
         });
       }
@@ -220,9 +228,9 @@ export class TemporaryRoleService {
               temporaryRole: {
                 ...temporaryRole,
                 isActive: false,
-                expiredAt: now,
+                expiredAt: toFirebaseTimestamp(now),
               },
-              lastLogin: new Date(),
+              lastLogin: getServerTimestamp(), // Usar serverTimestamp para auditoria
             },
             { merge: true },
           );
@@ -352,10 +360,12 @@ export class TemporaryRoleService {
       changeType: "temporary_extension",
       reason: `Role temporário estendido: ${data.reason.toUpperCase()}`,
       changedBy: data.extendedBy,
-      changedAt: new Date(),
+      changedAt: getServerTimestamp(), // SOLUÇÃO DEFINITIVA: Usar serverTimestamp
       temporaryPeriod: {
-        startDate: data.currentUser.temporaryRole!.startDate,
-        endDate: data.newEndDate,
+        startDate: toFirebaseTimestamp(
+          fromFirebaseDate(data.currentUser.temporaryRole!.startDate),
+        ),
+        endDate: toFirebaseTimestamp(data.newEndDate),
       },
       metadata: {
         ip: "captured-from-session",
@@ -408,7 +418,7 @@ export class TemporaryRoleService {
       changeType: "automatic_revert",
       reason: "Período temporário expirado automaticamente",
       changedBy: "system",
-      changedAt: data.now,
+      changedAt: getServerTimestamp(), // SOLUÇÃO DEFINITIVA: Usar serverTimestamp
       metadata: {
         ip: "system",
         userAgent: "system",

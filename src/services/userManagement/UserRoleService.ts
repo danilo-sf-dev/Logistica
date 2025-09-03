@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { PermissionService } from "../permissionService";
+import { toFirebaseTimestamp, getServerTimestamp } from "../../utils/dateUtils";
 import type {
   UserProfile,
   RoleChange,
@@ -120,17 +121,17 @@ export class UserRoleService {
   ): Partial<UserProfile> {
     const updateData: Partial<UserProfile> = {
       role: newRole,
-      lastLogin: new Date(),
+      lastLogin: getServerTimestamp(), // Usar serverTimestamp para auditoria
     };
 
     if (changeType === "temporary" && temporaryPeriod) {
       updateData.temporaryRole = {
         role: newRole,
-        startDate: new Date(temporaryPeriod.startDate),
-        endDate: new Date(temporaryPeriod.endDate),
+        startDate: toFirebaseTimestamp(temporaryPeriod.startDate),
+        endDate: toFirebaseTimestamp(temporaryPeriod.endDate),
         reason: "TEMPORARY_ROLE",
         grantedBy: "system",
-        grantedAt: new Date(temporaryPeriod.startDate),
+        grantedAt: getServerTimestamp(), // Usar serverTimestamp para auditoria
         isActive: true,
       };
     } else {
@@ -170,11 +171,11 @@ export class UserRoleService {
       changeType: data.changeType,
       reason: data.reason.toUpperCase(),
       changedBy: data.changedBy,
-      changedAt: new Date(),
+      changedAt: getServerTimestamp(), // SOLUÇÃO DEFINITIVA: Usar serverTimestamp
       ...(data.temporaryPeriod && {
         temporaryPeriod: {
-          startDate: new Date(data.temporaryPeriod.startDate),
-          endDate: new Date(data.temporaryPeriod.endDate),
+          startDate: toFirebaseTimestamp(data.temporaryPeriod.startDate),
+          endDate: toFirebaseTimestamp(data.temporaryPeriod.endDate),
         },
       }),
       metadata: {
