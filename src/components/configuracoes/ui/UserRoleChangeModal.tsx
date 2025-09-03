@@ -2,6 +2,8 @@ import React from "react";
 import { X, Clock, Save } from "lucide-react";
 import { PermissionService } from "../../../services/permissionService";
 import LoadingButton from "../../common/LoadingButton";
+import { DateRangeInput } from "../../common/DateRangeInput";
+import { DateService } from "../../../services/DateService";
 import type { UserRole, RoleChangeType } from "../../../types/permissions";
 
 interface UserRoleChangeModalProps {
@@ -213,34 +215,19 @@ export const UserRoleChangeModal: React.FC<UserRoleChangeModalProps> = ({
                   <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
                   Configuração do Período Temporário
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-blue-700 mb-1">
-                      Data Início <span className="text-blue-900">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) =>
-                        onFormChange("startDate", e.target.value)
-                      }
-                      className="input-field w-full border-blue-300 focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-blue-700 mb-1">
-                      Data Fim <span className="text-blue-900">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => onFormChange("endDate", e.target.value)}
-                      className="input-field w-full border-blue-300 focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
+
+                <DateRangeInput
+                  startDate={formData.startDate}
+                  endDate={formData.endDate}
+                  onStartDateChange={(date) => onFormChange("startDate", date)}
+                  onEndDateChange={(date) => onFormChange("endDate", date)}
+                  minStartDate={DateService.getCurrentDateString()}
+                  required
+                  startDateLabel="Data Início"
+                  endDateLabel="Data Fim"
+                  className="mb-3"
+                />
+
                 <p className="text-xs text-blue-600 mt-2 break-words">
                   ⚠️ O perfil será automaticamente revertido após a data de fim
                 </p>
