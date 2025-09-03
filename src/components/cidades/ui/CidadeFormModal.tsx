@@ -9,6 +9,7 @@ import {
   obterRegiaoPorEstado,
 } from "utils/constants";
 import { useRotasForCidades } from "../state/useRotasForCidades";
+import { DateDisplay } from "../../common/DateDisplay";
 
 type Props = {
   aberto: boolean;
@@ -186,7 +187,7 @@ export const CidadeFormModal: React.FC<Props> = ({
                 {rotas.map((rota) => (
                   <option key={rota.id} value={rota.id}>
                     {rota.nome} -{" "}
-                    {new Date(rota.dataRota).toLocaleDateString("pt-BR")}
+                    <DateDisplay date={rota.dataRota} format="short" />
                   </option>
                 ))}
               </select>
