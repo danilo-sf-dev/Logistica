@@ -4,7 +4,7 @@
 
 **Data de Início:** Janeiro 2025  
 **Responsável:** Equipe de Desenvolvimento  
-**Última Atualização:** Janeiro 2025 - FASE 5 Concluída + Sistema de Ordenação Implementado
+**Última Atualização:** Janeiro 2025 - FASE 5 Concluída + Sistema de Ordenação Implementado + Correção de Datas Excel
 
 ---
 
@@ -30,6 +30,22 @@
 - **Serviços de Gestão:** CRUD de usuários com auditoria
 - **Testes Unitários:** Cobertura completa dos serviços
 - **Arquivo de Demonstração:** Para validação em ambiente isolado
+
+### **✅ IMPLEMENTAÇÃO ADICIONAL: CORREÇÃO DE DATAS EXCEL (Dezembro 2024)**
+
+- **Problema Identificado:** Excel interpreta datas com -1 dia devido ao fuso horário
+- **Solução Implementada:** Correção específica para objetos Date vindos do Excel
+- **Módulo Afetado:** Importação de Veículos (`veiculosImportService.ts`)
+- **Resultado:** Datas salvam corretamente (03/09/2025 → 2025-09-03)
+- **Documentação:** `docs/IMPLEMENTACAO_IMPORTACAO_EXCEL_DATAS.md`
+- **Status:** ✅ Testado e Validado
+
+**Detalhes Técnicos:**
+
+- Correção aplicada APENAS para objetos Date do Excel
+- Mantém uso do `DateService.normalizeForFirebase` para consistência
+- Não afeta outros fluxos de data (formulários, etc.)
+- Logs específicos para monitoramento da correção
 
 ### **🎯 Próximo Marco: FASE 6 (Semana 6)**
 

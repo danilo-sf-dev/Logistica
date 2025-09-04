@@ -1,13 +1,18 @@
-import { BaseImportService } from "./importService";
 import { VeiculosService } from "../../veiculos/data/veiculosService";
+import { BaseImportService } from "./importService";
 import type {
   ImportConfig,
-  ValidationResult,
   ImportResult,
+  ValidationResult,
 } from "../types/importTypes";
 import type { VeiculoFormData } from "../../veiculos/types";
 import { TipoCarroceria, StatusVeiculo, UnidadeNegocio } from "../../../types";
+import { DateService } from "../../../services/DateService";
 
+/**
+ * Serviço de Importação de Veículos via Excel
+ * Implementa correção +1 dia para objetos Date do Excel
+ */
 export class VeiculosImportService extends BaseImportService {
   protected config: ImportConfig = {
     entityType: "veiculos",
@@ -105,8 +110,8 @@ export class VeiculosImportService extends BaseImportService {
           "3",
           "Disponível",
           "Frigorífico",
-          "15/01/2024",
-          "15/04/2024",
+          "2024-01-15",
+          "2024-04-15",
           "Veículo em excelente estado",
         ],
         [
@@ -120,8 +125,8 @@ export class VeiculosImportService extends BaseImportService {
           "6",
           "Disponível",
           "Ovos",
-          "20/02/2024",
-          "20/05/2024",
+          "2024-02-20",
+          "2024-05-20",
           "Veículo para transporte de ovos",
         ],
       ],
@@ -136,8 +141,8 @@ export class VeiculosImportService extends BaseImportService {
         "Quantidade Eixos: 2, 3, 4, 5, 6, 7, 8, 9 (apenas o número)",
         "Status: Disponível, Em Uso, Manutenção, Inativo",
         "Unidade Negócio: Frigorífico, Ovos, Ambos",
-        "Última Manutenção: Data no formato DD/MM/AAAA (opcional)",
-        "Próxima Manutenção: Data no formato DD/MM/AAAA (opcional)",
+        "Última Manutenção: Data nos formatos DD/MM/AAAA, DD/MM/AA ou YYYY-MM-DD (opcional)",
+        "Próxima Manutenção: Data nos formatos DD/MM/AAAA, DD/MM/AA ou YYYY-MM-DD (opcional)",
         "Observação: Observações sobre o veículo (opcional, será convertida para maiúsculas)",
       ],
       validations: [
@@ -147,7 +152,7 @@ export class VeiculosImportService extends BaseImportService {
         "Status deve ser uma das opções válidas (exatamente como aparece no sistema)",
         "Unidade Negócio deve ser uma das opções válidas (exatamente como aparece no sistema)",
         "Tipo Baú deve ser uma das opções válidas (exatamente como aparece no sistema)",
-        "Datas devem estar no formato DD/MM/AAAA (se fornecidas)",
+        "Datas podem estar nos formatos DD/MM/AAAA, DD/MM/AA ou YYYY-MM-DD (se fornecidas)",
       ],
     },
   };
@@ -374,7 +379,7 @@ export class VeiculosImportService extends BaseImportService {
           warnings.push({
             row: rowNumber,
             field: "Última Manutenção",
-            message: `Data de última manutenção "${row[10]}" não está no formato DD/MM/AAAA`,
+            message: `Data de última manutenção "${row[10]}" não está em formato válido (DD/MM/AAAA, DD/MM/AA ou YYYY-MM-DD)`,
           });
         }
 
@@ -382,7 +387,7 @@ export class VeiculosImportService extends BaseImportService {
           warnings.push({
             row: rowNumber,
             field: "Próxima Manutenção",
-            message: `Data de próxima manutenção "${row[11]}" não está no formato DD/MM/AAAA`,
+            message: `Data de próxima manutenção "${row[11]}" não está em formato válido (DD/MM/AAAA, DD/MM/AA ou YYYY-MM-DD)`,
           });
         }
       });
@@ -405,30 +410,33 @@ export class VeiculosImportService extends BaseImportService {
   }
 
   protected async transformData(data: any[]): Promise<VeiculoFormData[]> {
-    return data.map((row) => ({
-      placa: row[0]?.toString().toUpperCase().trim() || "",
-      modelo: row[1]?.toString().toUpperCase().trim() || "",
-      marca: row[2]?.toString().toUpperCase().trim() || "",
-      ano: row[3]?.toString().trim() || "",
-      capacidade: row[4]?.toString().trim() || "",
-      tipoCarroceria:
-        VeiculosImportService.TIPO_CARROCERIA_MAP[row[5]?.toString()] ||
-        "truck",
-      tipoBau:
-        VeiculosImportService.TIPO_BAU_MAP[row[6]?.toString()] || "frigorifico",
-      quantidadeEixos: row[7]?.toString().trim() || "",
-      status:
-        VeiculosImportService.STATUS_MAP[row[8]?.toString()] || "disponivel",
-      unidadeNegocio:
-        VeiculosImportService.UNIDADE_NEGOCIO_MAP[row[9]?.toString()] ||
-        "frigorifico",
-      ultimaManutencao: this.convertDateToISO(row[10]?.toString().trim() || ""),
-      proximaManutencao: this.convertDateToISO(
-        row[11]?.toString().trim() || "",
-      ),
-      motorista: "",
-      observacao: row[12]?.toString().toUpperCase().trim() || "",
-    }));
+    return data.map((row, index) => {
+      const veiculo = {
+        placa: row[0]?.toString().toUpperCase().trim() || "",
+        modelo: row[1]?.toString().toUpperCase().trim() || "",
+        marca: row[2]?.toString().toUpperCase().trim() || "",
+        ano: row[3]?.toString().trim() || "",
+        capacidade: row[4]?.toString().trim() || "",
+        tipoCarroceria:
+          VeiculosImportService.TIPO_CARROCERIA_MAP[row[5]?.toString()] ||
+          "truck",
+        tipoBau:
+          VeiculosImportService.TIPO_BAU_MAP[row[6]?.toString()] ||
+          "frigorifico",
+        quantidadeEixos: row[7]?.toString().trim() || "",
+        status:
+          VeiculosImportService.STATUS_MAP[row[8]?.toString()] || "disponivel",
+        unidadeNegocio:
+          VeiculosImportService.UNIDADE_NEGOCIO_MAP[row[9]?.toString()] ||
+          "frigorifico",
+        ultimaManutencao: this.convertDateForFirebase(row[10]),
+        proximaManutencao: this.convertDateForFirebase(row[11]),
+        motorista: "",
+        observacao: row[12]?.toString().toUpperCase().trim() || "",
+      };
+
+      return veiculo;
+    });
   }
 
   protected async saveToDatabase(
@@ -442,14 +450,14 @@ export class VeiculosImportService extends BaseImportService {
         await VeiculosService.createVeiculo(veiculoData);
         savedCount++;
       } catch (error) {
-        console.error("Erro ao salvar veículo:", error);
+        console.error("Erro ao salvar veículo:", veiculoData.placa, error);
         errors.push(
           `Erro ao salvar veículo ${veiculoData.placa}: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
         );
       }
     }
 
-    return {
+    const result = {
       success: errors.length === 0,
       totalRows: data.length,
       importedRows: savedCount,
@@ -458,35 +466,181 @@ export class VeiculosImportService extends BaseImportService {
       warnings: [],
       duration: 0,
     };
+
+    return result;
   }
 
   private isValidDate(dateString: string): boolean {
-    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    const match = dateString.match(dateRegex);
+    const dateStr = dateString.toString().trim();
 
-    if (!match) return false;
+    // Formato YYYY-MM-DD
+    const isoRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+    const isoMatch = dateStr.match(isoRegex);
 
-    const [, day, month, year] = match;
-    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    if (isoMatch) {
+      const [, year, month, day] = isoMatch;
+      const date = new Date(Number(year), Number(month) - 1, Number(day));
+      return (
+        date.getDate() === Number(day) &&
+        date.getMonth() === Number(month) - 1 &&
+        date.getFullYear() === Number(year)
+      );
+    }
 
-    return (
-      date.getDate() === Number(day) &&
-      date.getMonth() === Number(month) - 1 &&
-      date.getFullYear() === Number(year)
-    );
+    // Formato DD/MM/AAAA
+    const fullYearRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+    const fullYearMatch = dateStr.match(fullYearRegex);
+
+    if (fullYearMatch) {
+      const [, day, month, year] = fullYearMatch;
+      const date = new Date(Number(year), Number(month) - 1, Number(day));
+      return (
+        date.getDate() === Number(day) &&
+        date.getMonth() === Number(month) - 1 &&
+        date.getFullYear() === Number(year)
+      );
+    }
+
+    // Formato DD/MM/AA
+    const shortYearRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2})$/;
+    const shortYearMatch = dateStr.match(shortYearRegex);
+
+    if (shortYearMatch) {
+      const [, day, month, shortYear] = shortYearMatch;
+
+      let fullYear: number;
+      const yearNum = Number(shortYear);
+
+      if (yearNum >= 0 && yearNum <= 29) {
+        fullYear = 2000 + yearNum;
+      } else if (yearNum >= 30 && yearNum <= 99) {
+        fullYear = 1900 + yearNum;
+      } else {
+        return false;
+      }
+
+      const date = new Date(fullYear, Number(month) - 1, Number(day));
+      return (
+        date.getDate() === Number(day) &&
+        date.getMonth() === Number(month) - 1 &&
+        date.getFullYear() === fullYear
+      );
+    }
+
+    return false;
   }
 
-  private convertDateToISO(dateString: string): string {
-    if (!dateString || !this.isValidDate(dateString)) {
+  /**
+   * Correção +1 dia para objetos Date do Excel
+   */
+  private convertDateForFirebase(dateValue: any): string {
+    if (!dateValue) {
       return "";
     }
 
-    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    const match = dateString.match(dateRegex);
+    if (dateValue instanceof Date) {
+      // CRÍTICO: Excel interpreta datas com -1 dia, correção necessária
+      const correctedDate = new Date(dateValue);
+      correctedDate.setDate(correctedDate.getDate() + 1);
 
-    if (!match) return "";
+      const normalizedDate = DateService.normalizeForFirebase(correctedDate);
+      const result = DateService.toLocalISOString(normalizedDate).split("T")[0];
+      return result;
+    }
 
-    const [, day, month, year] = match;
-    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    const dateStr = dateValue.toString().trim();
+
+    if (
+      dateStr.includes("GMT") ||
+      dateStr.includes("UTC") ||
+      dateStr.match(/\w{3}\s+\w{3}\s+\d{1,2}\s+\d{4}/)
+    ) {
+      try {
+        const dateObj = new Date(dateStr);
+        if (!isNaN(dateObj.getTime())) {
+          const correctedDate = new Date(dateObj);
+          correctedDate.setDate(correctedDate.getDate() + 1);
+
+          const normalizedDate =
+            DateService.normalizeForFirebase(correctedDate);
+          const result =
+            DateService.toLocalISOString(normalizedDate).split("T")[0];
+          return result;
+        }
+      } catch (error) {
+        console.error("Erro ao converter string JavaScript:", error);
+      }
+    }
+
+    // Formato YYYY-MM-DD
+    const isoRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+    const isoMatch = dateStr.match(isoRegex);
+
+    if (isoMatch) {
+      const [, year, month, day] = isoMatch;
+      const date = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        12,
+        0,
+        0,
+        0,
+      );
+      const result = DateService.toLocalISOString(date).split("T")[0];
+      return result;
+    }
+
+    // Formato DD/MM/AAAA
+    const fullYearRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+    const fullYearMatch = dateStr.match(fullYearRegex);
+
+    if (fullYearMatch) {
+      const [, day, month, year] = fullYearMatch;
+      const date = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        12,
+        0,
+        0,
+        0,
+      );
+      const result = DateService.toLocalISOString(date).split("T")[0];
+      return result;
+    }
+
+    // Formato DD/MM/AA - Excel converte automaticamente 01/09/2025 → 01/09/25
+    const shortYearRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2})$/;
+    const shortYearMatch = dateStr.match(shortYearRegex);
+
+    if (shortYearMatch) {
+      const [, day, month, shortYear] = shortYearMatch;
+
+      let fullYear: number;
+      const yearNum = Number(shortYear);
+
+      if (yearNum >= 0 && yearNum <= 29) {
+        fullYear = 2000 + yearNum;
+      } else if (yearNum >= 30 && yearNum <= 99) {
+        fullYear = 1900 + yearNum;
+      } else {
+        return "";
+      }
+
+      const date = new Date(
+        fullYear,
+        Number(month) - 1,
+        Number(day),
+        12,
+        0,
+        0,
+        0,
+      );
+      const result = DateService.toLocalISOString(date).split("T")[0];
+      return result;
+    }
+
+    return "";
   }
 }

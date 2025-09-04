@@ -1,11 +1,11 @@
-import { BaseImportService } from "./importService";
 import { funcionariosService } from "../../funcionarios/data/funcionariosService";
-import type { FuncionarioInput } from "../../funcionarios/types";
+import { BaseImportService } from "./importService";
 import type {
   ImportConfig,
-  ValidationResult,
   ImportResult,
+  ValidationResult,
 } from "../types/importTypes";
+import type { FuncionarioInput } from "../../funcionarios/types";
 
 export class FuncionariosImportService extends BaseImportService {
   protected config: ImportConfig = {
@@ -587,20 +587,26 @@ export class FuncionariosImportService extends BaseImportService {
     };
   }
 
-  private isValidDate(dateString: string): boolean {
-    if (!dateString || dateString.trim() === "") return false;
+  private convertSalaryFormat(salaryString: string): string {
+    if (!salaryString || salaryString.trim() === "") return "";
 
-    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    if (!dateRegex.test(dateString)) return false;
+    // Remover espaços
+    let salary = salaryString.trim();
 
-    const [, day, month, year] = dateString.match(dateRegex)!;
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    // Se contém vírgula, converter para ponto decimal
+    if (salary.includes(",")) {
+      // Substituir vírgula por ponto
+      salary = salary.replace(",", ".");
+    }
 
-    return (
-      date.getDate() === parseInt(day) &&
-      date.getMonth() === parseInt(month) - 1 &&
-      date.getFullYear() === parseInt(year)
-    );
+    // Validar se é um número válido
+    const numericValue = parseFloat(salary);
+    if (isNaN(numericValue)) {
+      return salary; // Retorna o valor original se não for numérico
+    }
+
+    // Retornar como string com ponto decimal
+    return numericValue.toString();
   }
 
   private convertDateToISO(dateString: any): string {
@@ -675,25 +681,19 @@ export class FuncionariosImportService extends BaseImportService {
     return "";
   }
 
-  private convertSalaryFormat(salaryString: string): string {
-    if (!salaryString || salaryString.trim() === "") return "";
+  private isValidDate(dateString: string): boolean {
+    if (!dateString || dateString.trim() === "") return false;
 
-    // Remover espaços
-    let salary = salaryString.trim();
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    if (!dateRegex.test(dateString)) return false;
 
-    // Se contém vírgula, converter para ponto decimal
-    if (salary.includes(",")) {
-      // Substituir vírgula por ponto
-      salary = salary.replace(",", ".");
-    }
+    const [, day, month, year] = dateString.match(dateRegex)!;
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
-    // Validar se é um número válido
-    const numericValue = parseFloat(salary);
-    if (isNaN(numericValue)) {
-      return salary; // Retorna o valor original se não for numérico
-    }
-
-    // Retornar como string com ponto decimal
-    return numericValue.toString();
+    return (
+      date.getDate() === parseInt(day) &&
+      date.getMonth() === parseInt(month) - 1 &&
+      date.getFullYear() === parseInt(year)
+    );
   }
 }
