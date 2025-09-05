@@ -8,6 +8,8 @@ import type {
   TipoCarroceria,
 } from "../../../types";
 import { maskPlaca } from "../../../utils/masks";
+import { DateInput } from "../../common/DateInput";
+import { DateService } from "../../../services/DateService";
 
 interface VeiculoFormModalProps {
   isOpen: boolean;
@@ -49,6 +51,24 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Função auxiliar para converter datas de forma segura
+  const convertDateForForm = (date: any): string => {
+    if (!date) return "";
+
+    try {
+      if (typeof date === "string") {
+        return date;
+      }
+
+      // Se for um objeto Date ou FirebaseDate
+      const dateObj = DateService.fromFirebaseDate(date);
+      return DateService.toLocalISOString(dateObj).split("T")[0];
+    } catch (error) {
+      console.error("Erro ao converter data:", error);
+      return "";
+    }
+  };
+
   useEffect(() => {
     if (editingVeiculo) {
       setFormData({
@@ -62,8 +82,8 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
         tipoBau: editingVeiculo.tipoBau || "frigorifico",
         status: editingVeiculo.status || "disponivel",
         unidadeNegocio: editingVeiculo.unidadeNegocio || "frigorifico",
-        ultimaManutencao: editingVeiculo.ultimaManutencao || "",
-        proximaManutencao: editingVeiculo.proximaManutencao || "",
+        ultimaManutencao: convertDateForForm(editingVeiculo.ultimaManutencao),
+        proximaManutencao: convertDateForForm(editingVeiculo.proximaManutencao),
         motorista: editingVeiculo.motorista || "",
         observacao: editingVeiculo.observacao || "",
       });
@@ -389,41 +409,34 @@ export const VeiculoFormModal: React.FC<VeiculoFormModalProps> = ({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Última Manutenção
-                </label>
-                <input
-                  type="date"
+                <DateInput
+                  label="Última Manutenção"
                   value={formData.ultimaManutencao}
-                  onChange={(e) =>
+                  onChange={(date) =>
                     setFormData({
                       ...formData,
-                      ultimaManutencao: e.target.value,
+                      ultimaManutencao: date,
                     })
                   }
-                  className={`input-field ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
                   disabled={somenteLeitura}
+                  name="ultimaManutencao"
+                  id="ultimaManutencao"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Próxima Manutenção
-                </label>
-                <input
-                  type="date"
+                <DateInput
+                  label="Próxima Manutenção"
                   value={formData.proximaManutencao}
-                  onChange={(e) =>
+                  onChange={(date) =>
                     setFormData({
                       ...formData,
-                      proximaManutencao: e.target.value,
+                      proximaManutencao: date,
                     })
                   }
-                  className={`input-field ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
+                  minDate={formData.ultimaManutencao}
                   disabled={somenteLeitura}
+                  name="proximaManutencao"
+                  id="proximaManutencao"
                 />
               </div>
             </div>

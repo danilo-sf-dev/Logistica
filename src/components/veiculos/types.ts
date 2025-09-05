@@ -17,10 +17,12 @@ export interface Veiculo extends BaseEntity {
   tipoBau: string;
   status: StatusVeiculo;
   unidadeNegocio: UnidadeNegocio;
-  ultimaManutencao?: string;
-  proximaManutencao?: string;
+  ultimaManutencao?: string | Date; // ✅ Pode ser string ou Date (Firebase)
+  proximaManutencao?: string | Date; // ✅ Pode ser string ou Date (Firebase)
   motorista?: string;
   observacao?: string;
+  dataCriacao: string | Date; // ✅ Pode ser string ou Date (Firebase)
+  dataAtualizacao: string | Date; // ✅ Pode ser string ou Date (Firebase)
 }
 
 export type VeiculoInput = Omit<

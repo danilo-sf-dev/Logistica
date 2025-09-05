@@ -13,6 +13,8 @@ import {
 import { db } from "../../../firebase/config";
 import type { Funcionario, FuncionarioInput } from "../types";
 import NotificationService from "../../../services/notificationService";
+import { DateService } from "../../../services/DateService";
+import { MoneyService } from "../../../services/MoneyService";
 
 const COLLECTION = "funcionarios";
 
@@ -23,29 +25,6 @@ async function listar(): Promise<Funcionario[]> {
     id: d.id,
     ...(d.data() as Omit<Funcionario, "id">),
   }));
-}
-
-function normalizeMoneyString(valor?: string | null): string | null {
-  if (!valor) return null;
-
-  // Remove todos os caracteres não numéricos, exceto ponto e vírgula
-  let cleaned = String(valor).replace(/[^\d.,]/g, "");
-
-  // Se não há números, retorna null
-  if (!cleaned) return null;
-
-  // Se contém vírgula, substituir por ponto
-  if (cleaned.includes(",")) {
-    cleaned = cleaned.replace(",", ".");
-  }
-
-  // Converter para número
-  const num = Number(cleaned);
-
-  if (Number.isNaN(num)) return null;
-
-  // Retorna como string com 2 casas decimais
-  return num.toFixed(2);
 }
 
 const limpar = (s: string) => s.replace(/\D/g, "");
@@ -95,16 +74,37 @@ async function criar(input: FuncionarioInput): Promise<string> {
     throw new Error("CNH já cadastrada no sistema");
   }
 
-  const payload = {
+  const payload: any = {
     ...input,
     cpf: limpar(input.cpf),
     celular: limpar(input.celular),
     cep: input.cep ? limpar(input.cep) : undefined,
-    salario: normalizeMoneyString(input.salario),
+    salario: MoneyService.normalizeForFirebase(input.salario),
     ativo: input.ativo !== undefined ? input.ativo : true,
     dataCriacao: serverTimestamp(),
     dataAtualizacao: serverTimestamp(),
   };
+
+  // Normalizar datas usando DateService
+  if (input.dataAdmissao) {
+    payload.dataAdmissao = DateService.normalizeForFirebase(input.dataAdmissao);
+  }
+  if (input.cnhVencimento) {
+    payload.cnhVencimento = DateService.normalizeForFirebase(
+      input.cnhVencimento,
+    );
+  }
+  if (input.toxicoUltimoExame) {
+    payload.toxicoUltimoExame = DateService.normalizeForFirebase(
+      input.toxicoUltimoExame,
+    );
+  }
+  if (input.toxicoVencimento) {
+    payload.toxicoVencimento = DateService.normalizeForFirebase(
+      input.toxicoVencimento,
+    );
+  }
+
   const ref = await addDoc(collection(db, COLLECTION), payload);
 
   // Enviar notificação sobre novo funcionário
@@ -133,15 +133,36 @@ async function atualizar(id: string, input: FuncionarioInput): Promise<void> {
     throw new Error("CNH já cadastrada no sistema");
   }
 
-  const payload = {
+  const payload: any = {
     ...input,
     cpf: limpar(input.cpf),
     celular: limpar(input.celular),
     cep: input.cep ? limpar(input.cep) : undefined,
-    salario: normalizeMoneyString(input.salario),
+    salario: MoneyService.normalizeForFirebase(input.salario),
     ativo: input.ativo !== undefined ? input.ativo : true,
     dataAtualizacao: serverTimestamp(),
   };
+
+  // Normalizar datas usando DateService
+  if (input.dataAdmissao) {
+    payload.dataAdmissao = DateService.normalizeForFirebase(input.dataAdmissao);
+  }
+  if (input.cnhVencimento) {
+    payload.cnhVencimento = DateService.normalizeForFirebase(
+      input.cnhVencimento,
+    );
+  }
+  if (input.toxicoUltimoExame) {
+    payload.toxicoUltimoExame = DateService.normalizeForFirebase(
+      input.toxicoUltimoExame,
+    );
+  }
+  if (input.toxicoVencimento) {
+    payload.toxicoVencimento = DateService.normalizeForFirebase(
+      input.toxicoVencimento,
+    );
+  }
+
   await updateDoc(doc(db, COLLECTION, id), payload);
 }
 

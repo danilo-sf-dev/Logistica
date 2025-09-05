@@ -9,6 +9,7 @@ import {
   VeiculosSortConfig,
 } from "../types";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
+import { useDateValidation } from "../../../hooks";
 
 export const useVeiculos = () => {
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
@@ -29,60 +30,91 @@ export const useVeiculos = () => {
   >({});
 
   const { showNotification } = useNotification();
+  const { validateDate, validatePeriod } = useDateValidation();
 
-  const validar = useCallback((input: VeiculoFormData) => {
-    const novosErros: Partial<Record<keyof VeiculoFormData, string>> = {};
+  const validar = useCallback(
+    (input: VeiculoFormData) => {
+      const novosErros: Partial<Record<keyof VeiculoFormData, string>> = {};
 
-    // Se o veículo estiver inativo, não validar nada (não pode ser editado)
-    if (input.status === "inativo") {
-      setErros({});
-      return true;
-    }
-
-    // Validação apenas para veículos ativos
-    if (!input.placa?.trim()) {
-      novosErros.placa = "Placa é obrigatória";
-    }
-
-    if (!input.modelo?.trim()) {
-      novosErros.modelo = "Modelo é obrigatório";
-    }
-
-    if (!input.marca?.trim()) {
-      novosErros.marca = "Marca é obrigatória";
-    }
-
-    if (!input.ano?.trim()) {
-      novosErros.ano = "Ano é obrigatório";
-    } else {
-      const ano = parseInt(input.ano);
-      if (isNaN(ano) || ano < 1900 || ano > new Date().getFullYear() + 1) {
-        novosErros.ano = "Ano deve ser entre 1900 e o próximo ano";
+      // Se o veículo estiver inativo, não validar nada (não pode ser editado)
+      if (input.status === "inativo") {
+        setErros({});
+        return true;
       }
-    }
 
-    if (!input.capacidade?.trim()) {
-      novosErros.capacidade = "Capacidade é obrigatória";
-    } else {
-      const capacidade = parseFloat(input.capacidade);
-      if (isNaN(capacidade) || capacidade <= 0) {
-        novosErros.capacidade = "Capacidade deve ser um número positivo";
+      // Validação apenas para veículos ativos
+      if (!input.placa?.trim()) {
+        novosErros.placa = "Placa é obrigatória";
       }
-    }
 
-    if (!input.quantidadeEixos?.trim()) {
-      novosErros.quantidadeEixos = "Quantidade de eixos é obrigatória";
-    } else {
-      const eixos = parseInt(input.quantidadeEixos);
-      if (isNaN(eixos) || eixos < 2 || eixos > 10) {
-        novosErros.quantidadeEixos =
-          "Quantidade de eixos deve ser entre 2 e 10";
+      if (!input.modelo?.trim()) {
+        novosErros.modelo = "Modelo é obrigatório";
       }
-    }
 
-    setErros(novosErros);
-    return Object.keys(novosErros).length === 0;
-  }, []);
+      if (!input.marca?.trim()) {
+        novosErros.marca = "Marca é obrigatória";
+      }
+
+      if (!input.ano?.trim()) {
+        novosErros.ano = "Ano é obrigatório";
+      } else {
+        const ano = parseInt(input.ano);
+        if (isNaN(ano) || ano < 1900 || ano > new Date().getFullYear() + 1) {
+          novosErros.ano = "Ano deve ser entre 1900 e o próximo ano";
+        }
+      }
+
+      if (!input.capacidade?.trim()) {
+        novosErros.capacidade = "Capacidade é obrigatória";
+      } else {
+        const capacidade = parseFloat(input.capacidade);
+        if (isNaN(capacidade) || capacidade <= 0) {
+          novosErros.capacidade = "Capacidade deve ser um número positivo";
+        }
+      }
+
+      if (!input.quantidadeEixos?.trim()) {
+        novosErros.quantidadeEixos = "Quantidade de eixos é obrigatória";
+      } else {
+        const eixos = parseInt(input.quantidadeEixos);
+        if (isNaN(eixos) || eixos < 2 || eixos > 10) {
+          novosErros.quantidadeEixos =
+            "Quantidade de eixos deve ser entre 2 e 10";
+        }
+      }
+
+      // ✅ Validações de data de manutenção
+      if (input.ultimaManutencao) {
+        const dateValidation = validateDate(input.ultimaManutencao);
+        if (!dateValidation.isValid) {
+          novosErros.ultimaManutencao = dateValidation.error;
+        }
+      }
+
+      if (input.proximaManutencao) {
+        const dateValidation = validateDate(input.proximaManutencao);
+        if (!dateValidation.isValid) {
+          novosErros.proximaManutencao = dateValidation.error;
+        }
+      }
+
+      // ✅ Validar que próxima manutenção > última manutenção
+      if (input.ultimaManutencao && input.proximaManutencao) {
+        const periodValidation = validatePeriod(
+          input.ultimaManutencao,
+          input.proximaManutencao,
+          365,
+        );
+        if (!periodValidation.isValid) {
+          novosErros.proximaManutencao = periodValidation.error;
+        }
+      }
+
+      setErros(novosErros);
+      return Object.keys(novosErros).length === 0;
+    },
+    [validateDate, validatePeriod],
+  );
 
   const fetchVeiculos = useCallback(async () => {
     try {

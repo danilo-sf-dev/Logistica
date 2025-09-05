@@ -1,11 +1,13 @@
-import { BaseImportService } from "./importService";
 import { funcionariosService } from "../../funcionarios/data/funcionariosService";
-import type { FuncionarioInput } from "../../funcionarios/types";
+import { BaseImportService } from "./importService";
 import type {
   ImportConfig,
-  ValidationResult,
   ImportResult,
+  ValidationResult,
 } from "../types/importTypes";
+import type { FuncionarioInput } from "../../funcionarios/types";
+import { DateService } from "../../../services/DateService";
+import { MoneyService } from "../../../services/MoneyService";
 
 export class FuncionariosImportService extends BaseImportService {
   protected config: ImportConfig = {
@@ -122,7 +124,7 @@ export class FuncionariosImportService extends BaseImportService {
         "6. CEP deve ter 8 dígitos",
         "7. Função: motorista, ajudante, outro, outros",
         "8. Datas devem estar no formato DD/MM/AAAA",
-        "9. Salário deve ser numérico usando ponto decimal (ex: 3500.00)",
+        "9. Salário aceita formatos: 3500.00, 3500,00 ou 3.500,00",
       ],
       validations: [
         "CPF deve ser único no sistema e ter 11 dígitos (sistema adiciona zero à esquerda automaticamente)",
@@ -130,7 +132,7 @@ export class FuncionariosImportService extends BaseImportService {
         "Email deve ser único (se fornecido)",
         "CEP deve ter 8 dígitos",
         "Data de admissão deve ser válida",
-        "Salário deve ser numérico (aceita 3500.00 ou 3500,00)",
+        "Salário aceita formatos: 3500.00, 3500,00 ou 3.500,00",
         "CNH Vencimento deve ser uma data futura",
         "Tóxico Vencimento deve ser uma data futura",
       ],
@@ -296,15 +298,16 @@ export class FuncionariosImportService extends BaseImportService {
         // Validar formato do salário (se fornecido)
         if (row[16]) {
           const salaryValue = row[16].toString().trim();
-          const convertedSalary = this.convertSalaryFormat(salaryValue);
+          const centavos = this.convertSalaryToCentavos(salaryValue);
           if (
-            convertedSalary === salaryValue &&
-            isNaN(parseFloat(salaryValue))
+            centavos === "0" &&
+            salaryValue !== "0" &&
+            salaryValue !== "0,00"
           ) {
             errors.push({
               row: rowNumber,
               field: "Salário",
-              message: `Salário "${salaryValue}" deve ser um número válido (ex: 3500.00 ou 3500,00)`,
+              message: `Salário "${salaryValue}" deve ser um número válido (ex: 3500.00 ou 3.500,00)`,
             });
           }
         }
@@ -519,18 +522,14 @@ export class FuncionariosImportService extends BaseImportService {
           endereco: enderecoCompleto,
           cidade: row[9]?.toString().trim().toUpperCase() || "",
           funcao: (row[10]?.toString().toLowerCase() as any) || "motorista",
-          cnhVencimento: this.convertDateToISO(
-            row[11]?.toString().trim() || "",
-          ),
+          cnhVencimento: this.convertDateForFirebase(row[11]),
           cnhCategoria: row[12]?.toString().trim().toUpperCase() || "",
-          toxicoUltimoExame: this.convertDateToISO(
-            row[13]?.toString().trim() || "",
+          toxicoUltimoExame: this.convertDateForFirebase(row[13]),
+          toxicoVencimento: this.convertDateForFirebase(row[14]),
+          dataAdmissao: this.convertDateForFirebase(row[15]),
+          salario: this.convertSalaryToCentavos(
+            row[16]?.toString().trim() || "",
           ),
-          toxicoVencimento: this.convertDateToISO(
-            row[14]?.toString().trim() || "",
-          ),
-          dataAdmissao: this.convertDateToISO(row[15]?.toString().trim() || ""),
-          salario: this.convertSalaryFormat(row[16]?.toString().trim() || ""),
           observacao: row[17]?.toString().trim().toUpperCase() || "",
           status: "disponivel",
           tipoContrato: "integral",
@@ -587,92 +586,32 @@ export class FuncionariosImportService extends BaseImportService {
     };
   }
 
-  private isValidDate(dateString: string): boolean {
-    if (!dateString || dateString.trim() === "") return false;
+  private convertSalaryToCentavos(salaryString: string): string {
+    if (!salaryString || salaryString.trim() === "") return "0";
 
-    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    if (!dateRegex.test(dateString)) return false;
+    let salary = salaryString.trim();
 
-    const [, day, month, year] = dateString.match(dateRegex)!;
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    // Remove caracteres não numéricos exceto vírgula e ponto
+    salary = salary.replace(/[^\d.,]/g, "");
 
-    return (
-      date.getDate() === parseInt(day) &&
-      date.getMonth() === parseInt(month) - 1 &&
-      date.getFullYear() === parseInt(year)
-    );
-  }
+    if (!salary) return "0";
 
-  private convertDateToISO(dateString: any): string {
-    if (!dateString) {
-      return "";
+    // Se contém vírgula, trata como formato brasileiro (ex: "3.500,00")
+    if (salary.includes(",")) {
+      // Remove pontos (separadores de milhar) e substitui vírgula por ponto
+      salary = salary.replace(/\./g, "").replace(",", ".");
     }
 
-    // Se for um objeto Date, converter para string
-    if (dateString instanceof Date) {
-      const day = dateString.getDate().toString().padStart(2, "0");
-      const month = (dateString.getMonth() + 1).toString().padStart(2, "0");
-      const year = dateString.getFullYear();
-      return `${year}-${month}-${day}`;
+    // Converte para número
+    const numericValue = parseFloat(salary);
+    if (isNaN(numericValue)) {
+      return "0";
     }
 
-    const dateStr = dateString.toString();
+    // Converte reais para centavos
+    const centavos = Math.round(numericValue * 100);
 
-    // Tentar converter string de data JavaScript para Date
-    if (dateStr.includes("GMT") || dateStr.includes("UTC")) {
-      try {
-        // Extrair a data da string JavaScript (ex: "Tue Aug 26 2025 21:00:00 GMT-0300")
-        // Usar regex para extrair dia, mês e ano
-        const dateMatch = dateStr.match(
-          /(\w{3})\s+(\w{3})\s+(\d{1,2})\s+(\d{4})/,
-        );
-        if (dateMatch) {
-          const [, , monthName, day, year] = dateMatch;
-          const monthMap: { [key: string]: string } = {
-            Jan: "01",
-            Feb: "02",
-            Mar: "03",
-            Apr: "04",
-            May: "05",
-            Jun: "06",
-            Jul: "07",
-            Aug: "08",
-            Sep: "09",
-            Oct: "10",
-            Nov: "11",
-            Dec: "12",
-          };
-          const month = monthMap[monthName];
-          if (month) {
-            return `${year}-${month}-${day.padStart(2, "0")}`;
-          }
-        }
-
-        // Fallback: tentar criar Date e usar métodos locais
-        const dateObj = new Date(dateStr);
-        if (!isNaN(dateObj.getTime())) {
-          const day = dateObj.getDate().toString().padStart(2, "0");
-          const month = (dateObj.getMonth() + 1).toString().padStart(2, "0");
-          const year = dateObj.getFullYear();
-          return `${year}-${month}-${day}`;
-        }
-      } catch (error) {
-        // Ignorar erro e tentar outros formatos
-      }
-    }
-
-    // Se for string no formato DD/MM/AAAA, validar e converter
-    if (this.isValidDate(dateStr)) {
-      const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-      const match = dateStr.match(dateRegex);
-
-      if (match) {
-        const [, day, month, year] = match;
-        return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-      }
-    }
-
-    return "";
+    return centavos.toString();
   }
 
   private convertSalaryFormat(salaryString: string): string {
@@ -695,5 +634,132 @@ export class FuncionariosImportService extends BaseImportService {
 
     // Retornar como string com ponto decimal
     return numericValue.toString();
+  }
+
+  private isValidDate(dateString: string): boolean {
+    if (!dateString || dateString.trim() === "") return false;
+
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    if (!dateRegex.test(dateString)) return false;
+
+    const [, day, month, year] = dateString.match(dateRegex)!;
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+
+    return (
+      date.getDate() === parseInt(day) &&
+      date.getMonth() === parseInt(month) - 1 &&
+      date.getFullYear() === parseInt(year)
+    );
+  }
+
+  private convertDateForFirebase(dateValue: any): string {
+    if (!dateValue) {
+      return "";
+    }
+
+    if (dateValue instanceof Date) {
+      // CRÍTICO: Excel interpreta datas com -1 dia, correção necessária
+      const correctedDate = new Date(dateValue);
+      correctedDate.setDate(correctedDate.getDate() + 1);
+
+      const normalizedDate = DateService.normalizeForFirebase(correctedDate);
+      const result = DateService.toLocalISOString(normalizedDate).split("T")[0];
+      return result;
+    }
+
+    const dateStr = dateValue.toString().trim();
+
+    if (
+      dateStr.includes("GMT") ||
+      dateStr.includes("UTC") ||
+      dateStr.match(/\w{3}\s+\w{3}\s+\d{1,2}\s+\d{4}/)
+    ) {
+      try {
+        const dateObj = new Date(dateStr);
+        if (!isNaN(dateObj.getTime())) {
+          const correctedDate = new Date(dateObj);
+          correctedDate.setDate(correctedDate.getDate() + 1);
+
+          const normalizedDate =
+            DateService.normalizeForFirebase(correctedDate);
+          const result =
+            DateService.toLocalISOString(normalizedDate).split("T")[0];
+          return result;
+        }
+      } catch (error) {
+        console.error("Erro ao converter string JavaScript:", error);
+      }
+    }
+
+    // Formato YYYY-MM-DD
+    const isoRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+    const isoMatch = dateStr.match(isoRegex);
+
+    if (isoMatch) {
+      const [, year, month, day] = isoMatch;
+      const date = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        12,
+        0,
+        0,
+        0,
+      );
+      const result = DateService.toLocalISOString(date).split("T")[0];
+      return result;
+    }
+
+    // Formato DD/MM/AAAA
+    const fullYearRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+    const fullYearMatch = dateStr.match(fullYearRegex);
+
+    if (fullYearMatch) {
+      const [, day, month, year] = fullYearMatch;
+      const date = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        12,
+        0,
+        0,
+        0,
+      );
+      const result = DateService.toLocalISOString(date).split("T")[0];
+      return result;
+    }
+
+    // Formato DD/MM/AA - Excel converte automaticamente 01/09/2025 → 01/09/25
+    const shortYearRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2})$/;
+    const shortYearMatch = dateStr.match(shortYearRegex);
+
+    if (shortYearMatch) {
+      const [, day, month, shortYear] = shortYearMatch;
+
+      let fullYear: number;
+      const yearNum = Number(shortYear);
+
+      if (yearNum >= 0 && yearNum <= 29) {
+        fullYear = 2000 + yearNum;
+      } else if (yearNum >= 30 && yearNum <= 99) {
+        fullYear = 1900 + yearNum;
+      } else {
+        return "";
+      }
+
+      const date = new Date(
+        fullYear,
+        Number(month) - 1,
+        Number(day),
+        12,
+        0,
+        0,
+        0,
+      );
+      const result = DateService.toLocalISOString(date).split("T")[0];
+      return result;
+    }
+
+    return "";
   }
 }

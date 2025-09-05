@@ -8,6 +8,8 @@ export type Cidade = BaseEntity & {
   pesoMinimo?: number | null;
   rotaId?: string | null;
   observacao?: string;
+  dataCriacao: string | Date; // ✅ Pode ser string ou Date (Firebase)
+  dataAtualizacao: string | Date; // ✅ Pode ser string ou Date (Firebase)
 };
 
 export type CidadeInput = Omit<
@@ -15,7 +17,6 @@ export type CidadeInput = Omit<
   "id" | "dataCriacao" | "dataAtualizacao"
 >;
 
-// Tipo para formulário que aceita strings nos campos numéricos
 export type CidadeFormData = {
   nome: string;
   estado: string;

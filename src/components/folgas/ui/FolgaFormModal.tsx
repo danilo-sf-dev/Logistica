@@ -1,18 +1,20 @@
 import React from "react";
 import { X } from "lucide-react";
 import LoadingButton from "../../common/LoadingButton";
-import type { FolgaInput } from "../types";
+import type { FolgaFormData } from "../types";
 import type { TipoFolga, StatusFolga } from "../../../types";
 import { FuncionarioSelect } from "./FuncionarioSelect";
+import { DateRangeInput } from "../../common/DateRangeInput";
+import { useDateForm } from "../../../hooks";
 
 interface FolgaFormModalProps {
   mostrar: boolean;
   editando: boolean;
-  valores: FolgaInput;
-  setValores: (valores: FolgaInput) => void;
+  valores: FolgaFormData;
+  setValores: (valores: FolgaFormData) => void;
   onConfirmar: () => void;
   onCancelar: () => void;
-  erros?: Partial<Record<keyof FolgaInput, string>>;
+  erros?: Partial<Record<keyof FolgaFormData, string>>;
   loading?: boolean;
 }
 
@@ -26,6 +28,11 @@ export function FolgaFormModal({
   erros = {},
   loading = false,
 }: FolgaFormModalProps) {
+  const { getMinStartDate, getMinEndDate } = useDateForm({
+    startDate: valores.dataInicio,
+    endDate: valores.dataFim,
+  });
+
   if (!mostrar) return null;
 
   return (
@@ -129,44 +136,25 @@ export function FolgaFormModal({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Data de Início *
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={valores.dataInicio}
-                  onChange={(e) =>
-                    setValores({ ...valores, dataInicio: e.target.value })
-                  }
-                  className={`input-field ${erros.dataInicio ? "border-red-500" : ""}`}
-                />
-                {erros.dataInicio && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {erros.dataInicio}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Data de Fim *
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={valores.dataFim}
-                  onChange={(e) =>
-                    setValores({ ...valores, dataFim: e.target.value })
-                  }
-                  className={`input-field ${erros.dataFim ? "border-red-500" : ""}`}
-                />
-                {erros.dataFim && (
-                  <p className="text-red-500 text-xs mt-1">{erros.dataFim}</p>
-                )}
-              </div>
-            </div>
+            <DateRangeInput
+              startDate={valores.dataInicio}
+              endDate={valores.dataFim}
+              onStartDateChange={(date) =>
+                setValores({ ...valores, dataInicio: date })
+              }
+              onEndDateChange={(date) =>
+                setValores({ ...valores, dataFim: date })
+              }
+              minStartDate={getMinStartDate()}
+              maxEndDate={getMinEndDate()}
+              required
+              errors={{
+                startDate: erros.dataInicio,
+                endDate: erros.dataFim,
+              }}
+              startDateLabel="Data de Início"
+              endDateLabel="Data de Fim"
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

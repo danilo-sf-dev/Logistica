@@ -214,6 +214,7 @@ export class NotificationService {
         notificationsRef,
         where("targetUsers", "array-contains", userId),
       );
+
       const snapshot = await getDocs(notificationsQuery);
 
       const notifications: NotificationData[] = [];

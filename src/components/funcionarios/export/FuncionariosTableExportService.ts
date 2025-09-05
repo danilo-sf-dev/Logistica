@@ -3,6 +3,8 @@ import {
   type TableExportConfig,
 } from "../../relatorios/export/BaseTableExportService";
 import { formatCPF, formatCelular } from "../../../utils/masks";
+import { DateService } from "../../../services/DateService";
+import { MoneyService } from "../../../services/MoneyService";
 
 export class FuncionariosTableExportService extends BaseTableExportService {
   protected config: TableExportConfig = {
@@ -36,12 +38,7 @@ export class FuncionariosTableExportService extends BaseTableExportService {
       cnh: (valor) => (valor ? valor.toUpperCase() : "N/A"),
       cnhVencimento: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
       cnhCategoria: (valor) => (valor ? valor.toUpperCase() : "N/A"),
       celular: (valor) => (valor ? formatCelular(valor) : "N/A"),
@@ -89,34 +86,19 @@ export class FuncionariosTableExportService extends BaseTableExportService {
       },
       dataAdmissao: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
       salario: (valor) => {
         if (!valor) return "N/A";
-        return `R$ ${valor}`;
+        return MoneyService.formatForExport(valor);
       },
       toxicoUltimoExame: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
       toxicoVencimento: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
       observacao: (valor) => (valor ? valor : "N/A"),
       ativo: (valor) => {
@@ -126,12 +108,7 @@ export class FuncionariosTableExportService extends BaseTableExportService {
       },
       dataCriacao: (valor) => {
         if (!valor) return "N/A";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
+        return DateService.formatForDisplay(valor);
       },
     },
   };

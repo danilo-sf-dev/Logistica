@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import { Rota, RotaFormData } from "../types";
+import { DateService } from "../../../services/DateService";
 
 const COLLECTION_NAME = "rotas";
 
@@ -59,11 +60,20 @@ export const rotasService = {
 
   async create(rotaData: RotaFormData): Promise<string> {
     try {
-      const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+      // ✅ NORMALIZAÇÃO COMPONENTIZADA DE DATAS
+      const normalizedData = {
         ...rotaData,
-        dataCriacao: new Date(),
-        dataAtualizacao: new Date(),
-      });
+        dataRota: rotaData.dataRota
+          ? DateService.normalizeForFirebase(rotaData.dataRota)
+          : undefined,
+        dataCriacao: DateService.getServerTimestamp(),
+        dataAtualizacao: DateService.getServerTimestamp(),
+      };
+
+      const docRef = await addDoc(
+        collection(db, COLLECTION_NAME),
+        normalizedData,
+      );
       return docRef.id;
     } catch (error) {
       console.error("Erro ao criar rota:", error);
@@ -73,11 +83,21 @@ export const rotasService = {
 
   async update(id: string, rotaData: Partial<RotaFormData>): Promise<void> {
     try {
-      const docRef = doc(db, COLLECTION_NAME, id);
-      await updateDoc(docRef, {
+      // ✅ NORMALIZAÇÃO COMPONENTIZADA DE DATAS
+      const normalizedData: any = {
         ...rotaData,
-        dataAtualizacao: new Date(),
-      });
+        dataAtualizacao: DateService.getServerTimestamp(),
+      };
+
+      // Normalizar dataRota se fornecida
+      if (rotaData.dataRota) {
+        normalizedData.dataRota = DateService.normalizeForFirebase(
+          rotaData.dataRota,
+        );
+      }
+
+      const docRef = doc(db, COLLECTION_NAME, id);
+      await updateDoc(docRef, normalizedData);
     } catch (error) {
       console.error("Erro ao atualizar rota:", error);
       throw new Error("Erro ao atualizar rota");
@@ -125,7 +145,7 @@ export const rotasService = {
 
       await updateDoc(docRef, {
         cidades: novasCidades,
-        dataAtualizacao: new Date(),
+        dataAtualizacao: DateService.getServerTimestamp(),
       });
     } catch (error) {
       console.error("Erro ao atualizar cidades vinculadas:", error);

@@ -7,8 +7,8 @@ import {
   doc,
   orderBy,
   query,
-  serverTimestamp,
 } from "firebase/firestore";
+import { DateService } from "../../../services/DateService";
 import { db } from "../../../firebase/config";
 import type { Cidade, CidadeInput } from "../types";
 import { rotasService } from "../../rotas/data/rotasService";
@@ -96,8 +96,8 @@ async function criar(input: CidadeInput): Promise<string> {
     distancia: input.distancia ? Number(input.distancia) : null,
     pesoMinimo: input.pesoMinimo ? Number(input.pesoMinimo) : null,
     rotaId: input.rotaId || null,
-    dataCriacao: serverTimestamp(),
-    dataAtualizacao: serverTimestamp(),
+    dataCriacao: DateService.getServerTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   };
 
   // Remover campos null/undefined do payload final
@@ -178,7 +178,7 @@ async function atualizar(id: string, input: CidadeInput): Promise<void> {
     distancia: input.distancia ? Number(input.distancia) : null,
     pesoMinimo: input.pesoMinimo ? Number(input.pesoMinimo) : null,
     rotaId: input.rotaId || null,
-    dataAtualizacao: serverTimestamp(),
+    dataAtualizacao: DateService.getServerTimestamp(),
   };
 
   await updateDoc(cidadeRef, payload);

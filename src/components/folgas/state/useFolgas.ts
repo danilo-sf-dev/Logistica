@@ -2,9 +2,10 @@ import { useCallback, useMemo, useState } from "react";
 import { useNotification } from "../../../contexts/NotificationContext";
 import { folgasService } from "../data/folgasService";
 import { FolgasTableExportService } from "../export/FolgasTableExportService";
-import type { Folga, FolgaInput } from "../types";
+import type { Folga, FolgaFormData } from "../types";
 import type { StatusFolga, TipoFolga, DirecaoOrdenacao } from "../../../types";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
+import { useDateValidation } from "../../../hooks";
 
 export type OrdenacaoCampo =
   | "funcionarioNome"
@@ -17,6 +18,7 @@ export type OrdenacaoCampo =
 
 export function useFolgas() {
   const { showNotification } = useNotification();
+  const { validateDate, validatePeriod } = useDateValidation();
 
   const [lista, setLista] = useState<Folga[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +40,7 @@ export function useFolgas() {
   const [ordenarPor, setOrdenarPor] = useState<OrdenacaoCampo | null>(null);
   const [direcaoOrdenacao, setDirecaoOrdenacao] =
     useState<DirecaoOrdenacao>("asc");
-  const [valores, setValores] = useState<FolgaInput>({
+  const [valores, setValores] = useState<FolgaFormData>({
     funcionarioId: "",
     funcionarioNome: "",
     dataInicio: "",
@@ -50,9 +52,9 @@ export function useFolgas() {
     documento: "",
     horas: null,
   });
-  const [erros, setErros] = useState<Partial<Record<keyof FolgaInput, string>>>(
-    {},
-  );
+  const [erros, setErros] = useState<
+    Partial<Record<keyof FolgaFormData, string>>
+  >({});
 
   const itensPorPagina = 15;
 
@@ -69,50 +71,61 @@ export function useFolgas() {
     }
   }, [showNotification]);
 
-  const validar = useCallback((input: FolgaInput) => {
-    const novosErros: Partial<Record<keyof FolgaInput, string>> = {};
+  const validar = useCallback(
+    (input: FolgaFormData) => {
+      const novosErros: Partial<Record<keyof FolgaFormData, string>> = {};
 
-    // Se o funcionário estiver inativo, não validar nada (não pode solicitar folga)
-    if (input.funcionarioId) {
-      // Aqui precisaríamos verificar se o funcionário está ativo
-      // Por enquanto, vamos validar normalmente
-    }
-
-    if (!input.funcionarioId) {
-      novosErros.funcionarioId = "Funcionário é obrigatório";
-    }
-
-    if (!input.dataInicio) {
-      novosErros.dataInicio = "Data de início é obrigatória";
-    }
-
-    if (!input.dataFim) {
-      novosErros.dataFim = "Data de fim é obrigatória";
-    }
-
-    if (input.dataInicio && input.dataFim) {
-      const inicio = new Date(input.dataInicio);
-      const fim = new Date(input.dataFim);
-      if (inicio > fim) {
-        novosErros.dataFim = "Data de fim deve ser posterior à data de início";
+      // Se o funcionário estiver inativo, não validar nada (não pode solicitar folga)
+      if (input.funcionarioId) {
+        // Aqui precisaríamos verificar se o funcionário está ativo
+        // Por enquanto, vamos validar normalmente
       }
-    }
 
-    // Validação específica para horas em banco de horas e compensação
-    if (
-      (input.tipo === "banco_horas" || input.tipo === "compensacao") &&
-      input.horas !== null
-    ) {
-      if (input.horas < 0) {
-        novosErros.horas = "Quantidade de horas deve ser positiva";
-      } else if (input.horas > 24) {
-        novosErros.horas = "Quantidade de horas não pode ser maior que 24";
+      if (!input.funcionarioId) {
+        novosErros.funcionarioId = "Funcionário é obrigatório";
       }
-    }
 
-    setErros(novosErros);
-    return Object.keys(novosErros).length === 0;
-  }, []);
+      if (!input.dataInicio) {
+        novosErros.dataInicio = "Data de início é obrigatória";
+      } else {
+        const dateValidation = validateDate(input.dataInicio);
+        if (!dateValidation.isValid) {
+          novosErros.dataInicio = dateValidation.error;
+        }
+      }
+
+      if (!input.dataFim) {
+        novosErros.dataFim = "Data de fim é obrigatória";
+      }
+
+      if (input.dataInicio && input.dataFim) {
+        const periodValidation = validatePeriod(
+          input.dataInicio,
+          input.dataFim,
+          365,
+        );
+        if (!periodValidation.isValid) {
+          novosErros.dataFim = periodValidation.error;
+        }
+      }
+
+      // Validação específica para horas em banco de horas e compensação
+      if (
+        (input.tipo === "banco_horas" || input.tipo === "compensacao") &&
+        input.horas !== null
+      ) {
+        if (input.horas < 0) {
+          novosErros.horas = "Quantidade de horas deve ser positiva";
+        } else if (input.horas > 24) {
+          novosErros.horas = "Quantidade de horas não pode ser maior que 24";
+        }
+      }
+
+      setErros(novosErros);
+      return Object.keys(novosErros).length === 0;
+    },
+    [validateDate, validatePeriod],
+  );
 
   const confirmar = useCallback(async () => {
     if (!validar(valores)) {
@@ -122,7 +135,7 @@ export function useFolgas() {
     setErros({});
     setLoadingSubmit(true);
     try {
-      const payload: FolgaInput = {
+      const payload: FolgaFormData = {
         ...valores,
         // Tratar o campo horas corretamente
         horas: valores.horas || null,
@@ -186,8 +199,20 @@ export function useFolgas() {
     setValores({
       funcionarioId: f.funcionarioId || "",
       funcionarioNome: f.funcionarioNome || "",
-      dataInicio: f.dataInicio || "",
-      dataFim: f.dataFim || "",
+      dataInicio: f.dataInicio
+        ? typeof f.dataInicio === "string"
+          ? f.dataInicio
+          : (f.dataInicio as any).toDate
+            ? (f.dataInicio as any).toDate().toISOString().split("T")[0]
+            : f.dataInicio.toISOString().split("T")[0]
+        : "",
+      dataFim: f.dataFim
+        ? typeof f.dataFim === "string"
+          ? f.dataFim
+          : (f.dataFim as any).toDate
+            ? (f.dataFim as any).toDate().toISOString().split("T")[0]
+            : f.dataFim.toISOString().split("T")[0]
+        : "",
       tipo: f.tipo || "folga",
       status: f.status || "pendente",
       observacoes: f.observacoes || "",

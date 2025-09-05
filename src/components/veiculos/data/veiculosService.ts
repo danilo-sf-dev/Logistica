@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase/config";
 import { Veiculo, VeiculoFormData } from "../types";
+import { DateService } from "../../../services/DateService";
 
 export class VeiculosService {
   private static collectionName = "veiculos";
@@ -76,14 +77,29 @@ export class VeiculosService {
         );
       }
 
-      const docRef = await addDoc(collection(db, this.collectionName), {
+      const payload: any = {
         ...veiculoData,
         placa: veiculoData.placa.toUpperCase(),
         modelo: veiculoData.modelo?.toUpperCase() || "",
         marca: veiculoData.marca.toUpperCase(),
-        dataCriacao: new Date(),
-        dataAtualizacao: new Date(),
-      });
+        dataCriacao: DateService.getServerTimestamp(),
+        dataAtualizacao: DateService.getServerTimestamp(),
+      };
+
+      // ✅ Adicionar campos de manutenção apenas se tiverem valor
+      if (veiculoData.ultimaManutencao) {
+        payload.ultimaManutencao = DateService.normalizeForFirebase(
+          veiculoData.ultimaManutencao,
+        );
+      }
+
+      if (veiculoData.proximaManutencao) {
+        payload.proximaManutencao = DateService.normalizeForFirebase(
+          veiculoData.proximaManutencao,
+        );
+      }
+
+      const docRef = await addDoc(collection(db, this.collectionName), payload);
       return docRef.id;
     } catch (error) {
       console.error("Erro ao criar veículo:", error);
@@ -96,9 +112,9 @@ export class VeiculosService {
     veiculoData: Partial<VeiculoFormData>,
   ): Promise<void> {
     try {
-      const updateData = {
+      const updateData: any = {
         ...veiculoData,
-        dataAtualizacao: new Date(),
+        dataAtualizacao: DateService.getServerTimestamp(),
       };
 
       if (veiculoData.placa) {
@@ -109,6 +125,19 @@ export class VeiculosService {
       }
       if (veiculoData.marca) {
         updateData.marca = veiculoData.marca.toUpperCase();
+      }
+
+      // ✅ Adicionar campos de manutenção apenas se tiverem valor
+      if (veiculoData.ultimaManutencao) {
+        updateData.ultimaManutencao = DateService.normalizeForFirebase(
+          veiculoData.ultimaManutencao,
+        );
+      }
+
+      if (veiculoData.proximaManutencao) {
+        updateData.proximaManutencao = DateService.normalizeForFirebase(
+          veiculoData.proximaManutencao,
+        );
       }
 
       await updateDoc(doc(db, this.collectionName, id), updateData);
@@ -134,7 +163,7 @@ export class VeiculosService {
     try {
       await updateDoc(doc(db, this.collectionName, id), {
         status: novoStatus,
-        dataAtualizacao: new Date(),
+        dataAtualizacao: DateService.getServerTimestamp(),
       });
     } catch (error) {
       console.error("Erro ao alterar status do veículo:", error);

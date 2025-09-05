@@ -4,6 +4,7 @@ import type { Cidade } from "components/cidades/types";
 import type { OrdenacaoCampo, DirecaoOrdenacao } from "../state/useCidades";
 import { useRotasForCidades } from "../state/useRotasForCidades";
 import { REGIOES_BRASIL } from "../../../utils/constants";
+import { DateDisplay } from "../../common/DateDisplay";
 
 type Props = {
   cidades: Cidade[];
@@ -86,6 +87,14 @@ export const CidadesTable: React.FC<Props> = ({
                 Rota {renderSeta("rotaId")}
               </div>
             </th>
+            <th
+              className="table-header cursor-pointer hover:bg-gray-100"
+              onClick={() => onOrdenar("dataCriacao")}
+            >
+              <div className="flex items-center">
+                Data Criação {renderSeta("dataCriacao")}
+              </div>
+            </th>
             <th className="table-header">Ações</th>
           </tr>
         </thead>
@@ -135,6 +144,11 @@ export const CidadesTable: React.FC<Props> = ({
                         return rota ? rota.nome : "Rota não encontrada";
                       })()
                     : "-"}
+                </div>
+              </td>
+              <td className="table-cell">
+                <div className="text-sm text-gray-900">
+                  <DateDisplay date={cidade.dataCriacao} format="short" />
                 </div>
               </td>
               <td className="table-cell">

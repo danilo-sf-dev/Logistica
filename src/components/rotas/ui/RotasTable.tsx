@@ -8,6 +8,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Rota, RotaSortConfig, RotaOrdenacaoCampo } from "../types";
+import { DateDisplay } from "../../common/DateDisplay";
 
 interface RotasTableProps {
   rotas: Rota[];
@@ -26,18 +27,6 @@ export const RotasTable: React.FC<RotasTableProps> = ({
   sortConfig,
   onSort,
 }) => {
-  const formatDate = (dateString: string) => {
-    // Se a data já está no formato YYYY-MM-DD, converter diretamente
-    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      const [ano, mes, dia] = dateString.split("-");
-      return `${dia}/${mes}/${ano}`;
-    }
-
-    // Para outras datas, usar a conversão normal
-    const date = new Date(dateString);
-    return date.toLocaleDateString("pt-BR");
-  };
-
   const getSortIcon = (field: RotaOrdenacaoCampo) => {
     if (sortConfig.field !== field) return null;
     return sortConfig.direction === "asc" ? (
@@ -154,9 +143,11 @@ export const RotasTable: React.FC<RotasTableProps> = ({
                       </div>
                       <div className="text-sm text-gray-500">
                         Criada em{" "}
-                        {rota.dataCriacao
-                          ? formatDate(rota.dataCriacao.toISOString())
-                          : "Data não disponível"}
+                        {rota.dataCriacao ? (
+                          <DateDisplay date={rota.dataCriacao} format="short" />
+                        ) : (
+                          "Data não disponível"
+                        )}
                       </div>
                     </div>
                   </div>
@@ -165,7 +156,7 @@ export const RotasTable: React.FC<RotasTableProps> = ({
                 <td className="table-cell">
                   <div className="flex items-center text-sm text-gray-900">
                     <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                    {formatDate(rota.dataRota)}
+                    <DateDisplay date={rota.dataRota} format="short" />
                   </div>
                 </td>
 

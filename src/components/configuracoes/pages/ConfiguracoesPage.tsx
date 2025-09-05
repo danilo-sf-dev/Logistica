@@ -6,6 +6,7 @@ import { PerfilForm } from "../ui/PerfilForm";
 import { NotificacoesForm } from "../ui/NotificacoesForm";
 import { SistemaForm } from "../ui/SistemaForm";
 import { SegurancaForm } from "../ui/SegurancaForm";
+import { UserManagementForm } from "../ui/UserManagementForm";
 import { configTabs } from "../config/tabs";
 import type { ConfiguracoesProps } from "../types";
 
@@ -81,6 +82,8 @@ export const ConfiguracoesPage: React.FC<ConfiguracoesProps> = ({
         {activeTab === "seguranca" && (
           <SegurancaForm userProfile={userProfile} />
         )}
+
+        {activeTab === "gestao-usuarios" && <UserManagementForm />}
       </div>
     </div>
   );

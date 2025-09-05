@@ -1,5 +1,30 @@
 // Tipos comuns utilizados em todo o sistema
 
+// ========================================
+// TIPOS DE PERFIL E PERMISSÕES
+// ========================================
+
+/**
+ * Tipos de perfil de usuário no sistema
+ */
+export type UserRole =
+  | "admin_senior"
+  | "admin"
+  | "gerente"
+  | "dispatcher"
+  | "user";
+
+/**
+ * Nomes de exibição para cada perfil
+ */
+export const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {
+  admin_senior: "Administrador Sr",
+  admin: "Administrador",
+  gerente: "Gerente",
+  dispatcher: "Funcionário",
+  user: "Usuário",
+};
+
 // Status padrão para entidades
 export type Status =
   | "ativo"
@@ -168,3 +193,10 @@ export interface ConfiguracaoModal {
   fecharAoConfirmar: boolean;
   mostrarOverlay: boolean;
 }
+
+// ========================================
+// EXPORTAÇÃO DOS TIPOS DE PERMISSÕES
+// ========================================
+
+// Re-exportar todos os tipos de permissões
+export * from "./permissions";

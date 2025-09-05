@@ -8,6 +8,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Veiculo, VeiculosSortConfig } from "../types";
+import { DateDisplay } from "../../common/DateDisplay";
 
 interface VeiculosTableProps {
   veiculos: Veiculo[];
@@ -214,6 +215,24 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
                   {getSortIcon("unidadeNegocio")}
                 </div>
               </th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("ultimaManutencao")}
+              >
+                <div className="flex items-center">
+                  Última Manutenção
+                  {getSortIcon("ultimaManutencao")}
+                </div>
+              </th>
+              <th
+                className="table-header cursor-pointer hover:bg-gray-100"
+                onClick={() => onSort("proximaManutencao")}
+              >
+                <div className="flex items-center">
+                  Próxima Manutenção
+                  {getSortIcon("proximaManutencao")}
+                </div>
+              </th>
               <th className="table-header">Ações</th>
             </tr>
           </thead>
@@ -275,6 +294,30 @@ export const VeiculosTable: React.FC<VeiculosTableProps> = ({
                   <span className="text-sm text-gray-900 capitalize">
                     {veiculo.unidadeNegocio}
                   </span>
+                </td>
+                <td className="table-cell">
+                  <div className="text-sm text-gray-900">
+                    {veiculo.ultimaManutencao ? (
+                      <DateDisplay
+                        date={veiculo.ultimaManutencao}
+                        format="short"
+                      />
+                    ) : (
+                      "-"
+                    )}
+                  </div>
+                </td>
+                <td className="table-cell">
+                  <div className="text-sm text-gray-900">
+                    {veiculo.proximaManutencao ? (
+                      <DateDisplay
+                        date={veiculo.proximaManutencao}
+                        format="short"
+                      />
+                    ) : (
+                      "-"
+                    )}
+                  </div>
                 </td>
                 <td className="table-cell">
                   <div className="flex space-x-2">

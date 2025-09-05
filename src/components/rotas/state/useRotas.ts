@@ -9,6 +9,7 @@ import {
   RotaOrdenacaoCampo,
 } from "../types";
 import { useNotification } from "../../../contexts/NotificationContext";
+import { useDateValidation } from "../../../hooks";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
 export const useRotas = () => {
@@ -33,41 +34,41 @@ export const useRotas = () => {
 
   const { showNotification } = useNotification();
 
-  const validar = useCallback((input: RotaFormData) => {
-    const novosErros: Partial<Record<keyof RotaFormData, string>> = {};
+  // ✅ HOOKS COMPONENTIZADOS DE DATA
+  const { validateDate } = useDateValidation();
 
-    if (!input.nome?.trim()) {
-      novosErros.nome = "Nome da rota é obrigatório";
-    }
+  const validar = useCallback(
+    (input: RotaFormData) => {
+      const novosErros: Partial<Record<keyof RotaFormData, string>> = {};
 
-    if (!input.dataRota) {
-      novosErros.dataRota = "Data da rota é obrigatória";
-    } else {
-      // Obter a data de hoje no fuso horário local
-      const hoje = new Date();
-      const hojeLocal =
-        hoje.getFullYear() +
-        "-" +
-        String(hoje.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(hoje.getDate()).padStart(2, "0");
-
-      if (input.dataRota < hojeLocal) {
-        novosErros.dataRota = "Data da rota não pode ser anterior ao dia atual";
+      if (!input.nome?.trim()) {
+        novosErros.nome = "Nome da rota é obrigatório";
       }
-    }
 
-    if (!input.diaSemana || input.diaSemana.length === 0) {
-      novosErros.diaSemana = "Pelo menos um dia da semana deve ser selecionado";
-    }
+      // ✅ VALIDAÇÃO COMPONENTIZADA DE DATA
+      if (!input.dataRota) {
+        novosErros.dataRota = "Data da rota é obrigatória";
+      } else {
+        const dateValidation = validateDate(input.dataRota);
+        if (!dateValidation.isValid) {
+          novosErros.dataRota = dateValidation.error;
+        }
+      }
 
-    if (input.pesoMinimo !== undefined && input.pesoMinimo < 0) {
-      novosErros.pesoMinimo = "Peso mínimo deve ser um valor positivo";
-    }
+      if (!input.diaSemana || input.diaSemana.length === 0) {
+        novosErros.diaSemana =
+          "Pelo menos um dia da semana deve ser selecionado";
+      }
 
-    setErros(novosErros);
-    return Object.keys(novosErros).length === 0;
-  }, []);
+      if (input.pesoMinimo !== undefined && input.pesoMinimo < 0) {
+        novosErros.pesoMinimo = "Peso mínimo deve ser um valor positivo";
+      }
+
+      setErros(novosErros);
+      return Object.keys(novosErros).length === 0;
+    },
+    [validateDate],
+  );
 
   const fetchRotas = useCallback(async () => {
     try {

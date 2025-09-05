@@ -1,4 +1,6 @@
 import React from "react";
+import { useAuth } from "../../../contexts/AuthContext";
+import { PermissionService } from "../../../services/permissionService";
 import type { ConfigTab } from "../types";
 
 interface ConfiguracoesTabsProps {
@@ -14,10 +16,51 @@ export const ConfiguracoesTabs: React.FC<ConfiguracoesTabsProps> = ({
   onTabChange,
   className = "",
 }) => {
+  const { userProfile } = useAuth();
+
+  // Filtrar abas baseado nas permissões do usuário
+  const visibleTabs = tabs.filter((tab) => {
+    switch (tab.id) {
+      case "perfil":
+      case "notificacoes":
+        // Todas as abas são visíveis para todos os usuários
+        return true;
+
+      case "sistema":
+        // Apenas gerente, admin e admin_senior podem acessar
+        return PermissionService.canAccessSystemConfig(
+          userProfile?.role || "user",
+        );
+
+      case "seguranca":
+        // Apenas gerente, admin e admin_senior podem acessar
+        return PermissionService.canAccessSecurityConfig(
+          userProfile?.role || "user",
+        );
+
+      case "gestao-usuarios":
+        // Apenas gerente, admin e admin_senior podem acessar
+        return PermissionService.canManageUsers(userProfile?.role || "user");
+
+      default:
+        return true;
+    }
+  });
+
+  // Se a aba ativa não estiver visível, mudar para a primeira aba visível
+  React.useEffect(() => {
+    if (!visibleTabs.find((tab) => tab.id === activeTab)) {
+      const firstVisibleTab = visibleTabs[0];
+      if (firstVisibleTab) {
+        onTabChange(firstVisibleTab.id);
+      }
+    }
+  }, [visibleTabs, activeTab, onTabChange]);
+
   return (
     <div className={`border-b border-gray-200 ${className}`}>
       <nav className="-mb-px flex flex-wrap gap-2 sm:gap-8">
-        {tabs.map((tab) => {
+        {visibleTabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <button

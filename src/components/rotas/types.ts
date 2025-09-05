@@ -2,7 +2,7 @@ import type { BaseEntity } from "../../types";
 
 export interface Rota extends BaseEntity {
   nome: string;
-  dataRota: string;
+  dataRota: string | Date; // ✅ Pode ser string ou Date (Firebase)
   pesoMinimo: number;
   diaSemana: string[]; // Mudado de string para string[] para suportar múltiplos dias
   cidades: string[];
@@ -10,8 +10,14 @@ export interface Rota extends BaseEntity {
 
 export type RotaInput = Omit<Rota, "id" | "dataCriacao" | "dataAtualizacao">;
 
-// Alias para compatibilidade
-export type RotaFormData = RotaInput;
+// ✅ RotaFormData sempre usa string para dataRota (formulário)
+export interface RotaFormData {
+  nome: string;
+  dataRota: string; // Sempre string no formulário
+  pesoMinimo: number;
+  diaSemana: string[];
+  cidades: string[];
+}
 
 export interface RotaFilters {
   searchTerm: string;

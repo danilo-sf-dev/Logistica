@@ -15,6 +15,8 @@ export type Vendedor = BaseEntity & {
   tipoContrato: TipoContratoVendedor;
   ativo: boolean;
   cidadesAtendidas?: string[]; // Array de IDs das cidades que o vendedor atende
+  dataCriacao: string | Date; // ✅ Pode ser string ou Date (Firebase)
+  dataAtualizacao: string | Date; // ✅ Pode ser string ou Date (Firebase)
 };
 
 export type VendedorInput = Omit<
