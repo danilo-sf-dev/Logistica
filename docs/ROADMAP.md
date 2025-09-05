@@ -309,6 +309,8 @@ Este documento apresenta o planejamento futuro e melhorias planejadas para o SGL
 
 O roadmap do SGL está focado em:
 
+melhorias para 2026,
+
 - **Melhorias contínuas** da experiência do usuário
 - **Expansão de funcionalidades** baseada em feedback
 - **Integração com tecnologias** emergentes
