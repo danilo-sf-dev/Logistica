@@ -1,6 +1,7 @@
 import React from "react";
 import { History, ChevronUp, ChevronDown } from "lucide-react";
 import { PermissionService } from "../../../services/permissionService";
+import { fromFirebaseAuditDate } from "../../../utils/dateUtils";
 
 import type { RoleChange } from "../../../types/permissions";
 
@@ -100,7 +101,9 @@ export const UserHistoryTable: React.FC<UserHistoryTableProps> = ({
               roleChanges.slice(0, 10).map((change) => (
                 <tr key={change.id} className="hover:bg-gray-50">
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(change.changedAt).toLocaleDateString("pt-BR")}
+                    {fromFirebaseAuditDate(change.changedAt).toLocaleDateString(
+                      "pt-BR",
+                    )}
                   </td>
                   <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <div className="min-w-0">

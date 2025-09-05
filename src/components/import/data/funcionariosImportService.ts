@@ -7,7 +7,6 @@ import type {
 } from "../types/importTypes";
 import type { FuncionarioInput } from "../../funcionarios/types";
 import { DateService } from "../../../services/DateService";
-import { MoneyService } from "../../../services/MoneyService";
 
 export class FuncionariosImportService extends BaseImportService {
   protected config: ImportConfig = {
