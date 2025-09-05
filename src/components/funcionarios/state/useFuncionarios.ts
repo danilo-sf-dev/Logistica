@@ -3,7 +3,13 @@ import { useNotification } from "../../../contexts/NotificationContext";
 import { funcionariosService } from "../data/funcionariosService";
 import { FuncionariosTableExportService } from "../export/FuncionariosTableExportService";
 import type { Funcionario, FuncionarioInput } from "../types";
-import { validateCPF, validateCelular, validateEmail } from "utils/masks";
+import {
+  validateCPF,
+  validateCelular,
+  validateEmail,
+} from "../../../utils/masks";
+import { DateService } from "../../../services/DateService";
+import { MoneyService } from "../../../services/MoneyService";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
 export type OrdenacaoCampo =
@@ -95,50 +101,84 @@ export function useFuncionarios() {
     }
   }, [showNotification]);
 
-  const validar = useCallback((input: FuncionarioInput) => {
-    const novosErros: Partial<Record<keyof FuncionarioInput, string>> = {};
+  const validar = useCallback(
+    (input: FuncionarioInput) => {
+      const novosErros: Partial<Record<keyof FuncionarioInput, string>> = {};
 
-    // Se o funcionário estiver inativo, não validar nada (não pode ser editado)
-    if (!input.ativo) {
-      setErros({});
-      return true;
-    }
+      // Se o funcionário estiver inativo, não validar nada (não pode ser editado)
+      if (!input.ativo) {
+        setErros({});
+        return true;
+      }
 
-    // Validação apenas para funcionários ativos
-    if (!input.nome.trim()) {
-      novosErros.nome = "Nome é obrigatório";
-    }
-    if (!input.cpf.trim()) {
-      novosErros.cpf = "CPF é obrigatório";
-    } else if (!validateCPF(input.cpf)) {
-      novosErros.cpf = "CPF inválido";
-    }
-    if (!input.cnh.trim()) {
-      novosErros.cnh = "CNH é obrigatório";
-    }
-    if (!input.celular.trim()) {
-      novosErros.celular = "Celular é obrigatório";
-    } else if (!validateCelular(input.celular)) {
-      novosErros.celular = "Celular deve ter DDD e começar com 9";
-    }
-    if (!input.endereco.trim()) {
-      novosErros.endereco = "Endereço é obrigatório";
-    }
-    if (!input.cidade.trim()) {
-      novosErros.cidade = "Cidade é obrigatório";
-    }
-    if (!input.cep?.trim()) {
-      novosErros.cep = "CEP é obrigatório";
-    } else if (input.cep.replace(/\D/g, "").length !== 8) {
-      novosErros.cep = "CEP inválido";
-    }
-    if (input.email && !validateEmail(input.email)) {
-      novosErros.email = "Email inválido";
-    }
+      // Validação apenas para funcionários ativos
+      if (!input.nome.trim()) {
+        novosErros.nome = "Nome é obrigatório";
+      }
+      if (!input.cpf.trim()) {
+        novosErros.cpf = "CPF é obrigatório";
+      } else if (!validateCPF(input.cpf)) {
+        novosErros.cpf = "CPF inválido";
+      }
+      if (!input.cnh.trim()) {
+        novosErros.cnh = "CNH é obrigatório";
+      }
+      if (!input.celular.trim()) {
+        novosErros.celular = "Celular é obrigatório";
+      } else if (!validateCelular(input.celular)) {
+        novosErros.celular = "Celular deve ter DDD e começar com 9";
+      }
+      if (!input.endereco.trim()) {
+        novosErros.endereco = "Endereço é obrigatório";
+      }
+      if (!input.cidade.trim()) {
+        novosErros.cidade = "Cidade é obrigatório";
+      }
+      if (!input.cep?.trim()) {
+        novosErros.cep = "CEP é obrigatório";
+      } else if (input.cep.replace(/\D/g, "").length !== 8) {
+        novosErros.cep = "CEP inválido";
+      }
+      if (input.email && !validateEmail(input.email)) {
+        novosErros.email = "Email inválido";
+      }
 
-    setErros(novosErros);
-    return Object.keys(novosErros).length === 0;
-  }, []);
+      // Validações de datas usando DateService
+      const hoje = DateService.getCurrentDateString();
+
+      if (input.cnhVencimento) {
+        if (input.cnhVencimento < hoje) {
+          // Para edições, apenas avisa que está vencida, não impede salvar
+          if (editando) {
+            // Permite salvar, mas pode adicionar aviso se necessário
+          } else {
+            novosErros.cnhVencimento = "CNH está vencida";
+          }
+        }
+      }
+
+      if (input.toxicoVencimento) {
+        if (input.toxicoVencimento < hoje) {
+          // Para edições, apenas avisa que está vencido, não impede salvar
+          if (editando) {
+            // Permite salvar, mas pode adicionar aviso se necessário
+          } else {
+            novosErros.toxicoVencimento = "Exame toxicológico está vencido";
+          }
+        }
+      }
+
+      setErros(novosErros);
+
+      // Debug: log dos erros para identificar o problema
+      if (Object.keys(novosErros).length > 0) {
+        console.log("Erros de validação:", novosErros);
+      }
+
+      return Object.keys(novosErros).length === 0;
+    },
+    [editando],
+  );
 
   const confirmar = useCallback(async () => {
     // Prevent updating inactive employees
@@ -197,6 +237,13 @@ export function useFuncionarios() {
       await carregar();
     } catch (error) {
       console.error("Erro ao salvar funcionário:", error);
+
+      // Log detalhado do erro para debugging
+      if (error instanceof Error) {
+        console.error("Mensagem do erro:", error.message);
+        console.error("Stack trace:", error.stack);
+      }
+
       if (
         error instanceof Error &&
         error.message === "CPF já cadastrado no sistema"
@@ -208,7 +255,12 @@ export function useFuncionarios() {
       ) {
         showNotification("CNH já cadastrada no sistema", "error");
       } else {
-        showNotification("Erro ao salvar funcionário", "error");
+        const errorMessage =
+          error instanceof Error ? error.message : "Erro desconhecido";
+        showNotification(
+          `Erro ao salvar funcionário: ${errorMessage}`,
+          "error",
+        );
       }
     } finally {
       setLoadingSalvar(false);
@@ -250,7 +302,9 @@ export function useFuncionarios() {
       nome: f.nome || "",
       cpf: f.cpf || "",
       cnh: f.cnh || "",
-      cnhVencimento: (f as any).cnhVencimento || "",
+      cnhVencimento: DateService.fromFirebaseDateToString(
+        (f as any).cnhVencimento,
+      ),
       cnhCategoria: (f as any).cnhCategoria || "",
       celular: f.celular || (f as any).telefone || "",
       email: f.email || "",
@@ -260,13 +314,17 @@ export function useFuncionarios() {
       complemento: (f as any).complemento || "",
       cidade: f.cidade || "",
       funcao: (f as any).funcao || "motorista",
-      toxicoUltimoExame: (f as any).toxicoUltimoExame || "",
-      toxicoVencimento: (f as any).toxicoVencimento || "",
+      toxicoUltimoExame: DateService.fromFirebaseDateToString(
+        (f as any).toxicoUltimoExame,
+      ),
+      toxicoVencimento: DateService.fromFirebaseDateToString(
+        (f as any).toxicoVencimento,
+      ),
       status: (f.status as any) || "disponivel",
       tipoContrato: (f.tipoContrato as any) || "integral",
       unidadeNegocio: (f.unidadeNegocio as any) || "frigorifico",
-      dataAdmissao: f.dataAdmissao || "",
-      salario: f.salario ? String(f.salario) : "",
+      dataAdmissao: DateService.fromFirebaseDateToString(f.dataAdmissao),
+      salario: MoneyService.fromFirebaseValue(f.salario),
       observacao: f.observacao || "",
       ativo: f.ativo !== undefined ? f.ativo : true,
     });

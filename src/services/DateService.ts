@@ -94,6 +94,40 @@ export class DateService {
   }
 
   /**
+   * Converte FirebaseDate para string YYYY-MM-DD (para componentes DateInput)
+   */
+  static fromFirebaseDateToString(firebaseDate: any): string {
+    if (!firebaseDate) return "";
+
+    try {
+      let dateObj: Date;
+
+      if (firebaseDate instanceof Date) {
+        dateObj = firebaseDate;
+      } else if (firebaseDate && typeof firebaseDate.toDate === "function") {
+        dateObj = firebaseDate.toDate();
+      } else if (typeof firebaseDate === "string") {
+        dateObj = new Date(firebaseDate);
+      } else {
+        return "";
+      }
+
+      if (isNaN(dateObj.getTime())) {
+        return "";
+      }
+
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error("Erro ao converter data do Firebase:", error);
+      return "";
+    }
+  }
+
+  /**
    * Converte data para string ISO preservando fuso horário local
    */
   static toLocalISOString(date: Date | string): string {

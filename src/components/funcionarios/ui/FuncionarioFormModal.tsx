@@ -1,8 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import LoadingButton from "../../common/LoadingButton";
-import type { Funcionario, FuncionarioInput } from "../types";
-import { maskCPF, maskCelular, maskMoeda, maskCEP } from "utils/masks";
+import { Funcionario, FuncionarioInput } from "../types";
+import { maskCPF, maskCelular, maskCEP } from "../../../utils/masks";
+import { DateInput } from "../../common/DateInput";
+import { MoneyInput } from "../../common/MoneyInput";
+import { MoneyService } from "../../../services/MoneyService";
 
 type Props = {
   aberto: boolean;
@@ -134,18 +137,12 @@ const FuncionarioFormModal: React.FC<Props> = ({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Venc. CNH
-                </label>
-                <input
-                  type="date"
+                <DateInput
+                  label="Venc. CNH"
                   value={valores.cnhVencimento || ""}
-                  onChange={(e) =>
-                    onChange({ ...valores, cnhVencimento: e.target.value })
+                  onChange={(date) =>
+                    onChange({ ...valores, cnhVencimento: date })
                   }
-                  className={`input-field h-11 ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
                   disabled={somenteLeitura}
                 />
               </div>
@@ -295,36 +292,20 @@ const FuncionarioFormModal: React.FC<Props> = ({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Data de Admissão
-                </label>
-                <input
-                  type="date"
+                <DateInput
+                  label="Data de Admissão"
                   value={valores.dataAdmissao || ""}
-                  onChange={(e) =>
-                    onChange({ ...valores, dataAdmissao: e.target.value })
+                  onChange={(date) =>
+                    onChange({ ...valores, dataAdmissao: date })
                   }
-                  className={`input-field h-11 ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
                   disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Salário
-                </label>
-                <input
-                  type="text"
-                  value={maskMoeda(valores.salario || "")}
-                  onChange={(e) => {
-                    const valorLimpo = e.target.value.replace(/\D/g, "");
-                    onChange({ ...valores, salario: valorLimpo });
-                  }}
-                  className={`input-field h-11 ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
-                  placeholder="R$ 0,00"
+                <MoneyInput
+                  label="Salário"
+                  value={valores.salario || ""}
+                  onChange={(value) => onChange({ ...valores, salario: value })}
                   disabled={somenteLeitura}
                 />
               </div>
@@ -332,34 +313,22 @@ const FuncionarioFormModal: React.FC<Props> = ({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Último Exame Toxicológico
-                </label>
-                <input
-                  type="date"
+                <DateInput
+                  label="Último Exame Toxicológico"
                   value={valores.toxicoUltimoExame || ""}
-                  onChange={(e) =>
-                    onChange({ ...valores, toxicoUltimoExame: e.target.value })
+                  onChange={(date) =>
+                    onChange({ ...valores, toxicoUltimoExame: date })
                   }
-                  className={`input-field h-11 ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
                   disabled={somenteLeitura}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Venc. Exame Toxicológico
-                </label>
-                <input
-                  type="date"
+                <DateInput
+                  label="Venc. Exame Toxicológico"
                   value={valores.toxicoVencimento || ""}
-                  onChange={(e) =>
-                    onChange({ ...valores, toxicoVencimento: e.target.value })
+                  onChange={(date) =>
+                    onChange({ ...valores, toxicoVencimento: date })
                   }
-                  className={`input-field h-11 ${
-                    somenteLeitura ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
                   disabled={somenteLeitura}
                 />
               </div>

@@ -620,6 +620,14 @@ export class DateService {
   }
 
   /**
+   * Converte FirebaseDate para string YYYY-MM-DD (para componentes DateInput)
+   */
+  static fromFirebaseDateToString(firebaseDate: any): string {
+    // Converte qualquer formato Firebase para string YYYY-MM-DD
+    // Usado para carregar datas nos formulários de edição
+  }
+
+  /**
    * Converte data para Timestamp do Firebase
    */
   static toFirebaseTimestamp(date: string | Date): Timestamp {
