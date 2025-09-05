@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { X } from "lucide-react";
 import LoadingButton from "../../common/LoadingButton";
 import { Funcionario, FuncionarioInput } from "../types";
 import { maskCPF, maskCelular, maskCEP } from "../../../utils/masks";
 import { DateInput } from "../../common/DateInput";
 import { MoneyInput } from "../../common/MoneyInput";
-import { MoneyService } from "../../../services/MoneyService";
 
 type Props = {
   aberto: boolean;

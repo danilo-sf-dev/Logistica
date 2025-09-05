@@ -3,7 +3,7 @@
 // ========================================
 
 import { Timestamp, serverTimestamp } from "firebase/firestore";
-import type { FirebaseDate } from "../types/permissions";
+import type { FirebaseDate, FirebaseAuditDate } from "../types/permissions";
 
 /**
  * Converte FirebaseDate (Date | Timestamp) para Date
@@ -15,6 +15,28 @@ export const fromFirebaseDate = (firebaseDate: FirebaseDate): Date => {
   if (firebaseDate && typeof firebaseDate.toDate === "function") {
     return firebaseDate.toDate();
   }
+  return new Date();
+};
+
+/**
+ * Converte FirebaseAuditDate (Date | Timestamp | FieldValue) para Date
+ * Trata FieldValue como data atual (para serverTimestamp)
+ */
+export const fromFirebaseAuditDate = (
+  firebaseAuditDate: FirebaseAuditDate,
+): Date => {
+  if (firebaseAuditDate instanceof Date) {
+    return firebaseAuditDate;
+  }
+  // Verifica se é Timestamp (tem método toDate)
+  if (
+    firebaseAuditDate &&
+    "toDate" in firebaseAuditDate &&
+    typeof firebaseAuditDate.toDate === "function"
+  ) {
+    return firebaseAuditDate.toDate();
+  }
+  // Se for FieldValue (serverTimestamp) ou qualquer outro tipo, retorna data atual
   return new Date();
 };
 

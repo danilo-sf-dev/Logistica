@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useUserManagement } from "../state/useUserManagement";
 import { PermissionService } from "../../../services/permissionService";
+import { fromFirebaseAuditDate } from "../../../utils/dateUtils";
 import { UserFilters } from "./UserFilters";
 import { UserHistoryTable } from "./UserHistoryTable";
 import { UserRoleChangeModal } from "./UserRoleChangeModal";
@@ -282,7 +283,9 @@ export const UserManagementForm: React.FC<{ className?: string }> = ({
                     </td>
                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {user.lastLogin
-                        ? new Date(user.lastLogin).toLocaleDateString("pt-BR")
+                        ? fromFirebaseAuditDate(
+                            user.lastLogin,
+                          ).toLocaleDateString("pt-BR")
                         : "Nunca"}
                     </td>
                     <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">

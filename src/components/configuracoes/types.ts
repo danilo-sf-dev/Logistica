@@ -79,8 +79,8 @@ export interface SegurancaProps {
     displayName?: string | null;
     photoURL?: string | null;
     role?: string;
-    createdAt?: Date | any; // Pode ser Date ou Timestamp do Firestore
-    lastLogin?: Date | any; // Pode ser Date ou Timestamp do Firestore
+    createdAt?: any; // FirebaseDate (Date | Timestamp)
+    lastLogin?: any; // FirebaseAuditDate (Date | Timestamp | FieldValue)
     provider?: string;
     telefone?: string;
     cargo?: string;
@@ -97,7 +97,7 @@ export interface SegurancaProps {
       browser: string;
       os: string;
       userAgent: string;
-      timestamp: Date;
+      timestamp: any; // FirebaseDate (Date | Timestamp)
     };
   } | null;
   className?: string;
