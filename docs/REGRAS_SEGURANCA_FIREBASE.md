@@ -27,22 +27,49 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Usuários podem ler/escrever apenas seus próprios dados
+    // Usuários - Leitura para si mesmo ou quem pode gerenciar usuários
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null &&
+        (request.auth.uid == userId || canManageUsers());
+      allow write: if request.auth != null &&
+        (request.auth.uid == userId || canManageUsers());
     }
 
-    // Acesso geral requer role admin
-    match /{document=**} {
-      allow read, write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    // Função para obter role do usuário
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // Função para verificar se é admin senior
+    function isAdminSenior() {
+      return getUserRole() == 'admin_senior';
+    }
+
+    // Função para verificar se é admin
+    function isAdmin() {
+      return getUserRole() in ['admin', 'admin_senior'];
+    }
+
+    // Função para verificar se é gerente
+    function isGerente() {
+      return getUserRole() in ['gerente', 'admin', 'admin_senior'];
+    }
+
+    // Função para verificar se é dispatcher
+    function isDispatcher() {
+      return getUserRole() in ['dispatcher', 'gerente', 'admin', 'admin_senior'];
+    }
+
+    // Função para verificar se pode gerenciar usuários
+    function canManageUsers() {
+      return getUserRole() in ['gerente', 'admin', 'admin_senior'];
     }
 
     // Funcionários - Leitura para todos, escrita para admin/gerente
     match /funcionarios/{document=**} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'gerente'];
+      allow write: if request.auth != null && isGerente();
+      allow delete: if request.auth != null && isAdmin();
     }
 
     // Veículos - Leitura para todos, escrita para admin/gerente
@@ -81,11 +108,23 @@ service cloud.firestore {
     }
 
     // Notificações - Leitura para usuário específico, escrita para admin/gerente
-    match /notificacoes/{notificationId} {
+    match /notifications/{notificationId} {
       allow read: if request.auth != null &&
-        resource.data.targetUsers[request.auth.uid] == true;
+        resource.data.userId == request.auth.uid;
       allow write: if request.auth != null &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'gerente'];
+        resource.data.userId == request.auth.uid;
+    }
+
+    // Auditoria de mudanças de role - Apenas quem pode gerenciar usuários
+    match /role_changes/{changeId} {
+      allow read: if request.auth != null && canManageUsers();
+      allow write: if request.auth != null && canManageUsers();
+    }
+
+    // Logs de importação - Leitura para todos, escrita para quem importa
+    match /import_logs/{logId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
     }
   }
 }
@@ -97,25 +136,28 @@ service cloud.firestore {
 
 ### 🎭 **Roles Definidas**
 
-| Role         | Descrição     | Permissões                        |
-| ------------ | ------------- | --------------------------------- |
-| `admin`      | Administrador | Acesso total ao sistema           |
-| `gerente`    | Gerente       | Leitura total, escrita em módulos |
-| `dispatcher` | Despachante   | Leitura total, escrita limitada   |
-| `user`       | Usuário       | Leitura limitada, sem escrita     |
+| Role           | Descrição            | Permissões                        |
+| -------------- | -------------------- | --------------------------------- |
+| `admin_senior` | Administrador Senior | Acesso total sem restrições       |
+| `admin`        | Administrador        | Acesso total com restrições       |
+| `gerente`      | Gerente              | Leitura total, escrita em módulos |
+| `dispatcher`   | Despachante          | Leitura total, escrita limitada   |
+| `user`         | Usuário              | Leitura limitada, sem escrita     |
 
 ### 🔐 **Matriz de Permissões**
 
-| Coleção        | admin | gerente | dispatcher | user            |
-| -------------- | ----- | ------- | ---------- | --------------- |
-| `users`        | ✅ RW | ❌      | ❌         | ✅ RW (próprio) |
-| `funcionarios` | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
-| `veiculos`     | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
-| `rotas`        | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
-| `folgas`       | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
-| `cidades`      | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
-| `vendedores`   | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
-| `notificacoes` | ✅ RW | ✅ RW   | ✅ R       | ✅ R (próprias) |
+| Coleção         | admin_senior | admin | gerente | dispatcher | user            |
+| --------------- | ------------ | ----- | ------- | ---------- | --------------- |
+| `users`         | ✅ RW        | ✅ RW | ✅ RW   | ❌         | ✅ RW (próprio) |
+| `funcionarios`  | ✅ RW        | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
+| `veiculos`      | ✅ RW        | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
+| `rotas`         | ✅ RW        | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
+| `folgas`        | ✅ RW        | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
+| `cidades`       | ✅ RW        | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
+| `vendedores`    | ✅ RW        | ✅ RW | ✅ RW   | ✅ R       | ✅ R            |
+| `notifications` | ✅ RW        | ✅ RW | ✅ RW   | ✅ R       | ✅ R (próprias) |
+| `role_changes`  | ✅ RW        | ✅ RW | ✅ RW   | ❌         | ❌              |
+| `import_logs`   | ✅ RW        | ✅ RW | ✅ RW   | ✅ RW      | ✅ RW           |
 
 **Legenda:**
 

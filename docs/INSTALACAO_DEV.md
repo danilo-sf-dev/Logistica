@@ -4,9 +4,25 @@
 
 Este documento contém todas as instruções necessárias para configurar o **Sistema de Gestão de Logística (SGL)** em uma nova máquina de desenvolvimento. Inclui as modificações recentes realizadas no sistema de relatórios, migração para TypeScript, uso do Vite e todas as dependências necessárias.
 
-## 🎯 Modificações Recentes Implementadas (v1.2.0)
+## 🎯 Modificações Recentes Implementadas (v1.2.2+)
 
-### ✅ **Migração para TypeScript**
+### ✅ **Sistema de Gestão de Usuários Completo**
+
+- **Interface de Gestão**: Tela dedicada para gerenciar perfis e permissões
+- **Perfis Temporários**: Promoções com data de início e fim
+- **Auditoria Completa**: Histórico de todas as alterações de perfil
+- **Validação de Segurança**: Prevenção de escalação de privilégios
+- **Hierarquia de Roles**: admin_senior, admin, gerente, dispatcher, user
+
+### ✅ **Sistema de Importação de Dados**
+
+- **Importação Excel**: Upload de arquivos XLSX com validação
+- **Templates Automáticos**: Geração de planilhas modelo
+- **Validação de Dados**: Verificação de campos obrigatórios e formatos
+- **Relatórios de Importação**: Log detalhado de sucessos e falhas
+- **Suporte a Múltiplas Entidades**: Funcionários, veículos, cidades, vendedores
+
+### ✅ **Migração para TypeScript (100%)**
 
 - **Código Tipado**: Todo o projeto migrado para TypeScript
 - **Segurança de Tipos**: Verificação estática de tipos
@@ -246,7 +262,7 @@ VITE_VAPID_PUBLIC_KEY=BLh_ExAmPlE_VaPiD_KeY_1234567890abcdef
 
 # App Configuration
 VITE_APP_NAME=SGL - Sistema de Gestão de Logística
-VITE_APP_VERSION=1.2.0
+VITE_APP_VERSION=1.2.3
 VITE_APP_ENVIRONMENT=development
 ```
 

@@ -1,5 +1,34 @@
 # 📝 Changelog - Sistema de Gestão de Logística
 
+## [1.2.3] - 2025-01-XX
+
+### 🔄 **Revisão Completa da Documentação**
+
+#### **Documentação Atualizada**
+
+- **✅ README.md**: Atualizado com funcionalidades atuais do sistema
+- **✅ ARQUITETURA.md**: Estrutura do projeto atualizada com novas funcionalidades
+- **✅ API.md**: Estrutura de dados atualizada com sistema de gestão de usuários
+- **✅ CHANGELOG.md**: Histórico completo de todas as versões
+- **✅ GUIA_USUARIO.md**: Manual do usuário atualizado
+- **✅ INSTALACAO_DEV.md**: Guia de instalação atualizado
+- **✅ RESUMO_PROJETO.md**: Status atual do projeto
+- **✅ ROADMAP.md**: Planejamento futuro atualizado
+
+#### **Melhorias na Documentação**
+
+- **📚 Estrutura Organizada**: Documentação reorganizada por público-alvo
+- **🔍 Informações Atualizadas**: Todas as funcionalidades implementadas documentadas
+- **📋 Guias Detalhados**: Instruções passo a passo para todas as funcionalidades
+- **🎯 Público-Alvo**: Documentação específica para usuários, desenvolvedores e gestores
+
+#### **Novos Documentos**
+
+- **📖 GUIA_GESTAO_USUARIOS.md**: Guia completo para gestão de usuários
+- **📝 Documentação Técnica**: Detalhes de implementação atualizados
+
+---
+
 ## [1.2.2] - 2025-01-XX
 
 ### 🚛 **Reestruturação da Tabela de Veículos**

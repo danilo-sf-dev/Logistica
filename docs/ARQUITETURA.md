@@ -9,8 +9,8 @@ O SGL é um sistema web completo desenvolvido em React com TypeScript e Firebase
 ### Frontend
 
 - **Framework**: React 18 com Hooks
-- **Linguagem**: TypeScript
-- **Build Tool**: Vite
+- **Linguagem**: TypeScript (100% tipado)
+- **Build Tool**: Vite (otimizado)
 - **Roteamento**: React Router v6
 - **Estilização**: Tailwind CSS
 - **Gerenciamento de Estado**: Context API + useState/useEffect
@@ -19,7 +19,8 @@ O SGL é um sistema web completo desenvolvido em React com TypeScript e Firebase
 - **Ícones**: Lucide React
 - **Notificações**: React Hot Toast
 - **Exportação**: ExcelJS, jsPDF, file-saver
-- **Code Quality**: ESLint, Prettier
+- **Importação**: ExcelJS para upload de dados
+- **Code Quality**: ESLint, Prettier, TypeScript strict mode
 
 ### Backend (Firebase)
 
@@ -41,17 +42,28 @@ interface User {
   uid: string;
   email: string;
   displayName: string;
-  role: "admin" | "gerente" | "dispatcher" | "user";
+  photoURL?: string;
+  role: "admin_senior" | "admin" | "gerente" | "dispatcher" | "user";
   telefone?: string;
   cargo?: string;
   createdAt: Timestamp;
   lastLogin: Timestamp;
+  provider: string;
   sessionInfo?: {
     ip: string;
     userAgent: string;
     device: string;
     browser: string;
     os: string;
+  };
+
+  baseRole?: UserRole;
+  temporaryRole?: {
+    role: UserRole;
+    startDate: Timestamp;
+    endDate: Timestamp;
+    reason: string;
+    isActive: boolean;
   };
 }
 ```
@@ -183,6 +195,46 @@ interface Notification {
 }
 ```
 
+#### role_changes (Auditoria)
+
+```typescript
+interface RoleChange {
+  id?: string;
+  userId: string;
+  oldRole: UserRole;
+  newRole: UserRole;
+  changeType: "permanent" | "temporary";
+  reason: string;
+  changedBy: string;
+  changedAt: Timestamp;
+  temporaryPeriod?: {
+    startDate: Timestamp;
+    endDate: Timestamp;
+  };
+  approvedAt?: Timestamp;
+  approvalNotes?: string;
+}
+```
+
+#### import_logs (Logs de Importação)
+
+```typescript
+interface ImportLog {
+  id?: string;
+  entityType: string;
+  fileName: string;
+  fileSize: number;
+  totalRows: number;
+  importedRows: number;
+  failedRows: number;
+  errors: string[];
+  warnings: string[];
+  importedBy: string;
+  importedAt: Timestamp;
+  duration: number;
+}
+```
+
 ## 🏗️ Estrutura do Projeto
 
 ```
@@ -244,7 +296,7 @@ src/
 │   │   ├── state/
 │   │   ├── ui/
 │   │   └── pages/
-│   ├── configuracao/   # Configurações
+│   ├── configuracoes/  # Configurações e gestão de usuários
 │   │   ├── config/
 │   │   ├── state/
 │   │   ├── ui/
@@ -257,7 +309,11 @@ src/
 │       ├── ErrorBoundary/
 │       ├── ErrorPages/
 │       ├── modals/
-│       └── NotificationBell.tsx
+│       ├── LoadingButton.tsx
+│       ├── NotificationBell.tsx
+│       ├── DateInput.tsx
+│       ├── MoneyInput.tsx
+│       └── FilterClearButton.tsx
 ├── contexts/           # Contextos React
 │   ├── AuthContext.tsx
 │   └── NotificationContext.tsx
@@ -265,15 +321,32 @@ src/
 │   └── config.ts
 ├── hooks/              # Custom hooks
 │   ├── useErrorHandler.ts
-│   └── useResizeObserver.ts
+│   ├── useResizeObserver.ts
+│   ├── useDateConversion.ts
+│   ├── useDateForm.ts
+│   └── useDateValidation.ts
 ├── services/           # Serviços
+│   ├── userManagement/ # Serviços de gestão de usuários
+│   │   ├── UserRoleService.ts
+│   │   ├── UserProfileService.ts
+│   │   ├── TemporaryRoleService.ts
+│   │   ├── UserAuditService.ts
+│   │   ├── UserNotificationService.ts
+│   │   ├── UserValidationService.ts
+│   │   └── README.md
+│   ├── permissionService.ts
 │   ├── notificationService.ts
-│   └── sessionService.ts
+│   ├── sessionService.ts
+│   ├── userManagementService.ts
+│   ├── DateService.ts
+│   └── MoneyService.ts
 ├── types/              # Tipos TypeScript
+│   ├── permissions.ts  # Tipos de permissões e roles
 │   └── index.ts
 ├── utils/              # Utilitários
 │   ├── constants.ts
 │   ├── masks.ts
+│   ├── dateUtils.ts
 │   └── resizeObserverFix.ts
 ├── index.css           # Estilos globais
 ├── index.tsx           # Ponto de entrada
@@ -351,41 +424,88 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Função para verificar role do usuário
+    // Função para obter role do usuário
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // Função para verificar role específico
     function hasRole(role) {
-      return isAuthenticated() &&
-             request.auth.token.role == role;
+      return isAuthenticated() && getUserRole() == role;
+    }
+
+    // Função para verificar se é admin senior
+    function isAdminSenior() {
+      return hasRole('admin_senior');
     }
 
     // Função para verificar se é admin
     function isAdmin() {
-      return hasRole('admin');
+      return hasRole('admin') || isAdminSenior();
+    }
+
+    // Função para verificar se é gerente
+    function isGerente() {
+      return hasRole('gerente') || isAdmin();
+    }
+
+    // Função para verificar se é dispatcher
+    function isDispatcher() {
+      return hasRole('dispatcher') || isGerente();
+    }
+
+    // Função para verificar se pode deletar registros
+    function canDeleteRecords() {
+      return isAdmin() || isGerente();
+    }
+
+    // Função para verificar se pode exportar relatórios
+    function canExportReports() {
+      return isDispatcher() || isGerente() || isAdmin();
+    }
+
+    // Função para verificar se pode gerenciar usuários
+    function canManageUsers() {
+      return isGerente() || isAdmin();
+    }
+
+    // Função para verificar se pode acessar configurações do sistema
+    function canAccessSystemConfig() {
+      return isGerente() || isAdmin();
+    }
+
+    // Função para verificar se pode acessar configurações de segurança
+    function canAccessSecurityConfig() {
+      return isAdmin();
     }
 
     // Regras para usuários
     match /users/{userId} {
       allow read: if isAuthenticated() &&
-                     (request.auth.uid == userId || isAdmin());
+                     (request.auth.uid == userId || canManageUsers());
       allow write: if isAuthenticated() &&
-                      (request.auth.uid == userId || isAdmin());
+                      (request.auth.uid == userId || canManageUsers());
     }
 
     // Regras para funcionários
     match /funcionarios/{docId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin() || hasRole('gerente');
+      allow write: if isAdmin() || isGerente();
+      allow delete: if canDeleteRecords();
     }
 
     // Regras para veículos
     match /veiculos/{docId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin() || hasRole('gerente');
+      allow write: if isAdmin() || isGerente();
+      allow delete: if canDeleteRecords();
     }
 
     // Regras para rotas
     match /rotas/{docId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin() || hasRole('dispatcher');
+      allow write: if isAdmin() || isDispatcher();
+      allow delete: if canDeleteRecords();
     }
 
     // Regras para folgas
@@ -393,19 +513,22 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated() &&
                       (request.auth.uid == resource.data.funcionarioId ||
-                       isAdmin() || hasRole('gerente'));
+                       isAdmin() || isGerente());
+      allow delete: if canDeleteRecords();
     }
 
     // Regras para cidades
     match /cidades/{docId} {
       allow read: if isAuthenticated();
       allow write: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     // Regras para vendedores
     match /vendedores/{docId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin() || hasRole('gerente');
+      allow write: if isAdmin() || isGerente();
+      allow delete: if canDeleteRecords();
     }
 
     // Regras para notificações
@@ -414,6 +537,18 @@ service cloud.firestore {
                      request.auth.uid == resource.data.userId;
       allow write: if isAuthenticated() &&
                       request.auth.uid == request.resource.data.userId;
+    }
+
+    // Regras para auditoria de mudanças de role
+    match /role_changes/{docId} {
+      allow read: if canManageUsers();
+      allow write: if canManageUsers();
+    }
+
+    // Regras para logs de importação
+    match /import_logs/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
     }
   }
 }
