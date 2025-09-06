@@ -6,215 +6,182 @@ Esta pasta contém toda a documentação do projeto SGL, organizada por público
 
 ## 📁 Estrutura da Documentação
 
-### 🚀 **Para Usuários Finais**
+### 🎯 **Navegação Rápida por Público-Alvo**
 
-- **[GUIA_USUARIO.md](./GUIA_USUARIO.md)** - Guia completo de uso do sistema
-- **[INSTRUCOES_RAPIDAS.md](./INSTRUCOES_RAPIDAS.md)** - Instruções rápidas para começar
+#### 👤 **Para Usuários Finais**
 
-### 👨‍💻 **Para Desenvolvedores**
+- **[📁 usuarios/](./usuarios/)** - Guias e manuais para usuários do sistema
+  - [Guia do Usuário](./usuarios/GUIA_USUARIO.md) - Manual completo de uso
+  - [Gestão de Usuários](./usuarios/GUIA_GESTAO_USUARIOS.md) - Guia de gestão de usuários
+  - [Importação de Dados](./usuarios/IMPORTACAO_DADOS.md) - Como importar dados
 
-- **[ARQUITETURA.md](./ARQUITETURA.md)** - Documentação técnica e arquitetura
-- **[API.md](./API.md)** - Documentação da API e estrutura de dados
-- **[CONTRIBUICAO.md](./CONTRIBUICAO.md)** - Guia para contribuir com o projeto
-- **[INSTALACAO_DEV.md](./INSTALACAO_DEV.md)** - Guia de instalação para desenvolvedores
+#### 👨‍💻 **Para Desenvolvedores**
 
-### 📊 **Para Gestores**
+- **[📁 desenvolvimento/](./desenvolvimento/)** - Documentação técnica
+  - [Arquitetura](./desenvolvimento/ARQUITETURA.md) - Estrutura técnica do sistema
+  - [API](./desenvolvimento/API.md) - Documentação da API e dados
+  - [Instalação Dev](./desenvolvimento/INSTALACAO_DEV.md) - Setup do ambiente
+  - [Migração Vite](./desenvolvimento/MIGRACAO_VITE.md) - Migração para Vite
+  - [CORS Google SignIn](./desenvolvimento/CORS_GOOGLE_SIGNIN_FIX.md) - Correções técnicas
 
-- **[RESUMO_PROJETO.md](./RESUMO_PROJETO.md)** - Resumo executivo e status do projeto
-- **[ROADMAP.md](./ROADMAP.md)** - Planejamento futuro e melhorias
+#### 🔐 **Para Administradores de Segurança**
 
-### 🔧 **Para Administradores**
+- **[📁 seguranca/](./seguranca/)** - Documentação de segurança
+  - [Regras Firebase](./seguranca/REGRAS_SEGURANCA_FIREBASE.md) - Regras de segurança
+  - [Plano de Segurança](./seguranca/PLANO_SEGURANCA_PRODUCAO.md) - Plano de produção
+  - [Sistema de Permissões](./seguranca/SISTEMA_PERMISSOES_PERFIS.md) - Controle de acesso
+  - [Implementação Permissões](./seguranca/IMPLEMENTACAO_PERMISSOES_PERFIS.md) - Detalhes técnicos
 
-- **[REGRAS_SEGURANCA_FIREBASE.md](./REGRAS_SEGURANCA_FIREBASE.md)** - Configurações de segurança
-- **[SISTEMA_NOTIFICACOES.md](./SISTEMA_NOTIFICACOES.md)** - Sistema de notificações
-- **[NOTIFICACOES_EMAIL.md](./NOTIFICACOES_EMAIL.md)** - Configuração de notificações por email
-- **[IMPORTACAO_DADOS.md](./IMPORTACAO_DADOS.md)** - Guia de importação de dados
+#### 🔔 **Para Gestores de Notificações**
 
-### 📝 **Histórico e Controle**
+- **[📁 notificacoes/](./notificacoes/)** - Sistema de notificações
+  - [Sistema de Notificações](./notificacoes/SISTEMA_NOTIFICACOES.md) - Funcionalidades
+  - [Notificações Email](./notificacoes/NOTIFICACOES_EMAIL.md) - Configuração de email
 
-- **[CHANGELOG.md](./CHANGELOG.md)** - Histórico de mudanças e versões
+#### 🚀 **Para Administradores de Deploy**
+
+- **[📁 deploy/](./deploy/)** - Deploy e infraestrutura
+  - [Resumo Firebase](./deploy/RESUMO_EXECUTIVO_FIREBASE.md) - Resumo executivo
+  - [Atualização Firebase Rules](./deploy/ATUALIZACAO_FIREBASE_RULES.md) - Atualizações
+
+#### 🛠️ **Para Desenvolvedores de Implementações**
+
+- **[📁 implementacoes/](./implementacoes/)** - Implementações específicas
+  - [Componentização Datas](./implementacoes/IMPLEMENTACAO_COMPONENTIZACAO_DATAS.md)
+  - [Componentização Moeda](./implementacoes/IMPLEMENTACAO_COMPONENTIZACAO_MOEDA.md)
+  - [Importação Excel Datas](./implementacoes/IMPLEMENTACAO_IMPORTACAO_EXCEL_DATAS.md)
+  - [Loading Button](./implementacoes/LOADING_BUTTON_IMPLEMENTATION.md)
+  - [Responsividade Mobile](./implementacoes/RESPONSIVIDADE_MOBILE.md)
+
+#### 📊 **Para Gestores e Stakeholders**
+
+- **[📁 geral/](./geral/)** - Documentação geral e controle
+  - [README Principal](./geral/README.md) - Visão geral detalhada
+  - [Resumo do Projeto](./geral/RESUMO_PROJETO.md) - Status e resumo executivo
+  - [Changelog](./geral/CHANGELOG.md) - Histórico de mudanças
+  - [Roadmap](./geral/ROADMAP.md) - Planejamento futuro
+
+---
 
 ## 🎯 **Como Usar Esta Documentação**
 
 ### 👤 **Usuário Final**
 
-1. Comece com **[INSTRUCOES_RAPIDAS.md](./INSTRUCOES_RAPIDAS.md)**
-2. Para uso avançado, consulte **[GUIA_USUARIO.md](./GUIA_USUARIO.md)**
+1. Comece com **[usuarios/GUIA_USUARIO.md](./usuarios/GUIA_USUARIO.md)**
+2. Para gestão de usuários, consulte **[usuarios/GUIA_GESTAO_USUARIOS.md](./usuarios/GUIA_GESTAO_USUARIOS.md)**
+3. Para importação de dados, veja **[usuarios/IMPORTACAO_DADOS.md](./usuarios/IMPORTACAO_DADOS.md)**
 
 ### 👨‍💻 **Desenvolvedor**
 
-1. Leia **[ARQUITETURA.md](./ARQUITETURA.md)** para entender a estrutura
-2. Consulte **[API.md](./API.md)** para detalhes técnicos
-3. Siga **[CONTRIBUICAO.md](./CONTRIBUICAO.md)** para contribuir
-4. Use **[INSTALACAO_DEV.md](./INSTALACAO_DEV.md)** para configuração
+1. Leia **[desenvolvimento/ARQUITETURA.md](./desenvolvimento/ARQUITETURA.md)** para entender a estrutura
+2. Consulte **[desenvolvimento/API.md](./desenvolvimento/API.md)** para detalhes técnicos
+3. Siga **[desenvolvimento/INSTALACAO_DEV.md](./desenvolvimento/INSTALACAO_DEV.md)** para configuração
 
 ### 📈 **Gestor/Stakeholder**
 
-1. Veja **[RESUMO_PROJETO.md](./RESUMO_PROJETO.md)** para status atual
-2. Consulte **[ROADMAP.md](./ROADMAP.md)** para planejamento futuro
+1. Veja **[geral/RESUMO_PROJETO.md](./geral/RESUMO_PROJETO.md)** para status atual
+2. Consulte **[geral/ROADMAP.md](./geral/ROADMAP.md)** para planejamento futuro
 
 ### 🔧 **Administrador de Sistema**
 
-1. Configure segurança com **[REGRAS_SEGURANCA_FIREBASE.md](./REGRAS_SEGURANCA_FIREBASE.md)**
-2. Configure notificações com **[SISTEMA_NOTIFICACOES.md](./SISTEMA_NOTIFICACOES.md)**
-3. Importe dados com **[IMPORTACAO_DADOS.md](./IMPORTACAO_DADOS.md)**
+1. Configure segurança com **[seguranca/REGRAS_SEGURANCA_FIREBASE.md](./seguranca/REGRAS_SEGURANCA_FIREBASE.md)**
+2. Configure notificações com **[notificacoes/SISTEMA_NOTIFICACOES.md](./notificacoes/SISTEMA_NOTIFICACOES.md)**
+3. Importe dados com **[usuarios/IMPORTACAO_DADOS.md](./usuarios/IMPORTACAO_DADOS.md)**
 
-## 🆕 **Novas Funcionalidades Implementadas (v1.2.0+)**
+---
+
+## 🆕 **Funcionalidades Principais (v1.2.3)**
 
 ### 📊 **Sistema de Relatórios Avançado**
 
-- **Relatórios Detalhados**: Listas completas com todos os dados de cada entidade
-- **Exportação Excel**: Arquivos XLSX com formatação profissional
-- **Exportação PDF**: Documentos formatados para impressão
-- **Gráficos Interativos**: Visualizações dinâmicas com Recharts
-- **Filtros Avançados**: Busca e filtragem por múltiplos critérios
-- **Arquitetura Modular**: Serviços especializados por entidade
-- **Ordenação Inteligente**: Dados sempre do mais recente para o mais antigo
-- **Filtros de Período**: Aplicados apenas em entidades temporais (Rotas, Folgas)
-- **Interface Informativa**: Explicação clara sobre comportamento dos relatórios
+- **Relatórios Detalhados**: Listas completas com todos os dados
+- **Exportação Excel/PDF**: Arquivos formatados profissionalmente
+- **Gráficos Interativos**: Visualizações dinâmicas
+- **Filtros Avançados**: Busca e filtragem inteligente
 
 ### 🔔 **Sistema de Notificações Completo**
 
-- **NotificationService**: Serviço centralizado de notificações
-- **NotificationBell**: Sino de notificações no header
-- **Configurações de Notificação**: Interface para gerenciar preferências
-- **Notificações em Tempo Real**: Toast notifications para eventos
-- **Filtro por Preferências**: Só envia se usuário habilitou
-- **Salvamento no Firestore**: Notificações persistentes
-- **Tipos de Notificação**: funcionário, rota, folga, veículo
+- **NotificationService**: Serviço centralizado
+- **NotificationBell**: Interface de notificações
+- **Configurações Personalizadas**: Preferências por usuário
+- **Notificações em Tempo Real**: Toast notifications
 
 ### 🔐 **Sistema de Segurança Avançado**
 
-- **Regras de Segurança Firestore**: Implementadas e ativas
-- **Controle de Acesso por Role**: admin, gerente, dispatcher, user
-- **Proteção de Dados**: Leitura/escrita controlada por permissões
-- **Modo Teste Desabilitado**: Sistema em produção segura
-- **SessionService**: Captura real de IP e informações de dispositivo
+- **Regras Firestore**: Implementadas e ativas
+- **Controle por Role**: Hierarquia de permissões
+- **Gestão de Usuários**: Interface completa
+- **Auditoria Completa**: Histórico de alterações
 
-### 🔧 **Melhorias Técnicas**
+### 🚛 **Gestão Logística Completa**
 
-- **Migração para TypeScript**: Código tipado e mais seguro
-- **Build Tool Vite**: Desenvolvimento mais rápido
-- **Formatação Brasileira**: Datas no formato DD/MM/YYYY
-- **Layout Minimalista**: Interface em preto e branco
-- **Nomenclatura de Arquivos**: Padrão entity_dd-MM-YYYY.xlsx
-- **Tipos Separados**: Arquivos de tipos independentes por pacote
-- **Padrões de Código**: Eliminação de if/else com arrays de detectores
+- **Funcionários**: Cadastro e controle de status
+- **Veículos**: Gestão da frota
+- **Rotas**: Planejamento e acompanhamento
+- **Folgas**: Controle de ausências
+- **Cidades**: Cadastro geográfico
+- **Vendedores**: Gestão comercial
 
-### 🚛 **Reestruturação da Tabela de Veículos (v1.2.2)**
+---
 
-- **Colunas Separadas**: Ano, Carroceria e Baú agora são colunas independentes
-- **Campo Motorista Removido**: Não mais exibido na visualização (mantido no banco)
-- **Ordenação Individual**: Todas as colunas são ordenáveis
-- **Estrutura Otimizada**: Layout mais limpo e organizado
-
-### 🔒 **Campos de Edição Inteligentes (v1.2.2)**
-
-- **CPF**: Desabilitado na edição de funcionários e vendedores
-- **Placa**: Desabilitada na edição de veículos
-- **Funcionário**: Desabilitado na edição de folgas
-- **Email**: Desabilitado na configuração de perfil
-- **Validação de Unicidade**: Implementada para todos os campos únicos
-
-### 📈 **Funcionalidades de Exportação**
-
-- **Funcionários**: Relatório completo com dados pessoais e profissionais
-- **Veículos**: Informações técnicas e status da frota
-- **Rotas**: Detalhes de rotas e associações
-- **Folgas**: Histórico de solicitações e aprovações
-- **Cidades**: Dados geográficos e regionais
-- **Vendedores**: Informações comerciais e contatos
-
-## 🛠️ **Stack Tecnológica Atualizada**
+## 🛠️ **Stack Tecnológica**
 
 ### Frontend
 
-- **React 18**: Biblioteca principal
-- **TypeScript**: Tipagem estática
-- **Tailwind CSS**: Framework de estilos
-- **React Router**: Roteamento
-- **Vite**: Build tool
+- **React 18** + **TypeScript** (100% tipado)
+- **Vite** (build tool otimizado)
+- **Tailwind CSS** (estilização)
+- **React Router v6** (roteamento)
 
-### UI/UX
+### Backend
 
-- **Headless UI**: Componentes acessíveis
-- **Heroicons**: Ícones
-- **Lucide React**: Ícones adicionais
-- **Recharts**: Gráficos interativos
-
-### Backend/Serviços
-
-- **Firebase**: Backend como serviço
-  - **Firestore**: Banco de dados
-  - **Authentication**: Autenticação
-  - **Hosting**: Hospedagem
-  - **Cloud Messaging**: Notificações push
+- **Firebase** (Backend as a Service)
+  - **Firestore** (banco de dados NoSQL)
+  - **Authentication** (autenticação)
+  - **Hosting** (hospedagem)
+  - **Cloud Messaging** (notificações)
 
 ### Utilitários
 
-- **ExcelJS**: Exportação Excel
-- **jsPDF**: Exportação PDF
-- **file-saver**: Download de arquivos
-- **React Hot Toast**: Notificações toast
+- **ExcelJS** + **jsPDF** (exportação)
+- **React Hot Toast** (notificações)
+- **Headless UI** + **Heroicons** (componentes)
 
-## 📊 **Estrutura do Projeto Atualizada**
-
-```
-src/
-├── components/          # Componentes React
-│   ├── auth/           # Autenticação
-│   ├── dashboard/      # Dashboard principal
-│   ├── layout/         # Layout e navegação
-│   ├── funcionarios/   # Gestão de funcionários
-│   ├── veiculos/       # Gestão de veículos
-│   ├── rotas/          # Gestão de rotas
-│   ├── folgas/         # Controle de folgas
-│   ├── cidades/        # Cadastro de cidades
-│   ├── vendedores/     # Gestão de vendedores
-│   ├── relatorios/     # Sistema de relatórios
-│   ├── configuracao/   # Configurações
-│   ├── import/         # Sistema de importação
-│   └── common/         # Componentes comuns
-├── contexts/           # Contextos React
-├── firebase/           # Configuração Firebase
-├── hooks/              # Custom hooks
-├── services/           # Serviços
-├── types/              # Tipos TypeScript
-├── utils/              # Utilitários
-└── App.tsx             # Componente principal
-```
+---
 
 ## 🔗 **Links Úteis**
 
-- **Sistema Online**: https://your-project.web.app
-- **Firebase Console**: https://console.firebase.google.com/project/your-project
-- **Repositório**: [GitHub](https://github.com/seu-usuario/logistica)
+- **Sistema Online**: https://logistica-c7afc.web.app
+- **Firebase Console**: https://console.firebase.google.com/project/logistica-c7afc
 - **Documentação Firebase**: https://firebase.google.com/docs
+
+---
 
 ## 📝 **Última Atualização**
 
 **Data**: Janeiro 2025  
-**Versão**: 1.2.0  
-**Status**: ✅ Sistema em produção com novas funcionalidades
+**Versão**: 1.2.3  
+**Status**: ✅ **Sistema em produção com funcionalidades completas**
 
-### 🎯 **Principais Mudanças na v1.2.0**
+### 🎯 **Principais Mudanças na v1.2.3**
 
-1. **Migração para TypeScript**: Código mais seguro e tipado
-2. **Sistema de Relatórios**: Exportação Excel e PDF
-3. **Notificações Avançadas**: Sistema completo de notificações
-4. **Segurança Reforçada**: Controle de acesso por roles
-5. **Build Tool Vite**: Desenvolvimento mais rápido
-6. **Formatação Brasileira**: Datas e formatos locais
-7. **Arquitetura Modular**: Melhor organização do código
+1. **Reorganização da Documentação**: Estrutura organizacional por categorias
+2. **Sistema de Gestão de Usuários**: Interface completa implementada
+3. **Sistema de Importação**: Importação em lote de dados
+4. **Relatórios Avançados**: Exportação Excel e PDF
+5. **Notificações Avançadas**: Sistema completo de notificações
+6. **Segurança Reforçada**: Controle de acesso hierárquico
+
+---
 
 ## 🚀 **Próximos Passos**
 
 Para começar a usar o sistema:
 
-1. **Usuários**: Leia **[INSTRUCOES_RAPIDAS.md](./INSTRUCOES_RAPIDAS.md)**
-2. **Desenvolvedores**: Siga **[INSTALACAO_DEV.md](./INSTALACAO_DEV.md)**
-3. **Administradores**: Configure com **[REGRAS_SEGURANCA_FIREBASE.md](./REGRAS_SEGURANCA_FIREBASE.md)**
+1. **Usuários**: Leia **[usuarios/GUIA_USUARIO.md](./usuarios/GUIA_USUARIO.md)**
+2. **Desenvolvedores**: Siga **[desenvolvimento/INSTALACAO_DEV.md](./desenvolvimento/INSTALACAO_DEV.md)**
+3. **Administradores**: Configure com **[seguranca/REGRAS_SEGURANCA_FIREBASE.md](./seguranca/REGRAS_SEGURANCA_FIREBASE.md)**
 
 ---
 
-**📚 Documentação completa e atualizada para o SGL v1.2.0**
+**📚 Documentação completa e organizada para o SGL v1.2.3**
