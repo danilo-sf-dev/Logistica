@@ -38,6 +38,11 @@ Esta pasta contém toda a documentação do projeto SGL, organizada por público
   - [Sistema de Notificações](./notificacoes/SISTEMA_NOTIFICACOES.md) - Funcionalidades
   - [Notificações Email](./notificacoes/NOTIFICACOES_EMAIL.md) - Configuração de email
 
+#### 🔥 **Para Administradores do Firebase**
+
+- **[📁 firebase/](./firebase/)** - Documentação do Firebase
+  - [Guia Interface Web](./firebase/GUIA_INTERFACE_WEB.md) - Guia completo da interface web
+
 #### 🚀 **Para Administradores de Deploy**
 
 - **[📁 deploy/](./deploy/)** - Deploy e infraestrutura
@@ -87,6 +92,7 @@ Esta pasta contém toda a documentação do projeto SGL, organizada por público
 1. Configure segurança com **[seguranca/REGRAS_SEGURANCA_FIREBASE.md](./seguranca/REGRAS_SEGURANCA_FIREBASE.md)**
 2. Configure notificações com **[notificacoes/SISTEMA_NOTIFICACOES.md](./notificacoes/SISTEMA_NOTIFICACOES.md)**
 3. Importe dados com **[usuarios/IMPORTACAO_DADOS.md](./usuarios/IMPORTACAO_DADOS.md)**
+4. Gerencie o banco com **[firebase/GUIA_INTERFACE_WEB.md](./firebase/GUIA_INTERFACE_WEB.md)**
 
 ---
 
