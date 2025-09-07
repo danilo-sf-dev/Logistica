@@ -206,44 +206,54 @@ export class TemporaryRoleService {
     try {
       const now = new Date();
 
-      // Buscar usuários com roles temporários expirados
+      // Buscar usuários com roles temporários ativos
       const q = query(
         collection(db, "users"),
         where("temporaryRole.isActive", "==", true),
-        where("temporaryRole.endDate", "<=", now),
       );
 
       const querySnapshot = await getDocs(q);
 
+      // Verificar cada usuário individualmente para comparar datas corretamente
       for (const docSnapshot of querySnapshot.docs) {
         try {
           const userData = docSnapshot.data() as UserProfile;
           const temporaryRole = userData.temporaryRole!;
 
-          // Reverter para o role base
-          await setDoc(
-            docSnapshot.ref,
-            {
-              role: userData.baseRole || "user",
-              temporaryRole: {
-                ...temporaryRole,
-                isActive: false,
-                expiredAt: toFirebaseTimestamp(now),
+          // Converter endDate para Date se necessário
+          const endDate = fromFirebaseDate(temporaryRole.endDate);
+
+          // Verificar se o perfil temporário expirou
+          if (endDate <= now) {
+            console.log(
+              `🔄 Revertendo perfil temporário: ${userData.displayName}`,
+            );
+
+            // Reverter para o role base
+            await setDoc(
+              docSnapshot.ref,
+              {
+                role: userData.baseRole || "user",
+                temporaryRole: {
+                  ...temporaryRole,
+                  isActive: false,
+                  expiredAt: toFirebaseTimestamp(now),
+                },
+                lastLogin: getServerTimestamp(), // Usar serverTimestamp para auditoria
               },
-              lastLogin: getServerTimestamp(), // Usar serverTimestamp para auditoria
-            },
-            { merge: true },
-          );
+              { merge: true },
+            );
 
-          // Registrar mudança automática
-          await this.recordAutomaticRevert({
-            userId: docSnapshot.id,
-            userData,
-            temporaryRole,
-            now,
-          });
+            // Registrar mudança automática
+            await this.recordAutomaticRevert({
+              userId: docSnapshot.id,
+              userData,
+              temporaryRole,
+              now,
+            });
 
-          processed++;
+            processed++;
+          }
         } catch (error) {
           console.error(`Erro ao processar usuário ${docSnapshot.id}:`, error);
           errors.push(`Usuário ${docSnapshot.id}: ${error}`);
