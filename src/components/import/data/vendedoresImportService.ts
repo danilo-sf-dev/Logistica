@@ -263,15 +263,29 @@ export class VendedoresImportService extends BaseImportService {
         }
 
         // Validações específicas
-        // Validar formato de CPF (11 dígitos)
-        if (row[1] && row[1].toString().replace(/\D/g, "").length !== 11) {
-          errors.push({
-            row: rowNumber,
-            field: "cpf",
-            message: "CPF deve ter exatamente 11 dígitos",
-            value: row[1],
-            severity: "error",
-          });
+        // Validar formato de CPF (10 ou 11 dígitos)
+        if (row[1]) {
+          const cpfLimpo = row[1].toString().replace(/\D/g, "");
+          if (cpfLimpo.length === 10) {
+            // Adicionar zero à esquerda se tiver 10 dígitos
+            const cpfOriginal = row[1].toString().trim();
+            row[1] = "0" + cpfLimpo;
+            warnings.push({
+              row: rowNumber,
+              field: "cpf",
+              message: `CPF "${cpfOriginal}" foi corrigido para "${row[1]}" (zero à esquerda adicionado automaticamente)`,
+              value: row[1],
+              severity: "warning",
+            });
+          } else if (cpfLimpo.length !== 11) {
+            errors.push({
+              row: rowNumber,
+              field: "cpf",
+              message: `CPF "${row[1].toString().trim()}" deve ter 11 dígitos. Se o Excel removeu zeros à esquerda, adicione manualmente.`,
+              value: row[1],
+              severity: "error",
+            });
+          }
         }
 
         // Validar formato de celular (10 ou 11 dígitos)

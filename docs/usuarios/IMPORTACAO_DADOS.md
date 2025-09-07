@@ -209,12 +209,12 @@ src/
 - **Email**: Convertido para minúsculas
 - **Código Sistema**: Convertido para maiúsculas
 - **Unidade Negócio**: Convertida para minúsculas
-- **CPF**: Deve ter exatamente 11 dígitos
+- **CPF**: Deve ter exatamente 11 dígitos (zeros à esquerda são adicionados automaticamente se o Excel os removeu)
 - **Celular**: Deve ter 10 ou 11 dígitos
 - **Região**: Deve ser uma das opções válidas (SUDESTE, NORDESTE, SUL, NORTE, CENTRO-OESTE)
+- **Cidades Atendidas**: Nomes das cidades são automaticamente convertidos para IDs das cidades cadastradas
 - **Unidade Negócio**: Deve ser uma das opções válidas (frigorifico, ovos, ambos)
 - **Tipo Contrato**: Deve ser uma das opções válidas (clt, pj, autonomo, outro)
-- **Cidades Atendidas**: Separadas por vírgula e convertidas em array
 
 ### 5. Rotas
 
