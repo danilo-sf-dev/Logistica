@@ -1,13 +1,72 @@
 import { BaseImportService } from "./importService";
 import { vendedoresService } from "../../vendedores/data/vendedoresService";
+import { cidadesService } from "../../cidades/data/cidadesService";
 import type {
   ImportConfig,
   ImportResult,
   ValidationResult,
 } from "../types/importTypes";
 import type { VendedorInput } from "../../vendedores/types";
+import type { Cidade } from "../../cidades/types";
 
 export class VendedoresImportService extends BaseImportService {
+  private cidadesCache: Cidade[] = [];
+  private cidadesLoaded = false;
+
+  // Função para normalizar nomes de cidades (remover acentos e caracteres especiais)
+  private normalizeCityName(name: string): string {
+    return name
+      .normalize("NFD") // Decompor caracteres acentuados
+      .replace(/[\u0300-\u036f]/g, "") // Remover diacríticos (acentos)
+      .replace(/[^\w\s]/g, "") // Remover pontuação e caracteres especiais
+      .replace(/\s+/g, " ") // Normalizar espaços
+      .trim()
+      .toUpperCase();
+  }
+
+  // Função para buscar cidade por nome
+  private async buscarCidadePorNome(
+    nomeCidade: string,
+  ): Promise<string | null> {
+    // Carregar cidades se ainda não foram carregadas
+    if (!this.cidadesLoaded) {
+      try {
+        this.cidadesCache = await cidadesService.listar();
+        this.cidadesLoaded = true;
+      } catch (error) {
+        console.error("Erro ao carregar cidades:", error);
+        return null;
+      }
+    }
+
+    const nomeNormalizado = this.normalizeCityName(nomeCidade);
+
+    // Buscar cidade exata
+    let cidade = this.cidadesCache.find(
+      (c) => this.normalizeCityName(c.nome) === nomeNormalizado,
+    );
+
+    if (cidade) {
+      return cidade.id;
+    }
+
+    // Buscar cidade que contenha o nome (busca parcial)
+    cidade = this.cidadesCache.find((c) =>
+      this.normalizeCityName(c.nome).includes(nomeNormalizado),
+    );
+
+    if (cidade) {
+      return cidade.id;
+    }
+
+    // Buscar cidade que seja contida no nome (busca reversa)
+    cidade = this.cidadesCache.find((c) =>
+      nomeNormalizado.includes(this.normalizeCityName(c.nome)),
+    );
+
+    return cidade ? cidade.id : null;
+  }
+
   protected config: ImportConfig = {
     entityType: "vendedores",
     requiredFields: [
@@ -382,7 +441,9 @@ export class VendedoresImportService extends BaseImportService {
   }
 
   protected async transformData(data: any[]): Promise<any[]> {
-    return data.map((row) => {
+    const transformedData = [];
+
+    for (const row of data) {
       const transformed: VendedorInput = {
         nome: row[0]?.toString().toUpperCase() || "",
         cpf: row[1]?.toString().replace(/\D/g, "") || "",
@@ -412,12 +473,38 @@ export class VendedoresImportService extends BaseImportService {
           .filter((cidade: string) => cidade.length > 0);
 
         if (cidadesArray.length > 0) {
-          transformed.cidadesAtendidas = cidadesArray;
+          // Buscar IDs das cidades pelos nomes
+          const cidadesIds: string[] = [];
+          const cidadesNaoEncontradas: string[] = [];
+
+          for (const nomeCidade of cidadesArray) {
+            const cidadeId = await this.buscarCidadePorNome(nomeCidade);
+            if (cidadeId) {
+              cidadesIds.push(cidadeId);
+            } else {
+              cidadesNaoEncontradas.push(nomeCidade);
+            }
+          }
+
+          // Adicionar apenas as cidades encontradas
+          if (cidadesIds.length > 0) {
+            transformed.cidadesAtendidas = cidadesIds;
+          }
+
+          // Log das cidades não encontradas para debug
+          if (cidadesNaoEncontradas.length > 0) {
+            console.warn(
+              `Cidades não encontradas para o vendedor ${transformed.nome}:`,
+              cidadesNaoEncontradas,
+            );
+          }
         }
       }
 
-      return transformed;
-    });
+      transformedData.push(transformed);
+    }
+
+    return transformedData;
   }
 
   protected async saveToDatabase(data: any[]): Promise<ImportResult> {
