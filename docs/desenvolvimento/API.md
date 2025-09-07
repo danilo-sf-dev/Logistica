@@ -297,7 +297,7 @@ interface Vendedor {
   "id": "vend_001",
   "nome": "Carlos Oliveira",
   "cpf": "987.654.321-00",
-  "codigoVendSistema": "VEND001",
+  "codigoVendSistema": "20",
   "email": "carlos@empresa.com",
   "telefone": "(73) 88888-8888",
   "estado": "BA",
