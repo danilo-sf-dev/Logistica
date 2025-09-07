@@ -30,10 +30,18 @@
 
 **Níveis de Acesso:**
 
-- **admin**: Acesso total ao sistema
-- **gerente**: Gestão de equipes e relatórios
-- **dispatcher**: Gestão de rotas e veículos
-- **user**: Acesso básico de visualização
+- **admin_senior**: Acesso total sem restrições - pode gerenciar todos os usuários
+- **admin**: Acesso total com restrições de gestão de usuários - pode gerenciar até gerente
+- **gerente**: Acesso operacional completo + gestão limitada de usuários - pode gerenciar até funcionário e usuário
+- **dispatcher**: Usuário constante do sistema com CRUD limitado - não pode gerenciar usuários
+- **user**: Apenas visualização e relatórios - não pode gerenciar usuários
+
+**Sistema de Gestão de Usuários:**
+
+- Interface completa para gerenciar perfis e permissões
+- Perfis temporários com data de início e fim
+- Auditoria completa de todas as alterações
+- Validação de segurança para prevenir escalação de privilégios
 
 ---
 
@@ -491,6 +499,69 @@ O módulo de relatórios oferece:
 - **Email**: Receber por email
 - **Push**: Receber no navegador
 - **Salvar**: Configurações persistentes
+
+---
+
+## 👥 Gestão de Usuários
+
+### Acesso à Funcionalidade
+
+A gestão de usuários está disponível apenas para perfis administrativos:
+
+- **admin_senior**: Pode gerenciar todos os usuários
+- **admin**: Pode gerenciar até gerente
+- **gerente**: Pode gerenciar até funcionário e usuário
+
+### Como Acessar
+
+1. **Faça login** com um perfil que tenha permissão
+2. **Clique** no menu "Configurações" no canto superior direito
+3. **Selecione** a aba "Gestão de Usuários"
+4. A tela de gestão será exibida automaticamente
+
+### Funcionalidades Disponíveis
+
+#### **Lista de Usuários**
+
+- Visualização de todos os usuários do sistema
+- Informações: nome, email, perfil atual, status, último login
+- Filtros por perfil, status e busca por nome/email
+- Ordenação por qualquer coluna
+
+#### **Alteração de Perfil**
+
+- **Perfil Permanente**: Alteração definitiva do perfil
+- **Perfil Temporário**: Promoção com data de início e fim
+- **Validação de Segurança**: Prevenção de escalação de privilégios
+- **Auditoria Completa**: Histórico de todas as alterações
+
+#### **Perfis Temporários**
+
+- **Ativação**: Usuário recebe novo perfil na data de início
+- **Expiração**: Automaticamente volta ao perfil original
+- **Indicação Visual**: Status "Temporário" na lista
+- **Detalhes**: Informações sobre perfil base e data de expiração
+
+#### **Histórico de Alterações**
+
+- **Registro Completo**: Todas as mudanças de perfil
+- **Informações**: Data, usuário, perfil anterior/novo, tipo, motivo
+- **Ordenação**: Por data, usuário ou tipo de alteração
+- **Auditoria**: Quem fez a alteração e quando
+
+### Validações de Segurança
+
+- **Hierarquia Respeitada**: Não é possível promover para nível igual ou superior
+- **Motivo Obrigatório**: Mínimo de 10 caracteres para justificar alteração
+- **Validação de Datas**: Para perfis temporários, datas devem ser futuras
+- **Prevenção de Escalação**: Sistema impede promoções não autorizadas
+
+### Casos de Uso
+
+- **Substituições Temporárias**: Gerentes em férias ou licença
+- **Projetos Específicos**: Acesso limitado no tempo
+- **Treinamentos**: Permissões para aprendizado
+- **Emergências**: Acesso temporário para situações críticas
 
 ---
 

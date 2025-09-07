@@ -4,8 +4,10 @@
 
 ### 🌐 **Sistema Online**
 
-**URL:** https://your-project.web.app  
-**Status:** ✅ **FUNCIONANDO PERFEITAMENTE**
+**URL:** https://logistica-c7afc.web.app  
+**Status:** ✅ **FUNCIONANDO PERFEITAMENTE**  
+**Versão:** 1.2.3  
+**Última Atualização:** Janeiro 2025
 
 ---
 
@@ -24,12 +26,28 @@
 - **Configurações** do sistema
 - **Sistema de Importação** de dados
 
-### 🆕 **Novas Funcionalidades Implementadas (v1.2.0)**
+### 🆕 **Funcionalidades Implementadas (v1.2.2+)**
+
+#### 🔐 **Sistema de Gestão de Usuários Completo**
+
+- **Interface de Gestão**: Tela dedicada para gerenciar perfis e permissões
+- **Perfis Temporários**: Promoções com data de início e fim
+- **Auditoria Completa**: Histórico de todas as alterações de perfil
+- **Validação de Segurança**: Prevenção de escalação de privilégios
+- **Hierarquia de Roles**: admin_senior, admin, gerente, dispatcher, user
+
+#### 📥 **Sistema de Importação de Dados**
+
+- **Importação Excel**: Upload de arquivos XLSX com validação
+- **Templates Automáticos**: Geração de planilhas modelo
+- **Validação de Dados**: Verificação de campos obrigatórios e formatos
+- **Relatórios de Importação**: Log detalhado de sucessos e falhas
+- **Suporte a Múltiplas Entidades**: Funcionários, veículos, cidades, vendedores
 
 #### 🔐 **Sistema de Segurança Firebase**
 
 - **Regras de Segurança Firestore**: Implementadas e ativas
-- **Controle de Acesso por Role**: admin, gerente, dispatcher, user
+- **Controle de Acesso por Role**: admin_senior, admin, gerente, dispatcher, user
 - **Proteção de Dados**: Leitura/escrita controlada por permissões
 - **Modo Teste Desabilitado**: Sistema em produção segura
 - **SessionService**: Captura real de IP e informações de dispositivo

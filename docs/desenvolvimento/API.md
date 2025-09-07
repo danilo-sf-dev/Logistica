@@ -38,12 +38,21 @@ interface User {
   email: string; // Email do usuário
   displayName: string | null; // Nome de exibição
   photoURL: string | null; // URL da foto de perfil
-  role: "admin" | "gerente" | "dispatcher" | "user";
+  role: "admin_senior" | "admin" | "gerente" | "dispatcher" | "user";
   telefone?: string; // Telefone do usuário
   cargo?: string; // Cargo/função
   createdAt: Timestamp; // Data de criação
   lastLogin: Timestamp; // Último login
   provider: string; // Provedor de autenticação
+  // Campos para gestão de usuários
+  baseRole?: UserRole; // Perfil base (para perfis temporários)
+  temporaryRole?: {
+    role: UserRole;
+    startDate: Timestamp;
+    endDate: Timestamp;
+    reason: string;
+    isActive: boolean;
+  };
 }
 ```
 
@@ -647,8 +656,123 @@ interface AuditLog {
 }
 ```
 
+## 🔐 **Sistema de Gestão de Usuários**
+
+### 👥 **Coleções de Auditoria**
+
+#### role_changes (Auditoria de Mudanças de Perfil)
+
+```typescript
+interface RoleChange {
+  id?: string;
+  userId: string;
+  oldRole: UserRole;
+  newRole: UserRole;
+  changeType: "permanent" | "temporary";
+  reason: string;
+  changedBy: string;
+  changedAt: Timestamp;
+  temporaryPeriod?: {
+    startDate: Timestamp;
+    endDate: Timestamp;
+  };
+  approvedAt?: Timestamp;
+  approvalNotes?: string;
+}
+```
+
+#### import_logs (Logs de Importação)
+
+```typescript
+interface ImportLog {
+  id?: string;
+  entityType: string;
+  fileName: string;
+  fileSize: number;
+  totalRows: number;
+  importedRows: number;
+  failedRows: number;
+  errors: string[];
+  warnings: string[];
+  importedBy: string;
+  importedAt: Timestamp;
+  duration: number;
+}
+```
+
+### 🔐 **Sistema de Permissões**
+
+#### Hierarquia de Roles
+
+```typescript
+type UserRole =
+  | "admin_senior" // Administrador Senior - Acesso total
+  | "admin" // Administrador - Acesso total com restrições
+  | "gerente" // Gerente - Acesso operacional + gestão limitada
+  | "dispatcher" // Funcionário - Usuário constante do sistema
+  | "user"; // Usuário - Apenas visualização
+
+// Hierarquia de permissões para alteração de perfis
+const ROLE_HIERARCHY: Record<UserRole, UserRole[]> = {
+  admin_senior: ["admin_senior", "admin", "gerente", "dispatcher", "user"],
+  admin: ["gerente", "dispatcher", "user"],
+  gerente: ["dispatcher", "user"],
+  dispatcher: [],
+  user: [],
+};
+```
+
+#### Validações de Segurança
+
+```typescript
+interface PermissionValidationResult {
+  allowed: boolean;
+  reason?: string;
+  suggestions?: string[];
+}
+
+interface PermissionContext {
+  userRole: UserRole;
+  targetRole?: UserRole;
+  operation: CrudOperation;
+  resource?: string;
+  userId?: string;
+}
+```
+
+## 📥 **Sistema de Importação**
+
+### 📊 **Configurações de Importação**
+
+```typescript
+interface ImportConfig {
+  entityType: string;
+  requiredFields: string[];
+  optionalFields: string[];
+  validators: Record<string, (value: any) => boolean>;
+  transformers: Record<string, (value: any) => any>;
+}
+
+interface ImportResult {
+  success: boolean;
+  totalRows: number;
+  importedRows: number;
+  failedRows: number;
+  errors: string[];
+  warnings: string[];
+  duration: number;
+}
+```
+
+### 📋 **Entidades Suportadas para Importação**
+
+- **Funcionários**: Nome, CPF, CNH, telefone, email, endereço, cidade, status, função, data admissão, salário
+- **Veículos**: Placa, modelo, marca, ano, capacidade, status, unidade de negócio
+- **Cidades**: Nome, estado, região, unidade de negócio
+- **Vendedores**: Nome, CPF, email, telefone, estado, região, cidades atendidas
+
 ---
 
 **Última atualização:** Janeiro 2025  
-**Versão:** 1.1.0  
-**Status:** ✅ API operacional com novas funcionalidades de exportação
+**Versão:** 1.2.2  
+**Status:** ✅ API operacional com sistema completo de gestão de usuários e importação

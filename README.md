@@ -25,14 +25,16 @@ Sistema web completo para gestão de logística, desenvolvido com React, TypeScr
 - **Configurações**: Perfil, notificações, sistema e segurança
 - **Segurança**: Informações de sessão e controle de acesso
 
-## 🆕 **Novas Funcionalidades (v1.2.0)**
+## 🆕 **Funcionalidades Implementadas (v1.2.2+)**
 
-### 🔐 **Sistema de Segurança Firebase**
+### 🔐 **Sistema de Segurança e Permissões**
 
 - **Regras de Segurança Firestore**: Implementadas e ativas
-- **Controle de Acesso por Role**: admin, gerente, dispatcher, user
-- **Proteção de Dados**: Leitura/escrita controlada por permissões
-- **Modo Teste Desabilitado**: Sistema em produção segura
+- **Controle de Acesso por Role**: admin_senior, admin, gerente, dispatcher, user
+- **Sistema de Gestão de Usuários**: Interface completa para gerenciar perfis
+- **Perfis Temporários**: Promoções com data de início e fim
+- **Auditoria Completa**: Histórico de todas as alterações de perfil
+- **Validação de Permissões**: Sistema robusto de validação de acesso
 
 ### 🔔 **Sistema de Notificações Completo**
 
@@ -51,20 +53,31 @@ Sistema web completo para gestão de logística, desenvolvido com React, TypeScr
 - **Exportação PDF**: Documentos formatados para impressão
 - **Modal de Exportação**: Interface para escolher formato (PDF/Excel)
 - **Arquitetura Modular**: Serviços especializados por entidade
+- **Filtros Inteligentes**: Aplicados apenas em entidades temporais
+- **Ordenação Padrão**: Dados sempre do mais recente para o mais antigo
+
+### 📥 **Sistema de Importação de Dados**
+
+- **Importação Excel**: Upload de arquivos XLSX com validação
+- **Templates Automáticos**: Geração de planilhas modelo
+- **Validação de Dados**: Verificação de campos obrigatórios e formatos
+- **Relatórios de Importação**: Log detalhado de sucessos e falhas
+- **Suporte a Múltiplas Entidades**: Funcionários, veículos, cidades, vendedores
 
 ### 🔧 **Melhorias Técnicas**
 
-- **Formatação Brasileira**: Datas no formato DD/MM/YYYY
-- **Layout Minimalista**: Interface em preto e branco
+- **Migração para TypeScript**: Código 100% tipado e mais seguro
+- **Build Tool Vite**: Desenvolvimento mais rápido e build otimizado
+- **Formatação Brasileira**: Datas DD/MM/YYYY, CPF, telefone
+- **Layout Responsivo**: Interface adaptável para mobile, tablet e desktop
 - **Nomenclatura Padrão**: Arquivos nomeados como `entity_dd-MM-YYYY.xlsx`
-- **Tipos Separados**: Arquivos de tipos independentes por pacote
-- **Padrões de Código**: Eliminação de if/else com arrays de detectores
 - **SessionService**: Captura real de IP e informações de dispositivo
+- **Validação de Unicidade**: CPF, CNH, placa de veículos
 
 ### 📈 **Funcionalidades de Exportação**
 
 - **Funcionários**: Relatório completo com dados pessoais e profissionais
-- **Veículos**: Informações técnicas e status da frota
+- **Veículos**: Informações técnicas e status da frota (estrutura otimizada)
 - **Rotas**: Detalhes de rotas e associações
 - **Folgas**: Histórico de solicitações e aprovações
 - **Cidades**: Dados geográficos e regionais
@@ -215,10 +228,20 @@ O sistema suporta dois métodos de login:
 
 ## 👥 Roles e Permissões
 
-- **admin**: Acesso total ao sistema
-- **gerente**: Gestão de operações
-- **dispatcher**: Controle de rotas
-- **user**: Visualização básica
+### **Hierarquia de Perfis (do maior para o menor)**
+
+- **admin_senior**: Acesso total sem restrições - pode gerenciar todos os usuários
+- **admin**: Acesso total com restrições de gestão de usuários - pode gerenciar até gerente
+- **gerente**: Acesso operacional completo + gestão limitada de usuários - pode gerenciar até funcionário e usuário
+- **dispatcher**: Usuário constante do sistema com CRUD limitado - não pode gerenciar usuários
+- **user**: Apenas visualização e relatórios - não pode gerenciar usuários
+
+### **Sistema de Gestão de Usuários**
+
+- **Interface Completa**: Tela dedicada para gerenciar perfis e permissões
+- **Perfis Temporários**: Promoções com data de início e fim
+- **Auditoria**: Histórico completo de todas as alterações
+- **Validação de Segurança**: Prevenção de escalação de privilégios
 
 ## 📊 Estrutura do Projeto
 
@@ -234,14 +257,23 @@ src/
 │   ├── folgas/         # Controle de folgas
 │   ├── cidades/        # Cadastro de cidades
 │   ├── vendedores/     # Gestão de vendedores
-│   ├── relatorios/     # 🆕 Sistema de relatórios
-│   ├── configuracao/   # Configurações
-│   └── import/         # Sistema de importação
+│   ├── relatorios/     # Sistema de relatórios e exportação
+│   ├── configuracoes/  # Configurações e gestão de usuários
+│   ├── import/         # Sistema de importação de dados
+│   └── common/         # Componentes comuns (LoadingButton, etc.)
 ├── contexts/           # Contextos React
+│   ├── AuthContext.tsx
+│   └── NotificationContext.tsx
 ├── firebase/           # Configuração Firebase
 ├── hooks/              # Custom hooks
 ├── services/           # Serviços
+│   ├── userManagement/ # Serviços de gestão de usuários
+│   ├── permissionService.ts
+│   ├── notificationService.ts
+│   └── sessionService.ts
 ├── types/              # Tipos TypeScript
+│   ├── permissions.ts  # Tipos de permissões e roles
+│   └── index.ts
 ├── utils/              # Utilitários
 └── App.tsx             # Componente principal
 ```
@@ -426,6 +458,14 @@ Este projeto é desenvolvido para uso interno da empresa.
 - [x] **Arquitetura modular de exportação**
 - [x] **Sistema de notificações completo**
 - [x] **Controle de acesso por roles**
+- [x] **Sistema de gestão de usuários completo**
+- [x] **Perfis temporários implementados**
+- [x] **Sistema de auditoria completo**
+- [x] **Migração para TypeScript 100%**
+- [x] **Build tool Vite implementado**
+- [x] **Sistema de importação de dados**
+- [x] **Validação de unicidade de campos**
+- [x] **Interface responsiva otimizada**
 
 ### 🔄 Próximas Melhorias
 
