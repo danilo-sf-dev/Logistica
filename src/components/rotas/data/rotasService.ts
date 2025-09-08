@@ -126,9 +126,6 @@ export const rotasService = {
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
-        console.warn(
-          `Rota ${rotaId} não encontrada. Pulando atualização de cidades.`,
-        );
         return; // Rota não existe mais, não é um erro crítico
       }
 
@@ -155,9 +152,6 @@ export const rotasService = {
     } catch (error) {
       console.error("Erro ao atualizar cidades vinculadas:", error);
       // Não relançar o erro para não quebrar a exclusão da cidade
-      console.warn(
-        "Continuando com a exclusão da cidade mesmo com erro na rota",
-      );
     }
   },
 
