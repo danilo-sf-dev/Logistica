@@ -9,21 +9,9 @@ import { DateService } from "../../../services/DateService";
 export class RotasTableExportService extends BaseTableExportService {
   protected config: TableExportConfig = {
     titulo: "Rotas",
-    campos: [
-      "nome",
-      "dataRota",
-      "pesoMinimo",
-      "diaSemana",
-      "cidades",
-      "dataCriacao",
-    ],
+    campos: ["nome", "pesoMinimo", "diaSemana", "cidades", "dataCriacao"],
     formatacao: {
       nome: (valor) => (valor ? valor.toUpperCase() : "N/A"),
-      dataRota: (valor) => {
-        if (!valor) return "N/A";
-        // ✅ FORMATAÇÃO COMPONENTIZADA DE DATA
-        return DateService.formatForDisplay(valor);
-      },
       pesoMinimo: (valor) => {
         if (!valor) return "N/A";
         return `${valor} kg`;
@@ -31,6 +19,11 @@ export class RotasTableExportService extends BaseTableExportService {
       diaSemana: (valor) => {
         if (!valor || !Array.isArray(valor) || valor.length === 0) {
           return "Nenhum dia definido";
+        }
+
+        // Se contém "Qualquer dia da semana", retorna apenas isso
+        if (valor.includes("Qualquer dia da semana")) {
+          return "Qualquer dia da semana";
         }
 
         const diasMap: Record<string, string> = {

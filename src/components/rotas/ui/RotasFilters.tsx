@@ -18,6 +18,8 @@ const DIAS_SEMANA = [
   "Domingo",
 ];
 
+const QUALQUER_DIA = "Qualquer dia da semana";
+
 export const RotasFilters: React.FC<RotasFiltersProps> = ({
   filters,
   onFiltersChange,
@@ -52,6 +54,7 @@ export const RotasFilters: React.FC<RotasFiltersProps> = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">Todos os dias da semana</option>
+            <option value={QUALQUER_DIA}>{QUALQUER_DIA}</option>
             {DIAS_SEMANA.map((dia) => (
               <option key={dia} value={dia}>
                 {dia}

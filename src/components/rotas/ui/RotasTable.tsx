@@ -1,14 +1,6 @@
 import React from "react";
-import {
-  Edit,
-  Trash2,
-  Map,
-  Calendar,
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react";
+import { Edit, Trash2, Map, ChevronUp, ChevronDown } from "lucide-react";
 import { Rota, RotaSortConfig, RotaOrdenacaoCampo } from "../types";
-import { DateDisplay } from "../../common/DateDisplay";
 
 interface RotasTableProps {
   rotas: Rota[];
@@ -96,15 +88,6 @@ export const RotasTable: React.FC<RotasTableProps> = ({
                   {getSortIcon("nome")}
                 </div>
               </th>
-              <th
-                className="table-header cursor-pointer hover:bg-gray-100"
-                onClick={() => onSort("dataRota")}
-              >
-                <div className="flex items-center">
-                  Data
-                  {getSortIcon("dataRota")}
-                </div>
-              </th>
               <th className="table-header">Dia da Semana</th>
               <th
                 className="table-header cursor-pointer hover:bg-gray-100"
@@ -143,20 +126,13 @@ export const RotasTable: React.FC<RotasTableProps> = ({
                       </div>
                       <div className="text-sm text-gray-500">
                         Criada em{" "}
-                        {rota.dataCriacao ? (
-                          <DateDisplay date={rota.dataCriacao} format="short" />
-                        ) : (
-                          "Data não disponível"
-                        )}
+                        {rota.dataCriacao
+                          ? new Date(rota.dataCriacao).toLocaleDateString(
+                              "pt-BR",
+                            )
+                          : "Data não disponível"}
                       </div>
                     </div>
-                  </div>
-                </td>
-
-                <td className="table-cell">
-                  <div className="flex items-center text-sm text-gray-900">
-                    <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                    <DateDisplay date={rota.dataRota} format="short" />
                   </div>
                 </td>
 
@@ -164,14 +140,20 @@ export const RotasTable: React.FC<RotasTableProps> = ({
                   <div className="space-y-1 min-h-[2.5rem] flex flex-col justify-center">
                     {Array.isArray(rota.diaSemana) &&
                     rota.diaSemana.length > 0 ? (
-                      rota.diaSemana.map((dia, index) => (
-                        <div
-                          key={index}
-                          className={`px-2 py-1 text-xs font-semibold rounded-full ${getDiaSemanaColor(dia)} w-fit`}
-                        >
-                          {dia}
+                      rota.diaSemana.includes("Qualquer dia da semana") ? (
+                        <div className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 w-fit">
+                          Qualquer dia da semana
                         </div>
-                      ))
+                      ) : (
+                        rota.diaSemana.map((dia, index) => (
+                          <div
+                            key={index}
+                            className={`px-2 py-1 text-xs font-semibold rounded-full ${getDiaSemanaColor(dia)} w-fit`}
+                          >
+                            {dia}
+                          </div>
+                        ))
+                      )
                     ) : (
                       <span className="text-gray-400 text-sm">
                         Nenhum dia definido

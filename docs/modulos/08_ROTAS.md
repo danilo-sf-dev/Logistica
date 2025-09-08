@@ -56,57 +56,36 @@ A tela de rotas contém:
 
 **Campos obrigatórios** (marcados com \*):
 
-1. **Origem\***:
-   - Digite a cidade de origem
-   - Exemplo: "Salvador"
-   - Deve estar cadastrada no sistema
+1. **Nome da Rota\***:
+   - Digite um nome descritivo para a rota
+   - Exemplo: "Rota Sul", "Entrega Capital"
+   - Deve ser único no sistema
 
-2. **Destino\***:
-   - Digite a cidade de destino
-   - Exemplo: "São Paulo"
-   - Deve estar cadastrada no sistema
+2. **Peso Mínimo (kg)**:
+   - Digite o peso mínimo para a rota
+   - Exemplo: 1000 (para 1000 kg)
+   - Campo opcional
 
-3. **Funcionário\***:
-   - Selecione o motorista responsável
-   - Deve ser funcionário cadastrado
-   - Deve ter função de motorista
+#### **Passo 2.3: Configurar Dias da Semana**
 
-4. **Veículo\***:
-   - Selecione o veículo da rota
-   - Deve estar cadastrado no sistema
-   - Deve estar disponível
+1. **Dias da Semana\***:
+   - **Opção 1 - Qualquer dia da semana**:
+     - Marque o checkbox "Qualquer dia da semana"
+     - A rota estará disponível todos os dias
+     - Os checkboxes individuais ficam desabilitados
+   - **Opção 2 - Dias específicos**:
+     - Marque os dias específicos da semana
+     - Segunda-feira, Terça-feira, etc.
+     - Pode selecionar múltiplos dias
+     - Se marcar qualquer dia individual, "Qualquer dia" é desmarcado automaticamente
 
-#### **Passo 2.3: Preencher Datas e Horários**
+#### **Passo 2.4: Vincular Cidades**
 
-1. **Data de Partida\***:
-   - Clique no campo de data
-   - Selecione a data no calendário
-   - Formato: DD/MM/AAAA
-
-2. **Data de Chegada\***:
-   - Clique no campo de data
-   - Selecione a data no calendário
-   - Deve ser posterior à data de partida
-   - Formato: DD/MM/AAAA
-
-#### **Passo 2.4: Preencher Dados Operacionais**
-
-1. **Status\***:
-   - Selecione uma opção:
-     - Agendada
-     - Em Andamento
-     - Concluída
-     - Cancelada
-
-2. **Unidade de Negócio\***:
-   - Selecione uma opção:
-     - Frigorífico
-     - Ovos
-
-3. **Observações** (opcional):
-   - Digite informações adicionais
-   - Exemplo: "Carga especial, cuidado com temperatura"
-   - Máximo: 500 caracteres
+1. **Cidades Vinculadas**:
+   - As cidades são vinculadas na seção de Cidades
+   - Vá para o módulo "Cidades"
+   - Selecione a rota no dropdown de cada cidade
+   - As cidades vinculadas aparecerão aqui automaticamente
 
 #### **Passo 2.5: Salvar a Rota**
 
@@ -130,11 +109,10 @@ A tela de rotas contém:
 
 1. **Altere os campos** que precisam ser atualizados
 2. **Campos que podem ser editados**:
-   - Origem, destino
-   - Funcionário, veículo
-   - Datas de partida e chegada
-   - Status, observações
-   - Unidade de negócio
+   - Nome da rota
+   - Peso mínimo
+   - Dias da semana (incluindo "Qualquer dia da semana")
+   - Cidades vinculadas (através do módulo Cidades)
 
 #### **Passo 3.3: Salvar Alterações**
 
@@ -173,50 +151,50 @@ A tela de rotas contém:
 
 ---
 
-### 5. **Associando Funcionários e Veículos**
+### 5. **Gerenciando Cidades Vinculadas**
 
-#### **Passo 5.1: Associar Motorista**
+#### **Passo 5.1: Vincular Cidades à Rota**
 
-1. **Edite a rota** desejada
-2. **Clique no campo "Funcionário"**
-3. **Selecione o motorista** na lista
-4. **Verifique se funcionário** tem função de motorista
+1. **Acesse o módulo "Cidades"**
+2. **Encontre a cidade** que deseja vincular
+3. **Clique no ícone de edição** da cidade
+4. **Selecione a rota** no dropdown "Rota Vinculada"
 5. **Salve as alterações**
 
-#### **Passo 5.2: Associar Veículo**
+#### **Passo 5.2: Desvincular Cidades**
 
-1. **Edite a rota** desejada
-2. **Clique no campo "Veículo"**
-3. **Selecione o veículo** na lista
-4. **Verifique se veículo** está disponível
+1. **Acesse o módulo "Cidades"**
+2. **Encontre a cidade** vinculada
+3. **Clique no ícone de edição** da cidade
+4. **Selecione "Nenhuma rota"** no dropdown
 5. **Salve as alterações**
 
-#### **Passo 5.3: Verificar Disponibilidade**
+#### **Passo 5.3: Verificar Cidades Vinculadas**
 
-1. **Verifique se funcionário** não está em outra rota
-2. **Verifique se veículo** não está em uso
-3. **Confirme se datas** não conflitam
-4. **Planeje com antecedência** para evitar conflitos
+1. **Na tela de rotas**, veja a coluna "Cidades"
+2. **Mostra quantas cidades** estão vinculadas
+3. **Clique na rota** para ver detalhes
+4. **As cidades aparecem** na seção inferior
 
 ---
 
-### 6. **Gerenciando Datas e Horários**
+### 6. **Configurando Dias da Semana**
 
-#### **Passo 6.1: Definir Data de Partida**
+#### **Passo 6.1: Usar "Qualquer Dia da Semana"**
 
-1. **Clique no campo "Data de Partida"**
-2. **Selecione a data** no calendário
-3. **Verifique se data** é futura
-4. **Confirme a seleção**
+1. **Marque o checkbox** "Qualquer dia da semana"
+2. **Os dias individuais** ficam desabilitados
+3. **A rota estará disponível** todos os dias
+4. **Ideal para rotas** que funcionam diariamente
 
-#### **Passo 6.2: Definir Data de Chegada**
+#### **Passo 6.2: Selecionar Dias Específicos**
 
-1. **Clique no campo "Data de Chegada"**
-2. **Selecione a data** no calendário
-3. **Verifique se data** é posterior à partida
-4. **Confirme a seleção**
+1. **Desmarque "Qualquer dia"** se estiver marcado
+2. **Marque os dias específicos** desejados
+3. **Pode selecionar múltiplos** dias
+4. **Ideal para rotas** com horários específicos
 
-#### **Passo 6.3: Ajustar Datas**
+#### **Passo 6.3: Alterar Configuração**
 
 1. **Se precisar alterar**: Edite a rota
 2. **Se rota atrasou**: Atualize data de chegada
@@ -227,36 +205,26 @@ A tela de rotas contém:
 
 ### 7. **Buscando e Filtrando Rotas**
 
-#### **Passo 7.1: Busca por Origem/Destino**
+#### **Passo 7.1: Busca por Nome**
 
-1. **Digite a cidade** no campo de busca
+1. **Digite o nome da rota** no campo de busca
 2. **A lista será filtrada** automaticamente
 3. **Para limpar**: Apague o texto da busca
 
-#### **Passo 7.2: Filtro por Status**
+#### **Passo 7.2: Filtro por Dia da Semana**
 
-1. **Clique no dropdown "Status"**
-2. **Selecione o status** desejado
-3. **A lista mostrará apenas** rotas com esse status
-4. **Para limpar**: Selecione "Todos"
-
-#### **Passo 7.3: Filtro por Período**
-
-1. **Clique no dropdown "Período"**
-2. **Selecione o período** desejado:
-   - Hoje
-   - Esta semana
-   - Este mês
-   - Últimos 30 dias
-3. **A lista mostrará apenas** rotas do período
-4. **Para limpar**: Selecione "Todos"
-
-#### **Passo 7.4: Filtro por Unidade de Negócio**
-
-1. **Clique no dropdown "Unidade"**
-2. **Selecione a unidade** desejada
-3. **A lista mostrará apenas** rotas dessa unidade
-4. **Para limpar**: Selecione "Todas"
+1. **Clique no dropdown "Dia da Semana"**
+2. **Selecione o dia** desejado:
+   - Qualquer dia da semana
+   - Segunda-feira
+   - Terça-feira
+   - Quarta-feira
+   - Quinta-feira
+   - Sexta-feira
+   - Sábado
+   - Domingo
+3. **A lista mostrará apenas** rotas desse dia
+4. **Para limpar**: Selecione "Todos os dias da semana"
 
 ---
 

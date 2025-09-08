@@ -61,12 +61,8 @@ export const rotasService = {
 
   async create(rotaData: RotaFormData): Promise<string> {
     try {
-      // ✅ NORMALIZAÇÃO COMPONENTIZADA DE DATAS
       const normalizedData = {
         ...rotaData,
-        dataRota: rotaData.dataRota
-          ? DateService.normalizeForFirebase(rotaData.dataRota)
-          : undefined,
         dataCriacao: DateService.getServerTimestamp(),
         dataAtualizacao: DateService.getServerTimestamp(),
       };
@@ -79,8 +75,8 @@ export const rotasService = {
       // Enviar notificação sobre nova rota
       try {
         await NotificationService.notifyNewRota({
-          origem: rotaData.origem || "Não informado",
-          destino: rotaData.destino || "Não informado",
+          origem: rotaData.nome || "Não informado",
+          destino: "Rota criada",
           id: docRef.id,
         });
       } catch (notificationError) {
@@ -97,18 +93,10 @@ export const rotasService = {
 
   async update(id: string, rotaData: Partial<RotaFormData>): Promise<void> {
     try {
-      // ✅ NORMALIZAÇÃO COMPONENTIZADA DE DATAS
       const normalizedData: any = {
         ...rotaData,
         dataAtualizacao: DateService.getServerTimestamp(),
       };
-
-      // Normalizar dataRota se fornecida
-      if (rotaData.dataRota) {
-        normalizedData.dataRota = DateService.normalizeForFirebase(
-          rotaData.dataRota,
-        );
-      }
 
       const docRef = doc(db, COLLECTION_NAME, id);
       await updateDoc(docRef, normalizedData);
@@ -138,7 +126,10 @@ export const rotasService = {
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
-        throw new Error("Rota não encontrada");
+        console.warn(
+          `Rota ${rotaId} não encontrada. Pulando atualização de cidades.`,
+        );
+        return; // Rota não existe mais, não é um erro crítico
       }
 
       const rotaData = docSnap.data();
@@ -163,7 +154,10 @@ export const rotasService = {
       });
     } catch (error) {
       console.error("Erro ao atualizar cidades vinculadas:", error);
-      throw new Error("Erro ao atualizar cidades vinculadas");
+      // Não relançar o erro para não quebrar a exclusão da cidade
+      console.warn(
+        "Continuando com a exclusão da cidade mesmo com erro na rota",
+      );
     }
   },
 

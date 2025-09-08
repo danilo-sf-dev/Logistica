@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { X, Eye } from "lucide-react";
 import LoadingButton from "../../common/LoadingButton";
-import { DateInput } from "../../common/DateInput";
 import { Rota, RotaFormData } from "../types";
 import { cidadesService } from "../../cidades/data/cidadesService";
 import type { Cidade } from "../../cidades/types";
 import { REGIOES_BRASIL } from "../../../utils/constants";
-import { useDateConversion } from "../../../hooks";
 
 interface RotaFormModalProps {
   isOpen: boolean;
@@ -27,6 +25,8 @@ const DIAS_SEMANA = [
   "Domingo",
 ];
 
+const QUALQUER_DIA = "Qualquer dia da semana";
+
 export const RotaFormModal: React.FC<RotaFormModalProps> = ({
   isOpen,
   onClose,
@@ -35,11 +35,8 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
   erros = {},
   loading = false,
 }) => {
-  const { fromFirebaseDate, getCurrentDateString } = useDateConversion();
-
   const [formData, setFormData] = useState<RotaFormData>({
     nome: "",
-    dataRota: "",
     pesoMinimo: 0,
     diaSemana: [],
     cidades: [],
@@ -50,19 +47,8 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
 
   useEffect(() => {
     if (editingRota) {
-      let dataRotaString = "";
-      if (editingRota.dataRota) {
-        try {
-          const dataObj = fromFirebaseDate(editingRota.dataRota as any);
-          dataRotaString = dataObj.toISOString().split("T")[0];
-        } catch (error) {
-          console.error("Erro ao converter data da rota:", error);
-        }
-      }
-
       setFormData({
         nome: editingRota.nome,
-        dataRota: dataRotaString,
         pesoMinimo: editingRota.pesoMinimo,
         diaSemana: Array.isArray(editingRota.diaSemana)
           ? [...editingRota.diaSemana]
@@ -79,7 +65,7 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
       resetForm();
       setCidadesVinculadas([]);
     }
-  }, [editingRota, fromFirebaseDate]);
+  }, [editingRota]);
 
   const buscarCidadesVinculadas = async (cidadeIds: string[]) => {
     setLoadingCidades(true);
@@ -102,7 +88,6 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
   const resetForm = () => {
     setFormData({
       nome: "",
-      dataRota: "",
       pesoMinimo: 0,
       diaSemana: [],
       cidades: [],
@@ -130,6 +115,34 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
         ? prev.diaSemana.filter((d) => d !== dia)
         : [...prev.diaSemana, dia],
     }));
+  };
+
+  const toggleQualquerDia = () => {
+    setFormData((prev) => {
+      const temQualquerDia = prev.diaSemana.includes(QUALQUER_DIA);
+
+      if (temQualquerDia) {
+        // Se "Qualquer dia" está marcado, desmarca e volta aos dias individuais
+        return {
+          ...prev,
+          diaSemana: prev.diaSemana.filter((dia) => dia !== QUALQUER_DIA),
+        };
+      } else {
+        // Se "Qualquer dia" não está marcado, marca e desmarca todos os individuais
+        return {
+          ...prev,
+          diaSemana: [QUALQUER_DIA],
+        };
+      }
+    });
+  };
+
+  const isQualquerDiaSelecionado = () => {
+    return formData.diaSemana.includes(QUALQUER_DIA);
+  };
+
+  const isDiaIndividualSelecionado = (dia: string) => {
+    return formData.diaSemana.includes(dia) && !isQualquerDiaSelecionado();
   };
 
   if (!isOpen) return null;
@@ -172,23 +185,6 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
               </div>
 
               <div>
-                <DateInput
-                  label="Data da Rota"
-                  value={formData.dataRota}
-                  onChange={(date) =>
-                    setFormData({ ...formData, dataRota: date })
-                  }
-                  minDate={getCurrentDateString()}
-                  required
-                  error={erros.dataRota}
-                  name="dataRota"
-                  id="dataRota"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Peso Mínimo (kg)
                 </label>
@@ -213,21 +209,62 @@ export const RotaFormModal: React.FC<RotaFormModalProps> = ({
                   </p>
                 )}
               </div>
+            </div>
 
+            <div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Dias da Semana *
                 </label>
                 <div className="space-y-2">
+                  {/* Checkbox "Qualquer dia da semana" */}
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={isQualquerDiaSelecionado()}
+                      onChange={toggleQualquerDia}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    />
+                    <span className="ml-2 text-sm font-medium text-gray-700">
+                      {QUALQUER_DIA}
+                    </span>
+                  </label>
+
+                  {/* Separador visual */}
+                  <div className="border-t border-gray-200 my-2"></div>
+
+                  {/* Dias individuais */}
                   {DIAS_SEMANA.map((dia) => (
                     <label key={dia} className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={formData.diaSemana.includes(dia)}
-                        onChange={() => toggleDiaSemana(dia)}
-                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                        checked={isDiaIndividualSelecionado(dia)}
+                        onChange={() => {
+                          // Se selecionar um dia individual, desmarca "Qualquer dia"
+                          if (!isDiaIndividualSelecionado(dia)) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              diaSemana: prev.diaSemana.filter(
+                                (d) => d !== QUALQUER_DIA,
+                              ),
+                            }));
+                          }
+                          toggleDiaSemana(dia);
+                        }}
+                        disabled={isQualquerDiaSelecionado()}
+                        className={`h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded ${
+                          isQualquerDiaSelecionado()
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
                       />
-                      <span className="ml-2 text-sm text-gray-700">{dia}</span>
+                      <span
+                        className={`ml-2 text-sm text-gray-700 ${
+                          isQualquerDiaSelecionado() ? "opacity-50" : ""
+                        }`}
+                      >
+                        {dia}
+                      </span>
                     </label>
                   ))}
                 </div>
