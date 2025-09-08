@@ -9,7 +9,6 @@ import {
   RotaOrdenacaoCampo,
 } from "../types";
 import { useNotification } from "../../../contexts/NotificationContext";
-import { useDateValidation } from "../../../hooks";
 import type { TableExportFilters } from "../../relatorios/export/BaseTableExportService";
 
 export const useRotas = () => {
@@ -34,41 +33,24 @@ export const useRotas = () => {
 
   const { showNotification } = useNotification();
 
-  // ✅ HOOKS COMPONENTIZADOS DE DATA
-  const { validateDate } = useDateValidation();
+  const validar = useCallback((input: RotaFormData) => {
+    const novosErros: Partial<Record<keyof RotaFormData, string>> = {};
 
-  const validar = useCallback(
-    (input: RotaFormData) => {
-      const novosErros: Partial<Record<keyof RotaFormData, string>> = {};
+    if (!input.nome?.trim()) {
+      novosErros.nome = "Nome da rota é obrigatório";
+    }
 
-      if (!input.nome?.trim()) {
-        novosErros.nome = "Nome da rota é obrigatório";
-      }
+    if (!input.diaSemana || input.diaSemana.length === 0) {
+      novosErros.diaSemana = "Pelo menos um dia da semana deve ser selecionado";
+    }
 
-      // ✅ VALIDAÇÃO COMPONENTIZADA DE DATA
-      if (!input.dataRota) {
-        novosErros.dataRota = "Data da rota é obrigatória";
-      } else {
-        const dateValidation = validateDate(input.dataRota);
-        if (!dateValidation.isValid) {
-          novosErros.dataRota = dateValidation.error;
-        }
-      }
+    if (input.pesoMinimo !== undefined && input.pesoMinimo < 0) {
+      novosErros.pesoMinimo = "Peso mínimo deve ser um valor positivo";
+    }
 
-      if (!input.diaSemana || input.diaSemana.length === 0) {
-        novosErros.diaSemana =
-          "Pelo menos um dia da semana deve ser selecionado";
-      }
-
-      if (input.pesoMinimo !== undefined && input.pesoMinimo < 0) {
-        novosErros.pesoMinimo = "Peso mínimo deve ser um valor positivo";
-      }
-
-      setErros(novosErros);
-      return Object.keys(novosErros).length === 0;
-    },
-    [validateDate],
-  );
+    setErros(novosErros);
+    return Object.keys(novosErros).length === 0;
+  }, []);
 
   const fetchRotas = useCallback(async () => {
     try {
@@ -190,12 +172,19 @@ export const useRotas = () => {
     }
 
     if (filters.diaSemana) {
-      filtered = filtered.filter(
-        (rota) =>
-          rota.diaSemana &&
-          Array.isArray(rota.diaSemana) &&
-          rota.diaSemana.includes(filters.diaSemana),
-      );
+      filtered = filtered.filter((rota) => {
+        if (!rota.diaSemana || !Array.isArray(rota.diaSemana)) {
+          return false;
+        }
+
+        // Se o filtro é "Qualquer dia da semana", busca rotas que tenham essa opção
+        if (filters.diaSemana === "Qualquer dia da semana") {
+          return rota.diaSemana.includes("Qualquer dia da semana");
+        }
+
+        // Para dias específicos, busca normalmente
+        return rota.diaSemana.includes(filters.diaSemana);
+      });
     }
 
     // Aplicar ordenação
@@ -205,10 +194,7 @@ export const useRotas = () => {
         let bValue: any = b[sortConfig.field!];
 
         // Tratar valores específicos por campo
-        if (sortConfig.field === "dataRota") {
-          aValue = new Date(aValue).getTime();
-          bValue = new Date(bValue).getTime();
-        } else if (sortConfig.field === "cidades") {
+        if (sortConfig.field === "cidades") {
           // Para cidades, ordenar pela quantidade de cidades
           aValue = Array.isArray(aValue) ? aValue.length : 0;
           bValue = Array.isArray(bValue) ? bValue.length : 0;

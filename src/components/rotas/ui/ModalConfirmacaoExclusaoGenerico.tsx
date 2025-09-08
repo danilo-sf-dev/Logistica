@@ -27,10 +27,6 @@ const ModalConfirmacaoExclusaoGenerico: React.FC<Props> = ({
       details={[
         { label: "Rota", value: rota.nome },
         {
-          label: "Data",
-          value: new Date(rota.dataRota).toLocaleDateString("pt-BR"),
-        },
-        {
           label: "Dias da Semana",
           value: Array.isArray(rota.diaSemana)
             ? rota.diaSemana.join(", ")

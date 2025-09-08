@@ -241,10 +241,20 @@ Admin Senior → Pode alterar qualquer perfil
 ### **Funcionalidade**
 
 - Permite promoções temporárias sem alterar o perfil base
-- Retorno automático ao perfil anterior após o período
+- **Retorno automático** ao perfil anterior após o período
 - Aplicável apenas para perfis "Funcionário" e "Usuário"
+- **Verificação automática** a cada 5 minutos quando usuário está logado
 
-### **Exemplo de Uso**
+### **Sistema de Reversão Automática**
+
+#### **Como Funciona**
+
+1. **Verificação Contínua**: Sistema verifica perfis temporários a cada 5 minutos
+2. **Comparação Inteligente**: Compara data de expiração com data atual
+3. **Reversão Automática**: Retorna ao `baseRole` quando período expira
+4. **Auditoria Completa**: Registra todas as reversões no histórico
+
+#### **Exemplo de Uso**
 
 ```
 Usuário "João" (Role: user)
@@ -254,7 +264,16 @@ Motivo: Substituição de funcionário em férias
 
 Resultado:
 - 15/01 a 15/02: João tem perfil "Funcionário"
-- 16/02 em diante: João volta automaticamente para "Usuário"
+- 16/02 em diante: João volta AUTOMATICAMENTE para "Usuário"
+- Sistema registra a reversão no histórico de auditoria
+```
+
+#### **Função de Emergência**
+
+Para casos urgentes, disponível no console:
+
+```javascript
+executeManualRoleRevert(); // Reverte todos os perfis expirados imediatamente
 ```
 
 ---
@@ -275,6 +294,7 @@ Este sistema de permissões garante:
 - **Eficiência**: Usuários têm acesso adequado às suas necessidades
 - **Auditoria**: Rastreamento completo de mudanças
 - **Flexibilidade**: Períodos temporários para necessidades operacionais
+- **Automatização**: Reversão automática de perfis temporários expirados
 - **Escalabilidade**: Estrutura hierárquica clara e extensível
 
-O sistema está projetado para atender às necessidades operacionais diárias enquanto mantém a segurança e controle necessários para um ambiente empresarial.
+O sistema está projetado para atender às necessidades operacionais diárias enquanto mantém a segurança e controle necessários para um ambiente empresarial. A **reversão automática** garante que perfis temporários nunca fiquem ativos além do período autorizado, mantendo a integridade do sistema de permissões.

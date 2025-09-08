@@ -5,6 +5,7 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { toast } from "react-hot-toast";
@@ -22,38 +23,38 @@ export interface NotificationData {
   type: "funcionario" | "rota" | "folga" | "veiculo" | "sistema";
   title: string;
   message: string;
-  userId?: string;
-  targetUsers?: string[];
+  userId: string;
   createdAt: Date;
   read: boolean;
   priority: "low" | "medium" | "high";
 }
 
 export class NotificationService {
-  // Criar notificação no Firestore
+  // Criar notificação para um usuário específico
   static async createNotification(
     data: Omit<NotificationData, "id" | "createdAt" | "read">,
   ): Promise<void> {
     try {
-      // Buscar usuários que devem receber a notificação
-      const usersToNotify = await this.getUsersToNotify(data);
+      const notificationRef = doc(collection(db, "notificacoes"));
+      const notification: NotificationData = {
+        ...data,
+        id: notificationRef.id,
+        createdAt: new Date(),
+        read: false,
+      };
 
-      // Criar notificação para cada usuário elegível
-      for (const user of usersToNotify) {
-        const notificationRef = doc(collection(db, "notificacoes"));
-        const notification: NotificationData = {
-          ...data,
-          id: notificationRef.id,
-          createdAt: new Date(),
-          read: false,
-          userId: user.id, // Associar ao usuário específico
-          targetUsers: [user.id], // Lista de usuários que devem ver
-        };
+      await setDoc(notificationRef, notification);
 
-        await setDoc(notificationRef, notification);
+      // Buscar dados do usuário para enviar notificação
+      const userRef = doc(db, "users", data.userId);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data();
 
-        // Enviar notificação imediata (toast)
-        await this.sendNotificationToUser(user, notification);
+      if (userData) {
+        await this.sendNotificationToUser(
+          { id: data.userId, ...userData },
+          notification,
+        );
       }
     } catch (error) {
       console.error("Erro ao criar notificação:", error);
@@ -61,15 +62,39 @@ export class NotificationService {
     }
   }
 
+  // Criar notificação para todos os usuários elegíveis
+  static async createNotificationForAllUsers(
+    data: Omit<NotificationData, "id" | "createdAt" | "read" | "userId">,
+  ): Promise<void> {
+    try {
+      // Buscar usuários que devem receber a notificação
+      const usersToNotify = await this.getUsersToNotify(data);
+
+      // Criar notificação para cada usuário elegível
+      for (const user of usersToNotify) {
+        await this.createNotification({
+          ...data,
+          userId: user.id,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao criar notificação para todos os usuários:", error);
+      throw error;
+    }
+  }
+
   // Buscar usuários que devem receber a notificação
   static async getUsersToNotify(
-    notificationData: Omit<NotificationData, "id" | "createdAt" | "read">,
+    notificationData: Omit<
+      NotificationData,
+      "id" | "createdAt" | "read" | "userId"
+    >,
   ): Promise<any[]> {
     try {
       const usersRef = collection(db, "users");
       const usersQuery = query(
         usersRef,
-        where("role", "in", ["admin", "gerente"]),
+        where("role", "in", ["admin_senior", "admin", "gerente"]),
       );
       const usersSnapshot = await getDocs(usersQuery);
 
@@ -93,7 +118,10 @@ export class NotificationService {
   // Verificar se usuário deve receber a notificação
   static shouldNotifyUser(
     userData: any,
-    notificationData: Omit<NotificationData, "id" | "createdAt" | "read">,
+    notificationData: Omit<
+      NotificationData,
+      "id" | "createdAt" | "read" | "userId"
+    >,
   ): boolean {
     const notificacoes = userData.notificacoes || {};
 
@@ -105,7 +133,8 @@ export class NotificationService {
       case "veiculo":
         return notificacoes.manutencao !== false;
       case "funcionario":
-        return notificacoes.funcionarios !== false;
+        // Notificações de funcionários não têm toggle específico, usar push como padrão
+        return notificacoes.push !== false;
       default:
         return true;
     }
@@ -169,7 +198,7 @@ export class NotificationService {
 
   // Notificações específicas por tipo
   static async notifyNewFuncionario(funcionarioData: any): Promise<void> {
-    await this.createNotification({
+    await this.createNotificationForAllUsers({
       type: "funcionario",
       title: "Novo Funcionário Cadastrado",
       message: `Funcionário ${funcionarioData.nome} foi cadastrado no sistema.`,
@@ -178,7 +207,7 @@ export class NotificationService {
   }
 
   static async notifyNewRota(rotaData: any): Promise<void> {
-    await this.createNotification({
+    await this.createNotificationForAllUsers({
       type: "rota",
       title: "Nova Rota Criada",
       message: `Rota de ${rotaData.origem} para ${rotaData.destino} foi criada.`,
@@ -187,7 +216,7 @@ export class NotificationService {
   }
 
   static async notifyNewFolga(folgaData: any): Promise<void> {
-    await this.createNotification({
+    await this.createNotificationForAllUsers({
       type: "folga",
       title: "Nova Solicitação de Folga",
       message: `Solicitação de folga para ${folgaData.funcionarioNome} em ${folgaData.data}.`,
@@ -196,7 +225,7 @@ export class NotificationService {
   }
 
   static async notifyVeiculoManutencao(veiculoData: any): Promise<void> {
-    await this.createNotification({
+    await this.createNotificationForAllUsers({
       type: "veiculo",
       title: "Manutenção de Veículo",
       message: `Veículo ${veiculoData.placa} precisa de manutenção.`,
@@ -212,7 +241,7 @@ export class NotificationService {
       const notificationsRef = collection(db, "notificacoes");
       const notificationsQuery = query(
         notificationsRef,
-        where("targetUsers", "array-contains", userId),
+        where("userId", "==", userId),
       );
 
       const snapshot = await getDocs(notificationsQuery);

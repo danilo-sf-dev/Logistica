@@ -22,6 +22,7 @@ import {
 import { doc, setDoc, getDoc, DocumentData } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 import SessionService from "../services/sessionService";
+import { useTemporaryRoleScheduler } from "../hooks/useTemporaryRoleScheduler";
 
 import { UserProfile } from "../types";
 
@@ -62,6 +63,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Hook para verificação automática de perfis temporários expirados
+  useTemporaryRoleScheduler();
 
   // Login com email/senha
   const login = async (

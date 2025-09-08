@@ -160,8 +160,8 @@ service cloud.firestore {
     
     match /notificacoes/{docId} {
       allow read: if isAuthenticated() &&
-                     (resource.data.targetUsers && 
-                      request.auth.uid in resource.data.targetUsers);
+                     (request.auth.uid == resource.data.userId || 
+                      canManageUsers());
       allow write: if isAuthenticated() && isGerente();
     }
 

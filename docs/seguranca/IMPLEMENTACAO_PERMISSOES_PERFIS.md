@@ -982,8 +982,11 @@ export const UserManagementForm: React.FC = () => {
 #### **4.1 Períodos Temporários**
 
 - [x] Implementar sistema de períodos temporários
-- [x] Criar job para retorno automático de roles
+- [x] Criar hook `useTemporaryRoleScheduler` para verificação automática
+- [x] Implementar reversão automática a cada 5 minutos
+- [x] Corrigir query do Firestore para busca precisa de perfis expirados
 - [x] Testar cenários de expiração
+- [x] Implementar função de emergência `executeManualRoleRevert()`
 
 #### **4.2 Auditoria e Histórico**
 
@@ -1125,6 +1128,70 @@ export const UserManagementForm: React.FC = () => {
 
 ---
 
+## 🔄 **Sistema de Reversão Automática de Perfis Temporários**
+
+### **📋 Visão Geral**
+
+O sistema implementa verificação automática e reversão de perfis temporários expirados, garantindo que usuários retornem automaticamente ao seu perfil base quando o período temporário expira.
+
+### **🛠️ Implementação Técnica**
+
+#### **Hook de Verificação Automática**
+
+```typescript
+// src/hooks/useTemporaryRoleScheduler.ts
+export const useTemporaryRoleScheduler = () => {
+  // Executa verificação a cada 5 minutos
+  // Integrado ao AuthContext para execução automática
+};
+```
+
+#### **Serviço de Processamento**
+
+```typescript
+// src/services/userManagement/TemporaryRoleService.ts
+static async processExpiredTemporaryRoles() {
+  // Busca usuários com perfis temporários ativos
+  // Compara datas individualmente para precisão
+  // Reverte automaticamente perfis expirados
+}
+```
+
+### **⚙️ Funcionamento**
+
+1. **Verificação Periódica**: A cada 5 minutos quando usuário está logado
+2. **Busca Inteligente**: Query otimizada no Firestore para perfis temporários ativos
+3. **Comparação Precisa**: Conversão correta de datas Firebase para comparação
+4. **Reversão Automática**: Retorno ao `baseRole` quando `endDate <= now`
+5. **Auditoria Completa**: Registro de todas as reversões no histórico
+
+### **🔧 Função de Emergência**
+
+```typescript
+// src/utils/manualRoleRevert.ts
+export const executeManualRoleRevert = async () => {
+  // Execução manual imediata para casos urgentes
+  // Disponível no console: executeManualRoleRevert()
+};
+```
+
+### **📊 Logs e Monitoramento**
+
+- **Logs Essenciais**: Apenas informações críticas
+- **Reversões**: `🔄 Revertendo perfil temporário: [Nome]`
+- **Sucesso**: `✅ X perfil(is) temporário(s) revertido(s) automaticamente`
+- **Erros**: Captura e exibição de erros específicos
+
+### **✅ Benefícios**
+
+- **Automatização**: Sem necessidade de intervenção manual
+- **Precisão**: Comparação correta de datas e fusos horários
+- **Confiabilidade**: Execução contínua e robusta
+- **Auditoria**: Rastreamento completo de todas as reversões
+- **Performance**: Verificação eficiente sem impacto no sistema
+
+---
+
 ## 📚 **Documentação Relacionada**
 
 - **[SISTEMA_PERMISSOES_PERFIS.md](./SISTEMA_PERMISSOES_PERFIS.md)** - Conceitos e regras do sistema
@@ -1161,6 +1228,8 @@ O sistema foi implementado com **foco na estabilidade e segurança**, evitando q
 - ✅ **Performance excelente** (< 600ms para operações)
 - ✅ **Segurança robusta** com validações hierárquicas
 - ✅ **Auditoria completa** de todas as operações
+- ✅ **Reversão automática** de perfis temporários expirados
+- ✅ **Monitoramento contínuo** com logs essenciais
 - ✅ **Interface limpa** e profissional
 
 **O sistema está pronto para FASE 6 (Deploy) quando autorizado pelo usuário.**

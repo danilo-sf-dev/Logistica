@@ -12,6 +12,7 @@ import {
 import { db } from "../../../firebase/config";
 import type { Folga, FolgaFormData } from "../types";
 import { DateService } from "../../../services/DateService";
+import { NotificationService } from "../../../services/notificationService";
 
 const COLLECTION = "folgas";
 
@@ -210,6 +211,19 @@ async function criar(input: FolgaFormData): Promise<string> {
     dataAtualizacao: DateService.getServerTimestamp(),
   };
   const ref = await addDoc(collection(db, COLLECTION), normalizedData);
+
+  // Enviar notificação sobre nova folga
+  try {
+    await NotificationService.notifyNewFolga({
+      funcionarioNome: input.funcionarioNome || "Funcionário não informado",
+      data: input.dataInicio || "Data não informada",
+      id: ref.id,
+    });
+  } catch (notificationError) {
+    console.error("Erro ao enviar notificação:", notificationError);
+    // Não falha a criação da folga se a notificação falhar
+  }
+
   return ref.id;
 }
 

@@ -1008,7 +1008,7 @@ Linha 2: email
 Email "joao@email.com" já cadastrado no sistema
 
 Linha 2: codigoVendSistema
-Código "VEND001" já cadastrado no sistema
+Código "20" já cadastrado no sistema
 ```
 
 **Veículos:**
@@ -1444,8 +1444,8 @@ Nome* | CPF* | Email | Celular* | Região* | Código Sistema | Unidade Negócio*
 
 ```
 Nome* | CPF* | Email | Celular* | Região* | Código Sistema | Unidade Negócio* | Tipo Contrato* | Cidades Atendidas
-JOÃO SILVA | 12345678901 | joao@empresa.com | 11999999999 | SUDESTE | VEND001 | frigorifico | clt | São Paulo,Rio de Janeiro
-MARIA SANTOS | 98765432100 | maria@empresa.com | 11888888888 | NORDESTE | VEND002 | ovos | pj | Salvador,Ilhéus
+JOÃO SILVA | 12345678901 | joao@empresa.com | 11999999999 | SUDESTE | 20 | frigorifico | clt | São Paulo,Rio de Janeiro
+MARIA SANTOS | 98765432100 | maria@empresa.com | 11888888888 | NORDESTE | 80 | ovos | pj | Salvador,Ilhéus
 ```
 
 ### Exemplo: Template de Veículos

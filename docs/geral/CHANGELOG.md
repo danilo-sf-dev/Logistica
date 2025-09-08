@@ -1,5 +1,37 @@
 # 📝 Changelog - Sistema de Gestão de Logística
 
+## [1.2.4] - 2025-01-XX
+
+### 🗺️ **Atualização do Módulo de Rotas**
+
+#### **Mudanças na Regra de Negócio**
+
+- **❌ Removido**: Campo "Data da Rota" - rotas não precisam mais de data específica
+- **✅ Adicionado**: Checkbox "Qualquer dia da semana" - permite rotas que funcionam todos os dias
+- **🔄 Atualizado**: Sistema de dias da semana - agora suporta "Qualquer dia" ou dias específicos
+
+#### **Melhorias na Interface**
+
+- **📝 Formulário Simplificado**: Removido campo de data, foco em nome e dias da semana
+- **🎯 Checkbox Inteligente**: "Qualquer dia da semana" desabilita dias individuais automaticamente
+- **📊 Tabela Atualizada**: Removida coluna de data, melhor exibição dos dias da semana
+- **🔍 Filtros Melhorados**: Filtro por "Qualquer dia da semana" adicionado
+
+#### **Funcionalidades Atualizadas**
+
+- **✅ Criação de Rotas**: Processo simplificado sem necessidade de data
+- **✅ Edição de Rotas**: Foco em configuração de dias da semana
+- **✅ Listagem de Rotas**: Visualização otimizada sem coluna de data
+- **✅ Filtros de Rotas**: Busca por "Qualquer dia da semana" implementada
+- **✅ Exportação de Relatórios**: Campos atualizados para nova estrutura
+
+#### **Documentação Atualizada**
+
+- **📖 Manual de Rotas**: Instruções atualizadas para nova funcionalidade
+- **🔧 Guia Técnico**: Documentação de desenvolvimento atualizada
+
+---
+
 ## [1.2.3] - 2025-01-XX
 
 ### 🔄 **Revisão Completa da Documentação**

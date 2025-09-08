@@ -13,6 +13,7 @@ import {
 import { db } from "../../../firebase/config";
 import { Rota, RotaFormData } from "../types";
 import { DateService } from "../../../services/DateService";
+import { NotificationService } from "../../../services/notificationService";
 
 const COLLECTION_NAME = "rotas";
 
@@ -60,12 +61,8 @@ export const rotasService = {
 
   async create(rotaData: RotaFormData): Promise<string> {
     try {
-      // ✅ NORMALIZAÇÃO COMPONENTIZADA DE DATAS
       const normalizedData = {
         ...rotaData,
-        dataRota: rotaData.dataRota
-          ? DateService.normalizeForFirebase(rotaData.dataRota)
-          : undefined,
         dataCriacao: DateService.getServerTimestamp(),
         dataAtualizacao: DateService.getServerTimestamp(),
       };
@@ -74,6 +71,19 @@ export const rotasService = {
         collection(db, COLLECTION_NAME),
         normalizedData,
       );
+
+      // Enviar notificação sobre nova rota
+      try {
+        await NotificationService.notifyNewRota({
+          origem: rotaData.nome || "Não informado",
+          destino: "Rota criada",
+          id: docRef.id,
+        });
+      } catch (notificationError) {
+        console.error("Erro ao enviar notificação:", notificationError);
+        // Não falha a criação da rota se a notificação falhar
+      }
+
       return docRef.id;
     } catch (error) {
       console.error("Erro ao criar rota:", error);
@@ -83,18 +93,10 @@ export const rotasService = {
 
   async update(id: string, rotaData: Partial<RotaFormData>): Promise<void> {
     try {
-      // ✅ NORMALIZAÇÃO COMPONENTIZADA DE DATAS
       const normalizedData: any = {
         ...rotaData,
         dataAtualizacao: DateService.getServerTimestamp(),
       };
-
-      // Normalizar dataRota se fornecida
-      if (rotaData.dataRota) {
-        normalizedData.dataRota = DateService.normalizeForFirebase(
-          rotaData.dataRota,
-        );
-      }
 
       const docRef = doc(db, COLLECTION_NAME, id);
       await updateDoc(docRef, normalizedData);
@@ -124,7 +126,7 @@ export const rotasService = {
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
-        throw new Error("Rota não encontrada");
+        return; // Rota não existe mais, não é um erro crítico
       }
 
       const rotaData = docSnap.data();
@@ -149,7 +151,7 @@ export const rotasService = {
       });
     } catch (error) {
       console.error("Erro ao atualizar cidades vinculadas:", error);
-      throw new Error("Erro ao atualizar cidades vinculadas");
+      // Não relançar o erro para não quebrar a exclusão da cidade
     }
   },
 

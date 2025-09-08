@@ -3,24 +3,8 @@ import { BaseExportService, type ExportConfig } from "./BaseExportService";
 export class RotasExportService extends BaseExportService {
   protected config: ExportConfig = {
     titulo: "Rotas",
-    campos: [
-      "nome",
-      "dataRota",
-      "pesoMinimo",
-      "diaSemana",
-      "cidades",
-      "dataCriacao",
-    ],
+    campos: ["nome", "pesoMinimo", "diaSemana", "cidades", "dataCriacao"],
     formatacao: {
-      dataRota: (valor) => {
-        if (!valor) return "";
-        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
-          const [year, month, day] = valor.split("-");
-          return `${day}/${month}/${year}`;
-        }
-        if (valor.toDate) return valor.toDate().toLocaleDateString("pt-BR");
-        return valor;
-      },
       pesoMinimo: (valor) => {
         if (!valor || valor === 0) return "Não definido";
         return `${valor} kg`;
@@ -28,6 +12,10 @@ export class RotasExportService extends BaseExportService {
       diaSemana: (valor) => {
         if (!valor) return "N/A";
         if (Array.isArray(valor)) {
+          // Se contém "Qualquer dia da semana", retorna apenas isso
+          if (valor.includes("Qualquer dia da semana")) {
+            return "Qualquer dia da semana";
+          }
           return valor.join(", ");
         }
         return valor;
@@ -45,7 +33,7 @@ export class RotasExportService extends BaseExportService {
         return valor;
       },
     },
-    ordenacao: ["nome", "dataRota", "dataCriacao"],
+    ordenacao: ["nome", "dataCriacao"],
   };
 
   protected getFilteredData(dados: any[]): any[] {
@@ -65,7 +53,6 @@ export class RotasExportService extends BaseExportService {
   protected getColumnHeaders(): string[] {
     const headerMap: Record<string, string> = {
       nome: "Nome da Rota",
-      dataRota: "Data da Rota",
       pesoMinimo: "Peso Mínimo",
       diaSemana: "Dias da Semana",
       cidades: "Cidades Vinculadas",
