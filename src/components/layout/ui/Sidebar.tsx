@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { X, LogOut, Truck } from "lucide-react";
 import { PermissionService } from "../../../services/permissionService";
+import NotificationBell from "../../common/NotificationBell";
 import type { SidebarProps } from "../types";
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -99,11 +100,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex flex-col w-64">
           <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-              <div className="flex items-center flex-shrink-0 px-4">
-                <Truck className="h-8 w-8 text-primary-600" />
-                <span className="ml-2 text-xl font-semibold text-gray-900">
-                  SGL
-                </span>
+              <div className="flex items-center justify-between flex-shrink-0 px-4 mb-2">
+                <div className="flex items-center">
+                  <Truck className="h-8 w-8 text-primary-600" />
+                  <span className="ml-2 text-xl font-semibold text-white">
+                    SGL
+                  </span>
+                </div>
+                {/* Notification Bell para desktop */}
+                <div className="flex-shrink-0">
+                  <NotificationBell className="text-gray-300 hover:text-white" />
+                </div>
               </div>
               <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                 {navigation.map((item) => {

@@ -73,14 +73,14 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
       {/* Botão do sino */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         aria-label="Notificações"
       >
         <Bell size={20} />
 
         {/* Badge de notificações não lidas */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium shadow-sm">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -88,45 +88,43 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
 
       {/* Dropdown de notificações */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h3 className="text-sm font-medium text-gray-900">Notificações</h3>
+          <div className="flex items-center justify-between p-2 border-b border-gray-200">
+            <h3 className="text-xs font-medium text-gray-900">Notificações</h3>
             <button
               onClick={() => setIsOpen(false)}
               className="text-gray-400 hover:text-gray-600"
             >
-              <X size={16} />
+              <X size={12} />
             </button>
           </div>
 
           {/* Lista de notificações */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto">
             {loading ? (
-              <div className="p-4 text-center text-gray-500">
-                Carregando notificações...
-              </div>
+              <div className="p-3 text-center text-gray-500">Carregando...</div>
             ) : notifications.length === 0 ? (
-              <div className="p-4 text-center text-gray-500">
+              <div className="p-3 text-center text-gray-500">
                 Nenhuma notificação
               </div>
             ) : (
               notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                  className={`p-2 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
                     !notification.read ? "bg-blue-50" : ""
                   }`}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium text-gray-900">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-xs font-medium text-gray-900 truncate">
                         {notification.title}
                       </h4>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-xs text-gray-600 mt-1">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-gray-400 mt-2">
+                      <p className="text-xs text-gray-400 mt-1">
                         {new Date(notification.createdAt).toLocaleString(
                           "pt-BR",
                         )}
@@ -136,10 +134,10 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                     {!notification.read && (
                       <button
                         onClick={() => markAsRead(notification.id)}
-                        className="ml-2 p-1 text-gray-400 hover:text-green-600 transition-colors"
+                        className="ml-1 p-0.5 text-gray-400 hover:text-green-600 transition-colors flex-shrink-0"
                         title="Marcar como lida"
                       >
-                        <Check size={14} />
+                        <Check size={10} />
                       </button>
                     )}
                   </div>
@@ -150,7 +148,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="p-3 border-t border-gray-200">
+            <div className="p-1.5 border-t border-gray-200">
               <button
                 onClick={() => {
                   // Marcar todas como lidas
@@ -158,7 +156,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                     if (!n.read) markAsRead(n.id);
                   });
                 }}
-                className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
               >
                 Marcar todas como lidas
               </button>

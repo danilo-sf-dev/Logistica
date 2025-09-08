@@ -13,6 +13,7 @@ import {
 import { db } from "../../../firebase/config";
 import { Rota, RotaFormData } from "../types";
 import { DateService } from "../../../services/DateService";
+import { NotificationService } from "../../../services/notificationService";
 
 const COLLECTION_NAME = "rotas";
 
@@ -74,6 +75,19 @@ export const rotasService = {
         collection(db, COLLECTION_NAME),
         normalizedData,
       );
+
+      // Enviar notificação sobre nova rota
+      try {
+        await NotificationService.notifyNewRota({
+          origem: rotaData.origem || "Não informado",
+          destino: rotaData.destino || "Não informado",
+          id: docRef.id,
+        });
+      } catch (notificationError) {
+        console.error("Erro ao enviar notificação:", notificationError);
+        // Não falha a criação da rota se a notificação falhar
+      }
+
       return docRef.id;
     } catch (error) {
       console.error("Erro ao criar rota:", error);

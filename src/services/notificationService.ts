@@ -94,7 +94,7 @@ export class NotificationService {
       const usersRef = collection(db, "users");
       const usersQuery = query(
         usersRef,
-        where("role", "in", ["admin", "gerente"]),
+        where("role", "in", ["admin_senior", "admin", "gerente"]),
       );
       const usersSnapshot = await getDocs(usersQuery);
 
@@ -133,7 +133,8 @@ export class NotificationService {
       case "veiculo":
         return notificacoes.manutencao !== false;
       case "funcionario":
-        return notificacoes.funcionarios !== false;
+        // Notificações de funcionários não têm toggle específico, usar push como padrão
+        return notificacoes.push !== false;
       default:
         return true;
     }
