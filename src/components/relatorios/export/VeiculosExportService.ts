@@ -190,7 +190,7 @@ export class VeiculosExportService extends BaseExportService {
 
         const total = data.dadosProcessados.reduce(
           (sum: number, d: any) => sum + d.value,
-          0,
+          0
         );
 
         // Grid dinâmico baseado no número de status
@@ -198,7 +198,7 @@ export class VeiculosExportService extends BaseExportService {
         const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
         const cardWidth = Math.min(
           40,
-          (availableWidth - (totalCards - 1) * 6) / totalCards,
+          (availableWidth - (totalCards - 1) * 6) / totalCards
         );
         const cardSpacing = 6;
         let cardX = margin;
@@ -229,8 +229,8 @@ export class VeiculosExportService extends BaseExportService {
           doc.setTextColor(107, 114, 128);
           doc.text(
             `(${percentText})`,
-            cardX + doc.getTextWidth(`${item.value} `),
-            yPosition + 8,
+            cardX + doc.getTextWidth(`${item.value} `) + 3,
+            yPosition + 8
           );
           doc.setTextColor(0, 0, 0);
 
@@ -254,9 +254,9 @@ export class VeiculosExportService extends BaseExportService {
         const dadosFiltrados = this.getFilteredData(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosTabela = dadosFiltrados
-          .slice(0, 50)
-          .map((item) => this.config.campos.map((campo) => item[campo] || ""));
+        const dadosTabela = dadosFiltrados.map((item) =>
+          this.config.campos.map((campo) => item[campo] || "")
+        );
 
         autoTable(doc, {
           head: [colunas],
@@ -335,7 +335,7 @@ export class VeiculosExportService extends BaseExportService {
         const resumoSheet = workbook.addWorksheet("Resumo");
         const total = data.dadosProcessados.reduce(
           (sum: number, d: any) => sum + d.value,
-          0,
+          0
         );
 
         resumoSheet.getCell(1, 1).value = "RESUMO ESTATÍSTICO";
@@ -395,7 +395,7 @@ export class VeiculosExportService extends BaseExportService {
 
       saveAs(
         blob,
-        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`,
+        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`
       );
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);

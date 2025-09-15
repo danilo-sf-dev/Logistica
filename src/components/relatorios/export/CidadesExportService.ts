@@ -63,13 +63,13 @@ export class CidadesExportService extends BaseExportService {
   // Método para obter configurações de largura de coluna específicas para cidades
   protected getColumnWidths(): Record<number, { cellWidth: number }> {
     return {
-      0: { cellWidth: 35 }, // Nome
+      0: { cellWidth: 50 }, // Nome
       1: { cellWidth: 15 }, // Estado
       2: { cellWidth: 30 }, // Região
       3: { cellWidth: 20 }, // Distância
       4: { cellWidth: 20 }, // Peso Mínimo
       5: { cellWidth: 30 }, // Rota
-      6: { cellWidth: 30 }, // Observação
+      6: { cellWidth: 70 }, // Observação
     };
   }
 
@@ -125,7 +125,7 @@ export class CidadesExportService extends BaseExportService {
 
         const total = data.dadosProcessados.reduce(
           (sum: number, d: any) => sum + d.value,
-          0,
+          0
         );
 
         // Grid dinâmico baseado no número de regiões
@@ -133,7 +133,7 @@ export class CidadesExportService extends BaseExportService {
         const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
         const cardWidth = Math.min(
           40,
-          (availableWidth - (totalCards - 1) * 6) / totalCards,
+          (availableWidth - (totalCards - 1) * 6) / totalCards
         );
         const cardSpacing = 6;
         let cardX = margin;
@@ -164,8 +164,8 @@ export class CidadesExportService extends BaseExportService {
           doc.setTextColor(107, 114, 128);
           doc.text(
             `(${percentText})`,
-            cardX + doc.getTextWidth(`${item.value} `),
-            yPosition + 8,
+            cardX + doc.getTextWidth(`${item.value} `) + 3,
+            yPosition + 8
           );
           doc.setTextColor(0, 0, 0);
 
@@ -189,9 +189,9 @@ export class CidadesExportService extends BaseExportService {
         const dadosFiltrados = await this.processDataWithRotas(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosTabela = dadosFiltrados
-          .slice(0, 50)
-          .map((item) => this.config.campos.map((campo) => item[campo] || ""));
+        const dadosTabela = dadosFiltrados.map((item) =>
+          this.config.campos.map((campo) => item[campo] || "")
+        );
 
         autoTable(doc, {
           head: [colunas],
@@ -270,7 +270,7 @@ export class CidadesExportService extends BaseExportService {
         const resumoSheet = workbook.addWorksheet("Resumo");
         const total = data.dadosProcessados.reduce(
           (sum: number, d: any) => sum + d.value,
-          0,
+          0
         );
 
         resumoSheet.getCell(1, 1).value = "RESUMO ESTATÍSTICO";
@@ -330,7 +330,7 @@ export class CidadesExportService extends BaseExportService {
 
       saveAs(
         blob,
-        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`,
+        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`
       );
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);

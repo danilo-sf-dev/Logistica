@@ -85,7 +85,20 @@ export abstract class BaseExportService {
 
   protected getColumnHeaders(): string[] {
     return this.config.campos.map(
-      (campo) => campo.charAt(0).toUpperCase() + campo.slice(1),
+      (campo) => campo.charAt(0).toUpperCase() + campo.slice(1)
+    );
+  }
+
+  protected getColumnWidths(): Record<number, { cellWidth: number }> {
+    return Object.fromEntries(
+      this.config.campos.map((campo, index) => {
+        // Largura específica para o nome do funcionário
+        if (campo === "funcionarioNome") {
+          return [index, { cellWidth: 80 }];
+        }
+        // Largura padrão para outros campos
+        return [index, { cellWidth: 25 }];
+      })
     );
   }
 
@@ -140,7 +153,7 @@ export abstract class BaseExportService {
     doc.text(
       `Período de Referência: ${this.formatPeriodo(this.config.titulo?.toLowerCase() || "")}`,
       margin,
-      yPosition + 4,
+      yPosition + 4
     );
 
     // Informações do usuário (direita)
@@ -200,7 +213,7 @@ export abstract class BaseExportService {
     doc.text(
       pageText,
       (pageWidth - doc.getTextWidth(pageText)) / 2,
-      pageHeight - 15,
+      pageHeight - 15
     );
   }
 
@@ -225,7 +238,7 @@ export abstract class BaseExportService {
 
         const total = data.dadosProcessados.reduce(
           (sum, d) => sum + d.value,
-          0,
+          0
         );
 
         // Grid dinâmico baseado no número de status
@@ -233,7 +246,7 @@ export abstract class BaseExportService {
         const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
         const cardWidth = Math.min(
           40, // Reduzido de 50 para 40 para caber mais cards
-          (availableWidth - (totalCards - 1) * 6) / totalCards, // Reduzido spacing de 8 para 6
+          (availableWidth - (totalCards - 1) * 6) / totalCards // Reduzido spacing de 8 para 6
         );
         const cardSpacing = 6; // Reduzido de 8 para 6
         let cardX = margin;
@@ -264,8 +277,8 @@ export abstract class BaseExportService {
           doc.setTextColor(107, 114, 128);
           doc.text(
             `(${percentText})`,
-            cardX + doc.getTextWidth(`${item.value} `),
-            yPosition + 8,
+            cardX + doc.getTextWidth(`${item.value} `) + 3,
+            yPosition + 8
           );
           doc.setTextColor(0, 0, 0);
 
@@ -289,9 +302,9 @@ export abstract class BaseExportService {
         const dadosFiltrados = this.getFilteredData(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosTabela = dadosFiltrados
-          .slice(0, 50)
-          .map((item) => this.config.campos.map((campo) => item[campo] || ""));
+        const dadosTabela = dadosFiltrados.map((item) =>
+          this.config.campos.map((campo) => item[campo] || "")
+        );
 
         autoTable(doc, {
           head: [colunas],
@@ -316,18 +329,7 @@ export abstract class BaseExportService {
             lineColor: [229, 231, 235],
             lineWidth: 0.5,
           },
-          columnStyles: {
-            ...Object.fromEntries(
-              this.config.campos.map((campo, index) => {
-                // Largura específica para o nome do funcionário
-                if (campo === "funcionarioNome") {
-                  return [index, { cellWidth: 80 }];
-                }
-                // Largura padrão para outros campos
-                return [index, { cellWidth: 25 }];
-              }),
-            ),
-          },
+          columnStyles: this.getColumnWidths(),
           margin: { left: margin, right: margin },
         });
       }
@@ -380,7 +382,7 @@ export abstract class BaseExportService {
         const resumoSheet = workbook.addWorksheet("Resumo");
         const total = data.dadosProcessados.reduce(
           (sum, d) => sum + d.value,
-          0,
+          0
         );
 
         resumoSheet.getCell(1, 1).value = "RESUMO ESTATÍSTICO";
@@ -440,7 +442,7 @@ export abstract class BaseExportService {
 
       saveAs(
         blob,
-        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`,
+        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`
       );
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
@@ -451,7 +453,7 @@ export abstract class BaseExportService {
   async exportRelatorio(
     formato: "pdf" | "csv",
     data: ExportData,
-    userInfo?: UserInfo,
+    userInfo?: UserInfo
   ): Promise<void> {
     try {
       if (formato === "pdf") {

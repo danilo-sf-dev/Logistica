@@ -161,7 +161,7 @@ export class VendedoresExportService extends BaseExportService {
                 return regiaoNome
                   ? `${cidade.nome} - ${cidade.estado} (${regiaoNome})`
                   : `${cidade.nome} - ${cidade.estado}`;
-              },
+              }
             );
             processedItem[campo] = nomesCidades.join(", ");
           } else {
@@ -198,20 +198,20 @@ export class VendedoresExportService extends BaseExportService {
 
         // Separar dados por categoria
         const dadosPorRegiao = data.dadosProcessados.filter((item: any) =>
-          item.name.startsWith("Região:"),
+          item.name.startsWith("Região:")
         );
         const dadosPorUnidade = data.dadosProcessados.filter((item: any) =>
-          item.name.startsWith("Unidade:"),
+          item.name.startsWith("Unidade:")
         );
         const dadosPorContrato = data.dadosProcessados.filter((item: any) =>
-          item.name.startsWith("Contrato:"),
+          item.name.startsWith("Contrato:")
         );
 
         // Função para renderizar uma linha de cards
         const renderizarLinhaCards = (
           titulo: string,
           dados: any[],
-          yPos: number,
+          yPos: number
         ) => {
           // Título da seção
           doc.setFontSize(7);
@@ -224,7 +224,7 @@ export class VendedoresExportService extends BaseExportService {
           const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
           const cardWidth = Math.min(
             35,
-            (availableWidth - (totalCards - 1) * 4) / totalCards,
+            (availableWidth - (totalCards - 1) * 4) / totalCards
           );
           const cardSpacing = 4;
           let cardX = margin;
@@ -232,7 +232,7 @@ export class VendedoresExportService extends BaseExportService {
           // Card Total para esta categoria
           const totalCategoria = dados.reduce(
             (sum: number, d: any) => sum + d.value,
-            0,
+            0
           );
           doc.setFontSize(5);
           doc.setFont("helvetica", "normal");
@@ -248,7 +248,7 @@ export class VendedoresExportService extends BaseExportService {
             doc.setFont("helvetica", "normal");
             const nomeLimpo = item.name.replace(
               /^(Região|Unidade|Contrato):\s*/,
-              "",
+              ""
             );
             doc.text(nomeLimpo.toUpperCase(), cardX, yPos);
             doc.setFontSize(10);
@@ -265,8 +265,8 @@ export class VendedoresExportService extends BaseExportService {
             doc.setTextColor(107, 114, 128);
             doc.text(
               `(${percentText})`,
-              cardX + doc.getTextWidth(`${item.value} `),
-              yPos + 6,
+              cardX + doc.getTextWidth(`${item.value} `) + 3,
+              yPos + 6
             );
             doc.setTextColor(0, 0, 0);
 
@@ -281,7 +281,7 @@ export class VendedoresExportService extends BaseExportService {
           yPosition = renderizarLinhaCards(
             "Distribuição por Região:",
             dadosPorRegiao,
-            yPosition,
+            yPosition
           );
         }
 
@@ -289,7 +289,7 @@ export class VendedoresExportService extends BaseExportService {
           yPosition = renderizarLinhaCards(
             "Distribuição por Unidade de Negócio:",
             dadosPorUnidade,
-            yPosition,
+            yPosition
           );
         }
 
@@ -297,7 +297,7 @@ export class VendedoresExportService extends BaseExportService {
           yPosition = renderizarLinhaCards(
             "Distribuição por Tipo de Contrato:",
             dadosPorContrato,
-            yPosition,
+            yPosition
           );
         }
 
@@ -318,9 +318,9 @@ export class VendedoresExportService extends BaseExportService {
         const dadosFiltrados = await this.processDataWithCidades(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosTabela = dadosFiltrados
-          .slice(0, 50)
-          .map((item) => this.config.campos.map((campo) => item[campo] || ""));
+        const dadosTabela = dadosFiltrados.map((item) =>
+          this.config.campos.map((campo) => item[campo] || "")
+        );
 
         autoTable(doc, {
           head: [colunas],
@@ -398,13 +398,13 @@ export class VendedoresExportService extends BaseExportService {
       if (data.dadosProcessados.length > 0) {
         // Separar dados por categoria
         const dadosPorRegiao = data.dadosProcessados.filter((item: any) =>
-          item.name.startsWith("Região:"),
+          item.name.startsWith("Região:")
         );
         const dadosPorUnidade = data.dadosProcessados.filter((item: any) =>
-          item.name.startsWith("Unidade:"),
+          item.name.startsWith("Unidade:")
         );
         const dadosPorContrato = data.dadosProcessados.filter((item: any) =>
-          item.name.startsWith("Contrato:"),
+          item.name.startsWith("Contrato:")
         );
 
         // Função para criar planilha de resumo
@@ -412,7 +412,7 @@ export class VendedoresExportService extends BaseExportService {
           const sheet = workbook.addWorksheet(titulo);
           const totalCategoria = dados.reduce(
             (sum: number, item: any) => sum + item.value,
-            0,
+            0
           );
 
           sheet.getCell(1, 1).value = titulo;
@@ -434,7 +434,7 @@ export class VendedoresExportService extends BaseExportService {
             const row = index + 4;
             const nomeLimpo = item.name.replace(
               /^(Região|Unidade|Contrato):\s*/,
-              "",
+              ""
             );
 
             // Formatar o nome da categoria adequadamente
@@ -442,7 +442,7 @@ export class VendedoresExportService extends BaseExportService {
             if (item.name.startsWith("Região:")) {
               // Usar a constante REGIOES_BRASIL para formatar regiões
               const regiaoNome = REGIOES_BRASIL.find(
-                (r) => r.valor === nomeLimpo,
+                (r) => r.valor === nomeLimpo
               )?.nome;
               nomeFormatado = regiaoNome || nomeLimpo.toUpperCase();
             } else if (item.name.startsWith("Unidade:")) {
@@ -490,7 +490,7 @@ export class VendedoresExportService extends BaseExportService {
         // Resumo Geral
         const total = data.dadosProcessados.reduce(
           (sum: number, item: any) => sum + item.value,
-          0,
+          0
         );
 
         const resumoGeralSheet = workbook.addWorksheet("Resumo Geral");
@@ -517,7 +517,7 @@ export class VendedoresExportService extends BaseExportService {
           if (item.name.startsWith("Região:")) {
             const nomeLimpo = item.name.replace(/^Região:\s*/, "");
             const regiaoNome = REGIOES_BRASIL.find(
-              (r) => r.valor === nomeLimpo,
+              (r) => r.valor === nomeLimpo
             )?.nome;
             nomeFormatado = `Região: ${regiaoNome || nomeLimpo.toUpperCase()}`;
           } else if (item.name.startsWith("Unidade:")) {
@@ -579,7 +579,7 @@ export class VendedoresExportService extends BaseExportService {
 
       saveAs(
         blob,
-        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`,
+        `relatorio_${this.config.titulo?.toLowerCase()}_${data.periodo}_${new Date().toISOString().split("T")[0]}.xlsx`
       );
     } catch (error) {
       console.error("Erro ao exportar Excel:", error);
