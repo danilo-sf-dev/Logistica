@@ -25,7 +25,16 @@ Sistema web completo para gestão de logística, desenvolvido com React, TypeScr
 - **Configurações**: Perfil, notificações, sistema e segurança
 - **Segurança**: Informações de sessão e controle de acesso
 
-## 🆕 **Funcionalidades Implementadas (v1.2.2+)**
+## 📋 **Changelog Recente (v1.3.0)**
+
+### ✅ **Últimas Atualizações**
+
+- **Merge com branch developer**: Conflitos resolvidos e sincronização completa
+- **Build otimizado**: Sistema atualizado com as últimas funcionalidades
+- **Documentação atualizada**: README principal revisado e atualizado
+- **Versão atualizada**: Sistema agora na versão 1.3.0
+
+## 🆕 **Funcionalidades Implementadas (v1.3.0+)**
 
 ### 🔐 **Sistema de Segurança e Permissões**
 
@@ -130,7 +139,7 @@ VITE_VAPID_PUBLIC_KEY=BLh_ExAmPlE_VaPiD_KeY_1234567890abcdef
 
 # App Configuration
 VITE_APP_NAME=SGL - Sistema de Gestão de Logística
-VITE_APP_VERSION=1.2.0
+VITE_APP_VERSION=1.3.0
 VITE_APP_ENVIRONMENT=development
 ```
 
@@ -409,22 +418,41 @@ A documentação completa do projeto está organizada na pasta [`docs/`](./docs/
 - Verificar configuração do Firebase
 - Confirmar domínios autorizados
 - Verificar regras do Firestore
+- Limpar cache do navegador
+- Verificar se o usuário tem permissões adequadas
 
 ### Erro de Build
 
 - Limpar cache: `npm run build -- --reset-cache`
 - Verificar dependências: `npm install`
+- Verificar se todas as variáveis de ambiente estão configuradas
+- Executar `npm run lint` para verificar erros de código
 
 ### Problemas de CORS
 
 - Configurar domínios no Firebase Console
 - Verificar configuração de hosting
+- Adicionar domínio localhost para desenvolvimento
 
 ### Erro na Exportação
 
 - Verificar se há dados para exportar
 - Aguardar processamento completo
 - Verificar se o navegador permite downloads
+- Verificar permissões de usuário para exportação
+
+### Conflitos de Merge
+
+- Resolver conflitos em arquivos de build (dist/)
+- Rebuildar o projeto após resolver conflitos
+- Verificar se todas as dependências estão atualizadas
+
+### Problemas de Performance
+
+- Verificar conexão com internet
+- Limpar cache do navegador
+- Verificar se o Firebase está funcionando
+- Monitorar uso de memória no navegador
 
 ## 📞 Suporte
 
