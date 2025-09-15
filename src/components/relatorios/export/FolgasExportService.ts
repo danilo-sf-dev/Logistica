@@ -83,4 +83,15 @@ export class FolgasExportService extends BaseExportService {
   protected getResumoHeaders(): string[] {
     return ["Status", "Quantidade", "Percentual"];
   }
+
+  // Método para obter configurações de largura de coluna específicas para folgas
+  protected getColumnWidths(): Record<number, { cellWidth: number }> {
+    return {
+      0: { cellWidth: 50 }, // Funcionário
+      1: { cellWidth: 25 }, // Início
+      2: { cellWidth: 25 }, // Fim
+      3: { cellWidth: 35 }, // Folga
+      4: { cellWidth: 25 }, // Status
+    };
+  }
 }

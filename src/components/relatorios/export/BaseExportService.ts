@@ -89,6 +89,19 @@ export abstract class BaseExportService {
     );
   }
 
+  protected getColumnWidths(): Record<number, { cellWidth: number }> {
+    return Object.fromEntries(
+      this.config.campos.map((campo, index) => {
+        // Largura específica para o nome do funcionário
+        if (campo === "funcionarioNome") {
+          return [index, { cellWidth: 80 }];
+        }
+        // Largura padrão para outros campos
+        return [index, { cellWidth: 25 }];
+      }),
+    );
+  }
+
   protected getResumoHeaders(): string[] {
     return ["Status", "Quantidade", "Percentual"];
   }
@@ -223,10 +236,10 @@ export abstract class BaseExportService {
 
         yPosition += 4;
 
-        const total = data.dadosProcessados.reduce(
-          (sum, d) => sum + d.value,
-          0,
-        );
+        // Para rotas, usar o número total de rotas únicas em vez da soma dos dias
+        const total =
+          data.dados?.length ||
+          data.dadosProcessados.reduce((sum, d) => sum + d.value, 0);
 
         // Grid dinâmico baseado no número de status
         const totalCards = data.dadosProcessados.length + 1; // +1 para o card TOTAL
@@ -264,7 +277,7 @@ export abstract class BaseExportService {
           doc.setTextColor(107, 114, 128);
           doc.text(
             `(${percentText})`,
-            cardX + doc.getTextWidth(`${item.value} `),
+            cardX + doc.getTextWidth(`${item.value} `) + 3,
             yPosition + 8,
           );
           doc.setTextColor(0, 0, 0);
@@ -289,9 +302,9 @@ export abstract class BaseExportService {
         const dadosFiltrados = this.getFilteredData(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosTabela = dadosFiltrados
-          .slice(0, 50)
-          .map((item) => this.config.campos.map((campo) => item[campo] || ""));
+        const dadosTabela = dadosFiltrados.map((item) =>
+          this.config.campos.map((campo) => item[campo] || ""),
+        );
 
         autoTable(doc, {
           head: [colunas],
@@ -316,18 +329,7 @@ export abstract class BaseExportService {
             lineColor: [229, 231, 235],
             lineWidth: 0.5,
           },
-          columnStyles: {
-            ...Object.fromEntries(
-              this.config.campos.map((campo, index) => {
-                // Largura específica para o nome do funcionário
-                if (campo === "funcionarioNome") {
-                  return [index, { cellWidth: 80 }];
-                }
-                // Largura padrão para outros campos
-                return [index, { cellWidth: 25 }];
-              }),
-            ),
-          },
+          columnStyles: this.getColumnWidths(),
           margin: { left: margin, right: margin },
         });
       }

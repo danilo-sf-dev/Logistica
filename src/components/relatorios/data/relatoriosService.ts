@@ -444,10 +444,11 @@ export const relatoriosService = {
 
   // Processar dados das rotas para relatório
   processarDadosRotas(rotas: RotaData[]): RelatorioData[] {
-    // Agrupar rotas por dia da semana
+    // Agrupar rotas por dia da semana - contar quantas rotas atendem cada dia
     const rotasPorDia = rotas.reduce(
       (acc, rota) => {
         if (rota.diaSemana && Array.isArray(rota.diaSemana)) {
+          // Para cada dia da semana que a rota atende, incrementa o contador
           rota.diaSemana.forEach((dia) => {
             acc[dia] = (acc[dia] || 0) + 1;
           });

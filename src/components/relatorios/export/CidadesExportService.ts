@@ -63,13 +63,13 @@ export class CidadesExportService extends BaseExportService {
   // Método para obter configurações de largura de coluna específicas para cidades
   protected getColumnWidths(): Record<number, { cellWidth: number }> {
     return {
-      0: { cellWidth: 35 }, // Nome
+      0: { cellWidth: 50 }, // Nome
       1: { cellWidth: 15 }, // Estado
       2: { cellWidth: 30 }, // Região
       3: { cellWidth: 20 }, // Distância
       4: { cellWidth: 20 }, // Peso Mínimo
       5: { cellWidth: 30 }, // Rota
-      6: { cellWidth: 30 }, // Observação
+      6: { cellWidth: 70 }, // Observação
     };
   }
 
@@ -164,7 +164,7 @@ export class CidadesExportService extends BaseExportService {
           doc.setTextColor(107, 114, 128);
           doc.text(
             `(${percentText})`,
-            cardX + doc.getTextWidth(`${item.value} `),
+            cardX + doc.getTextWidth(`${item.value} `) + 3,
             yPosition + 8,
           );
           doc.setTextColor(0, 0, 0);
@@ -189,9 +189,9 @@ export class CidadesExportService extends BaseExportService {
         const dadosFiltrados = await this.processDataWithRotas(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosTabela = dadosFiltrados
-          .slice(0, 50)
-          .map((item) => this.config.campos.map((campo) => item[campo] || ""));
+        const dadosTabela = dadosFiltrados.map((item) =>
+          this.config.campos.map((campo) => item[campo] || ""),
+        );
 
         autoTable(doc, {
           head: [colunas],

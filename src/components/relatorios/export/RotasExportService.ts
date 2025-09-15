@@ -66,4 +66,15 @@ export class RotasExportService extends BaseExportService {
   protected getResumoHeaders(): string[] {
     return ["Dia da Semana", "Quantidade", "Percentual"];
   }
+
+  // Método para obter configurações de largura de coluna específicas para rotas
+  protected getColumnWidths(): Record<number, { cellWidth: number }> {
+    return {
+      0: { cellWidth: 50 }, // Nome da Rota
+      1: { cellWidth: 25 }, // Peso Mínimo
+      2: { cellWidth: 60 }, // Dias da Semana
+      3: { cellWidth: 30 }, // Cidades Vinculadas
+      4: { cellWidth: 25 }, // Data de Criação
+    };
+  }
 }

@@ -229,7 +229,7 @@ export class VeiculosExportService extends BaseExportService {
           doc.setTextColor(107, 114, 128);
           doc.text(
             `(${percentText})`,
-            cardX + doc.getTextWidth(`${item.value} `),
+            cardX + doc.getTextWidth(`${item.value} `) + 3,
             yPosition + 8,
           );
           doc.setTextColor(0, 0, 0);
@@ -254,9 +254,9 @@ export class VeiculosExportService extends BaseExportService {
         const dadosFiltrados = this.getFilteredData(data.dados);
         const colunas = this.getColumnHeaders();
 
-        const dadosTabela = dadosFiltrados
-          .slice(0, 50)
-          .map((item) => this.config.campos.map((campo) => item[campo] || ""));
+        const dadosTabela = dadosFiltrados.map((item) =>
+          this.config.campos.map((campo) => item[campo] || ""),
+        );
 
         autoTable(doc, {
           head: [colunas],
